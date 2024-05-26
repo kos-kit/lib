@@ -1,4 +1,4 @@
-import { ConceptScheme } from "@/lib/models/ConceptScheme";
+import { ConceptScheme } from "../../src/models/ConceptScheme";
 import { behavesLikeConceptScheme } from "./behavesLikeConceptScheme";
 
 export const behavesLikeUnescoThesaurusConceptScheme = (

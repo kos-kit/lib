@@ -1,4 +1,4 @@
-import { ConceptScheme } from "@/lib/models/ConceptScheme";
+import { ConceptScheme } from "../../src/models/ConceptScheme";
 import { behavesLikeLabeledModel } from "./behavesLikeLabeledModel";
 
 export const behavesLikeConceptScheme = (

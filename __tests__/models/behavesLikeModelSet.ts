@@ -1,4 +1,4 @@
-import { ModelSet } from "@/lib/models/ModelSet";
+import { ModelSet } from "../../src/models/ModelSet";
 
 export const behavesLikeModelSet = (modelSet: ModelSet) => {
   it("should get concepts", async () => {

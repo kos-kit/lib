@@ -1,5 +1,5 @@
-import { Label } from "@/lib/models/Label";
-import { LabeledModel } from "@/lib/models/LabeledModel";
+import { Label } from "../../src/models/Label";
+import { LabeledModel } from "../../src/models/LabeledModel";
 
 export const behavesLikeLabeledModel = (
   lazyModel: () => Promise<LabeledModel>,

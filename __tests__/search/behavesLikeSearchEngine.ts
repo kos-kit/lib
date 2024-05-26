@@ -1,5 +1,5 @@
-import { SearchEngine } from "@/lib/search/SearchEngine";
-import { createSearchEngineFromJson } from "@/lib/search/createSearchEngineFromJson";
+import { SearchEngine } from "../../src/search/SearchEngine";
+import { createSearchEngineFromJson } from "../../src/search/createSearchEngineFromJson";
 
 export const behavesLikeSearchEngine = (
   lazySearchEngine: () => Promise<SearchEngine>,

@@ -1,7 +1,7 @@
-import { Concept } from "@/lib/models/Concept";
+import { Concept } from "../../src/models/Concept";
+import { SemanticRelationProperty } from "../../src/models/SemanticRelationProperty";
 import { behavesLikeConcept } from "./behavesLikeConcept";
 import { DataFactory } from "n3";
-import { SemanticRelationProperty } from "@/lib/models/SemanticRelationProperty";
 
 export const behavesLikeUnescoThesaurusConcept10 = (
   lazyConcept: () => Promise<Concept>,
