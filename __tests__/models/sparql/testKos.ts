@@ -1,8 +1,8 @@
 import { QueryEngine } from "@comunica/query-sparql-rdfjs";
 import { testDataset } from "../../testDataset";
-import { SparqlKos } from "../../../src/models/sparql/SparqlKos";
+import { Kos } from "../../../src/models/sparql/Kos";
 
-export const testSparqlKos = new SparqlKos(
+export const testKos = new Kos(
   {
     sources: [testDataset],
   },

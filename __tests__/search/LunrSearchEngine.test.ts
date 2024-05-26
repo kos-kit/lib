@@ -1,5 +1,5 @@
 import { behavesLikeSearchEngine } from "./behavesLikeSearchEngine";
-import { testRdfJsKos } from "../models/rdfjs/testRdfJsKos";
+import { testKos } from "../models/rdfjs/testKos";
 import { LunrSearchEngine } from "../../src/search/LunrSearchEngine";
 
 describe("LunrSearchEngine", () => {
@@ -7,7 +7,7 @@ describe("LunrSearchEngine", () => {
     LunrSearchEngine.create({
       conceptsLimit: 10,
       languageTag: "en",
-      kos: testRdfJsKos,
+      kos: testKos,
     }),
   );
 });
