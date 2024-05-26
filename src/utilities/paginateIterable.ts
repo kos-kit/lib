@@ -1,11 +1,13 @@
-import invariant from "ts-invariant";
-
 export function* paginateIterable<T>(
   iterable: Iterable<T>,
   { limit, offset }: { limit: number; offset: number },
 ): Iterable<T> {
-  invariant(limit > 0);
-  invariant(offset >= 0);
+  if (limit <= 0) {
+    throw new RangeError();
+  }
+  if (offset < 0) {
+    throw new RangeError();
+  }
 
   let itemI = 0;
   let yieldedItemCount = 0;

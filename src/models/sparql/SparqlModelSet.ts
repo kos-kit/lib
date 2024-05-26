@@ -1,6 +1,5 @@
 import { QueryEngine } from "@comunica/query-sparql";
 import { QueryStringContext } from "@comunica/types";
-import invariant from "ts-invariant";
 import { AbstractModelSet } from "../AbstractModelSet";
 import { Identifier } from "../Identifier";
 import { Concept } from "../Concept";
@@ -52,18 +51,20 @@ OFFSET ${offset}
       this.queryContext,
     )) {
       const conceptIdentifier = bindings.get("concept");
-      invariant(
+      if (
         conceptIdentifier &&
-          (conceptIdentifier.termType === "BlankNode" ||
-            conceptIdentifier.termType === "NamedNode"),
-      );
-      concepts.push(
-        new SparqlConcept({
-          identifier: conceptIdentifier,
-          queryContext: this.queryContext,
-          queryEngine: this.queryEngine,
-        }),
-      );
+        conceptIdentifier &&
+        (conceptIdentifier.termType === "BlankNode" ||
+          conceptIdentifier.termType === "NamedNode")
+      ) {
+        concepts.push(
+          new SparqlConcept({
+            identifier: conceptIdentifier,
+            queryContext: this.queryContext,
+            queryEngine: this.queryEngine,
+          }),
+        );
+      }
     }
 
     return concepts;
