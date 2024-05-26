@@ -1,6 +1,6 @@
 import { Literal, NamedNode } from "@rdfjs/types";
-import { Label } from "@/lib/models/Label";
 import { LanguageTag } from "./LanguageTag";
+import { Label } from "./Label";
 
 /**
  * A Label that only consists of its literal form.

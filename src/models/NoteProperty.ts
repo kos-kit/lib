@@ -1,4 +1,4 @@
-import { skos } from "@/lib/vocabularies";
+import { skos } from "../vocabularies";
 import { NamedNode } from "@rdfjs/types";
 
 export class NoteProperty {

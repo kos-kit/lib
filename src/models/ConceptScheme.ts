@@ -1,6 +1,6 @@
-import { Concept } from "@/lib/models/Concept";
-import { Identifier } from "@/lib/models/Identifier";
-import { LabeledModel } from "@/lib/models/LabeledModel";
+import { Concept } from "./Concept";
+import { Identifier } from "./Identifier";
+import { LabeledModel } from "./LabeledModel";
 
 export interface ConceptScheme extends LabeledModel {
   readonly identifier: Identifier;

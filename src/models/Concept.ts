@@ -1,10 +1,10 @@
 import { Literal } from "@rdfjs/types";
-import { LabeledModel } from "@/lib/models/LabeledModel";
-import { Identifier } from "@/lib/models/Identifier";
-import { ConceptScheme } from "@/lib/models/ConceptScheme";
 import { SemanticRelationProperty } from "./SemanticRelationProperty";
 import { NoteProperty } from "./NoteProperty";
 import { LanguageTag } from "./LanguageTag";
+import { LabeledModel } from "./LabeledModel";
+import { Identifier } from "./Identifier";
+import { ConceptScheme } from "./ConceptScheme";
 
 export interface Concept extends LabeledModel {
   readonly identifier: Identifier;

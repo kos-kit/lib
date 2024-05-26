@@ -1,5 +1,5 @@
-import { Identifier } from "@/lib/models/Identifier";
 import { DataFactory } from "n3";
+import { Identifier } from "../models/Identifier";
 
 export const stringToIdentifier = (str: string): Identifier => {
   if (str.startsWith("_:")) {

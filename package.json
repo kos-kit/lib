@@ -29,6 +29,11 @@
     "ts-invariant": "^0.10.3",
     "typescript": "^5"
   },
+  "files": [
+    "dist"
+  ],
+  "license": "GPL-3.0-only",
+  "main": "dist/index.js",
   "name": "@kos-kit/client",
   "scripts": {
     "build": "tsc -b",
@@ -37,5 +42,6 @@
     "test": "TZ=UTC yarn node --experimental-vm-modules node_modules/jest/bin/jest.js",
     "watch": "tsc -w --preserveWatchOutput"
   },
+  "types": "dist/index.d.ts",
   "version": "0.1.0"
 }

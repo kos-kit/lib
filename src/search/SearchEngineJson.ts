@@ -1,4 +1,4 @@
-import { SearchEngineType } from "@/lib/search/SearchEngineType";
+import { SearchEngineType } from "./SearchEngineType";
 
 /**
  * JSON serialization of a SearchEngine.

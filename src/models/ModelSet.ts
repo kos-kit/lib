@@ -1,7 +1,7 @@
-import { ConceptScheme } from "@/lib/models/ConceptScheme";
-import { Identifier } from "@/lib/models/Identifier";
-import { LanguageTag } from "@/lib/models/LanguageTag";
-import { Concept } from "@/lib/models/Concept";
+import { Concept } from "./Concept";
+import { ConceptScheme } from "./ConceptScheme";
+import { Identifier } from "./Identifier";
+import { LanguageTag } from "./LanguageTag";
 
 export interface ModelSet {
   conceptByIdentifier(identifier: Identifier): Promise<Concept>;

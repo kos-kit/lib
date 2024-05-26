@@ -1,9 +1,9 @@
-import { ModelSet } from "@/lib/models/ModelSet";
 import { Concept } from "./Concept";
 import { ConceptScheme } from "./ConceptScheme";
 import { Identifier } from "./Identifier";
 import { LanguageTag } from "./LanguageTag";
 import { LabeledModel } from "./LabeledModel";
+import { ModelSet } from "./ModelSet";
 
 export abstract class AbstractModelSet implements ModelSet {
   protected cachedLanguageTags: readonly LanguageTag[] | null = null;

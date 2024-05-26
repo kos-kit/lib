@@ -1,6 +1,6 @@
-import { Label } from "@/lib/models/Label";
-import { Model } from "@/lib/models/Model";
+import { Label } from "./Label";
 import { LanguageTag } from "./LanguageTag";
+import { Model } from "./Model";
 
 export interface LabeledModel extends Model {
   altLabels(kwds?: { languageTag?: LanguageTag }): Promise<readonly Label[]>;

@@ -1,13 +1,13 @@
 import lunr, { Index } from "lunr";
-import { ModelSet } from "@/lib/models/ModelSet";
-import { SearchEngine } from "@/lib/search/SearchEngine";
-import { SearchResult } from "@/lib/search/SearchResult";
-import { LanguageTag } from "@/lib/models/LanguageTag";
-import { LabeledModel } from "@/lib/models/LabeledModel";
-import { Identifier } from "@/lib/models/Identifier";
-import { identifierToString } from "@/lib/utilities/identifierToString";
-import { LunrIndexCompactor } from "@/lib/search/LunrIndexCompactor";
-import { SearchEngineJson } from "@/lib/search/SearchEngineJson";
+import { SearchEngine } from "./SearchEngine";
+import { LanguageTag } from "../models/LanguageTag";
+import { ModelSet } from "../models/ModelSet";
+import { SearchResult } from "./SearchResult";
+import { LabeledModel } from "../models/LabeledModel";
+import { Identifier } from "../models/Identifier";
+import { identifierToString } from "../utilities/identifierToString";
+import { SearchEngineJson } from "./SearchEngineJson";
+import { LunrIndexCompactor } from "./LunrIndexCompactor";
 
 export class LunrSearchEngine implements SearchEngine {
   private constructor(
