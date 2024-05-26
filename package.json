@@ -42,12 +42,12 @@
     "build": "tsc -b && cp package.json dist/",
     "clean": "rimraf dist",
     "rebuild": "rimraf dist && tsc -b && cp package.json dist/",
-    "test": "TZ=UTC yarn node --experimental-vm-modules node_modules/jest/bin/jest.js",
+    "test": "TZ=UTC node --experimental-vm-modules node_modules/jest/bin/jest.js",
     "watch": "tsc -w --preserveWatchOutput"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/kos-kit/client"
+    "url": "git+https://github.com/kos-kit/client"
   },
   "types": "dist/index.d.ts",
   "version": "1.0.0"
