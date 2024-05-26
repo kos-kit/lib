@@ -1,6 +1,6 @@
 import { QueryEngine } from "@comunica/query-sparql-rdfjs";
 import { testDataset } from "../../testDataset";
-import { SparqlModelSet } from "@/lib/models/sparql/SparqlModelSet";
+import { SparqlModelSet } from "../../../src/models/sparql/SparqlModelSet";
 
 export const testSparqlModelSet = new SparqlModelSet(
   {

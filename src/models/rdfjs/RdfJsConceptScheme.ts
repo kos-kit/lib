@@ -2,6 +2,11 @@ import TermSet from "@rdfjs/term-set";
 import { RdfJsLabeledModel } from "./RdfJsLabeledModel";
 import { Identifier } from "../Identifier";
 import { ConceptScheme } from "../ConceptScheme";
+import { mapTermToIdentifier } from "./mapTermToIdentifier";
+import { skos } from "../../vocabularies";
+import { Concept } from "../Concept";
+import { paginateIterable } from "../../utilities/paginateIterable";
+import { RdfJsConcept } from "./RdfJsConcept";
 
 export class RdfJsConceptScheme
   extends RdfJsLabeledModel

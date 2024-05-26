@@ -5,6 +5,10 @@ import { Identifier } from "../Identifier";
 import { Concept } from "../Concept";
 import { RdfJsConcept } from "./RdfJsConcept";
 import { skos } from "../../vocabularies";
+import { ConceptScheme } from "../ConceptScheme";
+import { identifierToString } from "../../utilities/identifierToString";
+import { RdfJsConceptScheme } from "./RdfJsConceptScheme";
+import { paginateIterable } from "../../utilities/paginateIterable";
 
 export class RdfJsModelSet extends AbstractModelSet {
   constructor(private readonly dataset: DatasetCore) {
