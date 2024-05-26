@@ -1,24 +1,21 @@
 import { DatasetCore, Literal, Quad } from "@rdfjs/types";
-import { SparqlLabeledModel } from "./SparqlLabeledModel";
-import { RdfJsConcept } from "../rdfjs/RdfJsConcept";
-import { Concept } from "../Concept";
+import { SparqlLabeledModel } from "./LabeledModel";
+import { Concept as RdfJsConcept } from "../rdfjs/Concept";
+import { Concept as IConcept } from "../Concept";
 import { ConceptScheme } from "../ConceptScheme";
-import { SparqlConceptScheme } from "./SparqlConceptScheme";
+import { ConceptScheme } from "./ConceptScheme";
 import { NoteProperty } from "../NoteProperty";
 import { SemanticRelationProperty } from "../SemanticRelationProperty";
 
-export class SparqlConcept
-  extends SparqlLabeledModel<RdfJsConcept>
-  implements Concept
-{
-  protected createRdfJsModel(dataset: DatasetCore<Quad, Quad>): RdfJsConcept {
+export class Concept extends SparqlLabeledModel<IConcept> implements IConcept {
+  protected createRdfJsModel(dataset: DatasetCore<Quad, Quad>): IConcept {
     return new RdfJsConcept({ dataset, identifier: this.identifier });
   }
 
   async inSchemes(): Promise<readonly ConceptScheme[]> {
     return (await (await this.getOrCreateRdfJsModel()).inSchemes()).map(
       (conceptScheme) =>
-        new SparqlConceptScheme({
+        new ConceptScheme({
           identifier: conceptScheme.identifier,
           queryContext: this.queryContext,
           queryEngine: this.queryEngine,
@@ -44,7 +41,7 @@ export class SparqlConcept
       await (await this.getOrCreateRdfJsModel()).semanticRelations(property)
     ).map(
       (conceptScheme) =>
-        new SparqlConcept({
+        new Concept({
           identifier: conceptScheme.identifier,
           queryContext: this.queryContext,
           queryEngine: this.queryEngine,
@@ -63,7 +60,7 @@ export class SparqlConcept
   async topConceptOf(): Promise<readonly ConceptScheme[]> {
     return (await (await this.getOrCreateRdfJsModel()).topConceptOf()).map(
       (conceptScheme) =>
-        new SparqlConceptScheme({
+        new ConceptScheme({
           identifier: conceptScheme.identifier,
           queryContext: this.queryContext,
           queryEngine: this.queryEngine,

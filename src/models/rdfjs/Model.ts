@@ -8,7 +8,7 @@ const rightsPredicates = [dcterms.rights, dc11.rights];
 /**
  * Abstract base class for RDF/JS Dataset-backed models.
  */
-export abstract class RdfJsModel {
+export abstract class Model {
   protected readonly dataset: DatasetCore;
   readonly identifier: Identifier;
 

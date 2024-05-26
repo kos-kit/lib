@@ -1,17 +1,14 @@
 import { NamedNode } from "@rdfjs/types";
 import { mapTermToIdentifier } from "./mapTermToIdentifier";
-import { RdfJsModel } from "./RdfJsModel";
-import { LabeledModel } from "../LabeledModel";
+import { Model } from "./Model";
+import { LabeledModel as ILabeledModel } from "../LabeledModel";
 import { LanguageTag } from "../LanguageTag";
 import { Label } from "../Label";
 import { skos, skosxl } from "../../vocabularies";
 import { LiteralLabel } from "../LiteralLabel";
-import { RdfJsLabel } from "./RdfJsLabel";
+import { RdfJsLabel } from "./Label";
 
-export abstract class RdfJsLabeledModel
-  extends RdfJsModel
-  implements LabeledModel
-{
+export abstract class LabeledModel extends Model implements ILabeledModel {
   altLabels(kwds?: { languageTag?: LanguageTag }): Promise<readonly Label[]> {
     return new Promise((resolve) =>
       resolve([

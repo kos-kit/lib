@@ -2,12 +2,10 @@ import { DatasetCore } from "@rdfjs/types";
 import { getRdfInstances } from "./getRdfInstances";
 import { AbstractKos } from "../AbstractKos";
 import { Identifier } from "../Identifier";
-import { Concept } from "../Concept";
-import { RdfJsConcept } from "./RdfJsConcept";
+import { Concept } from "./Concept";
 import { skos } from "../../vocabularies";
-import { ConceptScheme } from "../ConceptScheme";
 import { identifierToString } from "../../utilities/identifierToString";
-import { RdfJsConceptScheme } from "./RdfJsConceptScheme";
+import { ConceptScheme } from "./ConceptScheme";
 import { paginateIterable } from "../../utilities/paginateIterable";
 
 export class RdfJsKos extends AbstractKos {
@@ -17,9 +15,7 @@ export class RdfJsKos extends AbstractKos {
 
   conceptByIdentifier(identifier: Identifier): Promise<Concept> {
     return new Promise((resolve) =>
-      resolve(
-        new RdfJsConcept({ dataset: this.dataset, identifier: identifier }),
-      ),
+      resolve(new Concept({ dataset: this.dataset, identifier: identifier })),
     );
   }
 
@@ -45,7 +41,7 @@ export class RdfJsKos extends AbstractKos {
         { limit, offset },
       )) {
         result.push(
-          new RdfJsConcept({
+          new Concept({
             dataset: this.dataset,
             identifier: conceptIdentifier,
           }),
@@ -87,7 +83,7 @@ export class RdfJsKos extends AbstractKos {
       dataset: this.dataset,
       includeSubclasses: true,
     })) {
-      yield new RdfJsConceptScheme({
+      yield new ConceptScheme({
         dataset: this.dataset,
         identifier,
       });

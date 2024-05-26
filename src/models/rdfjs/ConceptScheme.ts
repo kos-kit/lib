@@ -1,17 +1,13 @@
 import TermSet from "@rdfjs/term-set";
-import { RdfJsLabeledModel } from "./RdfJsLabeledModel";
+import { LabeledModel } from "./LabeledModel";
 import { Identifier } from "../Identifier";
-import { ConceptScheme } from "../ConceptScheme";
+import { ConceptScheme as IConceptScheme } from "../ConceptScheme";
 import { mapTermToIdentifier } from "./mapTermToIdentifier";
 import { skos } from "../../vocabularies";
-import { Concept } from "../Concept";
 import { paginateIterable } from "../../utilities/paginateIterable";
-import { RdfJsConcept } from "./RdfJsConcept";
+import { Concept } from "./Concept";
 
-export class RdfJsConceptScheme
-  extends RdfJsLabeledModel
-  implements ConceptScheme
-{
+export class ConceptScheme extends LabeledModel implements IConceptScheme {
   private *topConceptIdentifiers(): Iterable<Identifier> {
     const conceptIdentifierSet = new TermSet<Identifier>();
 
@@ -62,7 +58,7 @@ export class RdfJsConceptScheme
         { limit, offset },
       )) {
         result.push(
-          new RdfJsConcept({
+          new Concept({
             dataset: this.dataset,
             identifier: conceptIdentifier,
           }),

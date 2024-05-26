@@ -2,11 +2,9 @@ import { QueryEngine } from "@comunica/query-sparql";
 import { QueryStringContext } from "@comunica/types";
 import { AbstractKos } from "../AbstractKos";
 import { Identifier } from "../Identifier";
-import { Concept } from "../Concept";
-import { SparqlConcept } from "./SparqlConcept";
 import { rdf, rdfs, skos } from "../../vocabularies";
-import { ConceptScheme } from "../ConceptScheme";
-import { SparqlConceptScheme } from "./SparqlConceptScheme";
+import { Concept } from "./Concept";
+import { ConceptScheme } from "./ConceptScheme";
 
 export class SparqlKos extends AbstractKos {
   constructor(
@@ -19,7 +17,7 @@ export class SparqlKos extends AbstractKos {
   conceptByIdentifier(identifier: Identifier): Promise<Concept> {
     return new Promise((resolve) =>
       resolve(
-        new SparqlConcept({
+        new Concept({
           identifier,
           queryContext: this.queryContext,
           queryEngine: this.queryEngine,
@@ -58,7 +56,7 @@ OFFSET ${offset}
           conceptIdentifier.termType === "NamedNode")
       ) {
         concepts.push(
-          new SparqlConcept({
+          new Concept({
             identifier: conceptIdentifier,
             queryContext: this.queryContext,
             queryEngine: this.queryEngine,
@@ -93,7 +91,7 @@ WHERE {
   conceptSchemeByIdentifier(identifier: Identifier): Promise<ConceptScheme> {
     return new Promise((resolve) =>
       resolve(
-        new SparqlConceptScheme({
+        new ConceptScheme({
           identifier,
           queryContext: this.queryContext,
           queryEngine: this.queryEngine,
@@ -123,7 +121,7 @@ WHERE {
           conceptSchemeIdentifier.termType === "NamedNode")
       ) {
         conceptSchemes.push(
-          new SparqlConceptScheme({
+          new ConceptScheme({
             identifier: conceptSchemeIdentifier,
             queryContext: this.queryContext,
             queryEngine: this.queryEngine,

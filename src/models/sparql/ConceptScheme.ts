@@ -1,18 +1,15 @@
 import { DatasetCore, Quad } from "@rdfjs/types";
-import { ConceptScheme } from "../ConceptScheme";
-import { RdfJsConceptScheme } from "../rdfjs/RdfJsConceptScheme";
-import { SparqlLabeledModel } from "./SparqlLabeledModel";
+import { ConceptScheme as IConceptScheme } from "../ConceptScheme";
+import { ConceptScheme as RdfJsConceptScheme } from "../rdfjs/ConceptScheme";
+import { SparqlLabeledModel as LabeledModel } from "./LabeledModel";
 import { skos, skosxl } from "../../vocabularies";
-import { Concept } from "../Concept";
-import { SparqlConcept } from "./SparqlConcept";
+import { Concept } from "./Concept";
 
-export class SparqlConceptScheme
-  extends SparqlLabeledModel<RdfJsConceptScheme>
-  implements ConceptScheme
+export class ConceptScheme
+  extends LabeledModel<IConceptScheme>
+  implements IConceptScheme
 {
-  protected createRdfJsModel(
-    dataset: DatasetCore<Quad, Quad>,
-  ): RdfJsConceptScheme {
+  protected createRdfJsModel(dataset: DatasetCore<Quad, Quad>): IConceptScheme {
     return new RdfJsConceptScheme({ dataset, identifier: this.identifier });
   }
 
@@ -38,7 +35,7 @@ CONSTRUCT {
   }): Promise<readonly Concept[]> {
     return (await (await this.getOrCreateRdfJsModel()).topConcepts(kwds)).map(
       (conceptScheme) =>
-        new SparqlConcept({
+        new Concept({
           identifier: conceptScheme.identifier,
           queryContext: this.queryContext,
           queryEngine: this.queryEngine,

@@ -1,13 +1,13 @@
 import { skosxl } from "../../vocabularies";
 import { Label } from "../Label";
-import { LabeledModel } from "../LabeledModel";
+import { LabeledModel as ILabeledModel } from "../LabeledModel";
 import { LanguageTag } from "../LanguageTag";
-import { RdfJsLabeledModel } from "../rdfjs/RdfJsLabeledModel";
-import { SparqlModel } from "./SparqlModel";
+import { LabeledModel as RdfJsLabeledModel } from "../rdfjs/LabeledModel";
+import { SparqlModel } from "./Model";
 
 export abstract class SparqlLabeledModel<RdfJsModelT extends RdfJsLabeledModel>
   extends SparqlModel<RdfJsModelT>
-  implements LabeledModel
+  implements ILabeledModel
 {
   async altLabels(kwds?: {
     languageTag?: LanguageTag;

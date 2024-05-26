@@ -1,9 +1,9 @@
 import { QueryEngine } from "@comunica/query-sparql";
 import { QueryStringContext } from "@comunica/types";
-import { RdfJsModel } from "../rdfjs/RdfJsModel";
+import { Model as RdfJsModel } from "../rdfjs/Model";
 import { DatasetCore, Literal, NamedNode } from "@rdfjs/types";
 import { Store } from "n3";
-import { Model } from "../Model";
+import { Model as IModel } from "../Model";
 import { Identifier } from "../Identifier";
 
 /**
@@ -12,7 +12,7 @@ import { Identifier } from "../Identifier";
  * Most methods are delegated to an RDF/JS-backed model after populating it with a SPARQL construct query.
  */
 export abstract class SparqlModel<RdfJsModelT extends RdfJsModel>
-  implements Model
+  implements IModel
 {
   readonly identifier: Identifier;
   protected readonly queryContext: QueryStringContext;

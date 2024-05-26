@@ -2,19 +2,18 @@ import { Literal } from "@rdfjs/types";
 import { SemanticRelationProperty } from "../SemanticRelationProperty";
 import { LanguageTag } from "../LanguageTag";
 import { NoteProperty } from "../NoteProperty";
-import { RdfJsLabeledModel } from "./RdfJsLabeledModel";
-import { ConceptScheme } from "../ConceptScheme";
-import { RdfJsConceptScheme } from "./RdfJsConceptScheme";
+import { LabeledModel } from "./LabeledModel";
+import { ConceptScheme } from "./ConceptScheme";
 import { skos } from "../../vocabularies";
-import { Concept } from "../Concept";
+import { Concept as IConcept } from "../Concept";
 
-export class RdfJsConcept extends RdfJsLabeledModel implements Concept {
+export class Concept extends LabeledModel implements IConcept {
   inSchemes(): Promise<readonly ConceptScheme[]> {
     return new Promise((resolve) =>
       resolve([
         ...this.filterAndMapObjects(skos.inScheme, (term) =>
           term.termType === "BlankNode" || term.termType === "NamedNode"
-            ? new RdfJsConceptScheme({
+            ? new ConceptScheme({
                 dataset: this.dataset,
                 identifier: term,
               })
@@ -56,7 +55,7 @@ export class RdfJsConcept extends RdfJsLabeledModel implements Concept {
       resolve([
         ...this.filterAndMapObjects(property.identifier, (term) =>
           term.termType === "NamedNode"
-            ? new RdfJsConcept({ dataset: this.dataset, identifier: term })
+            ? new Concept({ dataset: this.dataset, identifier: term })
             : null,
         ),
       ]),
@@ -79,7 +78,7 @@ export class RdfJsConcept extends RdfJsLabeledModel implements Concept {
       resolve([
         ...this.filterAndMapObjects(skos.topConceptOf, (term) =>
           term.termType === "BlankNode" || term.termType === "NamedNode"
-            ? new RdfJsConceptScheme({
+            ? new ConceptScheme({
                 dataset: this.dataset,
                 identifier: term,
               })
