@@ -13,7 +13,7 @@
   },
   "exclude": ["node_modules"],
   "extends": [
-    "@tsconfig/node20/tsconfig.json",
+    "@tsconfig/recommended/tsconfig.json",
     "@tsconfig/strictest/tsconfig.json"
   ],
   "include": ["src/**/*.ts"]

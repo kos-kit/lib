@@ -11,7 +11,7 @@
   },
   "devDependencies": {
     "@comunica/query-sparql-rdfjs": "^3.0.1",
-    "@tsconfig/node20": "^20.1.4",
+    "@tsconfig/recommended": "1.0.6",
     "@tsconfig/strictest": "^2.0.5",
     "@types/jest": "^29.5.12",
     "@types/lunr": "^2.3.7",
@@ -32,7 +32,7 @@
   "engines": {
     "node": ">=20"
   },
-  "exports": "./dist/index.js",
+  "main": "./dist/index.js",
   "files": [
     "dist"
   ],
@@ -49,7 +49,6 @@
     "type": "git",
     "url": "https://github.com/kos-kit/client"
   },
-  "type": "module",
   "types": "dist/index.d.ts",
   "version": "0.1.0"
 }
