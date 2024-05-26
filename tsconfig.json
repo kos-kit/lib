@@ -16,5 +16,5 @@
     "@tsconfig/node20/tsconfig.json",
     "@tsconfig/strictest/tsconfig.json"
   ],
-  "include": ["**/*.ts"]
+  "include": ["src/**/*.ts"]
 }
