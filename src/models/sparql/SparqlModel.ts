@@ -1,10 +1,10 @@
 import { QueryEngine } from "@comunica/query-sparql";
 import { QueryStringContext } from "@comunica/types";
-import { Identifier } from "@/lib/models/Identifier";
 import { RdfJsModel } from "../rdfjs/RdfJsModel";
 import { DatasetCore, Literal, NamedNode } from "@rdfjs/types";
 import { Store } from "n3";
-import { Model } from "@/lib/models/Model";
+import { Model } from "../Model";
+import { Identifier } from "../Identifier";
 
 /**
  * Abstract base class for SPARQL-backed models.

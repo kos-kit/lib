@@ -1,11 +1,11 @@
-import { Concept } from "@/lib/models/Concept";
 import { DatasetCore, Literal, Quad } from "@rdfjs/types";
-import { ConceptScheme } from "@/lib/models/ConceptScheme";
-import { NoteProperty } from "@/lib/models/NoteProperty";
-import { SemanticRelationProperty } from "@/lib/models/SemanticRelationProperty";
-import { RdfJsConcept } from "@/lib/models/rdfjs/RdfJsConcept";
-import { SparqlConceptScheme } from "@/lib/models/sparql/SparqlConceptScheme";
-import { SparqlLabeledModel } from "@/lib/models/sparql/SparqlLabeledModel";
+import { SparqlLabeledModel } from "./SparqlLabeledModel";
+import { RdfJsConcept } from "../rdfjs/RdfJsConcept";
+import { Concept } from "../Concept";
+import { ConceptScheme } from "../ConceptScheme";
+import { SparqlConceptScheme } from "./SparqlConceptScheme";
+import { NoteProperty } from "../NoteProperty";
+import { SemanticRelationProperty } from "../SemanticRelationProperty";
 
 export class SparqlConcept
   extends SparqlLabeledModel<RdfJsConcept>

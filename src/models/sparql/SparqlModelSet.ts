@@ -1,13 +1,13 @@
 import { QueryEngine } from "@comunica/query-sparql";
 import { QueryStringContext } from "@comunica/types";
-import { Concept } from "@/lib/models/Concept";
-import { ConceptScheme } from "@/lib/models//ConceptScheme";
-import { Identifier } from "@/lib/models//Identifier";
-import { SparqlConcept } from "@/lib/models/sparql/SparqlConcept";
-import { rdf, rdfs, skos } from "@/lib/vocabularies";
 import invariant from "ts-invariant";
-import { SparqlConceptScheme } from "@/lib/models/sparql/SparqlConceptScheme";
-import { AbstractModelSet } from "@/lib/models/AbstractModelSet";
+import { AbstractModelSet } from "../AbstractModelSet";
+import { Identifier } from "../Identifier";
+import { Concept } from "../Concept";
+import { SparqlConcept } from "./SparqlConcept";
+import { rdf, rdfs, skos } from "../../vocabularies";
+import { ConceptScheme } from "../ConceptScheme";
+import { SparqlConceptScheme } from "./SparqlConceptScheme";
 
 export class SparqlModelSet extends AbstractModelSet {
   constructor(

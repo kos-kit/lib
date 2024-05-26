@@ -1,9 +1,9 @@
-import { LabeledModel } from "@/lib/models/LabeledModel";
-import { SparqlModel } from "@/lib/models/sparql/SparqlModel";
-import { Label } from "@/lib/models/Label";
-import { LanguageTag } from "@/lib/models/LanguageTag";
-import { RdfJsLabeledModel } from "@/lib/models/rdfjs/RdfJsLabeledModel";
-import { skosxl } from "@/lib/vocabularies";
+import { skosxl } from "../../vocabularies";
+import { Label } from "../Label";
+import { LabeledModel } from "../LabeledModel";
+import { LanguageTag } from "../LanguageTag";
+import { RdfJsLabeledModel } from "../rdfjs/RdfJsLabeledModel";
+import { SparqlModel } from "./SparqlModel";
 
 export abstract class SparqlLabeledModel<RdfJsModelT extends RdfJsLabeledModel>
   extends SparqlModel<RdfJsModelT>

@@ -1,12 +1,7 @@
-import { Concept } from "@/lib/models/Concept";
-import { ConceptScheme } from "@/lib/models/ConceptScheme";
-import { RdfJsLabeledModel } from "@/lib/models/rdfjs/RdfJsLabeledModel";
 import TermSet from "@rdfjs/term-set";
-import { skos } from "@/lib/vocabularies";
-import { RdfJsConcept } from "@/lib/models/rdfjs/RdfJsConcept";
-import { mapTermToIdentifier } from "@/lib/models/rdfjs/mapTermToIdentifier";
-import { paginateIterable } from "@/lib/utilities/paginateIterable";
-import { Identifier } from "@/lib/models/Identifier";
+import { RdfJsLabeledModel } from "./RdfJsLabeledModel";
+import { Identifier } from "../Identifier";
+import { ConceptScheme } from "../ConceptScheme";
 
 export class RdfJsConceptScheme
   extends RdfJsLabeledModel

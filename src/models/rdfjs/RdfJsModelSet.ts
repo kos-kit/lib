@@ -1,14 +1,10 @@
 import { DatasetCore } from "@rdfjs/types";
-import { ConceptScheme } from "@/lib/models/ConceptScheme";
-import { RdfJsConceptScheme } from "@/lib/models/rdfjs/RdfJsConceptScheme";
-import { skos } from "@/lib/vocabularies";
-import { Identifier } from "@/lib/models/Identifier";
-import { identifierToString } from "@/lib/utilities/identifierToString";
-import { Concept } from "@/lib/models/Concept";
-import { RdfJsConcept } from "@/lib/models/rdfjs/RdfJsConcept";
 import { getRdfInstances } from "./getRdfInstances";
-import { paginateIterable } from "@/lib/utilities/paginateIterable";
-import { AbstractModelSet } from "@/lib/models/AbstractModelSet";
+import { AbstractModelSet } from "../AbstractModelSet";
+import { Identifier } from "../Identifier";
+import { Concept } from "../Concept";
+import { RdfJsConcept } from "./RdfJsConcept";
+import { skos } from "../../vocabularies";
 
 export class RdfJsModelSet extends AbstractModelSet {
   constructor(private readonly dataset: DatasetCore) {

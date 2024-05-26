@@ -1,5 +1,5 @@
 import { Term } from "@rdfjs/types";
-import { Identifier } from "@/lib/models/Identifier";
+import { Identifier } from "../Identifier";
 
 export const mapTermToIdentifier = (term: Term): Identifier | null => {
   switch (term.termType) {

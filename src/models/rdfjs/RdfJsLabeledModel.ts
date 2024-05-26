@@ -1,12 +1,12 @@
 import { NamedNode } from "@rdfjs/types";
-import { Label } from "@/lib/models/Label";
-import { LabeledModel } from "@/lib/models/LabeledModel";
-import { RdfJsModel } from "@/lib/models/rdfjs/RdfJsModel";
-import { RdfJsLabel } from "@/lib/models/rdfjs/RdfJsLabel";
-import { skos, skosxl } from "@/lib/vocabularies";
 import { mapTermToIdentifier } from "./mapTermToIdentifier";
-import { LanguageTag } from "@/lib/models/LanguageTag";
-import { LiteralLabel } from "@/lib/models/LiteralLabel";
+import { RdfJsModel } from "./RdfJsModel";
+import { LabeledModel } from "../LabeledModel";
+import { LanguageTag } from "../LanguageTag";
+import { Label } from "../Label";
+import { skos, skosxl } from "../../vocabularies";
+import { LiteralLabel } from "../LiteralLabel";
+import { RdfJsLabel } from "./RdfJsLabel";
 
 export abstract class RdfJsLabeledModel
   extends RdfJsModel

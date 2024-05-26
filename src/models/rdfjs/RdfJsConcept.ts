@@ -1,12 +1,12 @@
 import { Literal } from "@rdfjs/types";
-import { Concept } from "@/lib/models/Concept";
-import { RdfJsLabeledModel } from "@/lib/models/rdfjs/RdfJsLabeledModel";
-import { skos } from "@/lib/vocabularies";
-import { ConceptScheme } from "@/lib/models/ConceptScheme";
-import { RdfJsConceptScheme } from "@/lib/models/rdfjs/RdfJsConceptScheme";
 import { SemanticRelationProperty } from "../SemanticRelationProperty";
 import { LanguageTag } from "../LanguageTag";
 import { NoteProperty } from "../NoteProperty";
+import { RdfJsLabeledModel } from "./RdfJsLabeledModel";
+import { ConceptScheme } from "../ConceptScheme";
+import { RdfJsConceptScheme } from "./RdfJsConceptScheme";
+import { skos } from "../../vocabularies";
+import { Concept } from "../Concept";
 
 export class RdfJsConcept extends RdfJsLabeledModel implements Concept {
   inSchemes(): Promise<readonly ConceptScheme[]> {

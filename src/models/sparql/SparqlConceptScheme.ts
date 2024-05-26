@@ -1,10 +1,10 @@
-import { Concept } from "@/lib/models/Concept";
 import { DatasetCore, Quad } from "@rdfjs/types";
-import { ConceptScheme } from "@/lib/models/ConceptScheme";
-import { RdfJsConceptScheme } from "@/lib/models/rdfjs/RdfJsConceptScheme";
-import { SparqlConcept } from "@/lib/models/sparql/SparqlConcept";
-import { SparqlLabeledModel } from "@/lib/models/sparql/SparqlLabeledModel";
-import { skos, skosxl } from "@/lib/vocabularies";
+import { ConceptScheme } from "../ConceptScheme";
+import { RdfJsConceptScheme } from "../rdfjs/RdfJsConceptScheme";
+import { SparqlLabeledModel } from "./SparqlLabeledModel";
+import { skos, skosxl } from "../../vocabularies";
+import { Concept } from "../Concept";
+import { SparqlConcept } from "./SparqlConcept";
 
 export class SparqlConceptScheme
   extends SparqlLabeledModel<RdfJsConceptScheme>
