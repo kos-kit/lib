@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "baseUrl": "./src",
+    "declaration": true,
+    "declarationMap": true,
+    "exactOptionalPropertyTypes": false,
+    "experimentalDecorators": true,
+    "noUncheckedIndexedAccess": false,
+    "forceConsistentCasingInFileNames": true,
+    "incremental": true,
+    "outDir": "./dist",
+    "sourceMap": true
+  },
+  "exclude": ["node_modules"],
+  "extends": [
+    "@tsconfig/node20/tsconfig.json",
+    "@tsconfig/strictest/tsconfig.json"
+  ],
+  "include": ["./src/**/*.ts"]
+}
