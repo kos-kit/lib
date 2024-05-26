@@ -83,8 +83,9 @@ WHERE {
       this.queryContext,
     )) {
       const count = bindings.get("count");
-      invariant(count && count.termType === "Literal");
-      return parseInt(count.value);
+      if (count?.termType === "Literal") {
+        return parseInt(count.value);
+      }
     }
     throw new Error("should never get here");
   }
@@ -116,18 +117,19 @@ WHERE {
       this.queryContext,
     )) {
       const conceptSchemeIdentifier = bindings.get("conceptScheme");
-      invariant(
+      if (
         conceptSchemeIdentifier &&
-          (conceptSchemeIdentifier.termType === "BlankNode" ||
-            conceptSchemeIdentifier.termType === "NamedNode"),
-      );
-      conceptSchemes.push(
-        new SparqlConceptScheme({
-          identifier: conceptSchemeIdentifier,
-          queryContext: this.queryContext,
-          queryEngine: this.queryEngine,
-        }),
-      );
+        (conceptSchemeIdentifier.termType === "BlankNode" ||
+          conceptSchemeIdentifier.termType === "NamedNode")
+      ) {
+        conceptSchemes.push(
+          new SparqlConceptScheme({
+            identifier: conceptSchemeIdentifier,
+            queryContext: this.queryContext,
+            queryEngine: this.queryEngine,
+          }),
+        );
+      }
     }
 
     return conceptSchemes;
