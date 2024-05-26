@@ -1,11 +1,11 @@
-import { Index } from "lunr";
+import lunr from "lunr";
 
 // Adapted from https://john-millikin.com/compacting-lunr-search-indices
 export class LunrIndexCompactor {
   /**
    * Compact the given Lunr Index, returning an opque JSON-serializable data structure.
    */
-  compactLunrIndex(index: Index): any {
+  compactLunrIndex(index: lunr.Index): any {
     const output: any = index.toJSON();
     output.invertedIndex = this.compactInvertedIndex(output);
     output.fieldVectors = this.compactFieldVectors(output);
@@ -15,7 +15,7 @@ export class LunrIndexCompactor {
   /**
    * Expand the opaque JSON-serializable data structure returned by compact back into a Lunr Index.
    */
-  expandLunrIndex(compactJson: any): Index {
+  expandLunrIndex(compactJson: any): lunr.Index {
     const fields = compactJson["fields"];
 
     const fieldVectors = compactJson["fieldVectors"].map((item: any) => {
@@ -65,7 +65,7 @@ export class LunrIndexCompactor {
       return 0;
     });
 
-    return Index.load({
+    return lunr.Index.load({
       version: compactJson["version"],
       fields: fields,
       fieldVectors: fieldVectors,
