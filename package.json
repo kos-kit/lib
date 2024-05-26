@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "@comunica/query-sparql": "^3.0.1",
+    "@kos-kit/client": "0.1.0",
     "@rdfjs/namespace": "^1.1.0",
     "@rdfjs/term-set": "^1.1.0",
     "@rdfjs/types": "^1.1.0",
@@ -39,9 +40,9 @@
   "license": "GPL-3.0-only",
   "name": "@kos-kit/client",
   "scripts": {
-    "build": "tsc -b",
+    "build": "tsc -b && cp package.json dist/",
     "clean": "rimraf dist",
-    "rebuild": "rimraf dist && tsc -b",
+    "rebuild": "rimraf dist && tsc -b && cp package.json dist/",
     "test": "TZ=UTC yarn node --experimental-vm-modules node_modules/jest/bin/jest.js",
     "watch": "tsc -w --preserveWatchOutput"
   },

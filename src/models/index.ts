@@ -2,6 +2,7 @@ export * from "./Concept";
 export * from "./ConceptScheme";
 export * from "./Identifier";
 export * from "./Label";
+export * from "./LabeledModel";
 export * from "./LanguageTag";
 export * from "./MappingProperty";
 export * from "./ModelSet";
