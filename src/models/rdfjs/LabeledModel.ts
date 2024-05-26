@@ -3,13 +3,13 @@ import { mapTermToIdentifier } from "./mapTermToIdentifier";
 import { Model } from "./Model";
 import { LabeledModel as ILabeledModel } from "../LabeledModel";
 import { LanguageTag } from "../LanguageTag";
-import { Label } from "../Label";
 import { skos, skosxl } from "../../vocabularies";
 import { LiteralLabel } from "../LiteralLabel";
-import { RdfJsLabel } from "./Label";
+import { Label } from "./Label";
+import { Label as ILabel } from "../Label";
 
 export abstract class LabeledModel extends Model implements ILabeledModel {
-  altLabels(kwds?: { languageTag?: LanguageTag }): Promise<readonly Label[]> {
+  altLabels(kwds?: { languageTag?: LanguageTag }): Promise<readonly ILabel[]> {
     return new Promise((resolve) =>
       resolve([
         ...this.labels({
@@ -23,7 +23,7 @@ export abstract class LabeledModel extends Model implements ILabeledModel {
 
   hiddenLabels(kwds?: {
     languageTag?: LanguageTag;
-  }): Promise<readonly Label[]> {
+  }): Promise<readonly ILabel[]> {
     return new Promise((resolve) =>
       resolve([
         ...this.labels({
@@ -43,7 +43,7 @@ export abstract class LabeledModel extends Model implements ILabeledModel {
     languageTag?: LanguageTag;
     skosPredicate: NamedNode;
     skosXlPredicate: NamedNode;
-  }): Iterable<Label> {
+  }): Iterable<ILabel> {
     yield* this.filterAndMapObjects(skosPredicate, (term) =>
       term.termType === "Literal" &&
       (!languageTag || term.language === languageTag)
@@ -72,7 +72,7 @@ export abstract class LabeledModel extends Model implements ILabeledModel {
           continue;
         }
 
-        return new RdfJsLabel({
+        return new Label({
           dataset: this.dataset,
           identifier: labelIdentifier,
           literalForm: literalFormQuad.object,
@@ -83,7 +83,7 @@ export abstract class LabeledModel extends Model implements ILabeledModel {
     });
   }
 
-  prefLabels(kwds?: { languageTag?: LanguageTag }): Promise<readonly Label[]> {
+  prefLabels(kwds?: { languageTag?: LanguageTag }): Promise<readonly ILabel[]> {
     return new Promise((resolve) =>
       resolve([
         ...this.labels({

@@ -11,9 +11,7 @@ import { Identifier } from "../Identifier";
  *
  * Most methods are delegated to an RDF/JS-backed model after populating it with a SPARQL construct query.
  */
-export abstract class SparqlModel<RdfJsModelT extends RdfJsModel>
-  implements IModel
-{
+export abstract class Model<RdfJsModelT extends RdfJsModel> implements IModel {
   readonly identifier: Identifier;
   protected readonly queryContext: QueryStringContext;
   protected readonly queryEngine: QueryEngine;

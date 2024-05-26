@@ -1,9 +1,9 @@
 import { DatasetCore, Literal } from "@rdfjs/types";
-import { Label } from "../Label";
+import { Label as ILabel } from "../Label";
 import { Model } from "./Model";
 import { Identifier } from "../Identifier";
 
-export class RdfJsLabel extends Model implements Label {
+export class Label extends Model implements ILabel {
   readonly literalForm: Literal;
 
   constructor({

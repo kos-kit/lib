@@ -6,7 +6,7 @@ import { rdf, rdfs, skos } from "../../vocabularies";
 import { Concept } from "./Concept";
 import { ConceptScheme } from "./ConceptScheme";
 
-export class SparqlKos extends AbstractKos {
+export class Kos extends AbstractKos {
   constructor(
     private readonly queryContext: QueryStringContext,
     private readonly queryEngine: QueryEngine,

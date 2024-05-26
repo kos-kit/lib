@@ -3,10 +3,10 @@ import { Label } from "../Label";
 import { LabeledModel as ILabeledModel } from "../LabeledModel";
 import { LanguageTag } from "../LanguageTag";
 import { LabeledModel as RdfJsLabeledModel } from "../rdfjs/LabeledModel";
-import { SparqlModel } from "./Model";
+import { Model } from "./Model";
 
-export abstract class SparqlLabeledModel<RdfJsModelT extends RdfJsLabeledModel>
-  extends SparqlModel<RdfJsModelT>
+export abstract class LabeledModel<RdfJsModelT extends RdfJsLabeledModel>
+  extends Model<RdfJsModelT>
   implements ILabeledModel
 {
   async altLabels(kwds?: {

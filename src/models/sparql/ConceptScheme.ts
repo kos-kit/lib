@@ -1,7 +1,7 @@
 import { DatasetCore, Quad } from "@rdfjs/types";
 import { ConceptScheme as IConceptScheme } from "../ConceptScheme";
 import { ConceptScheme as RdfJsConceptScheme } from "../rdfjs/ConceptScheme";
-import { SparqlLabeledModel as LabeledModel } from "./LabeledModel";
+import { LabeledModel as LabeledModel } from "./LabeledModel";
 import { skos, skosxl } from "../../vocabularies";
 import { Concept } from "./Concept";
 

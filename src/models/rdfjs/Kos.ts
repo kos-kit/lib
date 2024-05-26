@@ -8,7 +8,7 @@ import { identifierToString } from "../../utilities/identifierToString";
 import { ConceptScheme } from "./ConceptScheme";
 import { paginateIterable } from "../../utilities/paginateIterable";
 
-export class RdfJsKos extends AbstractKos {
+export class Kos extends AbstractKos {
   constructor(private readonly dataset: DatasetCore) {
     super();
   }
