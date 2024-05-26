@@ -1,6 +1,5 @@
 /dist/
 /node_modules/
-next-env.d.ts
 yarn-error.log*
 yarn-debug.log*
 /.vscode/
