@@ -17,8 +17,8 @@ export abstract class AbstractKos implements Kos {
     while (offset < conceptsCount) {
       for (const concept of await this.conceptsPage({ limit, offset })) {
         yield concept;
+        offset++;
       }
-      offset++;
     }
   }
 
