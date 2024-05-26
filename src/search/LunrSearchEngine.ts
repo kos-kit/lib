@@ -16,6 +16,7 @@ export class LunrSearchEngine implements SearchEngine {
   private constructor(
     private readonly documents: Record<string, Record<string, string>>, // type -> identifier -> prefLabel
     private readonly index: Index,
+    private readonly languageTag: LanguageTag,
   ) {}
 
   static async create({
@@ -105,7 +106,7 @@ export class LunrSearchEngine implements SearchEngine {
       }
     });
 
-    return new LunrSearchEngine(compactIndexDocuments, index);
+    return new LunrSearchEngine(compactIndexDocuments, index, languageTag);
   }
 
   static fromJson(json: SearchEngineJson) {
@@ -113,19 +114,28 @@ export class LunrSearchEngine implements SearchEngine {
     return new LunrSearchEngine(
       json["documents"],
       lunrIndexCompactor.expandLunrIndex(json["index"]),
+      json["languageTag"],
     );
   }
 
   search({
+    languageTag,
     limit,
     offset,
     query,
   }: {
+    languageTag: LanguageTag;
     limit: number;
     offset: number;
     query: string;
   }): Promise<readonly SearchResult[]> {
     return new Promise((resolve) => {
+      if (languageTag !== this.languageTag) {
+        throw new RangeError(
+          `expected language tag '${this.languageTag}', actual '${this.languageTag}`,
+        );
+      }
+
       const results: SearchResult[] = [];
       let lunrResultCount = 0;
       for (const lunrResult of this.index.search(query)) {
@@ -157,8 +167,20 @@ export class LunrSearchEngine implements SearchEngine {
     });
   }
 
-  searchCount({ query }: { query: string }): Promise<number> {
+  searchCount({
+    languageTag,
+    query,
+  }: {
+    languageTag: LanguageTag;
+    query: string;
+  }): Promise<number> {
     return new Promise((resolve) => {
+      if (languageTag !== this.languageTag) {
+        throw new RangeError(
+          `expected language tag '${this.languageTag}', actual '${this.languageTag}`,
+        );
+      }
+
       resolve(this.index.search(query).length);
     });
   }
@@ -168,6 +190,7 @@ export class LunrSearchEngine implements SearchEngine {
     return {
       documents: this.documents,
       index: lunrIndexCompactor.compactLunrIndex(this.index),
+      languageTag: this.languageTag,
       type: "Lunr",
     };
   }

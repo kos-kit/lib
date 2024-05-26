@@ -9,10 +9,11 @@ export const behavesLikeSearchEngine = (
   ) => {
     const query = "right to education";
 
-    const count = await searchEngine.searchCount({ query });
+    const count = await searchEngine.searchCount({ languageTag: "en", query });
     expect(count).toBeGreaterThan(0);
 
     const results = await searchEngine.search({
+      languageTag: "en",
       limit: 10,
       offset: 0,
       query,
