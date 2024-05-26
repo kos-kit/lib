@@ -16,9 +16,5 @@
     "@tsconfig/node20/tsconfig.json",
     "@tsconfig/strictest/tsconfig.json"
   ],
-  "include": [
-    "./src/**/*.ts",
-    "../explorer/lib/Configuration.ts",
-    "../explorer/lib/GlobalRef.ts"
-  ]
+  "include": ["**/*.ts"]
 }

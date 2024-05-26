@@ -1,7 +1,7 @@
 import { NamedNode, DatasetCore, Term, Literal } from "@rdfjs/types";
-import { Identifier } from "@/lib/models/Identifier";
-import { dc11, dcterms } from "@/lib/vocabularies";
 import { LanguageTag } from "../LanguageTag";
+import { dc11, dcterms } from "../../vocabularies";
+import { Identifier } from "../Identifier";
 
 const rightsPredicates = [dcterms.rights, dc11.rights];
 

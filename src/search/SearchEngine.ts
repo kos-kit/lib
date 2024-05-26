@@ -1,5 +1,5 @@
-import { SearchResult } from "@/lib/search/SearchResult";
-import { SearchEngineJson } from "@/lib/search/SearchEngineJson";
+import { SearchEngineJson } from "./SearchEngineJson";
+import { SearchResult } from "./SearchResult";
 
 export interface SearchEngine {
   search(kwds: {
