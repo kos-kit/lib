@@ -1,6 +1,6 @@
 import { QueryEngine } from "@comunica/query-sparql";
 import { QueryStringContext } from "@comunica/types";
-import { AbstractModelSet } from "../AbstractModelSet";
+import { AbstractKos } from "../AbstractKos";
 import { Identifier } from "../Identifier";
 import { Concept } from "../Concept";
 import { SparqlConcept } from "./SparqlConcept";
@@ -8,7 +8,7 @@ import { rdf, rdfs, skos } from "../../vocabularies";
 import { ConceptScheme } from "../ConceptScheme";
 import { SparqlConceptScheme } from "./SparqlConceptScheme";
 
-export class SparqlModelSet extends AbstractModelSet {
+export class SparqlKos extends AbstractKos {
   constructor(
     private readonly queryContext: QueryStringContext,
     private readonly queryEngine: QueryEngine,

@@ -1,1 +1,1 @@
-export * from "./SparqlModelSet";
+export * from "./SparqlKos";

@@ -3,9 +3,9 @@ import { ConceptScheme } from "./ConceptScheme";
 import { Identifier } from "./Identifier";
 import { LanguageTag } from "./LanguageTag";
 import { LabeledModel } from "./LabeledModel";
-import { ModelSet } from "./ModelSet";
+import { Kos } from "./Kos";
 
-export abstract class AbstractModelSet implements ModelSet {
+export abstract class AbstractKos implements Kos {
   protected cachedLanguageTags: readonly LanguageTag[] | null = null;
 
   abstract conceptByIdentifier(identifier: Identifier): Promise<Concept>;

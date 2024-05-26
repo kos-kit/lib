@@ -1,6 +1,6 @@
 import { DatasetCore } from "@rdfjs/types";
 import { getRdfInstances } from "./getRdfInstances";
-import { AbstractModelSet } from "../AbstractModelSet";
+import { AbstractKos } from "../AbstractKos";
 import { Identifier } from "../Identifier";
 import { Concept } from "../Concept";
 import { RdfJsConcept } from "./RdfJsConcept";
@@ -10,7 +10,7 @@ import { identifierToString } from "../../utilities/identifierToString";
 import { RdfJsConceptScheme } from "./RdfJsConceptScheme";
 import { paginateIterable } from "../../utilities/paginateIterable";
 
-export class RdfJsModelSet extends AbstractModelSet {
+export class RdfJsKos extends AbstractKos {
   constructor(private readonly dataset: DatasetCore) {
     super();
   }

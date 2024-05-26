@@ -1,6 +1,6 @@
-import { behavesLikeModelSet } from "../behavesLikeModelSet";
-import { testRdfJsModelSet } from "./testRdfJsModelSet";
+import { behavesLikeKos } from "../behavesLikeKos";
+import { testRdfJsKos } from "./testRdfJsKos";
 
-describe("RdfJsModelSet", () => {
-  behavesLikeModelSet(testRdfJsModelSet);
+describe("RdfJsKos", () => {
+  behavesLikeKos(testRdfJsKos);
 });

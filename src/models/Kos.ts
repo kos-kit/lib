@@ -3,7 +3,7 @@ import { ConceptScheme } from "./ConceptScheme";
 import { Identifier } from "./Identifier";
 import { LanguageTag } from "./LanguageTag";
 
-export interface ModelSet {
+export interface Kos {
   conceptByIdentifier(identifier: Identifier): Promise<Concept>;
   concepts(): AsyncGenerator<Concept>;
   conceptsPage(kwds: {

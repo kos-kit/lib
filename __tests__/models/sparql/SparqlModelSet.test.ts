@@ -1,6 +1,6 @@
-import { behavesLikeModelSet } from "../behavesLikeModelSet";
-import { testSparqlModelSet } from "./testSparqlModelSet";
+import { behavesLikeKos } from "../behavesLikeKos";
+import { testSparqlKos } from "./testSparqlKos";
 
-describe("SparqlModelSet", () => {
-  behavesLikeModelSet(testSparqlModelSet);
+describe("SparqlKos", () => {
+  behavesLikeKos(testSparqlKos);
 });

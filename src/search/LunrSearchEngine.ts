@@ -1,7 +1,7 @@
 import lunr, { Index } from "lunr";
 import { SearchEngine } from "./SearchEngine";
 import { LanguageTag } from "../models/LanguageTag";
-import { ModelSet } from "../models/ModelSet";
+import { Kos } from "../models/Kos";
 import { SearchResult } from "./SearchResult";
 import { LabeledModel } from "../models/LabeledModel";
 import { Identifier } from "../models/Identifier";
@@ -18,11 +18,11 @@ export class LunrSearchEngine implements SearchEngine {
   static async create({
     conceptsLimit,
     languageTag,
-    modelSet,
+    kos,
   }: {
     conceptsLimit?: number;
     languageTag: LanguageTag;
-    modelSet: ModelSet;
+    kos: Kos;
   }): Promise<LunrSearchEngine> {
     type IndexDocument = {
       readonly identifier: string;
@@ -58,7 +58,7 @@ export class LunrSearchEngine implements SearchEngine {
 
     if (conceptsLimit != null) {
       // Don't index all concepts in the set, in testing
-      for (const concept of await modelSet.conceptsPage({
+      for (const concept of await kos.conceptsPage({
         limit: conceptsLimit,
         offset: 0,
       })) {
@@ -66,14 +66,14 @@ export class LunrSearchEngine implements SearchEngine {
       }
     } else {
       // Index all concepts in the set
-      for await (const concept of await modelSet.concepts()) {
+      for await (const concept of await kos.concepts()) {
         indexDocumentPromises.push(toIndexDocument(concept, "Concept"));
       }
     }
 
     // Index concept schemes
     indexDocumentPromises.push(
-      ...(await modelSet.conceptSchemes()).map((conceptScheme) =>
+      ...(await kos.conceptSchemes()).map((conceptScheme) =>
         toIndexDocument(conceptScheme, "ConceptScheme"),
       ),
     );
