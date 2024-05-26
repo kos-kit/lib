@@ -1,1 +1,1 @@
-export * from "./SparqlKos";
+export * from "./Kos";

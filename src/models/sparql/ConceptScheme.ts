@@ -6,10 +6,12 @@ import { skos, skosxl } from "../../vocabularies";
 import { Concept } from "./Concept";
 
 export class ConceptScheme
-  extends LabeledModel<IConceptScheme>
+  extends LabeledModel<RdfJsConceptScheme>
   implements IConceptScheme
 {
-  protected createRdfJsModel(dataset: DatasetCore<Quad, Quad>): IConceptScheme {
+  protected createRdfJsModel(
+    dataset: DatasetCore<Quad, Quad>,
+  ): RdfJsConceptScheme {
     return new RdfJsConceptScheme({ dataset, identifier: this.identifier });
   }
 

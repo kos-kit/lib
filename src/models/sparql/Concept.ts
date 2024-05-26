@@ -2,13 +2,15 @@ import { DatasetCore, Literal, Quad } from "@rdfjs/types";
 import { SparqlLabeledModel } from "./LabeledModel";
 import { Concept as RdfJsConcept } from "../rdfjs/Concept";
 import { Concept as IConcept } from "../Concept";
-import { ConceptScheme } from "../ConceptScheme";
 import { ConceptScheme } from "./ConceptScheme";
 import { NoteProperty } from "../NoteProperty";
 import { SemanticRelationProperty } from "../SemanticRelationProperty";
 
-export class Concept extends SparqlLabeledModel<IConcept> implements IConcept {
-  protected createRdfJsModel(dataset: DatasetCore<Quad, Quad>): IConcept {
+export class Concept
+  extends SparqlLabeledModel<RdfJsConcept>
+  implements IConcept
+{
+  protected createRdfJsModel(dataset: DatasetCore<Quad, Quad>): RdfJsConcept {
     return new RdfJsConcept({ dataset, identifier: this.identifier });
   }
 
