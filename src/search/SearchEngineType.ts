@@ -1,1 +1,1 @@
-export type SearchEngineType = "Lunr" | "Rest";
+export type SearchEngineType = "Lunr" | "Server";

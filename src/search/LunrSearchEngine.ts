@@ -9,6 +9,9 @@ import { identifierToString } from "../utilities/identifierToString";
 import { SearchEngineJson } from "./SearchEngineJson";
 import { LunrIndexCompactor } from "./LunrIndexCompactor";
 
+/**
+ * A SearchEngine implementation built with Lunr.js, so it can be used in the browser.
+ */
 export class LunrSearchEngine implements SearchEngine {
   private constructor(
     private readonly documents: Record<string, Record<string, string>>, // type -> identifier -> prefLabel
@@ -141,7 +144,6 @@ export class LunrSearchEngine implements SearchEngine {
           results.push({
             identifier: lunrResult.ref,
             prefLabel: documentPrefLabel,
-            score: lunrResult.score,
             type: documentType as SearchResult["type"],
           });
           if (results.length === limit) {
