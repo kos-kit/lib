@@ -1,0 +1,27 @@
+name: Continuous Deployment
+on:
+  push:
+    branches:
+      - "main"
+  workflow_dispatch:
+jobs:
+  build:
+    name: Build, test, publish
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          cache: "yarn"
+          node-version: 20
+          registry-url: "https://registry.npmjs.org"
+      - name: Install dependencies
+        run: yarn install
+      - name: Build
+        run: yarn run build
+      - name: Test
+        run: yarn test
+      - name: Publish
+        run: yarn publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
