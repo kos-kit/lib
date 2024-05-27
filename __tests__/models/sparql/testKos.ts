@@ -1,10 +1,8 @@
-import { QueryEngine } from "@comunica/query-sparql-rdfjs";
-import { testDataset } from "../../testDataset";
 import { Kos } from "../../../src/models/sparql/Kos";
+import SparqlClient from "sparql-http-client/ParsingClient";
 
 export const testKos = new Kos(
-  {
-    sources: [testDataset],
-  },
-  new QueryEngine(),
+  new SparqlClient({
+    endpointUrl: "http://localhost:7878/sparql",
+  }),
 );

@@ -39,8 +39,7 @@ CONSTRUCT {
       (conceptScheme) =>
         new Concept({
           identifier: conceptScheme.identifier,
-          queryContext: this.queryContext,
-          queryEngine: this.queryEngine,
+          sparqlClient: this.sparqlClient,
         }),
     );
   }

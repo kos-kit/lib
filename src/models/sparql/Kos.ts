@@ -1,16 +1,12 @@
-import { QueryEngine } from "@comunica/query-sparql";
-import { QueryStringContext } from "@comunica/types";
 import { AbstractKos } from "../AbstractKos";
 import { Identifier } from "../Identifier";
 import { rdf, rdfs, skos } from "../../vocabularies";
 import { Concept } from "./Concept";
 import { ConceptScheme } from "./ConceptScheme";
+import SparqlClient from "sparql-http-client/ParsingClient";
 
 export class Kos extends AbstractKos {
-  constructor(
-    private readonly queryContext: QueryStringContext,
-    private readonly queryEngine: QueryEngine,
-  ) {
+  constructor(private readonly sparqlClient: SparqlClient) {
     super();
   }
 
@@ -19,8 +15,7 @@ export class Kos extends AbstractKos {
       resolve(
         new Concept({
           identifier,
-          queryContext: this.queryContext,
-          queryEngine: this.queryEngine,
+          sparqlClient: this.sparqlClient,
         }),
       ),
     );
@@ -44,11 +39,8 @@ LIMIT ${limit}
 OFFSET ${offset}
 `;
 
-    for await (const bindings of await this.queryEngine.queryBindings(
-      query,
-      this.queryContext,
-    )) {
-      const conceptIdentifier = bindings.get("concept");
+    for (const resultRow of await this.sparqlClient.query.select(query)) {
+      const conceptIdentifier = resultRow["concept"];
       if (
         conceptIdentifier &&
         conceptIdentifier &&
@@ -58,8 +50,7 @@ OFFSET ${offset}
         concepts.push(
           new Concept({
             identifier: conceptIdentifier,
-            queryContext: this.queryContext,
-            queryEngine: this.queryEngine,
+            sparqlClient: this.sparqlClient,
           }),
         );
       }
@@ -76,11 +67,8 @@ WHERE {
 }
     `;
 
-    for await (const bindings of await this.queryEngine.queryBindings(
-      query,
-      this.queryContext,
-    )) {
-      const count = bindings.get("count");
+    for (const resultRow of await this.sparqlClient.query.select(query)) {
+      const count = resultRow["count"];
       if (count?.termType === "Literal") {
         return parseInt(count.value);
       }
@@ -93,8 +81,7 @@ WHERE {
       resolve(
         new ConceptScheme({
           identifier,
-          queryContext: this.queryContext,
-          queryEngine: this.queryEngine,
+          sparqlClient: this.sparqlClient,
         }),
       ),
     );
@@ -110,11 +97,8 @@ WHERE {
 }
 `;
 
-    for await (const bindings of await this.queryEngine.queryBindings(
-      query,
-      this.queryContext,
-    )) {
-      const conceptSchemeIdentifier = bindings.get("conceptScheme");
+    for (const resultRow of await this.sparqlClient.query.select(query)) {
+      const conceptSchemeIdentifier = resultRow["conceptScheme"];
       if (
         conceptSchemeIdentifier &&
         (conceptSchemeIdentifier.termType === "BlankNode" ||
@@ -123,8 +107,7 @@ WHERE {
         conceptSchemes.push(
           new ConceptScheme({
             identifier: conceptSchemeIdentifier,
-            queryContext: this.queryContext,
-            queryEngine: this.queryEngine,
+            sparqlClient: this.sparqlClient,
           }),
         );
       }

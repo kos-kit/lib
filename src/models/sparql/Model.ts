@@ -1,10 +1,8 @@
-import { QueryEngine } from "@comunica/query-sparql";
-import { QueryStringContext } from "@comunica/types";
 import { Model as RdfJsModel } from "../rdfjs/Model";
 import { DatasetCore, Literal, NamedNode } from "@rdfjs/types";
-import { Store } from "n3";
 import { Model as IModel } from "../Model";
 import { Identifier } from "../Identifier";
+import SparqlClient from "sparql-http-client/ParsingClient";
 
 /**
  * Abstract base class for SPARQL-backed models.
@@ -13,22 +11,18 @@ import { Identifier } from "../Identifier";
  */
 export abstract class Model<RdfJsModelT extends RdfJsModel> implements IModel {
   readonly identifier: Identifier;
-  protected readonly queryContext: QueryStringContext;
-  protected readonly queryEngine: QueryEngine;
+  protected readonly sparqlClient: SparqlClient;
   private _rdfJsModel: RdfJsModelT | null = null;
 
   constructor({
     identifier,
-    queryContext,
-    queryEngine,
+    sparqlClient,
   }: {
     identifier: Identifier;
-    queryContext: QueryStringContext;
-    queryEngine: QueryEngine;
+    sparqlClient: SparqlClient;
   }) {
     this.identifier = identifier;
-    this.queryContext = queryContext;
-    this.queryEngine = queryEngine;
+    this.sparqlClient = sparqlClient;
   }
 
   protected abstract createRdfJsModel(dataset: DatasetCore): RdfJsModelT;
@@ -38,14 +32,9 @@ export abstract class Model<RdfJsModelT extends RdfJsModel> implements IModel {
       return this._rdfJsModel;
     }
 
-    const store = new Store();
-    for await (const quad of await this.queryEngine.queryQuads(
-      this.rdfJsDatasetQueryString,
-      this.queryContext,
-    )) {
-      store.addQuad(quad);
-    }
-    this._rdfJsModel = this.createRdfJsModel(store);
+    this._rdfJsModel = this.createRdfJsModel(
+      await this.sparqlClient.query.construct(this.rdfJsDatasetQueryString),
+    );
     return this._rdfJsModel;
   }
 

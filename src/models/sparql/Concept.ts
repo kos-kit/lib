@@ -16,8 +16,7 @@ export class Concept extends LabeledModel<RdfJsConcept> implements IConcept {
       (conceptScheme) =>
         new ConceptScheme({
           identifier: conceptScheme.identifier,
-          queryContext: this.queryContext,
-          queryEngine: this.queryEngine,
+          sparqlClient: this.sparqlClient,
         }),
     );
   }
@@ -42,8 +41,7 @@ export class Concept extends LabeledModel<RdfJsConcept> implements IConcept {
       (conceptScheme) =>
         new Concept({
           identifier: conceptScheme.identifier,
-          queryContext: this.queryContext,
-          queryEngine: this.queryEngine,
+          sparqlClient: this.sparqlClient,
         }),
     );
   }
@@ -61,8 +59,7 @@ export class Concept extends LabeledModel<RdfJsConcept> implements IConcept {
       (conceptScheme) =>
         new ConceptScheme({
           identifier: conceptScheme.identifier,
-          queryContext: this.queryContext,
-          queryEngine: this.queryEngine,
+          sparqlClient: this.sparqlClient,
         }),
     );
   }
