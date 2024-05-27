@@ -34,21 +34,22 @@
   },
   "main": "./dist/index.js",
   "files": [
-    "dist"
+    "**/*.js",
+    "**/*.ts*"
   ],
   "license": "GPL-3.0-only",
   "name": "@kos-kit/client",
   "scripts": {
-    "build": "tsc -b && cp package.json dist/",
+    "build": "tsc -b && cp LICENSE package.json dist/",
     "clean": "rimraf dist",
-    "rebuild": "rimraf dist && tsc -b && cp package.json dist/",
+    "rebuild": "rimraf dist && tsc -b && cp LICENSE package.json dist/",
     "test": "TZ=UTC node --experimental-vm-modules node_modules/jest/bin/jest.js",
-    "watch": "tsc -w --preserveWatchOutput"
+    "watch": "mkdir -p dist && cp LICENSE package.json dist/ && tsc -w --preserveWatchOutput"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/kos-kit/client"
   },
   "types": "dist/index.d.ts",
-  "version": "1.0.6"
+  "version": "1.0.7"
 }
