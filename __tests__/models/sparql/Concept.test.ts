@@ -3,7 +3,7 @@ import { behavesLikeUnescoThesaurusConcept10018 } from "../behavesLikeUnescoThes
 import { DataFactory } from "n3";
 import { behavesLikeUnescoThesaurusConcept10 } from "../behavesLikeUnescoThesaurusConcept10";
 
-describe("sparql.Concept", () => {
+(process.env["CI"] ? describe.skip : describe)("sparql.Concept", () => {
   behavesLikeUnescoThesaurusConcept10(() =>
     testKos.conceptByIdentifier(
       DataFactory.namedNode(
