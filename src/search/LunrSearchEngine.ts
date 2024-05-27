@@ -165,24 +165,6 @@ export class LunrSearchEngine implements SearchEngine {
     });
   }
 
-  searchCount({
-    languageTag,
-    query,
-  }: {
-    languageTag: LanguageTag;
-    query: string;
-  }): Promise<number> {
-    return new Promise((resolve) => {
-      if (languageTag !== this.languageTag) {
-        throw new RangeError(
-          `expected language tag '${this.languageTag}', actual '${this.languageTag}`,
-        );
-      }
-
-      resolve(this.index.search(query).length);
-    });
-  }
-
   toJson(): SearchEngineJson {
     const lunrIndexCompactor = new LunrIndexCompactor();
     return {
