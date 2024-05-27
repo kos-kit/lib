@@ -8,6 +8,7 @@ import { Identifier } from "../models/Identifier";
 import { identifierToString } from "../utilities/identifierToString";
 import { SearchEngineJson } from "./SearchEngineJson";
 import { LunrIndexCompactor } from "./LunrIndexCompactor";
+import { SearchResults } from "./SearchResults";
 
 /**
  * A SearchEngine implementation built with Lunr.js, so it can be used in the browser.
@@ -128,7 +129,7 @@ export class LunrSearchEngine implements SearchEngine {
     limit: number;
     offset: number;
     query: string;
-  }): Promise<readonly SearchResult[]> {
+  }): Promise<SearchResults> {
     return new Promise((resolve) => {
       if (languageTag !== this.languageTag) {
         throw new RangeError(
@@ -136,34 +137,31 @@ export class LunrSearchEngine implements SearchEngine {
         );
       }
 
-      const results: SearchResult[] = [];
-      let lunrResultCount = 0;
-      for (const lunrResult of this.index.search(query)) {
-        if (lunrResultCount++ < offset) {
-          continue;
-        }
+      const indexResults = this.index.search(query);
 
+      const page: SearchResult[] = [];
+      for (const indexResult of indexResults.slice(offset)) {
         for (const documentType of Object.keys(this.documents)) {
           const documentPrefLabel =
-            this.documents[documentType][lunrResult.ref];
+            this.documents[documentType][indexResult.ref];
 
           if (!documentPrefLabel) {
             continue;
           }
 
-          results.push({
-            identifier: lunrResult.ref,
+          page.push({
+            identifier: indexResult.ref,
             prefLabel: documentPrefLabel,
             type: documentType as SearchResult["type"],
           });
-          if (results.length === limit) {
-            resolve(results);
+          if (page.length === limit) {
+            resolve({ page, total: indexResults.length });
             return;
           }
           break;
         }
       }
-      resolve(results);
+      resolve({ page, total: indexResults.length });
     });
   }
 

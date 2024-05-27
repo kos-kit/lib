@@ -9,17 +9,15 @@ export const behavesLikeSearchEngine = (
   ) => {
     const query = "right to education";
 
-    const count = await searchEngine.searchCount({ languageTag: "en", query });
-    expect(count).toBeGreaterThan(0);
-
     const results = await searchEngine.search({
       languageTag: "en",
       limit: 10,
       offset: 0,
       query,
     });
-    expect(results).not.toHaveLength(0);
-    const result = results.find(
+    expect(results.total).toBeGreaterThan(0);
+    expect(results.page).not.toHaveLength(0);
+    const result = results.page.find(
       (result) =>
         result.identifier ===
         "<http://vocabularies.unesco.org/thesaurus/concept10>",

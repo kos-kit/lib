@@ -7,6 +7,7 @@ import { Kos as RdfJsKos } from "../models/rdfjs/Kos";
 import { Parser, Store } from "n3";
 import { identifierToString } from "../utilities/identifierToString";
 import { LanguageTag } from "../models";
+import { SearchResults } from "./SearchResults";
 
 /**
  * A SearchEngine implementation that makes HTTP requests to a kos-kit/server search endpoint.
@@ -27,17 +28,20 @@ export class ServerSearchEngine implements SearchEngine {
     limit: number;
     offset: number;
     query: string;
-  }): Promise<readonly SearchResult[]> {
+  }): Promise<SearchResults> {
     const response = await this.axios.get(`${this.endpoint}`, {
       params,
     });
+
+    const totalHeaderValue = response.headers["x-total-count"];
+    const total = parseInt(totalHeaderValue);
 
     const parser = new Parser({ format: "N-Triples" });
     const store = new Store();
     store.addQuads(parser.parse(response.data));
     const kos = new RdfJsKos(store);
 
-    const results: SearchResult[] = [];
+    const page: SearchResult[] = [];
 
     for await (const concept of kos.concepts()) {
       const prefLabels = await concept.prefLabels({
@@ -46,7 +50,7 @@ export class ServerSearchEngine implements SearchEngine {
       if (prefLabels.length === 0) {
         continue;
       }
-      results.push({
+      page.push({
         identifier: identifierToString(concept.identifier),
         prefLabel: prefLabels[0].literalForm.value,
         type: "Concept",
@@ -60,25 +64,14 @@ export class ServerSearchEngine implements SearchEngine {
       if (prefLabels.length === 0) {
         continue;
       }
-      results.push({
+      page.push({
         identifier: identifierToString(conceptScheme.identifier),
         prefLabel: prefLabels[0].literalForm.value,
         type: "ConceptScheme",
       });
     }
 
-    return results;
-  }
-
-  async searchCount(params: {
-    languageTag: LanguageTag;
-    query: string;
-  }): Promise<number> {
-    const response = await this.axios.get(`${this.endpoint}`, {
-      params,
-    });
-    const countHeaderValue = response.headers["x-total-count"];
-    return parseInt(countHeaderValue);
+    return { page, total };
   }
 
   toJson(): SearchEngineJson {

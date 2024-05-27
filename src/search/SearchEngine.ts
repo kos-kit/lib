@@ -1,6 +1,6 @@
 import { LanguageTag } from "../models";
 import { SearchEngineJson } from "./SearchEngineJson";
-import { SearchResult } from "./SearchResult";
+import { SearchResults } from "./SearchResults";
 
 export interface SearchEngine {
   search(kwds: {
@@ -8,12 +8,7 @@ export interface SearchEngine {
     limit: number;
     offset: number;
     query: string;
-  }): Promise<readonly SearchResult[]>;
-
-  searchCount(kwds: {
-    languageTag: LanguageTag;
-    query: string;
-  }): Promise<number>;
+  }): Promise<SearchResults>;
 
   toJson(): SearchEngineJson;
 }
