@@ -7,6 +7,7 @@ import { skos } from "../../vocabularies";
 import { identifierToString } from "../../utilities/identifierToString";
 import { ConceptScheme } from "./ConceptScheme";
 import { paginateIterable } from "../../utilities/paginateIterable";
+import { countIterable } from "../../utilities";
 
 export class Kos extends AbstractKos {
   constructor(private readonly dataset: DatasetCore) {
@@ -52,14 +53,9 @@ export class Kos extends AbstractKos {
   }
 
   conceptsCount(): Promise<number> {
-    return new Promise((resolve) => {
-      let count = 0;
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      for (const _ of this.conceptIdentifiers()) {
-        count++;
-      }
-      resolve(count);
-    });
+    return new Promise((resolve) =>
+      resolve(countIterable(this.conceptIdentifiers())),
+    );
   }
 
   async conceptSchemeByIdentifier(

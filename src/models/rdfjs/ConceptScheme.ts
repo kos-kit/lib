@@ -6,6 +6,7 @@ import { mapTermToIdentifier } from "./mapTermToIdentifier";
 import { skos } from "../../vocabularies";
 import { paginateIterable } from "../../utilities/paginateIterable";
 import { Concept } from "./Concept";
+import { countIterable } from "../../utilities";
 
 export class ConceptScheme extends LabeledModel implements IConceptScheme {
   private *topConceptIdentifiers(): Iterable<Identifier> {
@@ -69,13 +70,8 @@ export class ConceptScheme extends LabeledModel implements IConceptScheme {
   }
 
   topConceptsCount(): Promise<number> {
-    return new Promise((resolve) => {
-      let count = 0;
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      for (const _ of this.topConceptIdentifiers()) {
-        count++;
-      }
-      resolve(count);
-    });
+    return new Promise((resolve) =>
+      resolve(countIterable(this.topConceptIdentifiers())),
+    );
   }
 }
