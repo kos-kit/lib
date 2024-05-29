@@ -3,7 +3,7 @@ import { Identifier } from "../Identifier";
 import { rdf, rdfs, skos } from "../../vocabularies";
 import { Concept } from "./Concept";
 import { ConceptScheme } from "./ConceptScheme";
-import SparqlClient from "sparql-http-client/ParsingClient";
+import { SparqlClient } from "../../SparqlClient";
 
 export class Kos extends AbstractKos {
   constructor(private readonly sparqlClient: SparqlClient) {

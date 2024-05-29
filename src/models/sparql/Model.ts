@@ -2,7 +2,7 @@ import { Model as RdfJsModel } from "../rdfjs/Model";
 import { DatasetCore, Literal, NamedNode } from "@rdfjs/types";
 import { Model as IModel } from "../Model";
 import { Identifier } from "../Identifier";
-import SparqlClient from "sparql-http-client/ParsingClient";
+import { SparqlClient } from "../../SparqlClient";
 
 /**
  * Abstract base class for SPARQL-backed models.

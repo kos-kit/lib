@@ -1,5 +1,5 @@
 import { Kos } from "../../../src/models/sparql/Kos";
-import SparqlClient from "sparql-http-client/ParsingClient";
+import { SparqlClient } from "../../../src/SparqlClient";
 
 export const testKos = new Kos(
   new SparqlClient({
