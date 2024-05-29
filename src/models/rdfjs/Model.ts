@@ -60,7 +60,7 @@ export abstract class Model extends Resource {
   modified(): Promise<Literal | null> {
     return new Promise((resolve) =>
       resolve(
-        this.findAndMapObject(dcterms.modified, (term) =>
+        this.findAndMapObjectOptional(dcterms.modified, (term) =>
           term.termType === "Literal" ? term : null,
         ),
       ),

@@ -38,7 +38,7 @@ export class Resource {
     return count;
   }
 
-  protected findAndMapObject<T>(
+  protected findAndMapObjectOptional<T>(
     property: NamedNode,
     callback: (value: Term) => NonNullable<T> | null,
   ): NonNullable<T> | null {
@@ -54,6 +54,24 @@ export class Resource {
       }
     }
     return null;
+  }
+
+  protected findAndMapObjectRequired<T>(
+    property: NamedNode,
+    callback: (value: Term) => NonNullable<T> | null,
+  ): NonNullable<T> {
+    for (const quad of this.dataset.match(
+      this.identifier,
+      property,
+      null,
+      null,
+    )) {
+      const mappedObject: T | null = callback(quad.object);
+      if (mappedObject !== null) {
+        return mappedObject as NonNullable<T>;
+      }
+    }
+    throw new Error(`no appropriate ${property.value} found`);
   }
 
   protected *filterAndMapObjects<T>(
