@@ -16,6 +16,8 @@ const testDataset: Store = ntriplesStringToDataset(
     .readFileSync(
       path.join(
         path.dirname(fileURLToPath(import.meta.url)),
+        "..",
+        "..",
         "unesco-thesaurus.nt",
       ),
     )
