@@ -1,3 +1,1 @@
-import { testKos } from "./models/rdfjs/testKos";
-
-export const testKos = testKos;
+export { testKos } from "./models/rdfjs/testKos";
