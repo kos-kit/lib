@@ -1,85 +1,14 @@
-import { NamedNode, DatasetCore, Term, Literal } from "@rdfjs/types";
+import { NamedNode, Literal } from "@rdfjs/types";
 import { LanguageTag } from "../LanguageTag";
 import { dc11, dcterms } from "../../vocabularies";
-import { Identifier } from "../Identifier";
+import { Resource } from "./Resource";
 
 const rightsPredicates = [dcterms.rights, dc11.rights];
 
 /**
  * Abstract base class for RDF/JS Dataset-backed models.
  */
-export abstract class Model {
-  protected readonly dataset: DatasetCore;
-  readonly identifier: Identifier;
-
-  constructor({
-    dataset,
-    identifier,
-  }: {
-    dataset: DatasetCore;
-    identifier: Identifier;
-  }) {
-    this.dataset = dataset;
-    this.identifier = identifier;
-  }
-
-  protected countObjects(
-    property: NamedNode,
-    filter?: (value: Term) => boolean,
-  ) {
-    if (!filter) {
-      filter = () => true;
-    }
-
-    let count = 0;
-    for (const quad of this.dataset.match(
-      this.identifier,
-      property,
-      null,
-      null,
-    )) {
-      if (filter(quad.object)) {
-        count++;
-      }
-    }
-    return count;
-  }
-
-  protected findAndMapObject<T>(
-    property: NamedNode,
-    callback: (value: Term) => NonNullable<T> | null,
-  ): NonNullable<T> | null {
-    for (const quad of this.dataset.match(
-      this.identifier,
-      property,
-      null,
-      null,
-    )) {
-      const mappedObject: T | null = callback(quad.object);
-      if (mappedObject !== null) {
-        return mappedObject as NonNullable<T>;
-      }
-    }
-    return null;
-  }
-
-  protected *filterAndMapObjects<T>(
-    property: NamedNode,
-    callback: (value: Term) => NonNullable<T> | null,
-  ): Iterable<NonNullable<T>> {
-    for (const quad of this.dataset.match(
-      this.identifier,
-      property,
-      null,
-      null,
-    )) {
-      const mappedObject: T | null = callback(quad.object);
-      if (mappedObject !== null) {
-        yield mappedObject as NonNullable<T>;
-      }
-    }
-  }
-
+export abstract class Model extends Resource {
   private languageTaggedLiteralObject(
     languageTag: LanguageTag,
     predicate: NamedNode,

@@ -5,4 +5,4 @@ export * from "./getRdfInstances";
 export * from "./Kos";
 export * from "./Label";
 export * from "./mapTermToIdentifier";
-export * from "./Model";
+export * from "./Resource";
