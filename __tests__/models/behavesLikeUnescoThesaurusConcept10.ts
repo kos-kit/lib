@@ -27,13 +27,17 @@ export const behavesLikeUnescoThesaurusConcept10 = (
   it("should have multiple prefLabels", async () => {
     const concept = await lazyConcept();
 
-    const enPrefLabels = await concept.prefLabels({ languageTag: "en" });
+    const enPrefLabels = await concept.prefLabels({
+      languageTags: new Set(["en"]),
+    });
     expect(enPrefLabels).toHaveLength(1);
     expect(enPrefLabels[0].literalForm.value).toStrictEqual(
       "Right to education",
     );
 
-    const frPrefLabels = await concept.prefLabels({ languageTag: "fr" });
+    const frPrefLabels = await concept.prefLabels({
+      languageTags: new Set(["fr"]),
+    });
     expect(frPrefLabels).toHaveLength(1);
     expect(frPrefLabels[0].literalForm.value).toStrictEqual(
       "Droit à l'éducation",

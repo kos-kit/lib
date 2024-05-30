@@ -29,6 +29,8 @@ export class ServerSearchEngine implements SearchEngine {
     offset: number;
     query: string;
   }): Promise<SearchResults> {
+    const languageTags = new Set([params.languageTag, ""]);
+
     const response = await this.axios.get(`${this.endpoint}`, {
       params,
     });
@@ -45,7 +47,7 @@ export class ServerSearchEngine implements SearchEngine {
 
     for await (const concept of kos.concepts()) {
       const prefLabels = await concept.prefLabels({
-        languageTag: params.languageTag,
+        languageTags,
       });
       if (prefLabels.length === 0) {
         continue;
@@ -59,7 +61,7 @@ export class ServerSearchEngine implements SearchEngine {
 
     for (const conceptScheme of await kos.conceptSchemes()) {
       const prefLabels = await conceptScheme.prefLabels({
-        languageTag: params.languageTag,
+        languageTags,
       });
       if (prefLabels.length === 0) {
         continue;

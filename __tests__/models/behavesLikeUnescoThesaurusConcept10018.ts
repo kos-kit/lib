@@ -28,13 +28,17 @@ export const behavesLikeUnescoThesaurusConcept10018 = (
   it("should have multiple alt labels", async () => {
     const concept = await lazyConcept();
 
-    const arAltLabels = await concept.altLabels({ languageTag: "ar" });
+    const arAltLabels = await concept.altLabels({
+      languageTags: new Set(["ar"]),
+    });
     expect(arAltLabels).toHaveLength(1);
     expect(arAltLabels[0].literalForm.value).toStrictEqual(
       "تقييم التأثير على البيئة",
     );
 
-    const esAltLabels = await concept.altLabels({ languageTag: "es" });
+    const esAltLabels = await concept.altLabels({
+      languageTags: new Set(["es"]),
+    });
     expect(esAltLabels).toHaveLength(1);
     expect(esAltLabels[0].literalForm.value).toStrictEqual(
       "Valoración del impacto ambiental",
@@ -55,13 +59,17 @@ export const behavesLikeUnescoThesaurusConcept10018 = (
   it("should have multiple prefLabels", async () => {
     const concept = await lazyConcept();
 
-    const enPrefLabels = await concept.prefLabels({ languageTag: "en" });
+    const enPrefLabels = await concept.prefLabels({
+      languageTags: new Set(["en"]),
+    });
     expect(enPrefLabels).toHaveLength(1);
     expect(enPrefLabels[0].literalForm.value).toStrictEqual(
       "Environmental impact assessment",
     );
 
-    const frPrefLabels = await concept.prefLabels({ languageTag: "fr" });
+    const frPrefLabels = await concept.prefLabels({
+      languageTags: new Set(["fr"]),
+    });
     expect(frPrefLabels).toHaveLength(1);
     expect(frPrefLabels[0].literalForm.value).toStrictEqual(
       "Évaluation de l'impact sur l'environnement",

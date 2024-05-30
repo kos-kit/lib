@@ -29,6 +29,8 @@ export class LunrSearchEngine implements SearchEngine {
     languageTag: LanguageTag;
     kos: Kos;
   }): Promise<LunrSearchEngine> {
+    const languageTags = new Set([languageTag, ""]);
+
     type IndexDocument = {
       readonly identifier: string;
       readonly joinedLabels: string;
@@ -40,12 +42,14 @@ export class LunrSearchEngine implements SearchEngine {
       model: LabeledModel & { identifier: Identifier },
       type: SearchResult["type"],
     ): Promise<IndexDocument | null> => {
-      const prefLabels = await model.prefLabels({ languageTag });
+      const prefLabels = await model.prefLabels({
+        languageTags,
+      });
       if (prefLabels.length === 0) {
         return null;
       }
-      const altLabels = await model.altLabels({ languageTag });
-      const hiddenLabels = await model.hiddenLabels({ languageTag });
+      const altLabels = await model.altLabels({ languageTags });
+      const hiddenLabels = await model.hiddenLabels({ languageTags });
 
       const identifierString = identifierToString(model.identifier);
 

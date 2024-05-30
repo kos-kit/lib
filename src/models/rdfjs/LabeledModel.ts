@@ -9,11 +9,13 @@ import { Label } from "./Label";
 import { Label as ILabel } from "../Label";
 
 export abstract class LabeledModel extends Model implements ILabeledModel {
-  altLabels(kwds?: { languageTag?: LanguageTag }): Promise<readonly ILabel[]> {
+  altLabels(kwds?: {
+    languageTags?: Set<LanguageTag>;
+  }): Promise<readonly ILabel[]> {
     return new Promise((resolve) =>
       resolve([
         ...this.labels({
-          languageTag: kwds?.languageTag,
+          languageTags: kwds?.languageTags,
           skosPredicate: skos.altLabel,
           skosXlPredicate: skosxl.altLabel,
         }),
@@ -22,12 +24,12 @@ export abstract class LabeledModel extends Model implements ILabeledModel {
   }
 
   hiddenLabels(kwds?: {
-    languageTag?: LanguageTag;
+    languageTags?: Set<LanguageTag>;
   }): Promise<readonly ILabel[]> {
     return new Promise((resolve) =>
       resolve([
         ...this.labels({
-          languageTag: kwds?.languageTag,
+          languageTags: kwds?.languageTags,
           skosPredicate: skos.hiddenLabel,
           skosXlPredicate: skosxl.hiddenLabel,
         }),
@@ -36,17 +38,19 @@ export abstract class LabeledModel extends Model implements ILabeledModel {
   }
 
   private *labels({
-    languageTag,
+    languageTags,
     skosPredicate,
     skosXlPredicate,
   }: {
-    languageTag?: LanguageTag;
+    languageTags?: Set<LanguageTag>;
     skosPredicate: NamedNode;
     skosXlPredicate: NamedNode;
   }): Iterable<ILabel> {
+    languageTags = languageTags ?? new Set();
+
     yield* this.filterAndMapObjects(skosPredicate, (term) =>
       term.termType === "Literal" &&
-      (!languageTag || term.language === languageTag)
+      (languageTags.size === 0 || languageTags.has(term.language))
         ? new LiteralLabel(term)
         : null,
     );
@@ -68,7 +72,10 @@ export abstract class LabeledModel extends Model implements ILabeledModel {
           continue;
         }
 
-        if (languageTag && literalFormQuad.object.language !== languageTag) {
+        if (
+          languageTags.size > 0 &&
+          !languageTags.has(literalFormQuad.object.language)
+        ) {
           continue;
         }
 
@@ -83,11 +90,13 @@ export abstract class LabeledModel extends Model implements ILabeledModel {
     });
   }
 
-  prefLabels(kwds?: { languageTag?: LanguageTag }): Promise<readonly ILabel[]> {
+  prefLabels(kwds?: {
+    languageTags?: Set<LanguageTag>;
+  }): Promise<readonly ILabel[]> {
     return new Promise((resolve) =>
       resolve([
         ...this.labels({
-          languageTag: kwds?.languageTag,
+          languageTags: kwds?.languageTags,
           skosPredicate: skos.prefLabel,
           skosXlPredicate: skosxl.prefLabel,
         }),

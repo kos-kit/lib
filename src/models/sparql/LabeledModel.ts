@@ -10,19 +10,19 @@ export abstract class LabeledModel<RdfJsModelT extends RdfJsLabeledModel>
   implements ILabeledModel
 {
   async altLabels(kwds?: {
-    languageTag?: LanguageTag;
+    languageTags?: Set<LanguageTag>;
   }): Promise<readonly Label[]> {
     return (await this.getOrCreateRdfJsModel()).altLabels(kwds);
   }
 
   async hiddenLabels(kwds?: {
-    languageTag?: LanguageTag;
+    languageTags?: Set<LanguageTag>;
   }): Promise<readonly Label[]> {
     return (await this.getOrCreateRdfJsModel()).altLabels(kwds);
   }
 
   async prefLabels(kwds?: {
-    languageTag?: LanguageTag;
+    languageTags?: Set<LanguageTag>;
   }): Promise<readonly Label[]> {
     return (await this.getOrCreateRdfJsModel()).prefLabels(kwds);
   }
