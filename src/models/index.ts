@@ -10,5 +10,5 @@ export * from "./noteProperties";
 export * from "./NoteProperty";
 export * from "./semanticRelationProperties";
 export * from "./SemanticRelationProperty";
-export * as rdfjs from "./rdfjs";
+export * as mem from "./mem";
 export * as sparql from "./sparql";

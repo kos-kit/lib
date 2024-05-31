@@ -3,7 +3,7 @@ import axios, { AxiosInstance } from "axios";
 import { SearchEngine } from "./SearchEngine";
 import { SearchEngineJson } from "./SearchEngineJson";
 import { SearchResult } from "./SearchResult";
-import { Kos as RdfJsKos } from "../models/rdfjs/Kos";
+import { Kos as RdfJsKos } from "../models/mem/Kos";
 import { Parser, Store } from "n3";
 import { identifierToString } from "../utilities/identifierToString";
 import { LanguageTag } from "../models";

@@ -1,6 +1,6 @@
 import { DatasetCore, Literal, Quad } from "@rdfjs/types";
 import { LabeledModel } from "./LabeledModel";
-import { Concept as RdfJsConcept } from "../rdfjs/Concept";
+import { Concept as RdfJsConcept } from "../mem/Concept";
 import { Concept as IConcept } from "../Concept";
 import { ConceptScheme } from "./ConceptScheme";
 import { NoteProperty } from "../NoteProperty";

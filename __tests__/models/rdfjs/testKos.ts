@@ -1,4 +1,4 @@
-import { Kos } from "../../../src/models/rdfjs/Kos";
+import { Kos } from "../../../src/models/mem/Kos";
 import { Parser, Store } from "n3";
 import path from "node:path";
 import fs from "node:fs";
