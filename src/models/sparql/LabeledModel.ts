@@ -2,7 +2,7 @@ import { skosxl } from "../../vocabularies";
 import { Label } from "../Label";
 import { LabeledModel as ILabeledModel } from "../LabeledModel";
 import { LanguageTag } from "../LanguageTag";
-import { LabeledModel as RdfJsLabeledModel } from "../rdfjs/LabeledModel";
+import { LabeledModel as RdfJsLabeledModel } from "../mem/LabeledModel";
 import { Model } from "./Model";
 
 export abstract class LabeledModel<RdfJsModelT extends RdfJsLabeledModel>

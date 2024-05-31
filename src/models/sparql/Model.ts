@@ -1,4 +1,4 @@
-import { Model as RdfJsModel } from "../rdfjs/Model";
+import { Model as RdfJsModel } from "../mem/Model";
 import { DatasetCore, Literal, NamedNode } from "@rdfjs/types";
 import { Model as IModel } from "../Model";
 import { Identifier } from "../Identifier";

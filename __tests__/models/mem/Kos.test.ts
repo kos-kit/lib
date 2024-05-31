@@ -1,6 +1,6 @@
 import { behavesLikeKos } from "../behavesLikeKos";
 import { testKos } from "./testKos";
 
-describe("rdfjs.Kos", () => {
+describe("mem.Kos", () => {
   behavesLikeKos(testKos);
 });

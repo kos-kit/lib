@@ -1,5 +1,5 @@
 import { behavesLikeSearchEngine } from "./behavesLikeSearchEngine";
-import { testKos } from "../models/rdfjs/testKos";
+import { testKos } from "../models/mem/testKos";
 import { LunrSearchEngine } from "../../src/search/LunrSearchEngine";
 
 describe("LunrSearchEngine", () => {

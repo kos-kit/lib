@@ -1,1 +1,1 @@
-export { testKos } from "./models/rdfjs/testKos";
+export { testKos } from "./models/mem/testKos";
