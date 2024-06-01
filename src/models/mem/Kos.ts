@@ -1,6 +1,5 @@
 import { DatasetCore } from "@rdfjs/types";
 import { getRdfInstances } from "./getRdfInstances";
-import { AbstractKos } from "../AbstractKos";
 import { Identifier } from "../Identifier";
 import { Concept } from "./Concept";
 import { skos } from "../../vocabularies";
@@ -8,15 +7,32 @@ import { identifierToString } from "../../utilities/identifierToString";
 import { ConceptScheme } from "./ConceptScheme";
 import { paginateIterable } from "../../utilities/paginateIterable";
 import { countIterable } from "../../utilities";
+import { LanguageTagSet } from "../LanguageTagSet";
 
-export class Kos extends AbstractKos {
-  constructor(private readonly dataset: DatasetCore) {
-    super();
+export class Kos {
+  private readonly dataset: DatasetCore;
+  private readonly includeLanguageTags: LanguageTagSet;
+
+  constructor({
+    dataset,
+    includeLanguageTags,
+  }: {
+    dataset: DatasetCore;
+    includeLanguageTags: LanguageTagSet;
+  }) {
+    this.dataset = dataset;
+    this.includeLanguageTags = includeLanguageTags;
   }
 
   conceptByIdentifier(identifier: Identifier): Promise<Concept> {
     return new Promise((resolve) =>
-      resolve(new Concept({ dataset: this.dataset, identifier: identifier })),
+      resolve(
+        new Concept({
+          dataset: this.dataset,
+          identifier: identifier,
+          includeLanguageTags: this.includeLanguageTags,
+        }),
+      ),
     );
   }
 
@@ -26,6 +42,16 @@ export class Kos extends AbstractKos {
       dataset: this.dataset,
       includeSubclasses: true,
     });
+  }
+
+  async *concepts(): AsyncGenerator<Concept, any, unknown> {
+    for await (const conceptIdentifier of this.conceptIdentifiers()) {
+      yield new Concept({
+        dataset: this.dataset,
+        identifier: conceptIdentifier,
+        includeLanguageTags: this.includeLanguageTags,
+      });
+    }
   }
 
   conceptsPage({
@@ -45,6 +71,7 @@ export class Kos extends AbstractKos {
           new Concept({
             dataset: this.dataset,
             identifier: conceptIdentifier,
+            includeLanguageTags: this.includeLanguageTags,
           }),
         );
       }
@@ -82,6 +109,7 @@ export class Kos extends AbstractKos {
       yield new ConceptScheme({
         dataset: this.dataset,
         identifier,
+        includeLanguageTags: this.includeLanguageTags,
       });
     }
   }

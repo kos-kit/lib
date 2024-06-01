@@ -62,6 +62,7 @@ export class ConceptScheme extends LabeledModel implements IConceptScheme {
           new Concept({
             dataset: this.dataset,
             identifier: conceptIdentifier,
+            includeLanguageTags: this.includeLanguageTags,
           }),
         );
       }

@@ -3,7 +3,14 @@ import { makeStructuredValidator } from "envalid/dist/makers";
 import path from "node:path";
 import fs from "node:fs";
 
-export const filePathArrayValidator: envalid.StructuredValidator =
+export const directoryPathValidator = envalid.makeExactValidator((value) => {
+  if (value.length === 0) {
+    throw new Error("not specified");
+  }
+  return path.resolve(value);
+});
+
+export const existingFilePathArrayValidator: envalid.StructuredValidator =
   makeStructuredValidator((value) => {
     if (value.length === 0) {
       return [];

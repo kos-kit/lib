@@ -1,13 +1,24 @@
-import { AbstractKos } from "../AbstractKos";
 import { Identifier } from "../Identifier";
 import { rdf, rdfs, skos } from "../../vocabularies";
 import { Concept } from "./Concept";
 import { ConceptScheme } from "./ConceptScheme";
 import SparqlClient from "sparql-http-client/ParsingClient";
+import { LanguageTagSet } from "../LanguageTagSet";
+import { KosOptions } from "../KosOptions";
 
-export class Kos extends AbstractKos {
-  constructor(private readonly sparqlClient: SparqlClient) {
-    super();
+export class Kos {
+  private readonly options: KosOptions;
+  private readonly sparqlClient: SparqlClient;
+
+  constructor({
+    options,
+    sparqlClient,
+  }: {
+    options: KosOptions;
+    sparqlClient: SparqlClient;
+  }) {
+    this.options = options;
+    this.sparqlClient = sparqlClient;
   }
 
   conceptByIdentifier(identifier: Identifier): Promise<Concept> {
@@ -15,10 +26,23 @@ export class Kos extends AbstractKos {
       resolve(
         new Concept({
           identifier,
+          options: this.options,
           sparqlClient: this.sparqlClient,
         }),
       ),
     );
+  }
+
+  async *concepts(): AsyncGenerator<Concept, any, unknown> {
+    const conceptsCount = await this.conceptsCount();
+    const limit = 100;
+    let offset = 0;
+    while (offset < conceptsCount) {
+      for (const concept of await this.conceptsPage({ limit, offset })) {
+        yield concept;
+        offset++;
+      }
+    }
   }
 
   async conceptsPage({

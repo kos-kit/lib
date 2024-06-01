@@ -7,63 +7,74 @@ import { skos, skosxl } from "../../vocabularies";
 import { LiteralLabel } from "../LiteralLabel";
 import { Label } from "./Label";
 import { Label as ILabel } from "../Label";
+import { identifierToString } from "../../utilities";
 
 export abstract class LabeledModel extends Model implements ILabeledModel {
-  altLabels(kwds?: {
-    languageTags?: Set<LanguageTag>;
-  }): Promise<readonly ILabel[]> {
-    return new Promise((resolve) =>
-      resolve([
-        ...this.labels({
-          languageTags: kwds?.languageTags,
-          skosPredicate: skos.altLabel,
-          skosXlPredicate: skosxl.altLabel,
-        }),
-      ]),
-    );
+  get altLabels(): readonly ILabel[] {
+    return this.labels({
+      skosPredicate: skos.altLabel,
+      skosXlPredicate: skosxl.altLabel,
+    });
   }
 
-  hiddenLabels(kwds?: {
-    languageTags?: Set<LanguageTag>;
-  }): Promise<readonly ILabel[]> {
-    return new Promise((resolve) =>
-      resolve([
-        ...this.labels({
-          languageTags: kwds?.languageTags,
-          skosPredicate: skos.hiddenLabel,
-          skosXlPredicate: skosxl.hiddenLabel,
-        }),
-      ]),
-    );
+  get displayLabel(): string {
+    const prefLabels = this.prefLabels;
+    if (prefLabels.length > 0) {
+      for (const languageTag of this.includeLanguageTags) {
+        for (const prefLabel of prefLabels) {
+          if (prefLabel.literalForm.language === languageTag) {
+            return prefLabel.literalForm.value;
+          }
+        }
+      }
+    }
+
+    return identifierToString(this.identifier);
   }
 
-  private *labels({
-    languageTags,
+  get hiddenLabels(): readonly ILabel[] {
+    return this.labels({
+      skosPredicate: skos.hiddenLabel,
+      skosXlPredicate: skosxl.hiddenLabel,
+    });
+  }
+
+  private labels({
     skosPredicate,
     skosXlPredicate,
   }: {
-    languageTags?: Set<LanguageTag>;
+    includeLanguageTags?: Set<LanguageTag>;
     skosPredicate: NamedNode;
     skosXlPredicate: NamedNode;
-  }): Iterable<ILabel> {
-    languageTags = languageTags ?? new Set();
+  }): readonly ILabel[] {
+    const labels: ILabel[] = [];
 
-    yield* this.filterAndMapObjects(skosPredicate, (term) =>
-      term.termType === "Literal" &&
-      (languageTags.size === 0 || languageTags.has(term.language))
-        ? new LiteralLabel(term)
-        : null,
-    );
+    for (const quad of this.dataset.match(
+      this.identifier,
+      skosPredicate,
+      null,
+    )) {
+      if (
+        quad.object.termType === "Literal" &&
+        (this.includeLanguageTags.size === 0 ||
+          this.includeLanguageTags.has(quad.object.language))
+      ) {
+        labels.push(new LiteralLabel(quad.object));
+      }
+    }
 
     // Any resource in the range of a skosxl: label predicate is considered a skosxl:Label
-    yield* this.filterAndMapObjects(skosXlPredicate, (term) => {
-      const labelIdentifier = mapTermToIdentifier(term);
+    for (const quad of this.dataset.match(
+      this.identifier,
+      skosXlPredicate,
+      null,
+    )) {
+      const labelIdentifier = mapTermToIdentifier(quad.object);
       if (labelIdentifier === null) {
-        return null;
+        continue;
       }
-
       for (const literalFormQuad of this.dataset.match(
-        term,
+        labelIdentifier,
         skosxl.literalForm,
         null,
         null,
@@ -73,34 +84,30 @@ export abstract class LabeledModel extends Model implements ILabeledModel {
         }
 
         if (
-          languageTags.size > 0 &&
-          !languageTags.has(literalFormQuad.object.language)
+          this.includeLanguageTags.size > 0 &&
+          !this.includeLanguageTags.has(literalFormQuad.object.language)
         ) {
           continue;
         }
 
-        return new Label({
-          dataset: this.dataset,
-          identifier: labelIdentifier,
-          literalForm: literalFormQuad.object,
-        });
+        labels.push(
+          new Label({
+            dataset: this.dataset,
+            identifier: labelIdentifier,
+            includeLanguageTags: this.includeLanguageTags,
+            literalForm: literalFormQuad.object,
+          }),
+        );
       }
+    }
 
-      return null;
-    });
+    return labels;
   }
 
-  prefLabels(kwds?: {
-    languageTags?: Set<LanguageTag>;
-  }): Promise<readonly ILabel[]> {
-    return new Promise((resolve) =>
-      resolve([
-        ...this.labels({
-          languageTags: kwds?.languageTags,
-          skosPredicate: skos.prefLabel,
-          skosXlPredicate: skosxl.prefLabel,
-        }),
-      ]),
-    );
+  get prefLabels(): readonly ILabel[] {
+    return this.labels({
+      skosPredicate: skos.prefLabel,
+      skosXlPredicate: skosxl.prefLabel,
+    });
   }
 }
