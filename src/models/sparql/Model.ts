@@ -1,66 +1,52 @@
-import { Model as RdfJsModel } from "../mem/Model";
-import { DatasetCore, Literal, NamedNode } from "@rdfjs/types";
+import { Model as MemModel } from "../mem/Model";
+import { Literal, NamedNode } from "@rdfjs/types";
 import { Model as IModel } from "../Model";
 import { Identifier } from "../Identifier";
 import SparqlClient from "sparql-http-client/ParsingClient";
+import { LanguageTagSet } from "../LanguageTagSet";
 
 /**
  * Abstract base class for SPARQL-backed models.
  *
- * Most methods are delegated to an RDF/JS-backed model after populating it with a SPARQL construct query.
+ * Most methods are delegated to a memory-backed model after populating it with a SPARQL construct query.
  */
-export abstract class Model<RdfJsModelT extends RdfJsModel> implements IModel {
-  readonly identifier: Identifier;
+export abstract class Model<MemModelT extends MemModel> implements IModel {
+  protected readonly includeLanguageTags: LanguageTagSet;
+  protected readonly memModel: MemModelT;
   protected readonly sparqlClient: SparqlClient;
-  private _rdfJsModel: RdfJsModelT | null = null;
 
   constructor({
-    identifier,
+    includeLanguageTags,
+    memModel,
     sparqlClient,
   }: {
     identifier: Identifier;
+    includeLanguageTags: LanguageTagSet;
+    memModel: MemModelT;
     sparqlClient: SparqlClient;
   }) {
-    this.identifier = identifier;
+    this.includeLanguageTags = includeLanguageTags;
+    this.memModel = memModel;
     this.sparqlClient = sparqlClient;
   }
 
-  protected abstract createRdfJsModel(dataset: DatasetCore): RdfJsModelT;
-
-  protected async getOrCreateRdfJsModel(): Promise<RdfJsModelT> {
-    if (this._rdfJsModel !== null) {
-      return this._rdfJsModel;
-    }
-
-    this._rdfJsModel = this.createRdfJsModel(
-      await this.sparqlClient.query.construct(this.rdfJsDatasetQueryString),
-    );
-    return this._rdfJsModel;
+  get identifier(): Identifier {
+    return this.memModel.identifier;
   }
 
-  async license(
-    languageTag: string,
-  ): Promise<Literal | NamedNode<string> | null> {
-    return (await this.getOrCreateRdfJsModel()).license(languageTag);
+  get license(): Literal | NamedNode | null {
+    return this.memModel.license;
   }
 
-  async modified(): Promise<Literal | null> {
-    return (await this.getOrCreateRdfJsModel()).modified();
+  get modified(): Literal | null {
+    return this.memModel.modified;
   }
 
-  protected get rdfJsDatasetQueryString(): string {
-    return `
-CONSTRUCT WHERE {
-  <${this.identifier.value}> ?p ?o .
-}
-`;
+  get rights(): Literal | null {
+    return this.memModel.rights;
   }
 
-  async rights(languageTag: string): Promise<Literal | null> {
-    return (await this.getOrCreateRdfJsModel()).rights(languageTag);
-  }
-
-  async rightsHolder(languageTag: string): Promise<Literal | null> {
-    return (await this.getOrCreateRdfJsModel()).rightsHolder(languageTag);
+  get rightsHolder(): Literal | null {
+    return this.memModel.rightsHolder;
   }
 }

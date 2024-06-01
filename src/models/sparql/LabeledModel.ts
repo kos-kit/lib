@@ -10,35 +10,31 @@ export abstract class LabeledModel<RdfJsModelT extends RdfJsLabeledModel>
   implements ILabeledModel
 {
   get altLabels(): readonly Label[] {
-    return (await this.getOrCreateRdfJsModel()).altLabels;
+    return this.memModel.altLabels;
   }
 
-  async hiddenLabels(kwds?: {
-    languageTags?: Set<LanguageTag>;
-  }): Promise<readonly Label[]> {
-    return (await this.getOrCreateRdfJsModel()).altLabels(kwds);
+  get displayLabel(): string {
+    return this.memModel.displayLabel;
   }
 
-  async displayLabel(languageTag: string): Promise<string> {
-    return (await this.getOrCreateRdfJsModel()).displayLabel(languageTag);
+  get hiddenLabels(): readonly Label[] {
+    return this.memModel.hiddenLabels;
   }
 
-  async prefLabels(kwds?: {
-    languageTags?: Set<LanguageTag>;
-  }): Promise<readonly Label[]> {
-    return (await this.getOrCreateRdfJsModel()).prefLabels(kwds);
+  get prefLabels(): readonly Label[] {
+    return this.memModel.prefLabels;
   }
 
-  protected override get rdfJsDatasetQueryString(): string {
-    return `
-CONSTRUCT {
-  <${this.identifier.value}> ?p ?o .
-  <${this.identifier.value}> ?p ?label . ?label <${skosxl.literalForm.value}> ?literalForm .
-} WHERE {  
-  { <${this.identifier.value}> ?p ?o . }
-  UNION
-  { <${this.identifier.value}> ?p ?label . ?label <${skosxl.literalForm.value}> ?literalForm . }
-}
-`;
-  }
+  //   protected override get rdfJsDatasetQueryString(): string {
+  //     return `
+  // CONSTRUCT {
+  //   <${this.identifier.value}> ?p ?o .
+  //   <${this.identifier.value}> ?p ?label . ?label <${skosxl.literalForm.value}> ?literalForm .
+  // } WHERE {
+  //   { <${this.identifier.value}> ?p ?o . }
+  //   UNION
+  //   { <${this.identifier.value}> ?p ?label . ?label <${skosxl.literalForm.value}> ?literalForm . }
+  // }
+  // `;
+  //   }
 }

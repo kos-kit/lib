@@ -4,20 +4,19 @@ import { Concept } from "./Concept";
 import { ConceptScheme } from "./ConceptScheme";
 import SparqlClient from "sparql-http-client/ParsingClient";
 import { LanguageTagSet } from "../LanguageTagSet";
-import { KosOptions } from "../KosOptions";
 
 export class Kos {
-  private readonly options: KosOptions;
+  private readonly includeLanguageTags: LanguageTagSet;
   private readonly sparqlClient: SparqlClient;
 
   constructor({
-    options,
+    includeLanguageTags,
     sparqlClient,
   }: {
-    options: KosOptions;
+    includeLanguageTags: LanguageTagSet;
     sparqlClient: SparqlClient;
   }) {
-    this.options = options;
+    this.includeLanguageTags = includeLanguageTags;
     this.sparqlClient = sparqlClient;
   }
 
@@ -26,7 +25,7 @@ export class Kos {
       resolve(
         new Concept({
           identifier,
-          options: this.options,
+          includeLanguageTags: this.includeLanguageTags,
           sparqlClient: this.sparqlClient,
         }),
       ),
@@ -105,6 +104,7 @@ WHERE {
       resolve(
         new ConceptScheme({
           identifier,
+          includeLanguageTags: this.includeLanguageTags,
           sparqlClient: this.sparqlClient,
         }),
       ),

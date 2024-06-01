@@ -7,10 +7,6 @@ import { NoteProperty } from "../NoteProperty";
 import { SemanticRelationProperty } from "../SemanticRelationProperty";
 
 export class Concept extends LabeledModel<RdfJsConcept> implements IConcept {
-  protected createRdfJsModel(dataset: DatasetCore<Quad, Quad>): RdfJsConcept {
-    return new RdfJsConcept({ dataset, identifier: this.identifier });
-  }
-
   async inSchemes(): Promise<readonly ConceptScheme[]> {
     return (await (await this.getOrCreateRdfJsModel()).inSchemes()).map(
       (conceptScheme) =>
@@ -21,15 +17,12 @@ export class Concept extends LabeledModel<RdfJsConcept> implements IConcept {
     );
   }
 
-  async notations(): Promise<readonly Literal[]> {
-    return (await this.getOrCreateRdfJsModel()).notations();
+  get notations(): readonly Literal[] {
+    return this.memModel.notations;
   }
 
-  async notes(
-    languageTag: string,
-    property: NoteProperty,
-  ): Promise<readonly Literal[]> {
-    return (await this.getOrCreateRdfJsModel()).notes(languageTag, property);
+  notes(property: NoteProperty): readonly Literal[] {
+    return this.memModel.notes(property);
   }
 
   async semanticRelations(
