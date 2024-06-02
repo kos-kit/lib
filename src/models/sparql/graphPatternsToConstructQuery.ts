@@ -25,7 +25,9 @@ function graphPatternToConstructStrings(
 ): readonly IndentedString[] {
   let constructStrings = [graphPatternToString(graphPattern, indent)];
   if (graphPattern.subGraphPatterns) {
-    for (const subGraphPattern of graphPattern.subGraphPatterns) {
+    for (const subGraphPattern of sortGraphPatterns(
+      graphPattern.subGraphPatterns,
+    )) {
       constructStrings = constructStrings.concat(
         graphPatternToConstructStrings(subGraphPattern, indent + TAB_SPACES),
       );
@@ -58,7 +60,9 @@ function graphPatternToFilterStrings(
   }
 
   if (graphPattern.subGraphPatterns) {
-    for (const subGraphPattern of graphPattern.subGraphPatterns) {
+    for (const subGraphPattern of sortGraphPatterns(
+      graphPattern.subGraphPatterns,
+    )) {
       filterStrings = filterStrings.concat(
         graphPatternToFilterStrings(subGraphPattern, includeLanguageTags),
       );
@@ -74,7 +78,9 @@ function graphPatternToWhereStrings(
 ): readonly IndentedString[] {
   let whereStrings = [graphPatternToString(graphPattern, indent)];
   if (graphPattern.subGraphPatterns) {
-    for (const subGraphPattern of graphPattern.subGraphPatterns) {
+    for (const subGraphPattern of sortGraphPatterns(
+      graphPattern.subGraphPatterns,
+    )) {
       whereStrings = whereStrings.concat(
         graphPatternToWhereStrings(subGraphPattern, indent + TAB_SPACES),
       );
@@ -102,7 +108,9 @@ export function graphPatternsToConstructQuery(
     throw new RangeError("empty graph patterns");
   }
 
-  const filterStrings = graphPatterns
+  const sortedGraphPatterns = sortGraphPatterns(graphPatterns);
+
+  const filterStrings = sortedGraphPatterns
     .flatMap((graphPattern) =>
       graphPatternToFilterStrings(
         graphPattern,
@@ -115,13 +123,13 @@ export function graphPatternsToConstructQuery(
   return `\
 CONSTRUCT {
 ${indentedStringsToString(
-  graphPatterns.flatMap((graphPattern) =>
+  sortedGraphPatterns.flatMap((graphPattern) =>
     graphPatternToConstructStrings(graphPattern, TAB_SPACES),
   ),
 )}
 } WHERE {
 ${indentedStringsToString(
-  graphPatterns.flatMap((graphPattern) =>
+  sortedGraphPatterns.flatMap((graphPattern) =>
     graphPatternToWhereStrings(graphPattern, TAB_SPACES),
   ),
 )}${filterStrings.length > 0 ? "\n" + filterStrings : ""}
@@ -134,6 +142,21 @@ function indentedStringsToString(
   return indentedStrings
     .map(({ indent, string }) => " ".repeat(indent) + string)
     .join("\n");
+}
+
+function sortGraphPatterns(
+  graphPatterns: readonly GraphPattern[],
+): readonly GraphPattern[] {
+  const sortedGraphPatterns = graphPatterns.concat();
+  sortedGraphPatterns.sort((left, right) => {
+    // Required then optional.
+    if (left.optional) {
+      return right.optional ? 0 : 1;
+    } else {
+      return right.optional ? -1 : 0;
+    }
+  });
+  return sortedGraphPatterns;
 }
 
 function termToString(

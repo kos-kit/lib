@@ -5,6 +5,9 @@ import { ConceptScheme } from "./ConceptScheme";
 import { NoteProperty } from "../NoteProperty";
 import { SemanticRelationProperty } from "../SemanticRelationProperty";
 import { Literal } from "@rdfjs/types";
+import { GraphPatternSubject, GraphPattern } from "./GraphPattern";
+import { noteProperties } from "../noteProperties";
+import { skos } from "../../vocabularies";
 
 export class Concept extends LabeledModel<MemConcept> implements IConcept {
   // static IDENTIFIER_GRAPH_PATTERNS = [
@@ -30,6 +33,37 @@ export class Concept extends LabeledModel<MemConcept> implements IConcept {
 
   notes(property: NoteProperty): readonly Literal[] {
     return this.memModel.notes(property);
+  }
+
+  static override propertyGraphPatterns(
+    subject: GraphPatternSubject,
+  ): readonly GraphPattern[] {
+    const graphPatterns: GraphPattern[] = [];
+
+    graphPatterns.push({
+      subject,
+      predicate: skos.notation,
+      object: {
+        termType: "Variable",
+        value: "notation",
+      },
+      optional: true,
+    });
+
+    for (const noteProperty of noteProperties) {
+      graphPatterns.push({
+        subject,
+        predicate: noteProperty.identifier,
+        object: {
+          plainLiteral: true,
+          termType: "Variable",
+          value: noteProperty.name,
+        },
+        optional: true,
+      });
+    }
+
+    return LabeledModel.propertyGraphPatterns(subject).concat(graphPatterns);
   }
 
   async semanticRelations(

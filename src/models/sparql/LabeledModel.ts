@@ -1,4 +1,3 @@
-import { Variable } from "@rdfjs/types";
 import { Label } from "../Label";
 import { LabeledModel as ILabeledModel } from "../LabeledModel";
 import { LabeledModel as MemLabeledModel } from "../mem/LabeledModel";

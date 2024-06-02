@@ -5,6 +5,7 @@ import {
   graphPatternsToConstructQuery,
 } from "../../../src/models/sparql";
 import { skos } from "../../../src/vocabularies";
+import { Concept } from "../../../src/models/sparql/Concept";
 
 describe("graphPatternsToConstructQuery", () => {
   const subject: GraphPatternSubject = {
@@ -75,5 +76,17 @@ CONSTRUCT {
   <${subject.value}> <${predicate.value}> ?${object.value} .
   FILTER (!BOUND(?${object.value}) || LANG(?${object.value}) = "en" || LANG(?${object.value}) = "" )
 }`);
+  });
+
+  it("should translate a conceptByIdentifier query", () => {
+    const subject: GraphPatternSubject = {
+      termType: "NamedNode",
+      value: "http://example.com/concept",
+    };
+    const actual = graphPatternsToConstructQuery(
+      Concept.propertyGraphPatterns(subject),
+    );
+    // console.log("\n", actual);
+    expect(actual).not.toHaveLength(0);
   });
 });
