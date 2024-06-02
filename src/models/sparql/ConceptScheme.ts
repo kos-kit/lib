@@ -1,16 +1,16 @@
 import { ConceptScheme as IConceptScheme } from "../ConceptScheme";
-import { ConceptScheme as RdfJsConceptScheme } from "../mem/ConceptScheme";
+import { ConceptScheme as MemConceptScheme } from "../mem/ConceptScheme";
 import { LabeledModel as LabeledModel } from "./LabeledModel";
 import { Concept } from "./Concept";
 
 export class ConceptScheme
-  extends LabeledModel<RdfJsConceptScheme>
+  extends LabeledModel<MemConceptScheme>
   implements IConceptScheme
 {
-  // protected createRdfJsModel(
+  // protected createMemModel(
   //   dataset: DatasetCore<Quad, Quad>,
-  // ): RdfJsConceptScheme {
-  //   return new RdfJsConceptScheme({ dataset, identifier: this.identifier });
+  // ): MemConceptScheme {
+  //   return new MemConceptScheme({ dataset, identifier: this.identifier });
   // }
 
   //   protected override get rdfJsDatasetQueryString(): string {
@@ -34,7 +34,7 @@ export class ConceptScheme
     offset: number;
   }): Promise<readonly Concept[]> {
     throw new Error("not implemented yet");
-    // return (await (await this.getOrCreateRdfJsModel()).topConcepts(kwds)).map(
+    // return (await (await this.getOrCreateMemModel()).topConcepts(kwds)).map(
     //   (conceptScheme) =>
     //     new Concept({
     //       identifier: conceptScheme.identifier,
@@ -45,6 +45,6 @@ export class ConceptScheme
 
   async topConceptsCount(): Promise<number> {
     throw new Error("not implemented yet");
-    // return (await this.getOrCreateRdfJsModel()).topConceptsCount();
+    // return (await this.getOrCreateMemModel()).topConceptsCount();
   }
 }

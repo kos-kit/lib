@@ -1,12 +1,12 @@
 import { LabeledModel } from "./LabeledModel";
-import { Concept as RdfJsConcept } from "../mem/Concept";
+import { Concept as MemConcept } from "../mem/Concept";
 import { Concept as IConcept } from "../Concept";
 import { ConceptScheme } from "./ConceptScheme";
 import { NoteProperty } from "../NoteProperty";
 import { SemanticRelationProperty } from "../SemanticRelationProperty";
 import { Literal } from "@rdfjs/types";
 
-export class Concept extends LabeledModel<RdfJsConcept> implements IConcept {
+export class Concept extends LabeledModel<MemConcept> implements IConcept {
   // static IDENTIFIER_GRAPH_PATTERNS = [
   //   "?concept <${rdf.type.value}>/<${rdfs.subClassOf.value}>* <${skos.Concept.value}> ";
   // ]

@@ -1,12 +1,11 @@
 import { Model as MemModel } from "../mem/Model";
-import { Literal, NamedNode, Variable } from "@rdfjs/types";
+import { Literal, NamedNode } from "@rdfjs/types";
 import { Model as IModel } from "../Model";
 import { Identifier } from "../Identifier";
 import SparqlClient from "sparql-http-client/ParsingClient";
 import { LanguageTagSet } from "../LanguageTagSet";
 import { dc11, dcterms } from "../../vocabularies";
-import { GraphPattern } from "./GraphPattern";
-import { DataFactory } from "n3";
+import { GraphPattern, GraphPatternSubject } from "./GraphPattern";
 
 /**
  * Abstract base class for SPARQL-backed models.
@@ -53,41 +52,42 @@ export abstract class Model<MemModelT extends MemModel> implements IModel {
     return this.memModel.modified;
   }
 
-  protected static propertyGraphPatterns(
-    identifier: Variable,
+  static propertyGraphPatterns(
+    subject: GraphPatternSubject,
   ): readonly GraphPattern[] {
     return [
       {
-        subject: identifier,
+        subject,
         predicate: dcterms.license,
-        object: DataFactory.variable("license"),
-        objectOptions: { plainLiteral: true },
+        object: { termType: "Variable", plainLiteral: true, value: "license" },
         optional: true,
       },
       {
-        subject: identifier,
+        subject,
         predicate: dcterms.modified,
-        object: DataFactory.variable("modified"),
+        object: { termType: "Variable", value: "modified" },
         optional: true,
       },
       {
-        subject: identifier,
+        subject,
         predicate: dc11.rights,
-        object: DataFactory.variable("rights"),
+        object: { termType: "Variable", plainLiteral: true, value: "rights" },
         optional: true,
       },
       {
-        subject: identifier,
+        subject,
         predicate: dcterms.rights,
-        object: DataFactory.variable("rights"),
-        objectOptions: { plainLiteral: true },
+        object: { termType: "Variable", plainLiteral: true, value: "rights" },
         optional: true,
       },
       {
-        subject: identifier,
+        subject,
         predicate: dcterms.rightsHolder,
-        object: DataFactory.variable("rightsHolder"),
-        objectOptions: { plainLiteral: true },
+        object: {
+          termType: "Variable",
+          plainLiteral: true,
+          value: "rightsHolder",
+        },
         optional: true,
       },
     ];

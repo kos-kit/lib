@@ -1,14 +1,18 @@
 import { LanguageTagSet } from "../../../src/models/LanguageTagSet";
-import { graphPatternsToConstructQuery } from "../../../src/models/sparql";
+import {
+  GraphPatternObject,
+  GraphPatternSubject,
+  graphPatternsToConstructQuery,
+} from "../../../src/models/sparql";
 import { skos } from "../../../src/vocabularies";
 
 describe("graphPatternsToConstructQuery", () => {
-  const subject: { termType: "NamedNode"; value: string } = {
+  const subject: GraphPatternSubject = {
     termType: "NamedNode",
     value: "http://example.com/concept",
   };
   const predicate = skos.prefLabel;
-  const object: { termType: "Variable"; value: string } = {
+  const object: GraphPatternObject = {
     termType: "Variable",
     value: "prefLabel",
   };
