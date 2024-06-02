@@ -1,20 +1,27 @@
-import { DatasetCore, Literal, Quad } from "@rdfjs/types";
 import { LabeledModel } from "./LabeledModel";
 import { Concept as RdfJsConcept } from "../mem/Concept";
 import { Concept as IConcept } from "../Concept";
 import { ConceptScheme } from "./ConceptScheme";
 import { NoteProperty } from "../NoteProperty";
 import { SemanticRelationProperty } from "../SemanticRelationProperty";
+import { Literal } from "@rdfjs/types";
 
 export class Concept extends LabeledModel<RdfJsConcept> implements IConcept {
+  // static IDENTIFIER_GRAPH_PATTERNS = [
+  //   "?concept <${rdf.type.value}>/<${rdfs.subClassOf.value}>* <${skos.Concept.value}> ";
+  // ]
+
+  // static OPTIONAL_GRAPH_PATTERNS = LabeledModel.OPTIONAL_GRAPH_PATTERNS;
+
   async inSchemes(): Promise<readonly ConceptScheme[]> {
-    return (await (await this.getOrCreateRdfJsModel()).inSchemes()).map(
-      (conceptScheme) =>
-        new ConceptScheme({
-          identifier: conceptScheme.identifier,
-          sparqlClient: this.sparqlClient,
-        }),
-    );
+    throw new Error("not implemented yet");
+    //   return (await (await this.getOrCreateRdfJsModel()).inSchemes()).map(
+    //     (conceptScheme) =>
+    //       new ConceptScheme({
+    //         identifier: conceptScheme.identifier,
+    //         sparqlClient: this.sparqlClient,
+    //       }),
+    //   );
   }
 
   get notations(): readonly Literal[] {
@@ -28,32 +35,35 @@ export class Concept extends LabeledModel<RdfJsConcept> implements IConcept {
   async semanticRelations(
     property: SemanticRelationProperty,
   ): Promise<readonly Concept[]> {
-    return (
-      await (await this.getOrCreateRdfJsModel()).semanticRelations(property)
-    ).map(
-      (conceptScheme) =>
-        new Concept({
-          identifier: conceptScheme.identifier,
-          sparqlClient: this.sparqlClient,
-        }),
-    );
+    throw new Error("not implemented yet");
+    // return (
+    //   await (await this.getOrCreateRdfJsModel()).semanticRelations(property)
+    // ).map(
+    //   (conceptScheme) =>
+    //     new Concept({
+    //       identifier: conceptScheme.identifier,
+    //       sparqlClient: this.sparqlClient,
+    //     }),
+    // );
   }
 
   async semanticRelationsCount(
     property: SemanticRelationProperty,
   ): Promise<number> {
-    return (await this.getOrCreateRdfJsModel()).semanticRelationsCount(
-      property,
-    );
+    throw new Error("not implemented yet");
+    // return (await this.getOrCreateRdfJsModel()).semanticRelationsCount(
+    //   property,
+    // );
   }
 
   async topConceptOf(): Promise<readonly ConceptScheme[]> {
-    return (await (await this.getOrCreateRdfJsModel()).topConceptOf()).map(
-      (conceptScheme) =>
-        new ConceptScheme({
-          identifier: conceptScheme.identifier,
-          sparqlClient: this.sparqlClient,
-        }),
-    );
+    throw new Error("not implemented yet");
+    // return (await (await this.getOrCreateRdfJsModel()).topConceptOf()).map(
+    //   (conceptScheme) =>
+    //     new ConceptScheme({
+    //       identifier: conceptScheme.identifier,
+    //       sparqlClient: this.sparqlClient,
+    //     }),
+    // );
   }
 }

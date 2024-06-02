@@ -8,6 +8,7 @@ import { Parser, Store } from "n3";
 import { identifierToString } from "../utilities/identifierToString";
 import { LanguageTag } from "../models";
 import { SearchResults } from "./SearchResults";
+import { LanguageTagSet } from "../models/LanguageTagSet";
 
 /**
  * A SearchEngine implementation that makes HTTP requests to a kos-kit/server search endpoint.
@@ -29,8 +30,6 @@ export class ServerSearchEngine implements SearchEngine {
     offset: number;
     query: string;
   }): Promise<SearchResults> {
-    const languageTags = new Set([params.languageTag, ""]);
-
     const response = await this.axios.get(`${this.endpoint}`, {
       params,
     });
@@ -41,14 +40,15 @@ export class ServerSearchEngine implements SearchEngine {
     const parser = new Parser({ format: "N-Triples" });
     const store = new Store();
     store.addQuads(parser.parse(response.data));
-    const kos = new RdfJsKos(store);
+    const kos = new RdfJsKos({
+      dataset: store,
+      includeLanguageTags: new LanguageTagSet(params.languageTag, ""),
+    });
 
     const page: SearchResult[] = [];
 
     for await (const concept of kos.concepts()) {
-      const prefLabels = await concept.prefLabels({
-        languageTags,
-      });
+      const prefLabels = concept.prefLabels;
       if (prefLabels.length === 0) {
         continue;
       }
@@ -60,9 +60,7 @@ export class ServerSearchEngine implements SearchEngine {
     }
 
     for (const conceptScheme of await kos.conceptSchemes()) {
-      const prefLabels = await conceptScheme.prefLabels({
-        languageTags,
-      });
+      const prefLabels = conceptScheme.prefLabels;
       if (prefLabels.length === 0) {
         continue;
       }

@@ -1,14 +1,25 @@
 import { Model as MemModel } from "../mem/Model";
-import { Literal, NamedNode } from "@rdfjs/types";
+import { Literal, NamedNode, Variable } from "@rdfjs/types";
 import { Model as IModel } from "../Model";
 import { Identifier } from "../Identifier";
 import SparqlClient from "sparql-http-client/ParsingClient";
 import { LanguageTagSet } from "../LanguageTagSet";
+import { dc11, dcterms } from "../../vocabularies";
+import { GraphPattern } from "./GraphPattern";
+import { DataFactory } from "n3";
 
 /**
  * Abstract base class for SPARQL-backed models.
  *
- * Most methods are delegated to a memory-backed model after populating it with a SPARQL construct query.
+ * The SPARQL-backed models are implemented in the spirit of Labeled Property Graphs:
+ * - "properties" such as labels (skos:prefLabel, et al.), rights, et al. should be available as instance members in memory / without asynchronous calls.
+ * - "relationships" such as broader concepts, in-concept scheme, et al. should be retrieved via asynchronous calls.
+ *
+ * That means that creating a new instance of a model, such as a Concept, entails retrieving all of its instance "properties" first, usually via a SPARQL CONSTRUCT query.
+ *
+ * The line between "properties" and "relationships" can be intentionally blurred. For example:
+ * - Not all literals attached to an instance have to be "properties". Literals that would take up significant space (long strings, large arrays, etc.) can be retrieved via asynchronous methods instead.
+ * - Related RDF resources such as skosxl:Label instances can be retrieved as "properties".
  */
 export abstract class Model<MemModelT extends MemModel> implements IModel {
   protected readonly includeLanguageTags: LanguageTagSet;
@@ -40,6 +51,46 @@ export abstract class Model<MemModelT extends MemModel> implements IModel {
 
   get modified(): Literal | null {
     return this.memModel.modified;
+  }
+
+  protected static propertyGraphPatterns(
+    identifier: Variable,
+  ): readonly GraphPattern[] {
+    return [
+      {
+        subject: identifier,
+        predicate: dcterms.license,
+        object: DataFactory.variable("license"),
+        objectOptions: { plainLiteral: true },
+        optional: true,
+      },
+      {
+        subject: identifier,
+        predicate: dcterms.modified,
+        object: DataFactory.variable("modified"),
+        optional: true,
+      },
+      {
+        subject: identifier,
+        predicate: dc11.rights,
+        object: DataFactory.variable("rights"),
+        optional: true,
+      },
+      {
+        subject: identifier,
+        predicate: dcterms.rights,
+        object: DataFactory.variable("rights"),
+        objectOptions: { plainLiteral: true },
+        optional: true,
+      },
+      {
+        subject: identifier,
+        predicate: dcterms.rightsHolder,
+        object: DataFactory.variable("rightsHolder"),
+        objectOptions: { plainLiteral: true },
+        optional: true,
+      },
+    ];
   }
 
   get rights(): Literal | null {
