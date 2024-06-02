@@ -11,7 +11,7 @@ const rightsPredicates = [dcterms.rights, dc11.rights];
  * Abstract base class for RDF/JS Dataset-backed models.
  */
 export abstract class Model extends Resource implements IModel {
-  protected readonly includeLanguageTags: LanguageTagSet;
+  readonly includeLanguageTags: LanguageTagSet;
 
   constructor({
     dataset,

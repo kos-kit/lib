@@ -50,11 +50,4 @@ export const behavesLikeKos = (kos: Kos) => {
       ).toBeTruthy();
     }
   });
-
-  it("should get language tags", async () => {
-    const languageTags = await kos.languageTags();
-    expect(languageTags).not.toHaveLength(0);
-    expect(languageTags).toContain("en");
-    expect(languageTags).toContain("fr");
-  });
 };

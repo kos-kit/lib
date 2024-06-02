@@ -3,7 +3,6 @@ import { Literal, NamedNode } from "@rdfjs/types";
 import { Model as IModel } from "../Model";
 import { Identifier } from "../Identifier";
 import SparqlClient from "sparql-http-client/ParsingClient";
-import { LanguageTagSet } from "../LanguageTagSet";
 import { dc11, dcterms } from "../../vocabularies";
 import { GraphPattern, GraphPatternSubject } from "./GraphPattern";
 
@@ -21,21 +20,16 @@ import { GraphPattern, GraphPatternSubject } from "./GraphPattern";
  * - Related RDF resources such as skosxl:Label instances can be retrieved as "properties".
  */
 export abstract class Model<MemModelT extends MemModel> implements IModel {
-  protected readonly includeLanguageTags: LanguageTagSet;
   protected readonly memModel: MemModelT;
   protected readonly sparqlClient: SparqlClient;
 
   constructor({
-    includeLanguageTags,
     memModel,
     sparqlClient,
   }: {
-    identifier: Identifier;
-    includeLanguageTags: LanguageTagSet;
     memModel: MemModelT;
     sparqlClient: SparqlClient;
   }) {
-    this.includeLanguageTags = includeLanguageTags;
     this.memModel = memModel;
     this.sparqlClient = sparqlClient;
   }
