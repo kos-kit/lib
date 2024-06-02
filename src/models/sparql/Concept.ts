@@ -33,7 +33,7 @@ export class Concept extends LabeledModel<RdfJsConcept> implements IConcept {
   }
 
   async semanticRelations(
-    property: SemanticRelationProperty,
+    _property: SemanticRelationProperty,
   ): Promise<readonly Concept[]> {
     throw new Error("not implemented yet");
     // return (
@@ -48,7 +48,7 @@ export class Concept extends LabeledModel<RdfJsConcept> implements IConcept {
   }
 
   async semanticRelationsCount(
-    property: SemanticRelationProperty,
+    _property: SemanticRelationProperty,
   ): Promise<number> {
     throw new Error("not implemented yet");
     // return (await this.getOrCreateRdfJsModel()).semanticRelationsCount(

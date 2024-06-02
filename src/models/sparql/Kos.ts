@@ -6,21 +6,18 @@ import SparqlClient from "sparql-http-client/ParsingClient";
 import { LanguageTagSet } from "../LanguageTagSet";
 
 export class Kos {
-  private readonly includeLanguageTags: LanguageTagSet;
   private readonly sparqlClient: SparqlClient;
 
   constructor({
-    includeLanguageTags,
     sparqlClient,
   }: {
     includeLanguageTags: LanguageTagSet;
     sparqlClient: SparqlClient;
   }) {
-    this.includeLanguageTags = includeLanguageTags;
     this.sparqlClient = sparqlClient;
   }
 
-  conceptByIdentifier(identifier: Identifier): Promise<Concept> {
+  conceptByIdentifier(_identifier: Identifier): Promise<Concept> {
     throw new Error("not implemented yet");
     // return new Promise((resolve) =>
     //   resolve(
@@ -45,10 +42,8 @@ export class Kos {
     }
   }
 
-  async conceptsPage({
-    limit,
-    offset,
-  }: {
+  // eslint-disable-next-line no-empty-pattern
+  async conceptsPage({}: {
     limit: number;
     offset: number;
   }): Promise<readonly Concept[]> {
@@ -102,7 +97,7 @@ WHERE {
     throw new Error("should never get here");
   }
 
-  conceptSchemeByIdentifier(identifier: Identifier): Promise<ConceptScheme> {
+  conceptSchemeByIdentifier(_identifier: Identifier): Promise<ConceptScheme> {
     throw new Error("not implemented yet");
     // return new Promise((resolve) =>
     //   resolve(

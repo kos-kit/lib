@@ -29,7 +29,7 @@ export class ConceptScheme
   // `;
   //   }
 
-  async topConcepts(kwds: {
+  async topConcepts(_kwds: {
     limit: number;
     offset: number;
   }): Promise<readonly Concept[]> {
