@@ -1,10 +1,13 @@
-import { Literal, NamedNode, Variable } from "@rdfjs/types";
+import * as rdfjs from "@rdfjs/types";
+
+type Literal = Omit<rdfjs.Literal, "equals">;
+type NamedNode = Omit<rdfjs.NamedNode, "equals">;
+type Variable = Omit<rdfjs.Variable, "equals">;
 
 export interface GraphPattern {
-  object: Literal | NamedNode | Variable;
-  objectOptions?: { plainLiteral?: boolean };
+  object: Literal | NamedNode | (Variable & { plainLiteral?: boolean });
   optional: boolean;
   predicate: NamedNode | Variable;
-  subject: NamedNode | Variable;
   subGraphPatterns?: readonly GraphPattern[]; // For ?label ?license ...
+  subject: NamedNode | Variable;
 }
