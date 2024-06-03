@@ -1,6 +1,6 @@
 import { behavesLikeKos } from "../behavesLikeKos";
-import { testKos as testKos } from "./testKos";
+import { testKosFactory } from "./testKosFactory";
 
 (process.env["CI"] ? describe.skip : describe)("sparql.kos", () => {
-  behavesLikeKos(testKos);
+  behavesLikeKos(testKosFactory("en"));
 });

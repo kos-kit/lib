@@ -1,42 +1,111 @@
-import { skosxl } from "../../vocabularies";
 import { Label } from "../Label";
 import { LabeledModel as ILabeledModel } from "../LabeledModel";
-import { LanguageTag } from "../LanguageTag";
-import { LabeledModel as RdfJsLabeledModel } from "../mem/LabeledModel";
+import { LabeledModel as MemLabeledModel } from "../mem/LabeledModel";
+import {
+  GraphPattern,
+  GraphPatternSubject,
+  GraphPatternVariable,
+} from "./GraphPattern";
 import { Model } from "./Model";
+import { skos, skosxl } from "../../vocabularies";
 
-export abstract class LabeledModel<RdfJsModelT extends RdfJsLabeledModel>
-  extends Model<RdfJsModelT>
+export abstract class LabeledModel<MemModelT extends MemLabeledModel>
+  extends Model<MemModelT>
   implements ILabeledModel
 {
-  async altLabels(kwds?: {
-    languageTags?: Set<LanguageTag>;
-  }): Promise<readonly Label[]> {
-    return (await this.getOrCreateRdfJsModel()).altLabels(kwds);
+  get altLabels(): readonly Label[] {
+    return this.memModel.altLabels;
   }
 
-  async hiddenLabels(kwds?: {
-    languageTags?: Set<LanguageTag>;
-  }): Promise<readonly Label[]> {
-    return (await this.getOrCreateRdfJsModel()).altLabels(kwds);
+  get displayLabel(): string {
+    return this.memModel.displayLabel;
   }
 
-  async prefLabels(kwds?: {
-    languageTags?: Set<LanguageTag>;
-  }): Promise<readonly Label[]> {
-    return (await this.getOrCreateRdfJsModel()).prefLabels(kwds);
+  get hiddenLabels(): readonly Label[] {
+    return this.memModel.hiddenLabels;
   }
 
-  protected override get rdfJsDatasetQueryString(): string {
-    return `
-CONSTRUCT {
-  <${this.identifier.value}> ?p ?o .
-  <${this.identifier.value}> ?p ?label . ?label <${skosxl.literalForm.value}> ?literalForm .
-} WHERE {  
-  { <${this.identifier.value}> ?p ?o . }
-  UNION
-  { <${this.identifier.value}> ?p ?label . ?label <${skosxl.literalForm.value}> ?literalForm . }
-}
-`;
+  get prefLabels(): readonly Label[] {
+    return this.memModel.prefLabels;
   }
+
+  static override propertyGraphPatterns({
+    subject,
+    variablePrefix,
+  }: {
+    subject: GraphPatternSubject;
+    variablePrefix: string;
+  }): readonly GraphPattern[] {
+    const graphPatterns: GraphPattern[] = [];
+    for (const { skosPredicate, skosxlPredicate, variableName } of [
+      {
+        skosPredicate: skos.altLabel,
+        skosxlPredicate: skosxl.altLabel,
+        variableName: "AltLabel",
+      },
+      {
+        skosPredicate: skos.hiddenLabel,
+        skosxlPredicate: skosxl.hiddenLabel,
+        variableName: "HiddenLabel",
+      },
+      {
+        skosPredicate: skos.prefLabel,
+        skosxlPredicate: skosxl.prefLabel,
+        variableName: "PrefLabel",
+      },
+    ]) {
+      graphPatterns.push({
+        subject,
+        predicate: skosPredicate,
+        object: {
+          plainLiteral: true,
+          termType: "Variable",
+          value: variablePrefix + variableName,
+        },
+        optional: true,
+      });
+
+      const skosxlLabelVariable: GraphPatternVariable = {
+        termType: "Variable",
+        value: variablePrefix + variableName + "Resource",
+      };
+      graphPatterns.push({
+        subject,
+        predicate: skosxlPredicate,
+        object: skosxlLabelVariable,
+        optional: true,
+        subGraphPatterns: Model.propertyGraphPatterns({
+          subject: skosxlLabelVariable,
+          variablePrefix: skosxlLabelVariable.value,
+        }).concat([
+          {
+            subject: skosxlLabelVariable,
+            predicate: skosxl.literalForm,
+            object: {
+              termType: "Variable",
+              value: variablePrefix + variableName + "LiteralForm",
+            },
+            optional: false,
+          },
+        ]),
+      });
+    }
+
+    return Model.propertyGraphPatterns({ subject, variablePrefix }).concat(
+      graphPatterns,
+    );
+  }
+
+  //   protected override get rdfJsDatasetQueryString(): string {
+  //     return `
+  // CONSTRUCT {
+  //   <${this.identifier.value}> ?p ?o .
+  //   <${this.identifier.value}> ?p ?label . ?label <${skosxl.literalForm.value}> ?literalForm .
+  // } WHERE {
+  //   { <${this.identifier.value}> ?p ?o . }
+  //   UNION
+  //   { <${this.identifier.value}> ?p ?label . ?label <${skosxl.literalForm.value}> ?literalForm . }
+  // }
+  // `;
+  //   }
 }

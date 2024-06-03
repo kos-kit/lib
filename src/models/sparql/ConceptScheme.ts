@@ -1,50 +1,62 @@
-import { DatasetCore, Quad } from "@rdfjs/types";
 import { ConceptScheme as IConceptScheme } from "../ConceptScheme";
-import { ConceptScheme as RdfJsConceptScheme } from "../mem/ConceptScheme";
+import { ConceptScheme as MemConceptScheme } from "../mem/ConceptScheme";
 import { LabeledModel as LabeledModel } from "./LabeledModel";
-import { skos, skosxl } from "../../vocabularies";
 import { Concept } from "./Concept";
+import { identifierToString } from "../../utilities";
+import { skos } from "../../vocabularies";
+import { Identifier } from "../Identifier";
+import { mapResultRowsToIdentifiers } from "./mapResultRowsToIdentifiers";
+import { mapResultRowsToCount } from "./mapResultRowsToCount";
 
 export class ConceptScheme
-  extends LabeledModel<RdfJsConceptScheme>
+  extends LabeledModel<MemConceptScheme>
   implements IConceptScheme
 {
-  protected createRdfJsModel(
-    dataset: DatasetCore<Quad, Quad>,
-  ): RdfJsConceptScheme {
-    return new RdfJsConceptScheme({ dataset, identifier: this.identifier });
-  }
-
-  protected override get rdfJsDatasetQueryString(): string {
-    return `
-CONSTRUCT {
-  <${this.identifier.value}> ?p ?o .
-  <${this.identifier.value}> ?p ?label . ?label <${skosxl.literalForm.value}> ?literalForm .
-  ?concept <${skos.topConceptOf.value}> <${this.identifier.value}> .
-} WHERE {
-  { <${this.identifier.value}> ?p ?o . }
+  async topConceptsCount(): Promise<number> {
+    const identifierString = identifierToString(this.identifier);
+    return mapResultRowsToCount(
+      await this.sparqlClient.query.select(`\
+SELECT (COUNT(DISTINCT ?concept) AS ?count)
+WHERE {
+  { ${identifierString} <${skos.hasTopConcept.value}> ?concept . }
   UNION
-  { <${this.identifier.value}> ?p ?label . ?label <${skosxl.literalForm.value}> ?literalForm . }
-  UNION
-  { ?concept <${skos.topConceptOf.value}> <${this.identifier.value}> . }
-}
-`;
-  }
-
-  async topConcepts(kwds: {
-    limit: number;
-    offset: number;
-  }): Promise<readonly Concept[]> {
-    return (await (await this.getOrCreateRdfJsModel()).topConcepts(kwds)).map(
-      (conceptScheme) =>
-        new Concept({
-          identifier: conceptScheme.identifier,
-          sparqlClient: this.sparqlClient,
-        }),
+  { ?concept <${skos.topConceptOf.value}> ${identifierString} . }
+}`),
+      "count",
     );
   }
 
-  async topConceptsCount(): Promise<number> {
-    return (await this.getOrCreateRdfJsModel()).topConceptsCount();
+  private async topConceptIdentifiersPage({
+    limit,
+    offset,
+  }: {
+    limit: number;
+    offset: number;
+  }): Promise<readonly Identifier[]> {
+    const identifierString = identifierToString(this.identifier);
+    return mapResultRowsToIdentifiers(
+      await this.sparqlClient.query.select(`\
+SELECT DISTINCT ?concept
+WHERE {
+  { ${identifierString} <${skos.hasTopConcept.value}> ?concept . }
+  UNION
+  { ?concept <${skos.topConceptOf.value}> ${identifierString} . }
+}
+LIMIT ${limit}
+OFFSET ${offset}`),
+      "concept",
+    );
+  }
+
+  async topConceptsPage({
+    limit,
+    offset,
+  }: {
+    limit: number;
+    offset: number;
+  }): Promise<readonly Concept[]> {
+    return this.kos.conceptsByIdentifiers(
+      await this.topConceptIdentifiersPage({ limit, offset }),
+    );
   }
 }

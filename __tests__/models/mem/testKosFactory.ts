@@ -3,6 +3,8 @@ import { Parser, Store } from "n3";
 import path from "node:path";
 import fs from "node:fs";
 import { fileURLToPath } from "node:url";
+import { LanguageTagSet } from "../../../src/models/LanguageTagSet";
+import { LanguageTag } from "../../../src/models/LanguageTag";
 
 const ntriplesStringToDataset = (input: string): Store => {
   const parser = new Parser({ format: "N-Triples" });
@@ -24,4 +26,8 @@ const testDataset: Store = ntriplesStringToDataset(
     .toString(),
 );
 
-export const testKos = new Kos(testDataset);
+export const testKosFactory = (includeLanguageTag: LanguageTag) =>
+  new Kos({
+    dataset: testDataset,
+    includeLanguageTags: new LanguageTagSet(includeLanguageTag, ""),
+  });

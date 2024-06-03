@@ -45,7 +45,7 @@ export class ConceptScheme extends LabeledModel implements IConceptScheme {
     }
   }
 
-  topConcepts({
+  topConceptsPage({
     limit,
     offset,
   }: {
@@ -62,6 +62,7 @@ export class ConceptScheme extends LabeledModel implements IConceptScheme {
           new Concept({
             dataset: this.dataset,
             identifier: conceptIdentifier,
+            includeLanguageTags: this.includeLanguageTags,
           }),
         );
       }

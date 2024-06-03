@@ -1,11 +1,10 @@
 import { Label } from "../../src/models/Label";
 import { LabeledModel } from "../../src/models/LabeledModel";
+import { LanguageTag } from "../../src/models/LanguageTag";
 
 export const behavesLikeLabeledModel = (
-  lazyModel: () => Promise<LabeledModel>,
+  lazyModel: (includeLanguageTag: LanguageTag) => Promise<LabeledModel>,
 ) => {
-  const languageTags = new Set(["en", ""]);
-
   const expectLabels = (labels: readonly Label[]) => {
     expect(labels).toBeDefined();
     for (const label of labels) {
@@ -14,18 +13,18 @@ export const behavesLikeLabeledModel = (
   };
 
   it("should get altLabels", async () => {
-    const model = await lazyModel();
-    expectLabels(await model.altLabels({ languageTags }));
+    const model = await lazyModel("en");
+    expectLabels(model.altLabels);
   });
 
   it("should get hiddenLabels", async () => {
-    const model = await lazyModel();
-    expectLabels(await model.hiddenLabels({ languageTags }));
+    const model = await lazyModel("en");
+    expectLabels(model.hiddenLabels);
   });
 
   it("should get prefLabels", async () => {
-    const model = await lazyModel();
-    const prefLabels = await model.prefLabels({ languageTags });
+    const model = await lazyModel("en");
+    const prefLabels = model.prefLabels;
     expect(prefLabels).not.toHaveLength(0);
     expectLabels(prefLabels);
   });

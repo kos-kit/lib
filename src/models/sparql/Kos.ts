@@ -1,26 +1,116 @@
-import { AbstractKos } from "../AbstractKos";
 import { Identifier } from "../Identifier";
 import { rdf, rdfs, skos } from "../../vocabularies";
 import { Concept } from "./Concept";
 import { ConceptScheme } from "./ConceptScheme";
-import SparqlClient from "sparql-http-client/ParsingClient";
 
-export class Kos extends AbstractKos {
-  constructor(private readonly sparqlClient: SparqlClient) {
-    super();
+import { LanguageTagSet } from "../LanguageTagSet";
+import { ConstructQueryBuilder } from "./ConstructQueryBuilder";
+import { mem } from "..";
+import { GraphPatternVariable } from "./GraphPattern";
+import { mapResultRowsToIdentifiers } from "./mapResultRowsToIdentifiers";
+import { mapResultRowsToCount } from "./mapResultRowsToCount";
+import { SparqlClient } from "../../SparqlClient";
+
+export class Kos {
+  private static readonly CONCEPT_IDENTIFIER_GRAPH_PATTERN = `?concept <${rdf.type.value}>/<${rdfs.subClassOf.value}>* <${skos.Concept.value}> .`;
+  private static readonly CONCEPT_SCHEME_IDENTIFIER_GRAPH_PATTERN = `?conceptScheme <${rdf.type.value}>/<${rdfs.subClassOf.value}>* <${skos.ConceptScheme.value}> .`;
+
+  readonly includeLanguageTags: LanguageTagSet;
+  readonly sparqlClient: SparqlClient;
+
+  constructor({
+    includeLanguageTags,
+    sparqlClient,
+  }: {
+    includeLanguageTags: LanguageTagSet;
+    sparqlClient: SparqlClient;
+  }) {
+    this.includeLanguageTags = includeLanguageTags;
+    this.sparqlClient = sparqlClient;
   }
 
-  conceptByIdentifier(identifier: Identifier): Promise<Concept> {
-    return new Promise((resolve) =>
-      resolve(
-        new Concept({
-          identifier,
-          sparqlClient: this.sparqlClient,
-        }),
-      ),
+  async conceptByIdentifier(identifier: Identifier): Promise<Concept> {
+    return (await this.conceptsByIdentifiers([identifier]))[0];
+  }
+
+  private async conceptIdentifiersPage({
+    limit,
+    offset,
+  }: {
+    limit: number;
+    offset: number;
+  }): Promise<readonly Identifier[]> {
+    return mapResultRowsToIdentifiers(
+      await this.sparqlClient.query.select(`\
+SELECT ?concept
+WHERE {
+  ${Kos.CONCEPT_IDENTIFIER_GRAPH_PATTERN}
+}
+LIMIT ${limit}
+OFFSET ${offset}`),
+      "concept",
     );
   }
 
+  async *concepts(): AsyncGenerator<Concept, any, unknown> {
+    const conceptsCount = await this.conceptsCount();
+    const limit = 100;
+    let offset = 0;
+    while (offset < conceptsCount) {
+      for (const concept of await this.conceptsPage({ limit, offset })) {
+        yield concept;
+        offset++;
+      }
+    }
+  }
+
+  async conceptsByIdentifiers(
+    identifiers: readonly Identifier[],
+  ): Promise<readonly Concept[]> {
+    const conceptVariable: GraphPatternVariable = {
+      termType: "Variable",
+      value: "concept",
+    };
+    const includeLanguageTags = this.includeLanguageTags;
+    const dataset = await this.sparqlClient.query.construct(
+      new ConstructQueryBuilder({
+        includeLanguageTags,
+      })
+        .addGraphPatterns(
+          ...Concept.propertyGraphPatterns({
+            subject: conceptVariable,
+            variablePrefix: conceptVariable.value,
+          }),
+        )
+        .addValues(conceptVariable, ...identifiers)
+        .build(),
+      { operation: "postDirect" },
+    );
+    return identifiers.map(
+      (identifier) =>
+        new Concept({
+          kos: this,
+          memModel: new mem.Concept({
+            dataset,
+            identifier,
+            includeLanguageTags,
+          }),
+        }),
+    );
+  }
+
+  async conceptsCount(): Promise<number> {
+    return mapResultRowsToCount(
+      await this.sparqlClient.query.select(`\
+SELECT (COUNT(?concept) AS ?count)
+WHERE {
+  ${Kos.CONCEPT_IDENTIFIER_GRAPH_PATTERN}
+}`),
+      "count",
+    );
+  }
+
+  // eslint-disable-next-line no-empty-pattern
   async conceptsPage({
     limit,
     offset,
@@ -28,91 +118,69 @@ export class Kos extends AbstractKos {
     limit: number;
     offset: number;
   }): Promise<readonly Concept[]> {
-    const concepts: Concept[] = [];
+    return this.conceptsByIdentifiers(
+      await this.conceptIdentifiersPage({
+        limit,
+        offset,
+      }),
+    );
+  }
 
-    const query = `
-SELECT ?concept
-WHERE {
-  ?concept <${rdf.type.value}>/<${rdfs.subClassOf.value}>* <${skos.Concept.value}> .
-}
-LIMIT ${limit}
-OFFSET ${offset}
-`;
+  async conceptSchemeByIdentifier(
+    identifier: Identifier,
+  ): Promise<ConceptScheme> {
+    return (await this.conceptSchemesByIdentifiers([identifier]))[0];
+  }
 
-    for (const resultRow of await this.sparqlClient.query.select(query)) {
-      const conceptIdentifier = resultRow["concept"];
-      if (
-        conceptIdentifier &&
-        conceptIdentifier &&
-        (conceptIdentifier.termType === "BlankNode" ||
-          conceptIdentifier.termType === "NamedNode")
-      ) {
-        concepts.push(
-          new Concept({
-            identifier: conceptIdentifier,
-            sparqlClient: this.sparqlClient,
+  async conceptSchemesByIdentifiers(
+    identifiers: readonly Identifier[],
+  ): Promise<readonly ConceptScheme[]> {
+    const conceptSchemeVariable: GraphPatternVariable = {
+      termType: "Variable",
+      value: "conceptScheme",
+    };
+    const includeLanguageTags = this.includeLanguageTags;
+    const dataset = await this.sparqlClient.query.construct(
+      new ConstructQueryBuilder({
+        includeLanguageTags,
+      })
+        .addGraphPatterns(
+          ...ConceptScheme.propertyGraphPatterns({
+            subject: conceptSchemeVariable,
+            variablePrefix: conceptSchemeVariable.value,
           }),
-        );
-      }
-    }
-
-    return concepts;
-  }
-
-  async conceptsCount(): Promise<number> {
-    const query = `
-SELECT (COUNT(?concept) AS ?count)
-WHERE {
-  ?concept <${rdf.type.value}>/<${rdfs.subClassOf.value}>* <${skos.Concept.value}> .
-}
-    `;
-
-    for (const resultRow of await this.sparqlClient.query.select(query)) {
-      const count = resultRow["count"];
-      if (count?.termType === "Literal") {
-        return parseInt(count.value);
-      }
-    }
-    throw new Error("should never get here");
-  }
-
-  conceptSchemeByIdentifier(identifier: Identifier): Promise<ConceptScheme> {
-    return new Promise((resolve) =>
-      resolve(
+        )
+        .addValues(conceptSchemeVariable, ...identifiers)
+        .build(),
+      { operation: "postDirect" },
+    );
+    return identifiers.map(
+      (identifier) =>
         new ConceptScheme({
-          identifier,
-          sparqlClient: this.sparqlClient,
+          kos: this,
+          memModel: new mem.ConceptScheme({
+            dataset,
+            identifier,
+            includeLanguageTags,
+          }),
         }),
-      ),
+    );
+  }
+
+  private async conceptSchemeIdentifiers(): Promise<readonly Identifier[]> {
+    return mapResultRowsToIdentifiers(
+      await this.sparqlClient.query.select(`\
+SELECT ?conceptScheme
+WHERE {
+  ${Kos.CONCEPT_SCHEME_IDENTIFIER_GRAPH_PATTERN}
+}`),
+      "conceptScheme",
     );
   }
 
   async conceptSchemes(): Promise<readonly ConceptScheme[]> {
-    const conceptSchemes: ConceptScheme[] = [];
-
-    const query = `
-SELECT ?conceptScheme
-WHERE {
-  ?conceptScheme <${rdf.type.value}>/<${rdfs.subClassOf.value}>* <${skos.ConceptScheme.value}> .
-}
-`;
-
-    for (const resultRow of await this.sparqlClient.query.select(query)) {
-      const conceptSchemeIdentifier = resultRow["conceptScheme"];
-      if (
-        conceptSchemeIdentifier &&
-        (conceptSchemeIdentifier.termType === "BlankNode" ||
-          conceptSchemeIdentifier.termType === "NamedNode")
-      ) {
-        conceptSchemes.push(
-          new ConceptScheme({
-            identifier: conceptSchemeIdentifier,
-            sparqlClient: this.sparqlClient,
-          }),
-        );
-      }
-    }
-
-    return conceptSchemes;
+    return this.conceptSchemesByIdentifiers(
+      await this.conceptSchemeIdentifiers(),
+    );
   }
 }

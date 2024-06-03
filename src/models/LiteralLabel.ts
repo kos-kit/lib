@@ -1,5 +1,4 @@
-import { Literal, NamedNode } from "@rdfjs/types";
-import { LanguageTag } from "./LanguageTag";
+import { Literal } from "@rdfjs/types";
 import { Label } from "./Label";
 
 /**
@@ -8,21 +7,8 @@ import { Label } from "./Label";
 export class LiteralLabel implements Label {
   constructor(readonly literalForm: Literal) {}
 
-  license(
-    _languageTag: LanguageTag,
-  ): Promise<Literal | NamedNode<string> | null> {
-    return Promise.resolve(null);
-  }
-
-  modified(): Promise<Literal | null> {
-    return Promise.resolve(null);
-  }
-
-  rights(_languageTag: LanguageTag): Promise<Literal | null> {
-    return Promise.resolve(null);
-  }
-
-  rightsHolder(_languageTag: LanguageTag): Promise<Literal | null> {
-    return Promise.resolve(null);
-  }
+  readonly license = null;
+  readonly modified = null;
+  readonly rights = null;
+  readonly rightsHolder = null;
 }

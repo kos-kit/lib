@@ -1,11 +1,12 @@
 import { Literal } from "@rdfjs/types";
 import { SemanticRelationProperty } from "../SemanticRelationProperty";
-import { LanguageTag } from "../LanguageTag";
 import { NoteProperty } from "../NoteProperty";
 import { LabeledModel } from "./LabeledModel";
 import { ConceptScheme } from "./ConceptScheme";
 import { skos } from "../../vocabularies";
 import { Concept as IConcept } from "../Concept";
+import { mapTermToLiteral } from "./mapTermToLiteral";
+import { matchLiteral } from "./matchLiteral";
 
 export class Concept extends LabeledModel implements IConcept {
   inSchemes(): Promise<readonly ConceptScheme[]> {
@@ -16,6 +17,7 @@ export class Concept extends LabeledModel implements IConcept {
             ? new ConceptScheme({
                 dataset: this.dataset,
                 identifier: term,
+                includeLanguageTags: this.includeLanguageTags,
               })
             : null,
         ),
@@ -23,29 +25,25 @@ export class Concept extends LabeledModel implements IConcept {
     );
   }
 
-  notes(
-    languageTag: LanguageTag,
-    property: NoteProperty,
-  ): Promise<readonly Literal[]> {
-    return new Promise((resolve) =>
-      resolve([
-        ...this.filterAndMapObjects(property.identifier, (term) =>
-          term.termType === "Literal" && term.language === languageTag
-            ? term
-            : null,
-        ),
-      ]),
-    );
+  notes(property: NoteProperty): readonly Literal[] {
+    return [
+      ...this.filterAndMapObjects(property.identifier, (term) => {
+        const literal = mapTermToLiteral(term);
+        if (
+          literal !== null &&
+          matchLiteral(literal, {
+            includeLanguageTags: this.includeLanguageTags,
+          })
+        ) {
+          return literal;
+        }
+        return null;
+      }),
+    ];
   }
 
-  notations(): Promise<readonly Literal[]> {
-    return new Promise((resolve) =>
-      resolve([
-        ...this.filterAndMapObjects(skos.notation, (term) =>
-          term.termType === "Literal" ? term : null,
-        ),
-      ]),
-    );
+  get notations(): readonly Literal[] {
+    return [...this.filterAndMapObjects(skos.notation, mapTermToLiteral)];
   }
 
   semanticRelations(
@@ -55,7 +53,11 @@ export class Concept extends LabeledModel implements IConcept {
       resolve([
         ...this.filterAndMapObjects(property.identifier, (term) =>
           term.termType === "NamedNode"
-            ? new Concept({ dataset: this.dataset, identifier: term })
+            ? new Concept({
+                dataset: this.dataset,
+                identifier: term,
+                includeLanguageTags: this.includeLanguageTags,
+              })
             : null,
         ),
       ]),
@@ -81,6 +83,7 @@ export class Concept extends LabeledModel implements IConcept {
             ? new ConceptScheme({
                 dataset: this.dataset,
                 identifier: term,
+                includeLanguageTags: this.includeLanguageTags,
               })
             : null,
         ),
