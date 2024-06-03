@@ -71,6 +71,7 @@ export class ConstructQueryBuilder {
 
     const sortedGraphPatterns = sortGraphPatterns(this.graphPatterns);
 
+    // Put the VALUES first to help Oxigraph's SPARQL query planner
     const valuesString = this.valuesString();
 
     return `\
@@ -81,11 +82,11 @@ ${indentedStringsToString(
   ),
 )}
 } WHERE {
-${indentedStringsToString(
-  sortedGraphPatterns.flatMap((graphPattern) =>
-    this.graphPatternToWhereStrings(graphPattern, TAB_SPACES),
-  ),
-)}${valuesString.length > 0 ? "\n" + " ".repeat(TAB_SPACES) + valuesString : ""}
+${valuesString.length > 0 ? " ".repeat(TAB_SPACES) + valuesString + "\n" : ""}${indentedStringsToString(
+      sortedGraphPatterns.flatMap((graphPattern) =>
+        this.graphPatternToWhereStrings(graphPattern, TAB_SPACES),
+      ),
+    )}
 }`;
   }
 

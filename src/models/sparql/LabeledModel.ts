@@ -41,17 +41,17 @@ export abstract class LabeledModel<MemModelT extends MemLabeledModel>
       {
         skosPredicate: skos.altLabel,
         skosxlPredicate: skosxl.altLabel,
-        variableName: "altLabel",
+        variableName: "AltLabel",
       },
       {
         skosPredicate: skos.hiddenLabel,
         skosxlPredicate: skosxl.hiddenLabel,
-        variableName: "hiddenLabel",
+        variableName: "HiddenLabel",
       },
       {
         skosPredicate: skos.prefLabel,
         skosxlPredicate: skosxl.prefLabel,
-        variableName: "prefLabel",
+        variableName: "PrefLabel",
       },
     ]) {
       graphPatterns.push({
@@ -60,14 +60,14 @@ export abstract class LabeledModel<MemModelT extends MemLabeledModel>
         object: {
           plainLiteral: true,
           termType: "Variable",
-          value: variableName,
+          value: variablePrefix + variableName,
         },
         optional: true,
       });
 
       const skosxlLabelVariable: GraphPatternVariable = {
         termType: "Variable",
-        value: variableName + "Resource",
+        value: variablePrefix + variableName + "Resource",
       };
       graphPatterns.push({
         subject,
@@ -83,7 +83,7 @@ export abstract class LabeledModel<MemModelT extends MemLabeledModel>
             predicate: skosxl.literalForm,
             object: {
               termType: "Variable",
-              value: variableName + "LiteralForm",
+              value: variablePrefix + variableName + "LiteralForm",
             },
             optional: false,
           },

@@ -18,13 +18,13 @@ class Query implements ParsingQuery<DatasetCore<Quad, Quad>> {
     query: string,
     options?: QueryOptions | undefined,
   ): Promise<DatasetCore<Quad, Quad>> {
-    logger.debug("CONSTRUCT query:\n%s", query);
+    logger.trace("CONSTRUCT query:\n%s", query);
     const resultDataset = await this.delegate.construct(query, options);
-    if (logger.isLevelEnabled("debug")) {
+    if (logger.isLevelEnabled("trace")) {
       const resultDatasetString = new Writer({
         format: "Turtle",
       }).quadsToString([...resultDataset]);
-      logger.debug("CONSTRUCT query result:\n%s", resultDatasetString);
+      logger.trace("CONSTRUCT query result:\n%s", resultDatasetString);
     }
     return resultDataset;
   }
@@ -33,11 +33,11 @@ class Query implements ParsingQuery<DatasetCore<Quad, Quad>> {
     query: string,
     options?: QueryOptions | undefined,
   ): Promise<ResultRow[]> {
-    logger.debug("SELECT query:\n%s", query);
+    logger.trace("SELECT query:\n%s", query);
     const resultRows = await this.delegate.select(query, options);
-    if (logger.isLevelEnabled("debug")) {
+    if (logger.isLevelEnabled("trace")) {
       const resultRowsString = JSON.stringify(resultRows);
-      logger.debug("SELECT query result:\n%s", resultRowsString);
+      logger.trace("SELECT query result:\n%s", resultRowsString);
     }
     return resultRows;
   }

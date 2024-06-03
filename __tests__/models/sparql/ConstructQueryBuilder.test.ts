@@ -82,9 +82,14 @@ CONSTRUCT {
       termType: "NamedNode",
       value: "http://example.com/concept",
     };
-    const actual = new ConstructQueryBuilder().addGraphPatterns(
-      ...Concept.propertyGraphPatterns({ subject, variablePrefix: "concept" }),
-    );
+    const actual = new ConstructQueryBuilder()
+      .addGraphPatterns(
+        ...Concept.propertyGraphPatterns({
+          subject,
+          variablePrefix: "concept",
+        }),
+      )
+      .build();
     // console.log("\n", actual);
     expect(actual).not.toHaveLength(0);
   });

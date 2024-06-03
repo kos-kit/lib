@@ -53,7 +53,6 @@ export abstract class Model<MemModelT extends MemModel> implements IModel {
         predicate: dcterms.license,
         object: {
           termType: "Variable",
-          plainLiteral: true,
           value: variablePrefix + "License",
         },
         optional: true,
@@ -70,7 +69,7 @@ export abstract class Model<MemModelT extends MemModel> implements IModel {
         object: {
           termType: "Variable",
           plainLiteral: true,
-          value: variablePrefix + "Rights",
+          value: variablePrefix + "DcRights",
         },
         optional: true,
       },
@@ -80,7 +79,7 @@ export abstract class Model<MemModelT extends MemModel> implements IModel {
         object: {
           termType: "Variable",
           plainLiteral: true,
-          value: variablePrefix + "Rights",
+          value: variablePrefix + "DctermsRights",
         },
         optional: true,
       },

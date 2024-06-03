@@ -25,7 +25,7 @@ WHERE {
   UNION
   { ${identifierString} <${skos.topConceptOf.value}> ?conceptScheme . }
   UNION
-  { ?conceptScheme <${skos.hasTopConcept.value} ${identifierString} . }
+  { ?conceptScheme <${skos.hasTopConcept.value}> ${identifierString} . }
 }`),
         "conceptScheme",
       ),
@@ -54,7 +54,7 @@ WHERE {
       predicate: skos.notation,
       object: {
         termType: "Variable",
-        value: "notation",
+        value: variablePrefix + "Notation",
       },
       optional: true,
     });
@@ -66,7 +66,10 @@ WHERE {
         object: {
           plainLiteral: true,
           termType: "Variable",
-          value: noteProperty.name,
+          value:
+            variablePrefix +
+            noteProperty.name[0].toUpperCase() +
+            noteProperty.name.substring(1),
         },
         optional: true,
       });
@@ -87,7 +90,7 @@ WHERE {
         await this.sparqlClient.query.select(`
 SELECT DISTINCT ?concept
 WHERE {
-  ${identifierToString(this.identifier)} <${property.identifier}> ?concept .
+  ${identifierToString(this.identifier)} <${property.identifier.value}> ?concept .
 }`),
         "concept",
       ),
@@ -99,9 +102,9 @@ WHERE {
   ): Promise<number> {
     return mapResultRowsToCount(
       await this.sparqlClient.query.select(`
-SELECT COUNT(DISTINCT ?concept) AS ?count
+SELECT (COUNT(DISTINCT ?concept) AS ?count)
 WHERE {
-${identifierToString(this.identifier)} <${property.identifier}> ?concept .
+${identifierToString(this.identifier)} <${property.identifier.value}> ?concept .
 }`),
       "count",
     );
@@ -114,9 +117,9 @@ ${identifierToString(this.identifier)} <${property.identifier}> ?concept .
         await this.sparqlClient.query.select(`
 SELECT DISTINCT ?conceptScheme
 WHERE {
-  { ?conceptScheme <${skos.hasTopConcept}> ${identifierString} . }
+  { ?conceptScheme <${skos.hasTopConcept.value}> ${identifierString} . }
   UNION
-  { ${identifierString} <${skos.topConceptOf}> ?conceptScheme . }
+  { ${identifierString} <${skos.topConceptOf.value}> ?conceptScheme . }
 }`),
         "conceptScheme",
       ),
