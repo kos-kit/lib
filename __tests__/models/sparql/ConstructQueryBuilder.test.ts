@@ -1,13 +1,13 @@
 import { LanguageTagSet } from "../../../src/models/LanguageTagSet";
 import {
+  ConstructQueryBuilder,
   GraphPatternObject,
   GraphPatternSubject,
-  graphPatternsToConstructQuery,
 } from "../../../src/models/sparql";
 import { skos } from "../../../src/vocabularies";
 import { Concept } from "../../../src/models/sparql/Concept";
 
-describe("graphPatternsToConstructQuery", () => {
+describe("ConstructQueryBuilder", () => {
   const subject: GraphPatternSubject = {
     termType: "NamedNode",
     value: "http://example.com/concept",
@@ -20,14 +20,14 @@ describe("graphPatternsToConstructQuery", () => {
 
   it("should translate a single required pattern", () => {
     expect(
-      graphPatternsToConstructQuery([
-        {
+      new ConstructQueryBuilder()
+        .addGraphPatterns({
           subject,
           predicate,
           object,
           optional: false,
-        },
-      ]),
+        })
+        .build(),
     ).toStrictEqual(`\
 CONSTRUCT {
   <${subject.value}> <${predicate.value}> ?${object.value} .
@@ -38,14 +38,14 @@ CONSTRUCT {
 
   it("should translate a single optional pattern", () => {
     expect(
-      graphPatternsToConstructQuery([
-        {
+      new ConstructQueryBuilder()
+        .addGraphPatterns({
           subject,
           predicate,
           object,
           optional: true,
-        },
-      ]),
+        })
+        .build(),
     ).toStrictEqual(`\
 CONSTRUCT {
   <${subject.value}> <${predicate.value}> ?${object.value} .
@@ -58,17 +58,16 @@ CONSTRUCT {
 
   it("should translate a filter", () => {
     expect(
-      graphPatternsToConstructQuery(
-        [
-          {
-            subject,
-            predicate,
-            object: { ...object, plainLiteral: true },
-            optional: false,
-          },
-        ],
-        { includeLanguageTags: new LanguageTagSet("en", "") },
-      ),
+      new ConstructQueryBuilder({
+        includeLanguageTags: new LanguageTagSet("en", ""),
+      })
+        .addGraphPatterns({
+          subject,
+          predicate,
+          object: { ...object, plainLiteral: true },
+          optional: false,
+        })
+        .build(),
     ).toStrictEqual(`\
 CONSTRUCT {
   <${subject.value}> <${predicate.value}> ?${object.value} .
@@ -83,8 +82,8 @@ CONSTRUCT {
       termType: "NamedNode",
       value: "http://example.com/concept",
     };
-    const actual = graphPatternsToConstructQuery(
-      Concept.propertyGraphPatterns(subject),
+    const actual = new ConstructQueryBuilder().addGraphPatterns(
+      ...Concept.propertyGraphPatterns(subject),
     );
     // console.log("\n", actual);
     expect(actual).not.toHaveLength(0);

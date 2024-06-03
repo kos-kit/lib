@@ -4,10 +4,14 @@ import { Concept } from "./Concept";
 import { ConceptScheme } from "./ConceptScheme";
 import SparqlClient from "sparql-http-client/ParsingClient";
 import { LanguageTagSet } from "../LanguageTagSet";
-import { graphPatternsToConstructQuery } from "./graphPatternsToConstructQuery";
+import { ConstructQueryBuilder } from "./ConstructQueryBuilder";
 import { mem } from "..";
+import { GraphPatternVariable } from "./GraphPattern";
 
 export class Kos {
+  private static readonly CONCEPT_IDENTIFIER_GRAPH_PATTERN = `?concept <${rdf.type.value}>/<${rdfs.subClassOf.value}>* <${skos.Concept.value}> .`;
+  private static readonly CONCEPT_SCHEME_IDENTIFIER_GRAPH_PATTERN = `?conceptScheme <${rdf.type.value}>/<${rdfs.subClassOf.value}>* <${skos.ConceptScheme.value}> .`;
+
   private readonly includeLanguageTags: LanguageTagSet;
   private readonly sparqlClient: SparqlClient;
 
@@ -27,10 +31,9 @@ export class Kos {
     return new Concept({
       memModel: new mem.Concept({
         dataset: await this.sparqlClient.query.construct(
-          graphPatternsToConstructQuery(
-            Concept.propertyGraphPatterns(identifier),
-            { includeLanguageTags },
-          ),
+          new ConstructQueryBuilder({ includeLanguageTags })
+            .addGraphPatterns(...Concept.propertyGraphPatterns(identifier))
+            .build(),
         ),
         identifier,
         includeLanguageTags,
@@ -59,14 +62,13 @@ export class Kos {
     offset: number;
   }): Promise<readonly Identifier[]> {
     const conceptIdentifiers: Identifier[] = [];
-    for (const resultRow of await this.sparqlClient.query.select(`
-        SELECT ?concept
-        WHERE {
-          ?concept <${rdf.type.value}>/<${rdfs.subClassOf.value}>* <${skos.Concept.value}> .
-        }
-        LIMIT ${limit}
-        OFFSET ${offset}
-        `)) {
+    for (const resultRow of await this.sparqlClient.query.select(`\
+SELECT ?concept
+WHERE {
+  ${Kos.CONCEPT_IDENTIFIER_GRAPH_PATTERN}
+}
+LIMIT ${limit}
+OFFSET ${offset}`)) {
       const conceptIdentifier = resultRow["concept"];
       if (
         conceptIdentifier &&
@@ -80,31 +82,49 @@ export class Kos {
   }
 
   // eslint-disable-next-line no-empty-pattern
-  async conceptsPage({}: {
+  async conceptsPage({
+    limit,
+    offset,
+  }: {
     limit: number;
     offset: number;
   }): Promise<readonly Concept[]> {
-    throw new Error("not implemented yet");
-    //     const concepts: Concept[] = [];
+    const conceptIdentifiers = await this.conceptIdentifiersPage({
+      limit,
+      offset,
+    });
 
-    //         concepts.push(
-    //           new Concept({
-    //             identifier: conceptIdentifier,
-    //             includeLanguageTags: this.includeLanguageTags,
-    //             sparqlClient: this.sparqlClient,
-    //           }),
-    //         );
-    //       }
-    //     }
-
-    //     return concepts;
+    const conceptVariable: GraphPatternVariable = {
+      termType: "Variable",
+      value: "concept",
+    };
+    const includeLanguageTags = this.includeLanguageTags;
+    const dataset = await this.sparqlClient.query.construct(
+      new ConstructQueryBuilder({
+        includeLanguageTags,
+      })
+        .addGraphPatterns(...Concept.propertyGraphPatterns(conceptVariable))
+        .addValues(conceptVariable, ...conceptIdentifiers)
+        .build(),
+    );
+    return conceptIdentifiers.map(
+      (identifier) =>
+        new Concept({
+          memModel: new mem.Concept({
+            dataset,
+            identifier,
+            includeLanguageTags,
+          }),
+          sparqlClient: this.sparqlClient,
+        }),
+    );
   }
 
   async conceptsCount(): Promise<number> {
-    const query = `
+    const query = `\
 SELECT (COUNT(?concept) AS ?count)
 WHERE {
-  ?concept <${rdf.type.value}>/<${rdfs.subClassOf.value}>* <${skos.Concept.value}> .
+  ${Kos.CONCEPT_IDENTIFIER_GRAPH_PATTERN}
 }`;
 
     for (const resultRow of await this.sparqlClient.query.select(query)) {
@@ -116,46 +136,73 @@ WHERE {
     throw new Error("should never get here");
   }
 
-  conceptSchemeByIdentifier(_identifier: Identifier): Promise<ConceptScheme> {
-    throw new Error("not implemented yet");
-    // return new Promise((resolve) =>
-    //   resolve(
-    //     new ConceptScheme({
-    //       identifier,
-    //       includeLanguageTags: this.includeLanguageTags,
-    //       sparqlClient: this.sparqlClient,
-    //     }),
-    //   ),
-    // );
+  async conceptSchemeByIdentifier(
+    identifier: Identifier,
+  ): Promise<ConceptScheme> {
+    const includeLanguageTags = this.includeLanguageTags;
+    return new ConceptScheme({
+      memModel: new mem.ConceptScheme({
+        dataset: await this.sparqlClient.query.construct(
+          new ConstructQueryBuilder({ includeLanguageTags })
+            .addGraphPatterns(
+              ...ConceptScheme.propertyGraphPatterns(identifier),
+            )
+            .build(),
+        ),
+        identifier,
+        includeLanguageTags,
+      }),
+      sparqlClient: this.sparqlClient,
+    });
+  }
+
+  private async conceptSchemeIdentifiers(): Promise<readonly Identifier[]> {
+    const conceptSchemeIdentifiers: Identifier[] = [];
+    for (const resultRow of await this.sparqlClient.query.select(`\
+SELECT ?concept
+WHERE {
+  ${Kos.CONCEPT_SCHEME_IDENTIFIER_GRAPH_PATTERN}
+}`)) {
+      const conceptSchemeIdentifier = resultRow["concept"];
+      if (
+        conceptSchemeIdentifier &&
+        (conceptSchemeIdentifier.termType === "BlankNode" ||
+          conceptSchemeIdentifier.termType === "NamedNode")
+      ) {
+        conceptSchemeIdentifiers.push(conceptSchemeIdentifier);
+      }
+    }
+    return conceptSchemeIdentifiers;
   }
 
   async conceptSchemes(): Promise<readonly ConceptScheme[]> {
-    throw new Error("not implemented yet");
-    //     const conceptSchemes: ConceptScheme[] = [];
+    const conceptSchemeIdentifiers = await this.conceptSchemeIdentifiers();
 
-    //     const query = `
-    // SELECT ?conceptScheme
-    // WHERE {
-    //   ?conceptScheme <${rdf.type.value}>/<${rdfs.subClassOf.value}>* <${skos.ConceptScheme.value}> .
-    // }
-    // `;
-
-    //     for (const resultRow of await this.sparqlClient.query.select(query)) {
-    //       const conceptSchemeIdentifier = resultRow["conceptScheme"];
-    //       if (
-    //         conceptSchemeIdentifier &&
-    //         (conceptSchemeIdentifier.termType === "BlankNode" ||
-    //           conceptSchemeIdentifier.termType === "NamedNode")
-    //       ) {
-    //         conceptSchemes.push(
-    //           new ConceptScheme({
-    //             identifier: conceptSchemeIdentifier,
-    //             sparqlClient: this.sparqlClient,
-    //           }),
-    //         );
-    //       }
-    //     }
-
-    //     return conceptSchemes;
+    const conceptSchemeVariable: GraphPatternVariable = {
+      termType: "Variable",
+      value: "conceptScheme",
+    };
+    const includeLanguageTags = this.includeLanguageTags;
+    const dataset = await this.sparqlClient.query.construct(
+      new ConstructQueryBuilder({
+        includeLanguageTags,
+      })
+        .addGraphPatterns(
+          ...ConceptScheme.propertyGraphPatterns(conceptSchemeVariable),
+        )
+        .addValues(conceptSchemeVariable, ...conceptSchemeIdentifiers)
+        .build(),
+    );
+    return conceptSchemeIdentifiers.map(
+      (identifier) =>
+        new ConceptScheme({
+          memModel: new mem.ConceptScheme({
+            dataset,
+            identifier,
+            includeLanguageTags,
+          }),
+          sparqlClient: this.sparqlClient,
+        }),
+    );
   }
 }
