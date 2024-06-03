@@ -8,23 +8,28 @@ import { Literal } from "@rdfjs/types";
 import { GraphPatternSubject, GraphPattern } from "./GraphPattern";
 import { noteProperties } from "../noteProperties";
 import { skos } from "../../vocabularies";
+import { mapResultRowsToIdentifiers } from "./mapResultRowsToIdentifiers";
+import { identifierToString } from "../../utilities";
+import { mapResultRowsToCount } from "./mapResultRowsToCount";
 
 export class Concept extends LabeledModel<MemConcept> implements IConcept {
-  // static IDENTIFIER_GRAPH_PATTERNS = [
-  //   "?concept <${rdf.type.value}>/<${rdfs.subClassOf.value}>* <${skos.Concept.value}> ";
-  // ]
-
-  // static OPTIONAL_GRAPH_PATTERNS = LabeledModel.OPTIONAL_GRAPH_PATTERNS;
-
   async inSchemes(): Promise<readonly ConceptScheme[]> {
-    throw new Error("not implemented yet");
-    //   return (await (await this.getOrCreateRdfJsModel()).inSchemes()).map(
-    //     (conceptScheme) =>
-    //       new ConceptScheme({
-    //         identifier: conceptScheme.identifier,
-    //         sparqlClient: this.sparqlClient,
-    //       }),
-    //   );
+    // Could do this in a single CONSTRUCT as an optimization. This code is simpler.
+    const identifierString = identifierToString(this.identifier);
+    return this.kos.conceptSchemesByIdentifiers(
+      mapResultRowsToIdentifiers(
+        await this.sparqlClient.query.select(`
+SELECT DISTINCT ?conceptScheme
+WHERE {
+  { ${identifierString} <${skos.inScheme}> ?conceptScheme . }
+  UNION
+  { ${identifierString} <${skos.topConceptOf}> ?conceptScheme . }
+  UNION
+  { ?conceptScheme <${skos.hasTopConcept} ${identifierString} . }
+}`),
+        "conceptScheme",
+      ),
+    );
   }
 
   get notations(): readonly Literal[] {
@@ -67,37 +72,47 @@ export class Concept extends LabeledModel<MemConcept> implements IConcept {
   }
 
   async semanticRelations(
-    _property: SemanticRelationProperty,
+    property: SemanticRelationProperty,
   ): Promise<readonly Concept[]> {
-    throw new Error("not implemented yet");
-    // return (
-    //   await (await this.getOrCreateRdfJsModel()).semanticRelations(property)
-    // ).map(
-    //   (conceptScheme) =>
-    //     new Concept({
-    //       identifier: conceptScheme.identifier,
-    //       sparqlClient: this.sparqlClient,
-    //     }),
-    // );
+    // Could do this in a single CONSTRUCT as an optimization. This code is simpler.
+    return this.kos.conceptsByIdentifiers(
+      mapResultRowsToIdentifiers(
+        await this.sparqlClient.query.select(`
+SELECT DISTINCT ?concept
+WHERE {
+  ${identifierToString(this.identifier)} <${property.identifier}> ?concept .
+}`),
+        "concept",
+      ),
+    );
   }
 
   async semanticRelationsCount(
-    _property: SemanticRelationProperty,
+    property: SemanticRelationProperty,
   ): Promise<number> {
-    throw new Error("not implemented yet");
-    // return (await this.getOrCreateRdfJsModel()).semanticRelationsCount(
-    //   property,
-    // );
+    return mapResultRowsToCount(
+      await this.sparqlClient.query.select(`
+SELECT COUNT(DISTINCT ?concept) AS ?count
+WHERE {
+${identifierToString(this.identifier)} <${property.identifier}> ?concept .
+}`),
+      "count",
+    );
   }
 
   async topConceptOf(): Promise<readonly ConceptScheme[]> {
-    throw new Error("not implemented yet");
-    // return (await (await this.getOrCreateRdfJsModel()).topConceptOf()).map(
-    //   (conceptScheme) =>
-    //     new ConceptScheme({
-    //       identifier: conceptScheme.identifier,
-    //       sparqlClient: this.sparqlClient,
-    //     }),
-    // );
+    const identifierString = identifierToString(this.identifier);
+    return this.kos.conceptSchemesByIdentifiers(
+      mapResultRowsToIdentifiers(
+        await this.sparqlClient.query.select(`
+SELECT DISTINCT ?conceptScheme
+WHERE {
+  { ?conceptScheme <${skos.hasTopConcept}> ${identifierString} . }
+  UNION
+  { ${identifierString} <${skos.topConceptOf}> ?conceptScheme . }
+}`),
+        "conceptScheme",
+      ),
+    );
   }
 }

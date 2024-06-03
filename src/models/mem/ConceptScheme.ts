@@ -45,7 +45,7 @@ export class ConceptScheme extends LabeledModel implements IConceptScheme {
     }
   }
 
-  topConcepts({
+  topConceptsPage({
     limit,
     offset,
   }: {

@@ -2,9 +2,9 @@ import { Model as MemModel } from "../mem/Model";
 import { Literal, NamedNode } from "@rdfjs/types";
 import { Model as IModel } from "../Model";
 import { Identifier } from "../Identifier";
-import SparqlClient from "sparql-http-client/ParsingClient";
 import { dc11, dcterms } from "../../vocabularies";
 import { GraphPattern, GraphPatternSubject } from "./GraphPattern";
+import { Kos } from "./Kos";
 
 /**
  * Abstract base class for SPARQL-backed models.
@@ -20,18 +20,12 @@ import { GraphPattern, GraphPatternSubject } from "./GraphPattern";
  * - Related RDF resources such as skosxl:Label instances can be retrieved as "properties".
  */
 export abstract class Model<MemModelT extends MemModel> implements IModel {
+  protected readonly kos: Kos;
   protected readonly memModel: MemModelT;
-  protected readonly sparqlClient: SparqlClient;
 
-  constructor({
-    memModel,
-    sparqlClient,
-  }: {
-    memModel: MemModelT;
-    sparqlClient: SparqlClient;
-  }) {
+  constructor({ kos, memModel }: { kos: Kos; memModel: MemModelT }) {
+    this.kos = kos;
     this.memModel = memModel;
-    this.sparqlClient = sparqlClient;
   }
 
   get identifier(): Identifier {
@@ -93,5 +87,9 @@ export abstract class Model<MemModelT extends MemModel> implements IModel {
 
   get rightsHolder(): Literal | null {
     return this.memModel.rightsHolder;
+  }
+
+  protected get sparqlClient() {
+    return this.kos.sparqlClient;
   }
 }
