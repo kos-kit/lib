@@ -54,5 +54,5 @@
     "url": "git+https://github.com/kos-kit/client"
   },
   "types": "dist/index.d.ts",
-  "version": "1.0.16"
+  "version": "1.0.17"
 }
