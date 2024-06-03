@@ -1,6 +1,6 @@
 import { behavesLikeKos } from "../behavesLikeKos";
-import { testKos } from "./testKos";
+import { testKosFactory } from "./testKosFactory";
 
 describe("mem.Kos", () => {
-  behavesLikeKos(testKos);
+  behavesLikeKos(testKosFactory("en"));
 });

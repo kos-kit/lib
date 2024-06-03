@@ -78,6 +78,7 @@ OFFSET ${offset}`),
         .addGraphPatterns(...Concept.propertyGraphPatterns(conceptVariable))
         .addValues(conceptVariable, ...identifiers)
         .build(),
+      { operation: "postDirect" },
     );
     return identifiers.map(
       (identifier) =>
@@ -142,6 +143,7 @@ WHERE {
         )
         .addValues(conceptSchemeVariable, ...identifiers)
         .build(),
+      { operation: "postDirect" },
     );
     return identifiers.map(
       (identifier) =>

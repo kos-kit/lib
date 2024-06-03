@@ -2,12 +2,19 @@ import { Concept } from "../../src/models/Concept";
 import { SemanticRelationProperty } from "../../src/models/SemanticRelationProperty";
 import { behavesLikeConcept } from "./behavesLikeConcept";
 import { DataFactory } from "n3";
+import { expectConcept } from "./expectConcept";
+import { LanguageTag } from "../../src/models/LanguageTag";
 
 export const behavesLikeUnescoThesaurusConcept10 = (
-  lazyConcept: () => Promise<Concept>,
+  lazyConcept: (includeLanguageTag: LanguageTag) => Promise<Concept>,
 ) => {
+  it("should satisfy basic expect", async () => {
+    const concept = await lazyConcept("en");
+    expectConcept(concept);
+  });
+
   it("should be in the single concept scheme", async () => {
-    const concept = await lazyConcept();
+    const concept = await lazyConcept("en");
     const inSchemes = await concept.topConceptOf();
     expect(inSchemes).toHaveLength(1);
     expect(
@@ -18,26 +25,21 @@ export const behavesLikeUnescoThesaurusConcept10 = (
   });
 
   it("should have a modified date", async () => {
-    const concept = await lazyConcept();
-    expect((await concept.modified())!.value).toStrictEqual(
-      "2019-12-15T13:26:49Z",
-    );
+    const concept = await lazyConcept("en");
+    expect(concept.modified!.value).toStrictEqual("2019-12-15T13:26:49Z");
   });
 
   it("should have multiple prefLabels", async () => {
-    const concept = await lazyConcept();
+    const conceptEn = await lazyConcept("en");
+    const conceptFr = await lazyConcept("fr");
 
-    const enPrefLabels = await concept.prefLabels({
-      languageTags: new Set(["en"]),
-    });
+    const enPrefLabels = conceptEn.prefLabels;
     expect(enPrefLabels).toHaveLength(1);
     expect(enPrefLabels[0].literalForm.value).toStrictEqual(
       "Right to education",
     );
 
-    const frPrefLabels = await concept.prefLabels({
-      languageTags: new Set(["fr"]),
-    });
+    const frPrefLabels = conceptFr.prefLabels;
     expect(frPrefLabels).toHaveLength(1);
     expect(frPrefLabels[0].literalForm.value).toStrictEqual(
       "Droit à l'éducation",
@@ -45,7 +47,7 @@ export const behavesLikeUnescoThesaurusConcept10 = (
   });
 
   it("should be a top concept of the single concept scheme", async () => {
-    const concept = await lazyConcept();
+    const concept = await lazyConcept("en");
     const topConceptOf = await concept.topConceptOf();
     expect(topConceptOf).toHaveLength(1);
     expect(
@@ -56,7 +58,7 @@ export const behavesLikeUnescoThesaurusConcept10 = (
   });
 
   it("should have known semantic relations", async () => {
-    const concept = await lazyConcept();
+    const concept = await lazyConcept("en");
     for (const { semanticRelationProperty, conceptNumbers } of [
       {
         semanticRelationProperty: SemanticRelationProperty.NARROWER,

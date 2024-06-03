@@ -1,13 +1,19 @@
 import { Kos } from "../../src/models/Kos";
+import { expectConcept } from "./expectConcept";
+import { expectConceptScheme } from "./expectConceptScheme";
 
 export const behavesLikeKos = (kos: Kos) => {
   it("should get concepts", async () => {
     const firstConcepts = await kos.conceptsPage({ limit: 10, offset: 0 });
     expect(firstConcepts).toHaveLength(10);
+    for (const firstConcept of firstConcepts) {
+      expectConcept(firstConcept);
+    }
 
     const nextConcepts = await kos.conceptsPage({ limit: 10, offset: 10 });
     expect(nextConcepts).toHaveLength(10);
     for (const nextConcept of nextConcepts) {
+      expectConcept(nextConcept);
       expect(
         firstConcepts.every(
           (firstConcept) =>
@@ -22,10 +28,13 @@ export const behavesLikeKos = (kos: Kos) => {
       limit: 1,
       offset: 0,
     })) {
+      expectConcept(concept);
+      const conceptByIdentifier = await kos.conceptByIdentifier(
+        concept.identifier,
+      );
+      expectConcept(conceptByIdentifier);
       expect(
-        concept.identifier.equals(
-          (await kos.conceptByIdentifier(concept.identifier)).identifier,
-        ),
+        concept.identifier.equals(conceptByIdentifier.identifier),
       ).toBeTruthy();
       return;
     }
@@ -37,16 +46,20 @@ export const behavesLikeKos = (kos: Kos) => {
   });
 
   it("should get concept schemes", async () => {
-    expect(await kos.conceptSchemes()).toHaveLength(1);
+    const conceptSchemes = await kos.conceptSchemes();
+    expect(conceptSchemes).toHaveLength(1);
+    expectConceptScheme(conceptSchemes[0]);
   });
 
   it("should get a concept scheme by an identifier", async () => {
     for (const conceptScheme of await kos.conceptSchemes()) {
+      expectConceptScheme(conceptScheme);
+      const conceptSchemeByIdentifier = await kos.conceptSchemeByIdentifier(
+        conceptScheme.identifier,
+      );
+      expectConceptScheme(conceptSchemeByIdentifier);
       expect(
-        conceptScheme.identifier.equals(
-          (await kos.conceptSchemeByIdentifier(conceptScheme.identifier))
-            .identifier,
-        ),
+        conceptScheme.identifier.equals(conceptSchemeByIdentifier.identifier),
       ).toBeTruthy();
     }
   });

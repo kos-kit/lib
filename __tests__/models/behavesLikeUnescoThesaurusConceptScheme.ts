@@ -1,19 +1,28 @@
 import { ConceptScheme } from "../../src/models/ConceptScheme";
+import { LanguageTag } from "../../src/models/LanguageTag";
 import { behavesLikeConceptScheme } from "./behavesLikeConceptScheme";
+import { expectConceptScheme } from "./expectConceptScheme";
 
 export const behavesLikeUnescoThesaurusConceptScheme = (
-  lazyConceptScheme: () => Promise<ConceptScheme>,
+  lazyConceptScheme: (
+    includeLanguageTag: LanguageTag,
+  ) => Promise<ConceptScheme>,
 ) => {
+  it("should satisfy basic expect", async () => {
+    const conceptScheme = await lazyConceptScheme("en");
+    expectConceptScheme(conceptScheme);
+  });
+
   it("should have a modified date", async () => {
-    const conceptScheme = await lazyConceptScheme();
-    expect((await conceptScheme.modified())!.value).toStrictEqual(
+    const conceptScheme = await lazyConceptScheme("en");
+    expect(conceptScheme.modified!.value).toStrictEqual(
       "2024-03-25T14:24:28.295+01:00",
     );
   });
 
   it("should have a license", async () => {
-    const conceptScheme = await lazyConceptScheme();
-    const license = await conceptScheme.license("en");
+    const conceptScheme = await lazyConceptScheme("en");
+    const license = conceptScheme.license;
     expect(license).toBeDefined();
     expect(license!.termType).toStrictEqual("NamedNode");
     expect(license!.value).toStrictEqual(
@@ -22,17 +31,14 @@ export const behavesLikeUnescoThesaurusConceptScheme = (
   });
 
   it("should have multiple prefLabels", async () => {
-    const conceptScheme = await lazyConceptScheme();
+    const conceptSchemeEn = await lazyConceptScheme("en");
+    const conceptSchemeFr = await lazyConceptScheme("fr");
 
-    const enPrefLabels = await conceptScheme.prefLabels({
-      languageTags: new Set(["en"]),
-    });
+    const enPrefLabels = conceptSchemeEn.prefLabels;
     expect(enPrefLabels).toHaveLength(1);
     expect(enPrefLabels[0].literalForm.value).toStrictEqual("UNESCO Thesaurus");
 
-    const frPrefLabels = await conceptScheme.prefLabels({
-      languageTags: new Set(["fr"]),
-    });
+    const frPrefLabels = conceptSchemeFr.prefLabels;
     expect(frPrefLabels).toHaveLength(1);
     expect(frPrefLabels[0].literalForm.value).toStrictEqual(
       "Thésaurus de l'UNESCO",
@@ -40,15 +46,15 @@ export const behavesLikeUnescoThesaurusConceptScheme = (
   });
 
   it("should have rights", async () => {
-    const conceptScheme = await lazyConceptScheme();
-    const rights = await conceptScheme.rights("en");
+    const conceptScheme = await lazyConceptScheme("en");
+    const rights = conceptScheme.rights;
     expect(rights).toBeDefined();
     expect(rights!.value).toStrictEqual("CC-BY-SA");
   });
 
   it("should have a rights holder", async () => {
-    const conceptScheme = await lazyConceptScheme();
-    const rightsHolder = await conceptScheme.rightsHolder("en");
+    const conceptScheme = await lazyConceptScheme("en");
+    const rightsHolder = conceptScheme.rightsHolder;
     expect(rightsHolder).toBeDefined();
     expect(rightsHolder!.value).toStrictEqual("UNESCO");
   });
