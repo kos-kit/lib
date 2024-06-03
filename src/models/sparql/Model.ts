@@ -40,32 +40,48 @@ export abstract class Model<MemModelT extends MemModel> implements IModel {
     return this.memModel.modified;
   }
 
-  static propertyGraphPatterns(
-    subject: GraphPatternSubject,
-  ): readonly GraphPattern[] {
+  static propertyGraphPatterns({
+    subject,
+    variablePrefix,
+  }: {
+    subject: GraphPatternSubject;
+    variablePrefix: string;
+  }): readonly GraphPattern[] {
     return [
       {
         subject,
         predicate: dcterms.license,
-        object: { termType: "Variable", plainLiteral: true, value: "license" },
+        object: {
+          termType: "Variable",
+          plainLiteral: true,
+          value: variablePrefix + "License",
+        },
         optional: true,
       },
       {
         subject,
         predicate: dcterms.modified,
-        object: { termType: "Variable", value: "modified" },
+        object: { termType: "Variable", value: variablePrefix + "Modified" },
         optional: true,
       },
       {
         subject,
         predicate: dc11.rights,
-        object: { termType: "Variable", plainLiteral: true, value: "rights" },
+        object: {
+          termType: "Variable",
+          plainLiteral: true,
+          value: variablePrefix + "Rights",
+        },
         optional: true,
       },
       {
         subject,
         predicate: dcterms.rights,
-        object: { termType: "Variable", plainLiteral: true, value: "rights" },
+        object: {
+          termType: "Variable",
+          plainLiteral: true,
+          value: variablePrefix + "Rights",
+        },
         optional: true,
       },
       {
@@ -74,7 +90,7 @@ export abstract class Model<MemModelT extends MemModel> implements IModel {
         object: {
           termType: "Variable",
           plainLiteral: true,
-          value: "rightsHolder",
+          value: variablePrefix + "RightsHolder",
         },
         optional: true,
       },

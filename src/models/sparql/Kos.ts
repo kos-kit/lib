@@ -76,7 +76,12 @@ OFFSET ${offset}`),
       new ConstructQueryBuilder({
         includeLanguageTags,
       })
-        .addGraphPatterns(...Concept.propertyGraphPatterns(conceptVariable))
+        .addGraphPatterns(
+          ...Concept.propertyGraphPatterns({
+            subject: conceptVariable,
+            variablePrefix: conceptVariable.value,
+          }),
+        )
         .addValues(conceptVariable, ...identifiers)
         .build(),
       { operation: "postDirect" },
@@ -140,7 +145,10 @@ WHERE {
         includeLanguageTags,
       })
         .addGraphPatterns(
-          ...ConceptScheme.propertyGraphPatterns(conceptSchemeVariable),
+          ...ConceptScheme.propertyGraphPatterns({
+            subject: conceptSchemeVariable,
+            variablePrefix: conceptSchemeVariable.value,
+          }),
         )
         .addValues(conceptSchemeVariable, ...identifiers)
         .build(),

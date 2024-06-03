@@ -29,9 +29,13 @@ export abstract class LabeledModel<MemModelT extends MemLabeledModel>
     return this.memModel.prefLabels;
   }
 
-  static override propertyGraphPatterns(
-    subject: GraphPatternSubject,
-  ): readonly GraphPattern[] {
+  static override propertyGraphPatterns({
+    subject,
+    variablePrefix,
+  }: {
+    subject: GraphPatternSubject;
+    variablePrefix: string;
+  }): readonly GraphPattern[] {
     const graphPatterns: GraphPattern[] = [];
     for (const { skosPredicate, skosxlPredicate, variableName } of [
       {
@@ -70,9 +74,10 @@ export abstract class LabeledModel<MemModelT extends MemLabeledModel>
         predicate: skosxlPredicate,
         object: skosxlLabelVariable,
         optional: true,
-        subGraphPatterns: Model.propertyGraphPatterns(
-          skosxlLabelVariable,
-        ).concat([
+        subGraphPatterns: Model.propertyGraphPatterns({
+          subject: skosxlLabelVariable,
+          variablePrefix: skosxlLabelVariable.value,
+        }).concat([
           {
             subject: skosxlLabelVariable,
             predicate: skosxl.literalForm,
@@ -86,7 +91,9 @@ export abstract class LabeledModel<MemModelT extends MemLabeledModel>
       });
     }
 
-    return Model.propertyGraphPatterns(subject).concat(graphPatterns);
+    return Model.propertyGraphPatterns({ subject, variablePrefix }).concat(
+      graphPatterns,
+    );
   }
 
   //   protected override get rdfJsDatasetQueryString(): string {

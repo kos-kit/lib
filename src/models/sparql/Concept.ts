@@ -40,9 +40,13 @@ WHERE {
     return this.memModel.notes(property);
   }
 
-  static override propertyGraphPatterns(
-    subject: GraphPatternSubject,
-  ): readonly GraphPattern[] {
+  static override propertyGraphPatterns({
+    subject,
+    variablePrefix,
+  }: {
+    subject: GraphPatternSubject;
+    variablePrefix: string;
+  }): readonly GraphPattern[] {
     const graphPatterns: GraphPattern[] = [];
 
     graphPatterns.push({
@@ -68,7 +72,10 @@ WHERE {
       });
     }
 
-    return LabeledModel.propertyGraphPatterns(subject).concat(graphPatterns);
+    return LabeledModel.propertyGraphPatterns({
+      subject,
+      variablePrefix,
+    }).concat(graphPatterns);
   }
 
   async semanticRelations(

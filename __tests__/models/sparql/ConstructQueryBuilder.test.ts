@@ -83,7 +83,7 @@ CONSTRUCT {
       value: "http://example.com/concept",
     };
     const actual = new ConstructQueryBuilder().addGraphPatterns(
-      ...Concept.propertyGraphPatterns(subject),
+      ...Concept.propertyGraphPatterns({ subject, variablePrefix: "concept" }),
     );
     // console.log("\n", actual);
     expect(actual).not.toHaveLength(0);
