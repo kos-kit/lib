@@ -9,61 +9,6 @@ interface IndentedString {
   string: string;
 }
 
-function graphPatternToString(
-  graphPattern: GraphPattern,
-  indent: number,
-): IndentedString {
-  return {
-    indent,
-    string: `${termToString(graphPattern.subject)} ${termToString(graphPattern.predicate)} ${termToString(graphPattern.object)} .`,
-  };
-}
-
-function graphPatternToConstructStrings(
-  graphPattern: GraphPattern,
-  indent: number,
-): readonly IndentedString[] {
-  let constructStrings = [graphPatternToString(graphPattern, indent)];
-  if (graphPattern.subGraphPatterns) {
-    for (const subGraphPattern of sortGraphPatterns(
-      graphPattern.subGraphPatterns,
-    )) {
-      constructStrings = constructStrings.concat(
-        graphPatternToConstructStrings(subGraphPattern, indent + TAB_SPACES),
-      );
-    }
-  }
-  return constructStrings;
-}
-
-function graphPatternToWhereStrings(
-  graphPattern: GraphPattern,
-  indent: number,
-): readonly IndentedString[] {
-  let whereStrings = [graphPatternToString(graphPattern, indent)];
-  if (graphPattern.subGraphPatterns) {
-    for (const subGraphPattern of sortGraphPatterns(
-      graphPattern.subGraphPatterns,
-    )) {
-      whereStrings = whereStrings.concat(
-        graphPatternToWhereStrings(subGraphPattern, indent + TAB_SPACES),
-      );
-    }
-  }
-  if (!graphPattern.optional) {
-    return whereStrings;
-  }
-
-  return [{ indent, string: "OPTIONAL {" }]
-    .concat(
-      whereStrings.map((whereString) => ({
-        indent: whereString.indent + TAB_SPACES,
-        string: whereString.string,
-      })),
-    )
-    .concat([{ indent, string: "}" }]);
-}
-
 function indentedStringsToString(
   indentedStrings: readonly IndentedString[],
 ): string {
@@ -85,39 +30,6 @@ function sortGraphPatterns(
     }
   });
   return sortedGraphPatterns;
-}
-
-function termToString(
-  term:
-    | Omit<BlankNode, "equals">
-    | Omit<Literal, "equals">
-    | Omit<NamedNode, "equals">
-    | Omit<Variable, "equals">,
-): string {
-  switch (term.termType) {
-    case "BlankNode":
-      return `_:${term.value}`;
-    case "NamedNode":
-      return `<${term.value}>`;
-    case "Literal": {
-      const literalValue: Omit<Literal, "equals"> = term;
-      return (
-        '"' +
-        literalValue.value +
-        '"' +
-        (literalValue.datatype &&
-        literalValue.datatype.value !==
-          "http://www.w3.org/2001/XMLSchema#string" &&
-        literalValue.datatype.value !==
-          "http://www.w3.org/1999/02/22-rdf-syntax-ns#langString"
-          ? "^^" + literalValue.datatype.value
-          : "") +
-        (literalValue.language ? "@" + literalValue.language : "")
-      );
-    }
-    case "Variable":
-      return `?${term.value}`;
-  }
 }
 
 export class ConstructQueryBuilder {
@@ -159,37 +71,59 @@ export class ConstructQueryBuilder {
 
     const sortedGraphPatterns = sortGraphPatterns(this.graphPatterns);
 
-    const filterStrings = sortedGraphPatterns
-      .flatMap((graphPattern) => this.graphPatternToFilterStrings(graphPattern))
-      .map((filterString) => " ".repeat(TAB_SPACES) + filterString)
-      .join("\n");
-
     const valuesString = this.valuesString();
 
     return `\
 CONSTRUCT {
 ${indentedStringsToString(
   sortedGraphPatterns.flatMap((graphPattern) =>
-    graphPatternToConstructStrings(graphPattern, TAB_SPACES),
+    this.graphPatternToConstructStrings(graphPattern, TAB_SPACES),
   ),
 )}
 } WHERE {
 ${indentedStringsToString(
   sortedGraphPatterns.flatMap((graphPattern) =>
-    graphPatternToWhereStrings(graphPattern, TAB_SPACES),
+    this.graphPatternToWhereStrings(graphPattern, TAB_SPACES),
   ),
-)}${filterStrings.length > 0 ? "\n" + filterStrings : ""}${valuesString.length > 0 ? "\n" + " ".repeat(TAB_SPACES) + valuesString : ""}
+)}${valuesString.length > 0 ? "\n" + " ".repeat(TAB_SPACES) + valuesString : ""}
 }`;
   }
 
-  private graphPatternToFilterStrings(
+  private graphPatternToConstructStrings(
     graphPattern: GraphPattern,
-  ): readonly string[] {
-    if (this.includeLanguageTags.size === 0) {
-      return [];
+    indent: number,
+  ): readonly IndentedString[] {
+    let constructStrings = [this.graphPatternToString(graphPattern, indent)];
+    if (graphPattern.subGraphPatterns) {
+      for (const subGraphPattern of sortGraphPatterns(
+        graphPattern.subGraphPatterns,
+      )) {
+        constructStrings = constructStrings.concat(
+          this.graphPatternToConstructStrings(
+            subGraphPattern,
+            indent + TAB_SPACES,
+          ),
+        );
+      }
     }
+    return constructStrings;
+  }
 
-    let filterStrings: string[] = [];
+  private graphPatternToString(
+    graphPattern: GraphPattern,
+    indent: number,
+  ): IndentedString {
+    return {
+      indent,
+      string: `${this.termToString(graphPattern.subject)} ${this.termToString(graphPattern.predicate)} ${this.termToString(graphPattern.object)} .`,
+    };
+  }
+
+  private graphPatternToWhereStrings(
+    graphPattern: GraphPattern,
+    indent: number,
+  ): readonly IndentedString[] {
+    let whereStrings = [this.graphPatternToString(graphPattern, indent)];
     if (
       graphPattern.object.termType === "Variable" &&
       graphPattern.object.plainLiteral
@@ -199,22 +133,66 @@ ${indentedStringsToString(
           `LANG(?${graphPattern.object.value}) = "${includeLanguageTag}"`,
       );
 
-      filterStrings.push(
-        `FILTER (!BOUND(?${graphPattern.object.value}) || ${languageTagTests.join(" || ")} )`,
-      );
+      whereStrings.push({
+        indent,
+        string: `FILTER (!BOUND(?${graphPattern.object.value}) || ${languageTagTests.join(" || ")} )`,
+      });
     }
 
     if (graphPattern.subGraphPatterns) {
       for (const subGraphPattern of sortGraphPatterns(
         graphPattern.subGraphPatterns,
       )) {
-        filterStrings = filterStrings.concat(
-          this.graphPatternToFilterStrings(subGraphPattern),
+        whereStrings = whereStrings.concat(
+          this.graphPatternToWhereStrings(subGraphPattern, indent + TAB_SPACES),
         );
       }
     }
+    if (!graphPattern.optional) {
+      return whereStrings;
+    }
 
-    return filterStrings;
+    return [{ indent, string: "OPTIONAL {" }]
+      .concat(
+        whereStrings.map((whereString) => ({
+          indent: whereString.indent + TAB_SPACES,
+          string: whereString.string,
+        })),
+      )
+      .concat([{ indent, string: "}" }]);
+  }
+
+  private termToString(
+    term:
+      | Omit<BlankNode, "equals">
+      | Omit<Literal, "equals">
+      | Omit<NamedNode, "equals">
+      | Omit<Variable, "equals">,
+  ): string {
+    switch (term.termType) {
+      case "BlankNode":
+        return `_:${term.value}`;
+      case "NamedNode":
+        return `<${term.value}>`;
+      case "Literal": {
+        const literalValue: Omit<Literal, "equals"> = term;
+        return (
+          '"' +
+          literalValue.value +
+          '"' +
+          (literalValue.datatype &&
+          literalValue.datatype.value !==
+            "http://www.w3.org/2001/XMLSchema#string" &&
+          literalValue.datatype.value !==
+            "http://www.w3.org/1999/02/22-rdf-syntax-ns#langString"
+            ? "^^" + literalValue.datatype.value
+            : "") +
+          (literalValue.language ? "@" + literalValue.language : "")
+        );
+      }
+      case "Variable":
+        return `?${term.value}`;
+    }
   }
 
   private valuesString() {
@@ -228,6 +206,6 @@ ${indentedStringsToString(
     const variableValues = this.values[0];
     const [variable, values] = variableValues;
 
-    return `VALUES ?${variable.value} { ${values.map((value) => termToString(value)).join(" ")} }`;
+    return `VALUES ?${variable.value} { ${values.map((value) => this.termToString(value)).join(" ")} }`;
   }
 }

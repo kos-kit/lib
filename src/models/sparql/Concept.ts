@@ -21,11 +21,11 @@ export class Concept extends LabeledModel<MemConcept> implements IConcept {
         await this.sparqlClient.query.select(`
 SELECT DISTINCT ?conceptScheme
 WHERE {
-  { ${identifierString} <${skos.inScheme}> ?conceptScheme . }
+  { ${identifierString} <${skos.inScheme.value}> ?conceptScheme . }
   UNION
-  { ${identifierString} <${skos.topConceptOf}> ?conceptScheme . }
+  { ${identifierString} <${skos.topConceptOf.value}> ?conceptScheme . }
   UNION
-  { ?conceptScheme <${skos.hasTopConcept} ${identifierString} . }
+  { ?conceptScheme <${skos.hasTopConcept.value} ${identifierString} . }
 }`),
         "conceptScheme",
       ),

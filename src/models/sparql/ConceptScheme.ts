@@ -18,9 +18,9 @@ export class ConceptScheme
       await this.sparqlClient.query.select(`\
 SELECT (COUNT(DISTINCT ?concept) AS ?count)
 WHERE {
-  { ${identifierString} <${skos.hasTopConcept}> ?concept . }
+  { ${identifierString} <${skos.hasTopConcept.value}> ?concept . }
   UNION
-  { ?concept <${skos.topConceptOf}> ${identifierString} . }
+  { ?concept <${skos.topConceptOf.value}> ${identifierString} . }
 }`),
       "count",
     );
@@ -38,9 +38,9 @@ WHERE {
       await this.sparqlClient.query.select(`\
 SELECT DISTINCT ?concept
 WHERE {
-  { ${identifierString} <${skos.hasTopConcept}> ?concept . }
+  { ${identifierString} <${skos.hasTopConcept.value}> ?concept . }
   UNION
-  { ?concept <${skos.topConceptOf}> ${identifierString} . }
+  { ?concept <${skos.topConceptOf.value}> ${identifierString} . }
 }
 LIMIT ${limit}
 OFFSET ${offset}`),
