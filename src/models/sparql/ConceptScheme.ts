@@ -2,7 +2,10 @@ import { ConceptScheme as IConceptScheme } from "../ConceptScheme";
 import { ConceptScheme as MemConceptScheme } from "../mem/ConceptScheme";
 import { LabeledModel as LabeledModel } from "./LabeledModel";
 import { Concept } from "./Concept";
-import { identifierToString } from "../../utilities";
+import {
+  identifierToString,
+  paginationToAsyncGenerator,
+} from "../../utilities";
 import { skos } from "../../vocabularies";
 import { Identifier } from "../Identifier";
 import { mapResultRowsToIdentifiers } from "./mapResultRowsToIdentifiers";
@@ -46,6 +49,13 @@ LIMIT ${limit}
 OFFSET ${offset}`),
       "concept",
     );
+  }
+
+  async *topConcepts(): AsyncGenerator<Concept> {
+    yield* paginationToAsyncGenerator({
+      getPage: ({ offset }) => this.topConceptsPage({ limit: 100, offset }),
+      totalCount: await this.topConceptsCount(),
+    });
   }
 
   async topConceptsPage({

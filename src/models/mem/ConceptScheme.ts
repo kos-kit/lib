@@ -4,9 +4,8 @@ import { Identifier } from "../Identifier";
 import { ConceptScheme as IConceptScheme } from "../ConceptScheme";
 import { mapTermToIdentifier } from "./mapTermToIdentifier";
 import { skos } from "../../vocabularies";
-import { paginateIterable } from "../../utilities/paginateIterable";
+import { countIterable, paginateIterable } from "../../utilities";
 import { Concept } from "./Concept";
-import { countIterable } from "../../utilities";
 
 export class ConceptScheme extends LabeledModel implements IConceptScheme {
   private *topConceptIdentifiers(): Iterable<Identifier> {
@@ -42,6 +41,15 @@ export class ConceptScheme extends LabeledModel implements IConceptScheme {
         yield conceptIdentifier;
         conceptIdentifierSet.add(conceptIdentifier);
       }
+    }
+  }
+
+  async *topConcepts(): AsyncGenerator<Concept> {
+    for await (const conceptIdentifier of this.topConceptIdentifiers()) {
+      yield new Concept({
+        identifier: conceptIdentifier,
+        kos: this.kos,
+      });
     }
   }
 
