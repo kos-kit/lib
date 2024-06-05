@@ -8,6 +8,7 @@ import { Label as LiteralLabel } from "../literal/Label";
 import { Label } from "./Label";
 import { Label as ILabel } from "../Label";
 import { identifierToString } from "../../utilities";
+import { matchLiteral } from "./matchLiteral";
 
 export abstract class LabeledModel extends Model implements ILabeledModel {
   get altLabels(): readonly ILabel[] {
@@ -56,8 +57,9 @@ export abstract class LabeledModel extends Model implements ILabeledModel {
     )) {
       if (
         quad.object.termType === "Literal" &&
-        (this.includeLanguageTags.size === 0 ||
-          this.includeLanguageTags.has(quad.object.language))
+        matchLiteral(quad.object, {
+          includeLanguageTags: this.includeLanguageTags,
+        })
       ) {
         labels.push(new LiteralLabel(quad.object));
       }
@@ -84,8 +86,9 @@ export abstract class LabeledModel extends Model implements ILabeledModel {
         }
 
         if (
-          this.includeLanguageTags.size > 0 &&
-          !this.includeLanguageTags.has(literalFormQuad.object.language)
+          !matchLiteral(literalFormQuad.object, {
+            includeLanguageTags: this.includeLanguageTags,
+          })
         ) {
           continue;
         }

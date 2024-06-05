@@ -4,6 +4,7 @@ import { Resource } from "./Resource";
 import { LanguageTagSet } from "../LanguageTagSet";
 import { Identifier } from "../Identifier";
 import { Model as IModel } from "../Model";
+import { matchLiteral } from "./matchLiteral";
 
 const rightsPredicates = [dcterms.rights, dc11.rights];
 
@@ -36,17 +37,11 @@ export abstract class Model extends Resource implements IModel {
     if (literals.length === 0) {
       return null;
     }
-
-    if (this.includeLanguageTags.size === 0) {
-      return literals[0];
-    }
-
-    for (const languageTag of this.includeLanguageTags) {
-      for (const literal of literals) {
-        if (literal.language === languageTag) {
-          return literal;
-        }
-      }
+    const literal = literals[0];
+    if (
+      matchLiteral(literal, { includeLanguageTags: this.includeLanguageTags })
+    ) {
+      return literal;
     }
 
     return null;
@@ -74,16 +69,11 @@ export abstract class Model extends Resource implements IModel {
     if (literals.length === 0) {
       return null;
     }
-    if (this.includeLanguageTags.size === 0) {
-      return literals[0];
-    }
-
-    for (const languageTag of this.includeLanguageTags) {
-      for (const literal of literals) {
-        if (literal.language === languageTag) {
-          return literal;
-        }
-      }
+    const literal = literals[0];
+    if (
+      matchLiteral(literal, { includeLanguageTags: this.includeLanguageTags })
+    ) {
+      return literal;
     }
 
     return null;
