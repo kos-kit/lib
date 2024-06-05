@@ -7,7 +7,7 @@ export const behavesLikeConceptScheme = (
     includeLanguageTag: LanguageTag,
   ) => Promise<ConceptScheme>,
 ) => {
-  it("should get top concepts", async () => {
+  it("should get top concept pages", async () => {
     const conceptScheme = await lazyConceptScheme("en");
 
     const firstConcepts = await conceptScheme.topConceptsPage({
@@ -29,6 +29,14 @@ export const behavesLikeConceptScheme = (
         ),
       ).toBeTruthy();
     }
+  });
+
+  it("should get top concepts", async () => {
+    const conceptScheme = await lazyConceptScheme("en");
+    for await (const topConcept of conceptScheme.topConcepts()) {
+      expect(topConcept.displayLabel);
+    }
+    return;
   });
 
   it("should get top concepts count", async () => {
