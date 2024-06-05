@@ -10,6 +10,7 @@ import { GraphPatternVariable } from "./GraphPattern";
 import { mapResultRowsToIdentifiers } from "./mapResultRowsToIdentifiers";
 import { mapResultRowsToCount } from "./mapResultRowsToCount";
 import { SparqlClient } from "../../SparqlClient";
+import { paginationToAsyncGenerator } from "../../utilities/paginationToAsyncGenerator";
 
 export class Kos {
   private static readonly CONCEPT_IDENTIFIER_GRAPH_PATTERN = `?concept <${rdf.type.value}>/<${rdfs.subClassOf.value}>* <${skos.Concept.value}> .`;
@@ -52,16 +53,11 @@ OFFSET ${offset}`),
     );
   }
 
-  async *concepts(): AsyncGenerator<Concept, any, unknown> {
-    const conceptsCount = await this.conceptsCount();
-    const limit = 100;
-    let offset = 0;
-    while (offset < conceptsCount) {
-      for (const concept of await this.conceptsPage({ limit, offset })) {
-        yield concept;
-        offset++;
-      }
-    }
+  async *concepts(): AsyncGenerator<Concept> {
+    yield* paginationToAsyncGenerator({
+      getPage: ({ offset }) => this.conceptsPage({ limit: 100, offset }),
+      totalCount: await this.conceptsCount(),
+    });
   }
 
   async conceptsByIdentifiers(

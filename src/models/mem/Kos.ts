@@ -43,7 +43,7 @@ export class Kos {
     });
   }
 
-  async *concepts(): AsyncGenerator<Concept, any, unknown> {
+  async *concepts(): AsyncGenerator<Concept> {
     for await (const conceptIdentifier of this.conceptIdentifiers()) {
       yield new Concept({
         identifier: conceptIdentifier,

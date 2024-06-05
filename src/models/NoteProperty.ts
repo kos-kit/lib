@@ -29,8 +29,12 @@ export class NoteProperty {
 
   private constructor(
     readonly identifier: NamedNode,
-    readonly label: string,
+    readonly singularLabel: string,
   ) {
     this.name = identifier.value.substring(skos[""].value.length);
+  }
+
+  get pluralLabel(): string {
+    return this.singularLabel + "s";
   }
 }
