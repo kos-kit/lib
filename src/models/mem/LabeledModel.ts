@@ -95,9 +95,8 @@ export abstract class LabeledModel extends Model implements ILabeledModel {
 
         labels.push(
           new Label({
-            dataset: this.dataset,
             identifier: labelIdentifier,
-            includeLanguageTags: this.includeLanguageTags,
+            kos: this.kos,
             literalForm: literalFormQuad.object,
           }),
         );

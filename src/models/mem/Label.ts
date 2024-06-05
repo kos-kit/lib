@@ -1,24 +1,22 @@
-import { DatasetCore, Literal } from "@rdfjs/types";
+import { Literal } from "@rdfjs/types";
 import { Label as ILabel } from "../Label";
 import { Model } from "./Model";
 import { Identifier } from "../Identifier";
-import { LanguageTagSet } from "../LanguageTagSet";
+import { Kos } from "./Kos";
 
 export class Label extends Model implements ILabel {
   readonly literalForm: Literal;
 
   constructor({
-    dataset,
     identifier,
-    includeLanguageTags,
+    kos,
     literalForm,
   }: {
-    dataset: DatasetCore;
     identifier: Identifier;
-    includeLanguageTags: LanguageTagSet;
+    kos: Kos;
     literalForm: Literal;
   }) {
-    super({ dataset, identifier, includeLanguageTags });
+    super({ identifier, kos });
     this.literalForm = literalForm;
   }
 }

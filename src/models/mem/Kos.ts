@@ -10,8 +10,8 @@ import { countIterable } from "../../utilities";
 import { LanguageTagSet } from "../LanguageTagSet";
 
 export class Kos {
-  private readonly dataset: DatasetCore;
-  private readonly includeLanguageTags: LanguageTagSet;
+  readonly dataset: DatasetCore;
+  readonly includeLanguageTags: LanguageTagSet;
 
   constructor({
     dataset,
@@ -28,9 +28,8 @@ export class Kos {
     return new Promise((resolve) =>
       resolve(
         new Concept({
-          dataset: this.dataset,
           identifier: identifier,
-          includeLanguageTags: this.includeLanguageTags,
+          kos: this,
         }),
       ),
     );
@@ -47,9 +46,8 @@ export class Kos {
   async *concepts(): AsyncGenerator<Concept, any, unknown> {
     for await (const conceptIdentifier of this.conceptIdentifiers()) {
       yield new Concept({
-        dataset: this.dataset,
         identifier: conceptIdentifier,
-        includeLanguageTags: this.includeLanguageTags,
+        kos: this,
       });
     }
   }
@@ -69,9 +67,8 @@ export class Kos {
       )) {
         result.push(
           new Concept({
-            dataset: this.dataset,
             identifier: conceptIdentifier,
-            includeLanguageTags: this.includeLanguageTags,
+            kos: this,
           }),
         );
       }
@@ -107,9 +104,8 @@ export class Kos {
       includeSubclasses: true,
     })) {
       yield new ConceptScheme({
-        dataset: this.dataset,
         identifier,
-        includeLanguageTags: this.includeLanguageTags,
+        kos: this,
       });
     }
   }

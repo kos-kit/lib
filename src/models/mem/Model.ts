@@ -1,10 +1,11 @@
-import { NamedNode, Literal, DatasetCore } from "@rdfjs/types";
+import { NamedNode, Literal } from "@rdfjs/types";
 import { dc11, dcterms } from "../../vocabularies";
 import { Resource } from "./Resource";
-import { LanguageTagSet } from "../LanguageTagSet";
 import { Identifier } from "../Identifier";
 import { Model as IModel } from "../Model";
 import { matchLiteral } from "./matchLiteral";
+import { Kos } from "./Kos";
+import { LanguageTagSet } from "../LanguageTagSet";
 
 const rightsPredicates = [dcterms.rights, dc11.rights];
 
@@ -12,19 +13,15 @@ const rightsPredicates = [dcterms.rights, dc11.rights];
  * Abstract base class for RDF/JS Dataset-backed models.
  */
 export abstract class Model extends Resource implements IModel {
-  readonly includeLanguageTags: LanguageTagSet;
+  readonly kos: Kos;
 
-  constructor({
-    dataset,
-    identifier,
-    includeLanguageTags,
-  }: {
-    dataset: DatasetCore;
-    identifier: Identifier;
-    includeLanguageTags: LanguageTagSet;
-  }) {
-    super({ dataset, identifier });
-    this.includeLanguageTags = includeLanguageTags;
+  constructor({ identifier, kos }: { identifier: Identifier; kos: Kos }) {
+    super({ dataset: kos.dataset, identifier });
+    this.kos = kos;
+  }
+
+  protected get includeLanguageTags(): LanguageTagSet {
+    return this.kos.includeLanguageTags;
   }
 
   private literalObject(predicate: NamedNode): Literal | null {
@@ -39,7 +36,9 @@ export abstract class Model extends Resource implements IModel {
     }
     const literal = literals[0];
     if (
-      matchLiteral(literal, { includeLanguageTags: this.includeLanguageTags })
+      matchLiteral(literal, {
+        includeLanguageTags: this.includeLanguageTags,
+      })
     ) {
       return literal;
     }
@@ -71,7 +70,9 @@ export abstract class Model extends Resource implements IModel {
     }
     const literal = literals[0];
     if (
-      matchLiteral(literal, { includeLanguageTags: this.includeLanguageTags })
+      matchLiteral(literal, {
+        includeLanguageTags: this.includeLanguageTags,
+      })
     ) {
       return literal;
     }

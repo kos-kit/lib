@@ -15,9 +15,8 @@ export class Concept extends LabeledModel implements IConcept {
         ...this.filterAndMapObjects(skos.inScheme, (term) =>
           term.termType === "BlankNode" || term.termType === "NamedNode"
             ? new ConceptScheme({
-                dataset: this.dataset,
                 identifier: term,
-                includeLanguageTags: this.includeLanguageTags,
+                kos: this.kos,
               })
             : null,
         ),
@@ -54,9 +53,8 @@ export class Concept extends LabeledModel implements IConcept {
         ...this.filterAndMapObjects(property.identifier, (term) =>
           term.termType === "NamedNode"
             ? new Concept({
-                dataset: this.dataset,
                 identifier: term,
-                includeLanguageTags: this.includeLanguageTags,
+                kos: this.kos,
               })
             : null,
         ),
@@ -81,9 +79,8 @@ export class Concept extends LabeledModel implements IConcept {
         ...this.filterAndMapObjects(skos.topConceptOf, (term) =>
           term.termType === "BlankNode" || term.termType === "NamedNode"
             ? new ConceptScheme({
-                dataset: this.dataset,
                 identifier: term,
-                includeLanguageTags: this.includeLanguageTags,
+                kos: this.kos,
               })
             : null,
         ),
