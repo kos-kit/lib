@@ -1,10 +1,10 @@
 import { Literal } from "@rdfjs/types";
-import { Label } from "./Label";
+import { Label as ILabel } from "../Label";
 
 /**
  * A Label that only consists of its literal form.
  */
-export class LiteralLabel implements Label {
+export class Label implements ILabel {
   constructor(readonly literalForm: Literal) {}
 
   readonly license = null;

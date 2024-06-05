@@ -4,7 +4,7 @@ import { Model } from "./Model";
 import { LabeledModel as ILabeledModel } from "../LabeledModel";
 import { LanguageTag } from "../LanguageTag";
 import { skos, skosxl } from "../../vocabularies";
-import { LiteralLabel } from "../LiteralLabel";
+import { Label as LiteralLabel } from "../literal/Label";
 import { Label } from "./Label";
 import { Label as ILabel } from "../Label";
 import { identifierToString } from "../../utilities";
