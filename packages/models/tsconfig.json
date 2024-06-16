@@ -5,5 +5,10 @@
   },
   "exclude": ["node_modules"],
   "extends": ["../../tsconfig.json"],
-  "include": ["src/**/*.ts"]
+  "include": [
+    "src/**/*.ts",
+    "../rdf-resource/src/LanguageTag.ts",
+    "../rdf-resource/src/LanguageTagSet.ts",
+    "../rdf-resource/src/Identifier.ts"
+  ]
 }

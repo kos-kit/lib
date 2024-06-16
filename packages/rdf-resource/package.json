@@ -1,6 +1,5 @@
 {
   "dependencies": {
-    "@kos-kit/vocabularies": "2.0.0",
     "@rdfjs/types": "^1.1.0"
   },
   "engines": {
@@ -11,7 +10,7 @@
     "**/*.ts"
   ],
   "license": "GPL-3.0-only",
-  "name": "@kos-kit/models",
+  "name": "@kos-kit/rdf-resource",
   "scripts": {
     "build": "tsc -b && cp LICENSE package.json dist/",
     "clean": "rimraf dist",

@@ -1,6 +1,6 @@
 export * from "./Concept";
 export * from "./ConceptScheme";
-export * from "./getRdfInstanceQuads";
+export * from "./instanceQuads";
 export * from "./getRdfInstances";
 export * from "./Kos";
 export * from "./Label";

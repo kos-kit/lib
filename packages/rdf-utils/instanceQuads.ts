@@ -7,7 +7,7 @@ import { rdf, rdfs } from "../../vocabularies";
  *
  * Returns the quads declaring an instance to be of the given class or one of its subclasses.
  */
-export function* getRdfInstanceQuads({
+export function* instanceQuads({
   class_,
   dataset,
   includeSubclasses,
@@ -20,7 +20,7 @@ export function* getRdfInstanceQuads({
   instanceOfPredicate?: NamedNode;
   subClassOfPredicate?: NamedNode;
 }): Iterable<Quad> {
-  yield* getRdfInstanceQuadsRecursive({
+  yield* instanceQuadsRecursive({
     class_,
     dataset,
     includeSubclasses,
@@ -31,7 +31,7 @@ export function* getRdfInstanceQuads({
   });
 }
 
-function* getRdfInstanceQuadsRecursive({
+function* instanceQuadsRecursive({
   class_,
   dataset,
   includeSubclasses,
@@ -76,7 +76,7 @@ function* getRdfInstanceQuadsRecursive({
     } else if (visitedClasses.has(quad.subject)) {
       continue;
     }
-    yield* getRdfInstanceQuadsRecursive({
+    yield* instanceQuadsRecursive({
       class_: quad.subject,
       dataset,
       includeSubclasses,
