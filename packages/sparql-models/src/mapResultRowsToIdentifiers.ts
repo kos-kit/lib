@@ -1,11 +1,11 @@
 import { ResultRow } from "sparql-http-client/ResultParser";
-import { Identifier } from "../Identifier";
+import { BlankNode, NamedNode } from "@rdfjs/types";
 
 export function mapResultRowsToIdentifiers(
   resultRows: readonly ResultRow[],
   variable: string,
-): readonly Identifier[] {
-  const identifiers: Identifier[] = [];
+): readonly (BlankNode | NamedNode)[] {
+  const identifiers: (BlankNode | NamedNode)[] = [];
   for (const resultRow of resultRows) {
     const identifier = resultRow[variable];
     if (

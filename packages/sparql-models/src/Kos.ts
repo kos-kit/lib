@@ -1,16 +1,17 @@
-import { Identifier } from "../Identifier";
-import { rdf, rdfs, skos } from "../../vocabularies";
 import { Concept } from "./Concept";
 import { ConceptScheme } from "./ConceptScheme";
 
-import { LanguageTagSet } from "../LanguageTagSet";
 import { ConstructQueryBuilder } from "./ConstructQueryBuilder";
-import { mem } from "..";
 import { GraphPatternVariable } from "./GraphPattern";
 import { mapResultRowsToIdentifiers } from "./mapResultRowsToIdentifiers";
 import { mapResultRowsToCount } from "./mapResultRowsToCount";
 import { SparqlClient } from "./SparqlClient";
 import { paginationToAsyncGenerator } from "./paginationToAsyncGenerator";
+import { LanguageTagSet } from "@kos-kit/models";
+import { rdf, rdfs, skos } from "@kos-kit/vocabularies";
+import { BlankNode, NamedNode } from "@rdfjs/types";
+import { Resource } from "@kos-kit/rdf-resource";
+import * as mem from "@kos-kit/mem-models";
 
 export class Kos {
   private static readonly CONCEPT_IDENTIFIER_GRAPH_PATTERN = `?concept <${rdf.type.value}>/<${rdfs.subClassOf.value}>* <${skos.Concept.value}> .`;
@@ -30,7 +31,9 @@ export class Kos {
     this.sparqlClient = sparqlClient;
   }
 
-  async conceptByIdentifier(identifier: Identifier): Promise<Concept> {
+  async conceptByIdentifier(
+    identifier: BlankNode | NamedNode,
+  ): Promise<Concept> {
     return (await this.conceptsByIdentifiers([identifier]))[0];
   }
 
@@ -40,7 +43,7 @@ export class Kos {
   }: {
     limit: number;
     offset: number;
-  }): Promise<readonly Identifier[]> {
+  }): Promise<readonly Resource.Identifier[]> {
     return mapResultRowsToIdentifiers(
       await this.sparqlClient.query.select(`\
 SELECT ?concept
@@ -61,7 +64,7 @@ OFFSET ${offset}`),
   }
 
   async conceptsByIdentifiers(
-    identifiers: readonly Identifier[],
+    identifiers: readonly Resource.Identifier[],
   ): Promise<readonly Concept[]> {
     const conceptVariable: GraphPatternVariable = {
       termType: "Variable",
@@ -87,11 +90,11 @@ OFFSET ${offset}`),
         new Concept({
           kos: this,
           memModel: new mem.Concept({
-            identifier,
             kos: new mem.Kos({
               dataset,
               includeLanguageTags,
             }),
+            resource: new Resource({ dataset, identifier }),
           }),
         }),
     );
@@ -125,13 +128,13 @@ WHERE {
   }
 
   async conceptSchemeByIdentifier(
-    identifier: Identifier,
+    identifier: Resource.Identifier,
   ): Promise<ConceptScheme> {
     return (await this.conceptSchemesByIdentifiers([identifier]))[0];
   }
 
   async conceptSchemesByIdentifiers(
-    identifiers: readonly Identifier[],
+    identifiers: readonly Resource.Identifier[],
   ): Promise<readonly ConceptScheme[]> {
     const conceptSchemeVariable: GraphPatternVariable = {
       termType: "Variable",
@@ -157,14 +160,16 @@ WHERE {
         new ConceptScheme({
           kos: this,
           memModel: new mem.ConceptScheme({
-            identifier,
             kos: new mem.Kos({ dataset, includeLanguageTags }),
+            resource: new Resource({ dataset, identifier }),
           }),
         }),
     );
   }
 
-  private async conceptSchemeIdentifiers(): Promise<readonly Identifier[]> {
+  private async conceptSchemeIdentifiers(): Promise<
+    readonly Resource.Identifier[]
+  > {
     return mapResultRowsToIdentifiers(
       await this.sparqlClient.query.select(`\
 SELECT ?conceptScheme

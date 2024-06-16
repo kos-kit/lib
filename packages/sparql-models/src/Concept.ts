@@ -1,21 +1,23 @@
 import { LabeledModel } from "./LabeledModel";
-import { Concept as MemConcept } from "../mem/Concept";
-import { Concept as IConcept } from "../Concept";
 import { ConceptScheme } from "./ConceptScheme";
-import { NoteProperty } from "../NoteProperty";
-import { SemanticRelationProperty } from "../SemanticRelationProperty";
 import { Literal } from "@rdfjs/types";
 import { GraphPatternSubject, GraphPattern } from "./GraphPattern";
-import { noteProperties } from "../noteProperties";
-import { skos } from "../../vocabularies";
 import { mapResultRowsToIdentifiers } from "./mapResultRowsToIdentifiers";
-import { identifierToString } from "../../client/src/utilities";
 import { mapResultRowsToCount } from "./mapResultRowsToCount";
+import { Concept as MemConcept } from "@kos-kit/mem-models";
+import {
+  Concept as IConcept,
+  NoteProperty,
+  SemanticRelationProperty,
+  noteProperties,
+} from "@kos-kit/models";
+import { Resource } from "@kos-kit/rdf-resource";
+import { skos } from "@kos-kit/vocabularies";
 
 export class Concept extends LabeledModel<MemConcept> implements IConcept {
   async inSchemes(): Promise<readonly ConceptScheme[]> {
     // Could do this in a single CONSTRUCT as an optimization. This code is simpler.
-    const identifierString = identifierToString(this.identifier);
+    const identifierString = Resource.Identifier.toString(this.identifier);
     return this.kos.conceptSchemesByIdentifiers(
       mapResultRowsToIdentifiers(
         await this.sparqlClient.query.select(`
@@ -90,7 +92,7 @@ WHERE {
         await this.sparqlClient.query.select(`
 SELECT DISTINCT ?concept
 WHERE {
-  ${identifierToString(this.identifier)} <${property.identifier.value}> ?concept .
+  ${Resource.Identifier.toString(this.identifier)} <${property.identifier.value}> ?concept .
 }`),
         "concept",
       ),
@@ -104,14 +106,14 @@ WHERE {
       await this.sparqlClient.query.select(`
 SELECT (COUNT(DISTINCT ?concept) AS ?count)
 WHERE {
-${identifierToString(this.identifier)} <${property.identifier.value}> ?concept .
+${Resource.Identifier.toString(this.identifier)} <${property.identifier.value}> ?concept .
 }`),
       "count",
     );
   }
 
   async topConceptOf(): Promise<readonly ConceptScheme[]> {
-    const identifierString = identifierToString(this.identifier);
+    const identifierString = Resource.Identifier.toString(this.identifier);
     return this.kos.conceptSchemesByIdentifiers(
       mapResultRowsToIdentifiers(
         await this.sparqlClient.query.select(`

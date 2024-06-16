@@ -1,13 +1,12 @@
-import { Label } from "../Label";
-import { LabeledModel as ILabeledModel } from "../LabeledModel";
-import { LabeledModel as MemLabeledModel } from "../mem/LabeledModel";
+import { LabeledModel as ILabeledModel, Label } from "@kos-kit/models";
+import { LabeledModel as MemLabeledModel } from "@kos-kit/mem-models";
 import {
   GraphPattern,
   GraphPatternSubject,
   GraphPatternVariable,
 } from "./GraphPattern";
 import { Model } from "./Model";
-import { skos, skosxl } from "../../vocabularies";
+import { skos, skosxl } from "@kos-kit/vocabularies";
 
 export abstract class LabeledModel<MemModelT extends MemLabeledModel>
   extends Model<MemModelT>

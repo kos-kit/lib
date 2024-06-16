@@ -1,10 +1,9 @@
-import { Model as MemModel } from "../mem/Model";
-import { Literal, NamedNode } from "@rdfjs/types";
-import { Model as IModel } from "../Model";
-import { Identifier } from "../Identifier";
-import { dc11, dcterms } from "../../vocabularies";
+import { Model as MemModel } from "@kos-kit/mem-models";
+import { Model as IModel } from "@kos-kit/models";
+import { BlankNode, Literal, NamedNode } from "@rdfjs/types";
 import { GraphPattern, GraphPatternSubject } from "./GraphPattern";
 import { Kos } from "./Kos";
+import { dc11, dcterms } from "@kos-kit/vocabularies";
 
 /**
  * Abstract base class for SPARQL-backed models.
@@ -28,7 +27,7 @@ export abstract class Model<MemModelT extends MemModel> implements IModel {
     this.memModel = memModel;
   }
 
-  get identifier(): Identifier {
+  get identifier(): BlankNode | NamedNode {
     return this.memModel.identifier;
   }
 
