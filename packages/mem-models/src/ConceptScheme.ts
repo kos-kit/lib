@@ -4,7 +4,7 @@ import { Identifier } from "../Identifier";
 import { ConceptScheme as IConceptScheme } from "../ConceptScheme";
 import { mapTermToIdentifier } from "./mapTermToIdentifier";
 import { skos } from "../../vocabularies";
-import { countIterable, paginateIterable } from "../../utilities";
+import { countIterable, paginateIterable } from "../../client/src/utilities";
 import { Concept } from "./Concept";
 
 export class ConceptScheme extends LabeledModel implements IConceptScheme {

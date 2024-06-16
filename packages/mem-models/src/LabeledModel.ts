@@ -7,7 +7,7 @@ import { skos, skosxl } from "../../vocabularies";
 import { Label as LiteralLabel } from "../literal/Label";
 import { Label } from "./Label";
 import { Label as ILabel } from "../Label";
-import { identifierToString } from "../../utilities";
+import { identifierToString } from "../../client/src/utilities";
 import { matchLiteral } from "./matchLiteral";
 
 export abstract class LabeledModel extends Model implements ILabeledModel {
