@@ -1,5 +1,4 @@
 import { Literal } from "@rdfjs/types";
-import { SemanticRelationProperty } from "../SemanticRelationProperty";
 import { NoteProperty } from "../NoteProperty";
 import { LabeledModel } from "./LabeledModel";
 import { ConceptScheme } from "./ConceptScheme";
@@ -7,6 +6,7 @@ import { skos } from "../../vocabularies";
 import { Concept as IConcept } from "../Concept";
 import { mapTermToLiteral } from "./mapTermToLiteral";
 import { matchLiteral } from "./matchLiteral";
+import { SemanticRelationProperty } from "@kos-kit/models";
 
 export class Concept extends LabeledModel implements IConcept {
   inSchemes(): Promise<readonly ConceptScheme[]> {

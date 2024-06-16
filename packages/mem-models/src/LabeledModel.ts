@@ -1,16 +1,26 @@
 import { NamedNode } from "@rdfjs/types";
-import { mapTermToIdentifier } from "./mapTermToIdentifier";
 import { Model } from "./Model";
-import { LabeledModel as ILabeledModel } from "../LabeledModel";
-import { LanguageTag } from "../LanguageTag";
-import { skos, skosxl } from "../../vocabularies";
-import { Label as LiteralLabel } from "../literal/Label";
 import { Label } from "./Label";
-import { Label as ILabel } from "../Label";
-import { identifierToString } from "../../client/src/utilities";
-import { matchLiteral } from "./matchLiteral";
+import {
+  Label as ILabel,
+  LabeledModel as ILabeledModel,
+  LiteralLabel,
+} from "@kos-kit/models";
+import { skos, skosxl } from "@kos-kit/vocabularies";
+import { NamedResource } from "@kos-kit/rdf-resource/dist/NamedResource";
+import { Kos } from "./Kos";
+import {
+  Identifier,
+  LanguageTag,
+  Resource,
+  matchLiteral,
+} from "@kos-kit/rdf-resource";
 
 export abstract class LabeledModel extends Model implements ILabeledModel {
+  constructor({ kos, resource }: { kos: Kos; resource: NamedResource }) {
+    super({ kos, resource });
+  }
+
   get altLabels(): readonly ILabel[] {
     return this.labels({
       skosPredicate: skos.altLabel,
@@ -30,7 +40,7 @@ export abstract class LabeledModel extends Model implements ILabeledModel {
       }
     }
 
-    return identifierToString(this.identifier);
+    return Identifier.toString(this.identifier);
   }
 
   get hiddenLabels(): readonly ILabel[] {
@@ -38,6 +48,10 @@ export abstract class LabeledModel extends Model implements ILabeledModel {
       skosPredicate: skos.hiddenLabel,
       skosXlPredicate: skosxl.hiddenLabel,
     });
+  }
+
+  get iri(): NamedNode {
+    return this.resource.identifier as NamedNode;
   }
 
   private labels({
@@ -50,43 +64,30 @@ export abstract class LabeledModel extends Model implements ILabeledModel {
   }): readonly ILabel[] {
     const labels: ILabel[] = [];
 
-    for (const quad of this.dataset.match(
-      this.identifier,
+    for (const literal of this.resource.values(
       skosPredicate,
-      null,
+      Resource.ValueMappers.literal,
     )) {
       if (
-        quad.object.termType === "Literal" &&
-        matchLiteral(quad.object, {
+        matchLiteral(literal, {
           includeLanguageTags: this.includeLanguageTags,
         })
       ) {
-        labels.push(new LiteralLabel(quad.object));
+        labels.push(new LiteralLabel(literal));
       }
     }
 
     // Any resource in the range of a skosxl: label predicate is considered a skosxl:Label
-    for (const quad of this.dataset.match(
-      this.identifier,
+    for (const labelResource of this.resource.values(
       skosXlPredicate,
-      null,
+      Resource.ValueMappers.resource,
     )) {
-      const labelIdentifier = mapTermToIdentifier(quad.object);
-      if (labelIdentifier === null) {
-        continue;
-      }
-      for (const literalFormQuad of this.dataset.match(
-        labelIdentifier,
+      for (const literalForm of labelResource.values(
         skosxl.literalForm,
-        null,
-        null,
+        Resource.ValueMappers.literal,
       )) {
-        if (literalFormQuad.object.termType !== "Literal") {
-          continue;
-        }
-
         if (
-          !matchLiteral(literalFormQuad.object, {
+          !matchLiteral(literalForm, {
             includeLanguageTags: this.includeLanguageTags,
           })
         ) {
@@ -95,9 +96,9 @@ export abstract class LabeledModel extends Model implements ILabeledModel {
 
         labels.push(
           new Label({
-            identifier: labelIdentifier,
             kos: this.kos,
-            literalForm: literalFormQuad.object,
+            literalForm,
+            resource: labelResource,
           }),
         );
       }

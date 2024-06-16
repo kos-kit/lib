@@ -10,7 +10,7 @@ import { countIterable } from "../../client/src/utilities";
 import { LanguageTagSet } from "../LanguageTagSet";
 
 export class Kos {
-  readonly dataset: DatasetCore;
+  private readonly dataset: DatasetCore;
   readonly includeLanguageTags: LanguageTagSet;
 
   constructor({

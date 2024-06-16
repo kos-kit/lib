@@ -1,26 +1,20 @@
 /* eslint-disable no-inner-declarations */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-namespace */
-import {
-  NamedNode,
-  DatasetCore,
-  Term,
-  Quad,
-  BlankNode,
-  Literal,
-} from "@rdfjs/types";
-import { Identifier } from "./Identifier";
+import { NamedNode, DatasetCore, BlankNode, Literal } from "@rdfjs/types";
+import { NamedResource } from "./NamedResource";
+import DataFactory from "@rdfjs/data-model";
 
 export class Resource {
-  private readonly dataset: DatasetCore;
-  readonly identifier: Identifier;
+  readonly dataset: DatasetCore;
+  readonly identifier: Resource.Identifier;
 
   constructor({
     dataset,
     identifier,
   }: {
     dataset: DatasetCore;
-    identifier: Identifier;
+    identifier: Resource.Identifier;
   }) {
     this.dataset = dataset;
     this.identifier = identifier;
@@ -30,20 +24,8 @@ export class Resource {
     property: NamedNode,
     mapper: Resource.ValueMapper<T>,
   ): NonNullable<T> | null {
-    for (const quad of this.dataset.match(
-      this.identifier,
-      property,
-      null,
-      null,
-    )) {
-      const mappedObject: T | null = mapper(
-        quad.object as BlankNode | NamedNode | Literal,
-        quad,
-        this.dataset,
-      );
-      if (mappedObject !== null) {
-        return mappedObject as NonNullable<T>;
-      }
+    for (const value of this.values(property, mapper)) {
+      return value;
     }
     return null;
   }
@@ -71,7 +53,6 @@ export class Resource {
     )) {
       const mappedObject: T | null = mapper(
         quad.object as BlankNode | NamedNode | Literal,
-        quad,
         this.dataset,
       );
       if (mappedObject !== null) {
@@ -80,11 +61,7 @@ export class Resource {
     }
   }
 
-  valuesCount(property: NamedNode, filter?: (value: Term) => boolean) {
-    if (!filter) {
-      filter = () => true;
-    }
-
+  valuesCount<T>(property: NamedNode, mapper: Resource.ValueMapper<T>) {
     let count = 0;
     for (const quad of this.dataset.match(
       this.identifier,
@@ -92,7 +69,10 @@ export class Resource {
       null,
       null,
     )) {
-      if (filter(quad.object)) {
+      if (
+        mapper(quad.object as BlankNode | Literal | NamedNode, this.dataset) !==
+        null
+      ) {
         count++;
       }
     }
@@ -101,9 +81,31 @@ export class Resource {
 }
 
 export namespace Resource {
+  export type Identifier = BlankNode | NamedNode;
+
+  export namespace Identifier {
+    export function fromString(str: string) {
+      if (str.startsWith("_:")) {
+        return DataFactory.blankNode(str.substring("_:".length));
+      } else if (str.startsWith("<") && str.endsWith(">") && str.length > 2) {
+        return DataFactory.namedNode(str.substring(1, str.length - 1));
+      } else {
+        throw new RangeError(str);
+      }
+    }
+
+    export function toString(identifier: Identifier) {
+      switch (identifier.termType) {
+        case "BlankNode":
+          return `_:${identifier.value}`;
+        case "NamedNode":
+          return `<${identifier.value}>`;
+      }
+    }
+  }
+
   export type ValueMapper<T> = (
     object: BlankNode | Literal | NamedNode,
-    quad: Quad,
     dataset: DatasetCore,
   ) => NonNullable<T> | null;
 
@@ -124,6 +126,40 @@ export namespace Resource {
       object: BlankNode | Literal | NamedNode,
     ): NamedNode | null {
       return object.termType === "NamedNode" ? object : null;
+    }
+
+    export function identity(
+      object: BlankNode | Literal | NamedNode,
+    ): BlankNode | Literal | NamedNode {
+      return object;
+    }
+
+    export function literal(
+      object: BlankNode | Literal | NamedNode,
+    ): Literal | null {
+      return object.termType === "Literal" ? object : null;
+    }
+
+    export function namedResource(
+      object: BlankNode | Literal | NamedNode,
+      dataset: DatasetCore,
+    ): NamedResource | null {
+      const iri = Resource.ValueMappers.iri(object);
+      if (iri !== null) {
+        return new NamedResource({ dataset, iri });
+      }
+      return null;
+    }
+
+    export function resource(
+      object: BlankNode | Literal | NamedNode,
+      dataset: DatasetCore,
+    ): Resource | null {
+      const identifier = Resource.ValueMappers.identifier(object);
+      if (identifier !== null) {
+        return new Resource({ dataset, identifier });
+      }
+      return null;
     }
   }
 }

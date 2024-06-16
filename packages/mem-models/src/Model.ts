@@ -1,34 +1,39 @@
 import { NamedNode, Literal } from "@rdfjs/types";
-import { dc11, dcterms } from "../../vocabularies";
-import { Resource } from "./Resource";
-import { Identifier } from "../Identifier";
-import { Model as IModel } from "../Model";
-import { matchLiteral } from "./matchLiteral";
+import { dc11, dcterms } from "@kos-kit/vocabularies";
+import { Model as IModel } from "@kos-kit/models";
 import { Kos } from "./Kos";
-import { LanguageTagSet } from "../LanguageTagSet";
+import {
+  Identifier,
+  LanguageTagSet,
+  Resource,
+  matchLiteral,
+} from "@kos-kit/rdf-resource";
 
 const rightsPredicates = [dcterms.rights, dc11.rights];
 
 /**
  * Abstract base class for RDF/JS Dataset-backed models.
  */
-export abstract class Model extends Resource implements IModel {
-  readonly kos: Kos;
+export abstract class Model implements IModel {
+  protected readonly kos: Kos;
+  protected readonly resource: Resource;
 
-  constructor({ identifier, kos }: { identifier: Identifier; kos: Kos }) {
-    super({ dataset: kos.dataset, identifier });
+  constructor({ kos, resource }: { kos: Kos; resource: Resource }) {
     this.kos = kos;
+    this.resource = resource;
   }
 
   protected get includeLanguageTags(): LanguageTagSet {
     return this.kos.includeLanguageTags;
   }
 
+  get identifier(): Identifier {
+    return this.resource.identifier;
+  }
+
   private literalObject(predicate: NamedNode): Literal | null {
     const literals: readonly Literal[] = [
-      ...this.filterAndMapObjects(predicate, (term) =>
-        term.termType === "Literal" ? term : null,
-      ),
+      ...this.resource.values(predicate, Resource.ValueMappers.literal),
     ];
 
     if (literals.length === 0) {
@@ -49,16 +54,14 @@ export abstract class Model extends Resource implements IModel {
   get license(): Literal | NamedNode | null {
     const literals: Literal[] = [];
 
-    for (const quad of this.dataset.match(
-      this.identifier,
-      dcterms.license,
-      null,
+    for (const object of this.resource.values(dcterms.license, (term) =>
+      term.termType === "Literal" || term.termType == "NamedNode" ? term : null,
     )) {
-      switch (quad.object.termType) {
+      switch (object.termType) {
         case "NamedNode":
-          return quad.object;
+          return object;
         case "Literal":
-          literals.push(quad.object);
+          literals.push(object);
           break;
         default:
           break;
@@ -81,8 +84,9 @@ export abstract class Model extends Resource implements IModel {
   }
 
   get modified(): Literal | null {
-    return this.findAndMapObjectOptional(dcterms.modified, (term) =>
-      term.termType === "Literal" ? term : null,
+    return this.resource.optionalValue(
+      dcterms.modified,
+      Resource.ValueMappers.literal,
     );
   }
 
