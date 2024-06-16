@@ -1,5 +1,9 @@
 {
-  "dependencies": {},
+  "dependencies": {
+    "@types/lunr": "^2.3.7",
+    "axios": "^1.7.2",
+    "lunr": "^2.3.9"
+  },
   "engines": {
     "node": ">=20"
   },

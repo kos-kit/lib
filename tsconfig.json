@@ -16,5 +16,5 @@
     "@tsconfig/recommended/tsconfig.json",
     "@tsconfig/strictest/tsconfig.json"
   ],
-  "include": ["src/**/*.ts"]
+  "include": ["src/*.ts"]
 }
