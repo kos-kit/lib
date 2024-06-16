@@ -1,7 +1,7 @@
 import { LanguageTag } from "../../../src/models/LanguageTag";
 import { LanguageTagSet } from "../../../src/models/LanguageTagSet";
-import { Kos } from "../../../src/models/sparql/Kos";
-import { SparqlClient } from "../../../src/SparqlClient";
+import { Kos } from "../src/Kos";
+import { SparqlClient } from "../src/SparqlClient";
 
 export const testKosFactory = (includeLanguageTag: LanguageTag) =>
   new Kos({

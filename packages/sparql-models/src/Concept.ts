@@ -9,7 +9,7 @@ import { GraphPatternSubject, GraphPattern } from "./GraphPattern";
 import { noteProperties } from "../noteProperties";
 import { skos } from "../../vocabularies";
 import { mapResultRowsToIdentifiers } from "./mapResultRowsToIdentifiers";
-import { identifierToString } from "../../utilities";
+import { identifierToString } from "../../client/src/utilities";
 import { mapResultRowsToCount } from "./mapResultRowsToCount";
 
 export class Concept extends LabeledModel<MemConcept> implements IConcept {

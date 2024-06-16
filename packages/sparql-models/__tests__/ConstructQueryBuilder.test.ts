@@ -3,9 +3,9 @@ import {
   ConstructQueryBuilder,
   GraphPatternObject,
   GraphPatternSubject,
-} from "../../../src/models/sparql";
+} from "../src";
 import { skos } from "../../../src/vocabularies";
-import { Concept } from "../../../src/models/sparql/Concept";
+import { Concept } from "../src/Concept";
 
 describe("ConstructQueryBuilder", () => {
   const subject: GraphPatternSubject = {

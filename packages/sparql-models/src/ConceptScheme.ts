@@ -5,7 +5,7 @@ import { Concept } from "./Concept";
 import {
   identifierToString,
   paginationToAsyncGenerator,
-} from "../../utilities";
+} from "../../client/src/utilities";
 import { skos } from "../../vocabularies";
 import { Identifier } from "../Identifier";
 import { mapResultRowsToIdentifiers } from "./mapResultRowsToIdentifiers";

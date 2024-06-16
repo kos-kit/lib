@@ -9,8 +9,8 @@ import { mem } from "..";
 import { GraphPatternVariable } from "./GraphPattern";
 import { mapResultRowsToIdentifiers } from "./mapResultRowsToIdentifiers";
 import { mapResultRowsToCount } from "./mapResultRowsToCount";
-import { SparqlClient } from "../../SparqlClient";
-import { paginationToAsyncGenerator } from "../../utilities/paginationToAsyncGenerator";
+import { SparqlClient } from "./SparqlClient";
+import { paginationToAsyncGenerator } from "../../client/src/utilities/paginationToAsyncGenerator";
 
 export class Kos {
   private static readonly CONCEPT_IDENTIFIER_GRAPH_PATTERN = `?concept <${rdf.type.value}>/<${rdfs.subClassOf.value}>* <${skos.Concept.value}> .`;

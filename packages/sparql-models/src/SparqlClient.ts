@@ -3,7 +3,7 @@ import { ParsingQuery, QueryOptions } from "sparql-http-client";
 import ParsingSparqlClient from "sparql-http-client/ParsingClient";
 import { ResultRow } from "sparql-http-client/ResultParser";
 import { Writer } from "n3";
-import { logger } from "./logger";
+import { logger } from "../../client/src/logger";
 
 class Query implements ParsingQuery<DatasetCore<Quad, Quad>> {
   constructor(
