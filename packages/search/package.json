@@ -1,9 +1,5 @@
 {
-  "dependencies": {
-    "@rdfjs/namespace": "^1.1.0",
-    "@rdfjs/types": "^1.1.0",
-    "@types/rdfjs__namespace": "^1.1.5"
-  },
+  "dependencies": {},
   "engines": {
     "node": ">=20"
   },
@@ -12,7 +8,7 @@
     "**/*.ts"
   ],
   "license": "GPL-3.0-only",
-  "name": "@kos-kit/sparql-models",
+  "name": "@kos-kit/search",
   "scripts": {
     "build": "tsc -b && cp LICENSE package.json dist/",
     "clean": "rimraf dist",
