@@ -1,11 +1,11 @@
-import { LanguageTagSet } from "../../../src/models/LanguageTagSet";
+import { LanguageTagSet } from "@kos-kit/models";
 import {
   ConstructQueryBuilder,
   GraphPatternObject,
   GraphPatternSubject,
 } from "../src";
-import { skos } from "../../../src/vocabularies";
 import { Concept } from "../src/Concept";
+import { skos } from "@kos-kit/vocabularies";
 
 describe("ConstructQueryBuilder", () => {
   const subject: GraphPatternSubject = {
