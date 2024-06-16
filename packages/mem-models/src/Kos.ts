@@ -5,7 +5,7 @@ import { Concept } from "./Concept";
 import { skos } from "../../vocabularies";
 import { identifierToString } from "../../client/src/utilities/identifierToString";
 import { ConceptScheme } from "./ConceptScheme";
-import { paginateIterable } from "../../client/src/utilities/paginateIterable";
+import { paginateIterable } from "./paginateIterable";
 import { countIterable } from "../../client/src/utilities";
 import { LanguageTagSet } from "../LanguageTagSet";
 

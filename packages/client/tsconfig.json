@@ -5,5 +5,15 @@
   },
   "exclude": ["node_modules"],
   "extends": ["../../tsconfig.json"],
-  "include": ["src/**/*.ts"]
+  "include": [
+    "src/**/*.ts",
+    "../next-utils/src/base58.ts",
+    "../next-utils/src/envalidValidators.ts",
+    "../next-utils/src/defilenamify.ts",
+    "../next-utils/src/filenamify.ts",
+    "../next-utils/src/pageCount.ts",
+    "../mem-models/src/paginateIterable.ts",
+    "../sparql-models/src/paginationToAsyncGenerator.ts",
+    "../mem-models/src/countIterable.ts"
+  ]
 }

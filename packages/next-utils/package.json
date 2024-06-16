@@ -1,0 +1,27 @@
+{
+  "dependencies": {
+    "base-x": "^3.0.9",
+    "envalid": "^8.0.0"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "main": "./dist/index.js",
+  "files": [
+    "**/*.ts"
+  ],
+  "license": "GPL-3.0-only",
+  "name": "@kos-kit/next-utils",
+  "scripts": {
+    "build": "tsc -b && cp LICENSE package.json dist/",
+    "clean": "rimraf dist",
+    "rebuild": "rimraf dist && tsc -b && cp LICENSE package.json dist/",
+    "watch": "mkdir -p dist && cp LICENSE package.json dist/ && tsc -w --preserveWatchOutput"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kos-kit/lib"
+  },
+  "types": "dist/index.d.ts",
+  "version": "2.0.0"
+}
