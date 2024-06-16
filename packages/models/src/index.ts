@@ -11,6 +11,3 @@ export * from "./noteProperties";
 export * from "./NoteProperty";
 export * from "./semanticRelationProperties";
 export * from "./SemanticRelationProperty";
-export * as literal from "./literal";
-export * as mem from "./mem";
-export * as sparql from "./sparql";

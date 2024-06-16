@@ -1,4 +1,4 @@
-import { skos } from "../vocabularies";
+import { skos } from "@kos-kit/vocabularies";
 import { SemanticRelationProperty } from "./SemanticRelationProperty";
 
 export class MappingProperty extends SemanticRelationProperty {
