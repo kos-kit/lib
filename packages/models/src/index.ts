@@ -3,6 +3,8 @@ export * from "./ConceptScheme";
 export * from "./Kos";
 export * from "./Label";
 export * from "./LabeledModel";
+export * from "./LanguageTag";
+export * from "./LanguageTagSet";
 export * from "./LiteralLabel";
 export * from "./MappingProperty";
 export * from "./Model";
