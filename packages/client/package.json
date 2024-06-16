@@ -39,5 +39,5 @@
     "url": "git+https://github.com/kos-kit/lib"
   },
   "types": "dist/index.d.ts",
-  "version": "1.0.19"
+  "version": "2.0.0"
 }
