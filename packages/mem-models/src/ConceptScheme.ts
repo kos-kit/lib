@@ -1,39 +1,37 @@
 import TermSet from "@rdfjs/term-set";
 import { LabeledModel } from "./LabeledModel";
-import { Identifier } from "../Identifier";
-import { ConceptScheme as IConceptScheme } from "../ConceptScheme";
-import { mapTermToIdentifier } from "./mapTermToIdentifier";
-import { skos } from "../../vocabularies";
-import { countIterable, paginateIterable } from "../../client/src/utilities";
 import { Concept } from "./Concept";
+import { Resource } from "@kos-kit/rdf-resource";
+import { ConceptScheme as IConceptScheme } from "@kos-kit/models";
+import { skos } from "@kos-kit/vocabularies";
+import { BlankNode, NamedNode } from "@rdfjs/types";
+import { paginateIterable } from "./paginateIterable";
+import { countIterable } from "./countIterable";
 
 export class ConceptScheme extends LabeledModel implements IConceptScheme {
-  private *topConceptIdentifiers(): Iterable<Identifier> {
-    const conceptIdentifierSet = new TermSet<Identifier>();
+  private *topConceptIdentifiers(): Iterable<Resource.Identifier> {
+    const conceptIdentifierSet = new TermSet<Resource.Identifier>();
 
     // ConceptScheme -> Concept statement
-    for (const quad of this.dataset.match(
-      this.identifier,
+    for (const conceptIdentifier of this.resource.values(
       skos.hasTopConcept,
-      null,
+      Resource.ValueMappers.identifier,
     )) {
-      const conceptIdentifier = mapTermToIdentifier(quad.object);
-      if (
-        conceptIdentifier !== null &&
-        !conceptIdentifierSet.has(conceptIdentifier)
-      ) {
+      if (!conceptIdentifierSet.has(conceptIdentifier)) {
         yield conceptIdentifier;
         conceptIdentifierSet.add(conceptIdentifier);
       }
     }
 
     // Concept -> ConceptScheme statement
-    for (const quad of this.dataset.match(
+    for (const quad of this.resource.dataset.match(
       null,
       skos.topConceptOf,
       this.identifier,
     )) {
-      const conceptIdentifier = mapTermToIdentifier(quad.subject);
+      const conceptIdentifier = Resource.ValueMappers.identifier(
+        quad.subject as BlankNode | NamedNode,
+      );
       if (
         conceptIdentifier !== null &&
         !conceptIdentifierSet.has(conceptIdentifier)
@@ -45,10 +43,10 @@ export class ConceptScheme extends LabeledModel implements IConceptScheme {
   }
 
   async *topConcepts(): AsyncGenerator<Concept> {
-    for await (const conceptIdentifier of this.topConceptIdentifiers()) {
+    for await (const identifier of this.topConceptIdentifiers()) {
       yield new Concept({
-        identifier: conceptIdentifier,
         kos: this.kos,
+        resource: new Resource({ dataset: this.resource.dataset, identifier }),
       });
     }
   }
@@ -62,14 +60,17 @@ export class ConceptScheme extends LabeledModel implements IConceptScheme {
   }): Promise<readonly Concept[]> {
     return new Promise((resolve) => {
       const result: Concept[] = [];
-      for (const conceptIdentifier of paginateIterable(
-        this.topConceptIdentifiers(),
-        { limit, offset },
-      )) {
+      for (const identifier of paginateIterable(this.topConceptIdentifiers(), {
+        limit,
+        offset,
+      })) {
         result.push(
           new Concept({
-            identifier: conceptIdentifier,
             kos: this.kos,
+            resource: new Resource({
+              dataset: this.resource.dataset,
+              identifier,
+            }),
           }),
         );
       }

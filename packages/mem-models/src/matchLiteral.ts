@@ -1,5 +1,5 @@
+import { LanguageTagSet } from "@kos-kit/models";
 import { Literal } from "@rdfjs/types";
-import { LanguageTagSet } from "@kos-kit/rdf-resource/src/LanguageTagSet";
 
 export function matchLiteral(
   literal: Literal,

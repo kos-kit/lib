@@ -1,33 +1,36 @@
 import { Literal } from "@rdfjs/types";
-import { NoteProperty } from "../NoteProperty";
 import { LabeledModel } from "./LabeledModel";
 import { ConceptScheme } from "./ConceptScheme";
-import { skos } from "../../vocabularies";
-import { Concept as IConcept } from "../Concept";
-import { mapTermToLiteral } from "./mapTermToLiteral";
+import { Concept as IConcept, NoteProperty } from "@kos-kit/models";
 import { matchLiteral } from "./matchLiteral";
 import { SemanticRelationProperty } from "@kos-kit/models";
+import { skos } from "@kos-kit/vocabularies";
+import { Resource } from "@kos-kit/rdf-resource";
 
 export class Concept extends LabeledModel implements IConcept {
   inSchemes(): Promise<readonly ConceptScheme[]> {
     return new Promise((resolve) =>
-      resolve([
-        ...this.filterAndMapObjects(skos.inScheme, (term) =>
-          term.termType === "BlankNode" || term.termType === "NamedNode"
-            ? new ConceptScheme({
-                identifier: term,
-                kos: this.kos,
-              })
-            : null,
-        ),
-      ]),
+      resolve(
+        [
+          ...this.resource.values(
+            skos.inScheme,
+            Resource.ValueMappers.resource,
+          ),
+        ].map((resource) => new ConceptScheme({ kos: this.kos, resource })),
+      ),
     );
+  }
+
+  get notations(): readonly Literal[] {
+    return [
+      ...this.resource.values(skos.notation, Resource.ValueMappers.literal),
+    ];
   }
 
   notes(property: NoteProperty): readonly Literal[] {
     return [
-      ...this.filterAndMapObjects(property.identifier, (term) => {
-        const literal = mapTermToLiteral(term);
+      ...this.resource.values(property.identifier, (term) => {
+        const literal = Resource.ValueMappers.literal(term);
         if (
           literal !== null &&
           matchLiteral(literal, {
@@ -41,33 +44,27 @@ export class Concept extends LabeledModel implements IConcept {
     ];
   }
 
-  get notations(): readonly Literal[] {
-    return [...this.filterAndMapObjects(skos.notation, mapTermToLiteral)];
-  }
-
   semanticRelations(
     property: SemanticRelationProperty,
   ): Promise<readonly Concept[]> {
     return new Promise((resolve) =>
-      resolve([
-        ...this.filterAndMapObjects(property.identifier, (term) =>
-          term.termType === "NamedNode"
-            ? new Concept({
-                identifier: term,
-                kos: this.kos,
-              })
-            : null,
-        ),
-      ]),
+      resolve(
+        [
+          ...this.resource.values(
+            property.identifier,
+            Resource.ValueMappers.resource,
+          ),
+        ].map((resource) => new Concept({ kos: this.kos, resource })),
+      ),
     );
   }
 
   semanticRelationsCount(property: SemanticRelationProperty): Promise<number> {
     return new Promise((resolve) =>
       resolve(
-        this.countObjects(
+        this.resource.valuesCount(
           property.identifier,
-          (term) => term.termType === "NamedNode",
+          Resource.ValueMappers.identifier,
         ),
       ),
     );
@@ -75,16 +72,14 @@ export class Concept extends LabeledModel implements IConcept {
 
   topConceptOf(): Promise<readonly ConceptScheme[]> {
     return new Promise((resolve) =>
-      resolve([
-        ...this.filterAndMapObjects(skos.topConceptOf, (term) =>
-          term.termType === "BlankNode" || term.termType === "NamedNode"
-            ? new ConceptScheme({
-                identifier: term,
-                kos: this.kos,
-              })
-            : null,
-        ),
-      ]),
+      resolve(
+        [
+          ...this.resource.values(
+            skos.topConceptOf,
+            Resource.ValueMappers.resource,
+          ),
+        ].map((resource) => new ConceptScheme({ kos: this.kos, resource })),
+      ),
     );
   }
 }

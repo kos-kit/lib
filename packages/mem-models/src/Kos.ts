@@ -1,13 +1,12 @@
-import { DatasetCore } from "@rdfjs/types";
-import { getRdfInstances } from "./getRdfInstances";
-import { Identifier } from "../Identifier";
+import { BlankNode, DatasetCore, NamedNode } from "@rdfjs/types";
 import { Concept } from "./Concept";
-import { skos } from "../../vocabularies";
-import { identifierToString } from "../../client/src/utilities/identifierToString";
 import { ConceptScheme } from "./ConceptScheme";
 import { paginateIterable } from "./paginateIterable";
-import { countIterable } from "../../client/src/utilities";
-import { LanguageTagSet } from "../LanguageTagSet";
+import { LanguageTagSet } from "@kos-kit/models";
+import { skos } from "@kos-kit/vocabularies";
+import { Resource } from "@kos-kit/rdf-resource";
+import { instances } from "@kos-kit/rdf-utils";
+import { countIterable } from "./countIterable";
 
 export class Kos {
   private readonly dataset: DatasetCore;
@@ -24,19 +23,22 @@ export class Kos {
     this.includeLanguageTags = includeLanguageTags;
   }
 
-  conceptByIdentifier(identifier: Identifier): Promise<Concept> {
+  conceptByIdentifier(identifier: BlankNode | NamedNode): Promise<Concept> {
     return new Promise((resolve) =>
       resolve(
         new Concept({
-          identifier: identifier,
           kos: this,
+          resource: new Resource({
+            dataset: this.dataset,
+            identifier,
+          }),
         }),
       ),
     );
   }
 
-  private *conceptIdentifiers(): Iterable<Identifier> {
-    yield* getRdfInstances({
+  private *conceptIdentifiers(): Iterable<BlankNode | NamedNode> {
+    yield* instances({
       class_: skos.Concept,
       dataset: this.dataset,
       includeSubclasses: true,
@@ -44,10 +46,10 @@ export class Kos {
   }
 
   async *concepts(): AsyncGenerator<Concept> {
-    for await (const conceptIdentifier of this.conceptIdentifiers()) {
+    for await (const identifier of this.conceptIdentifiers()) {
       yield new Concept({
-        identifier: conceptIdentifier,
         kos: this,
+        resource: new Resource({ dataset: this.dataset, identifier }),
       });
     }
   }
@@ -61,14 +63,14 @@ export class Kos {
   }): Promise<readonly Concept[]> {
     return new Promise((resolve) => {
       const result: Concept[] = [];
-      for (const conceptIdentifier of paginateIterable(
-        this.conceptIdentifiers(),
-        { limit, offset },
-      )) {
+      for (const identifier of paginateIterable(this.conceptIdentifiers(), {
+        limit,
+        offset,
+      })) {
         result.push(
           new Concept({
-            identifier: conceptIdentifier,
             kos: this,
+            resource: new Resource({ dataset: this.dataset, identifier }),
           }),
         );
       }
@@ -83,14 +85,14 @@ export class Kos {
   }
 
   async conceptSchemeByIdentifier(
-    identifier: Identifier,
+    identifier: BlankNode | NamedNode,
   ): Promise<ConceptScheme> {
     for (const conceptScheme of await this.conceptSchemes()) {
       if (conceptScheme.identifier.equals(identifier)) {
         return conceptScheme;
       }
     }
-    throw new RangeError(identifierToString(identifier));
+    throw new RangeError(Resource.Identifier.toString(identifier));
   }
 
   conceptSchemes(): Promise<readonly ConceptScheme[]> {
@@ -98,14 +100,14 @@ export class Kos {
   }
 
   private *_conceptSchemes(): Iterable<ConceptScheme> {
-    for (const identifier of getRdfInstances({
+    for (const identifier of instances({
       class_: skos.ConceptScheme,
       dataset: this.dataset,
       includeSubclasses: true,
     })) {
       yield new ConceptScheme({
-        identifier,
         kos: this,
+        resource: new Resource({ dataset: this.dataset, identifier }),
       });
     }
   }

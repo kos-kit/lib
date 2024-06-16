@@ -4,23 +4,14 @@ import { Label } from "./Label";
 import {
   Label as ILabel,
   LabeledModel as ILabeledModel,
+  LanguageTag,
   LiteralLabel,
 } from "@kos-kit/models";
 import { skos, skosxl } from "@kos-kit/vocabularies";
-import { NamedResource } from "@kos-kit/rdf-resource/dist/NamedResource";
-import { Kos } from "./Kos";
-import {
-  Identifier,
-  LanguageTag,
-  Resource,
-  matchLiteral,
-} from "@kos-kit/rdf-resource";
+import { Resource } from "@kos-kit/rdf-resource";
+import { matchLiteral } from "./matchLiteral";
 
 export abstract class LabeledModel extends Model implements ILabeledModel {
-  constructor({ kos, resource }: { kos: Kos; resource: NamedResource }) {
-    super({ kos, resource });
-  }
-
   get altLabels(): readonly ILabel[] {
     return this.labels({
       skosPredicate: skos.altLabel,
@@ -40,7 +31,7 @@ export abstract class LabeledModel extends Model implements ILabeledModel {
       }
     }
 
-    return Identifier.toString(this.identifier);
+    return Resource.Identifier.toString(this.identifier);
   }
 
   get hiddenLabels(): readonly ILabel[] {
@@ -48,10 +39,6 @@ export abstract class LabeledModel extends Model implements ILabeledModel {
       skosPredicate: skos.hiddenLabel,
       skosXlPredicate: skosxl.hiddenLabel,
     });
-  }
-
-  get iri(): NamedNode {
-    return this.resource.identifier as NamedNode;
   }
 
   private labels({

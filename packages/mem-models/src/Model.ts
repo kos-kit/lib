@@ -1,13 +1,9 @@
-import { NamedNode, Literal } from "@rdfjs/types";
+import { NamedNode, Literal, BlankNode } from "@rdfjs/types";
 import { dc11, dcterms } from "@kos-kit/vocabularies";
-import { Model as IModel } from "@kos-kit/models";
+import { Model as IModel, LanguageTagSet } from "@kos-kit/models";
 import { Kos } from "./Kos";
-import {
-  Identifier,
-  LanguageTagSet,
-  Resource,
-  matchLiteral,
-} from "@kos-kit/rdf-resource";
+import { Resource } from "@kos-kit/rdf-resource";
+import { matchLiteral } from "./matchLiteral";
 
 const rightsPredicates = [dcterms.rights, dc11.rights];
 
@@ -27,7 +23,7 @@ export abstract class Model implements IModel {
     return this.kos.includeLanguageTags;
   }
 
-  get identifier(): Identifier {
+  get identifier(): BlankNode | NamedNode {
     return this.resource.identifier;
   }
 
