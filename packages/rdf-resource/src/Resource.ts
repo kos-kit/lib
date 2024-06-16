@@ -1,8 +1,18 @@
-import { NamedNode, DatasetCore, Term } from "@rdfjs/types";
-import { Identifier } from "../Identifier";
+/* eslint-disable no-inner-declarations */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-namespace */
+import {
+  NamedNode,
+  DatasetCore,
+  Term,
+  Quad,
+  BlankNode,
+  Literal,
+} from "@rdfjs/types";
+import { Identifier } from "./Identifier";
 
 export class Resource {
-  protected readonly dataset: DatasetCore;
+  private readonly dataset: DatasetCore;
   readonly identifier: Identifier;
 
   constructor({
@@ -16,10 +26,61 @@ export class Resource {
     this.identifier = identifier;
   }
 
-  protected countObjects(
+  optionalValue<T>(
     property: NamedNode,
-    filter?: (value: Term) => boolean,
-  ) {
+    mapper: Resource.ValueMapper<T>,
+  ): NonNullable<T> | null {
+    for (const quad of this.dataset.match(
+      this.identifier,
+      property,
+      null,
+      null,
+    )) {
+      const mappedObject: T | null = mapper(
+        quad.object as BlankNode | NamedNode | Literal,
+        quad,
+        this.dataset,
+      );
+      if (mappedObject !== null) {
+        return mappedObject as NonNullable<T>;
+      }
+    }
+    return null;
+  }
+
+  requiredValue<T>(
+    property: NamedNode,
+    mapper: Resource.ValueMapper<T>,
+  ): NonNullable<T> {
+    const value = this.optionalValue(property, mapper);
+    if (value !== null) {
+      return value;
+    }
+    throw new Error(`no appropriate ${property.value} found`);
+  }
+
+  *values<T>(
+    property: NamedNode,
+    mapper: Resource.ValueMapper<T>,
+  ): Iterable<NonNullable<T>> {
+    for (const quad of this.dataset.match(
+      this.identifier,
+      property,
+      null,
+      null,
+    )) {
+      const mappedObject: T | null = mapper(
+        quad.object as BlankNode | NamedNode | Literal,
+        quad,
+        this.dataset,
+      );
+      if (mappedObject !== null) {
+        yield mappedObject as NonNullable<T>;
+      }
+    }
+  }
+
+  valuesCount(property: NamedNode, filter?: (value: Term) => boolean) {
     if (!filter) {
       filter = () => true;
     }
@@ -37,57 +98,32 @@ export class Resource {
     }
     return count;
   }
+}
 
-  protected findAndMapObjectOptional<T>(
-    property: NamedNode,
-    callback: (value: Term) => NonNullable<T> | null,
-  ): NonNullable<T> | null {
-    for (const quad of this.dataset.match(
-      this.identifier,
-      property,
-      null,
-      null,
-    )) {
-      const mappedObject: T | null = callback(quad.object);
-      if (mappedObject !== null) {
-        return mappedObject as NonNullable<T>;
+export namespace Resource {
+  export type ValueMapper<T> = (
+    object: BlankNode | Literal | NamedNode,
+    quad: Quad,
+    dataset: DatasetCore,
+  ) => NonNullable<T> | null;
+
+  export namespace ValueMappers {
+    export function identifier(
+      object: BlankNode | Literal | NamedNode,
+    ): Identifier | null {
+      switch (object.termType) {
+        case "BlankNode":
+        case "NamedNode":
+          return object;
+        default:
+          return null;
       }
     }
-    return null;
-  }
 
-  protected findAndMapObjectRequired<T>(
-    property: NamedNode,
-    callback: (value: Term) => NonNullable<T> | null,
-  ): NonNullable<T> {
-    for (const quad of this.dataset.match(
-      this.identifier,
-      property,
-      null,
-      null,
-    )) {
-      const mappedObject: T | null = callback(quad.object);
-      if (mappedObject !== null) {
-        return mappedObject as NonNullable<T>;
-      }
-    }
-    throw new Error(`no appropriate ${property.value} found`);
-  }
-
-  protected *filterAndMapObjects<T>(
-    property: NamedNode,
-    callback: (value: Term) => NonNullable<T> | null,
-  ): Iterable<NonNullable<T>> {
-    for (const quad of this.dataset.match(
-      this.identifier,
-      property,
-      null,
-      null,
-    )) {
-      const mappedObject: T | null = callback(quad.object);
-      if (mappedObject !== null) {
-        yield mappedObject as NonNullable<T>;
-      }
+    export function iri(
+      object: BlankNode | Literal | NamedNode,
+    ): NamedNode | null {
+      return object.termType === "NamedNode" ? object : null;
     }
   }
 }

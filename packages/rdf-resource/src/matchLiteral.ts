@@ -1,5 +1,5 @@
 import { Literal } from "@rdfjs/types";
-import { LanguageTagSet } from "../LanguageTagSet";
+import { LanguageTagSet } from "./LanguageTagSet";
 
 export function matchLiteral(
   literal: Literal,

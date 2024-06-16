@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "@rdfjs/data-model": "^2.0.2",
     "@rdfjs/types": "^1.1.0"
   },
   "engines": {
