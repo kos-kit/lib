@@ -12,7 +12,7 @@
     "**/*.ts"
   ],
   "license": "GPL-3.0-only",
-  "name": "@kos-kit/sparql-models",
+  "name": "@kos-kit/vocabularies",
   "scripts": {
     "build": "tsc -b && cp LICENSE package.json dist/",
     "clean": "rimraf dist",

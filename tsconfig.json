@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "baseUrl": "./src",
     "declaration": true,
     "declarationMap": true,
     "exactOptionalPropertyTypes": false,
@@ -7,10 +8,13 @@
     "noUncheckedIndexedAccess": false,
     "forceConsistentCasingInFileNames": true,
     "incremental": true,
+    "outDir": "./dist",
     "sourceMap": true
   },
+  "exclude": ["node_modules"],
   "extends": [
     "@tsconfig/recommended/tsconfig.json",
     "@tsconfig/strictest/tsconfig.json"
-  ]
+  ],
+  "include": ["src/**/*.ts"]
 }
