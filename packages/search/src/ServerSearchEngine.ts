@@ -3,12 +3,11 @@ import axios, { AxiosInstance } from "axios";
 import { SearchEngine } from "./SearchEngine";
 import { SearchEngineJson } from "./SearchEngineJson";
 import { SearchResult } from "./SearchResult";
-import { Kos as RdfJsKos } from "../models/mem/Kos";
 import { Parser, Store } from "n3";
-import { identifierToString } from "../utilities/identifierToString";
-import { LanguageTag } from "../models";
 import { SearchResults } from "./SearchResults";
-import { LanguageTagSet } from "../models/LanguageTagSet";
+import { LanguageTag, LanguageTagSet } from "@kos-kit/models";
+import { Kos } from "@kos-kit/mem-models";
+import { Resource } from "@kos-kit/rdf-resource";
 
 /**
  * A SearchEngine implementation that makes HTTP requests to a kos-kit/server search endpoint.
@@ -40,7 +39,7 @@ export class ServerSearchEngine implements SearchEngine {
     const parser = new Parser({ format: "N-Triples" });
     const store = new Store();
     store.addQuads(parser.parse(response.data));
-    const kos = new RdfJsKos({
+    const kos = new Kos({
       dataset: store,
       includeLanguageTags: new LanguageTagSet(params.languageTag, ""),
     });
@@ -53,7 +52,7 @@ export class ServerSearchEngine implements SearchEngine {
         continue;
       }
       page.push({
-        identifier: identifierToString(concept.identifier),
+        identifier: Resource.Identifier.toString(concept.identifier),
         prefLabel: prefLabels[0].literalForm.value,
         type: "Concept",
       });
@@ -65,7 +64,7 @@ export class ServerSearchEngine implements SearchEngine {
         continue;
       }
       page.push({
-        identifier: identifierToString(conceptScheme.identifier),
+        identifier: Resource.Identifier.toString(conceptScheme.identifier),
         prefLabel: prefLabels[0].literalForm.value,
         type: "ConceptScheme",
       });

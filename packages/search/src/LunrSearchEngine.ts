@@ -1,14 +1,12 @@
 import lunr, { Index } from "lunr";
 import { SearchEngine } from "./SearchEngine";
-import { LanguageTag } from "../models/LanguageTag";
-import { Kos } from "../models/Kos";
 import { SearchResult } from "./SearchResult";
-import { LabeledModel } from "../models/LabeledModel";
-import { Identifier } from "../models/Identifier";
-import { identifierToString } from "../utilities/identifierToString";
 import { SearchEngineJson } from "./SearchEngineJson";
 import { LunrIndexCompactor } from "./LunrIndexCompactor";
 import { SearchResults } from "./SearchResults";
+import { Kos, LabeledModel, LanguageTag } from "@kos-kit/models";
+import { BlankNode, NamedNode } from "@rdfjs/types";
+import { Resource } from "@kos-kit/rdf-resource";
 
 /**
  * A SearchEngine implementation built with Lunr.js, so it can be used in the browser.
@@ -37,7 +35,7 @@ export class LunrSearchEngine implements SearchEngine {
     };
 
     const toIndexDocument = async (
-      model: LabeledModel & { identifier: Identifier },
+      model: LabeledModel & { identifier: BlankNode | NamedNode },
       type: SearchResult["type"],
     ): Promise<IndexDocument | null> => {
       const prefLabels = model.prefLabels;
@@ -47,7 +45,7 @@ export class LunrSearchEngine implements SearchEngine {
       const altLabels = model.altLabels;
       const hiddenLabels = model.hiddenLabels;
 
-      const identifierString = identifierToString(model.identifier);
+      const identifierString = Resource.Identifier.toString(model.identifier);
 
       return {
         identifier: identifierString,
@@ -71,7 +69,7 @@ export class LunrSearchEngine implements SearchEngine {
       }
     } else {
       // Index all concepts in the set
-      for await (const concept of await kos.concepts()) {
+      for await (const concept of kos.concepts()) {
         indexDocumentPromises.push(toIndexDocument(concept, "Concept"));
       }
     }
