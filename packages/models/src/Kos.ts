@@ -3,7 +3,7 @@ import { Concept } from "./Concept";
 import { ConceptScheme } from "./ConceptScheme";
 
 export interface Kos {
-  conceptByIri(identifier: BlankNode | NamedNode): Promise<Concept>;
+  conceptByIdentifier(identifier: BlankNode | NamedNode): Promise<Concept>;
   concepts(): AsyncGenerator<Concept>;
   conceptsPage(kwds: {
     limit: number;

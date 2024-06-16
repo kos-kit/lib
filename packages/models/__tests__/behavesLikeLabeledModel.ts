@@ -1,6 +1,4 @@
-import { Label } from "../../src/models/Label";
-import { LabeledModel } from "../../src/models/LabeledModel";
-import { LanguageTag } from "../../src/models/LanguageTag";
+import { Label, LabeledModel, LanguageTag } from "../src";
 
 export const behavesLikeLabeledModel = (
   lazyModel: (includeLanguageTag: LanguageTag) => Promise<LabeledModel>,

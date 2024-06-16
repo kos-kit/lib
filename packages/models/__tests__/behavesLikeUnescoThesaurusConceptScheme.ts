@@ -1,7 +1,6 @@
-import { ConceptScheme } from "../../src/models/ConceptScheme";
-import { LanguageTag } from "../../src/models/LanguageTag";
 import { behavesLikeConceptScheme } from "./behavesLikeConceptScheme";
 import { expectConceptScheme } from "./expectConceptScheme";
+import { ConceptScheme, LanguageTag } from "../src";
 
 export const behavesLikeUnescoThesaurusConceptScheme = (
   lazyConceptScheme: (

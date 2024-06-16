@@ -1,7 +1,7 @@
 import { testKosFactory } from "./testKosFactory";
-import { behavesLikeUnescoThesaurusConcept10018 } from "../behavesLikeUnescoThesaurusConcept10018";
+import { behavesLikeUnescoThesaurusConcept10018 } from "../../models/__tests__/behavesLikeUnescoThesaurusConcept10018";
 import { DataFactory } from "n3";
-import { behavesLikeUnescoThesaurusConcept10 } from "../behavesLikeUnescoThesaurusConcept10";
+import { behavesLikeUnescoThesaurusConcept10 } from "../../models/__tests__/behavesLikeUnescoThesaurusConcept10";
 
 describe("mem.Concept", () => {
   behavesLikeUnescoThesaurusConcept10((includeLanguageTag) =>

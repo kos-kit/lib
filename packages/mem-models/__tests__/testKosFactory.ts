@@ -1,10 +1,9 @@
-import { Kos } from "../../../src/models/mem/Kos";
 import { Parser, Store } from "n3";
 import path from "node:path";
 import fs from "node:fs";
 import { fileURLToPath } from "node:url";
-import { LanguageTagSet } from "../../../src/models/LanguageTagSet";
-import { LanguageTag } from "../../../src/models/LanguageTag";
+import { LanguageTag, LanguageTagSet } from "@kos-kit/models";
+import { Kos } from "../src/Kos";
 
 const ntriplesStringToDataset = (input: string): Store => {
   const parser = new Parser({ format: "N-Triples" });
@@ -20,6 +19,8 @@ const testDataset: Store = ntriplesStringToDataset(
         path.dirname(fileURLToPath(import.meta.url)),
         "..",
         "..",
+        "models",
+        "__tests__",
         "unesco-thesaurus.nt",
       ),
     )

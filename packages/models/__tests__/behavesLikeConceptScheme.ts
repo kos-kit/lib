@@ -1,6 +1,5 @@
-import { ConceptScheme } from "../../src/models/ConceptScheme";
-import { LanguageTag } from "../../src/models/LanguageTag";
 import { behavesLikeLabeledModel } from "./behavesLikeLabeledModel";
+import { ConceptScheme, LanguageTag } from "../src";
 
 export const behavesLikeConceptScheme = (
   lazyConceptScheme: (

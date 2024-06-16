@@ -1,5 +1,4 @@
-import { Concept } from "../../src/models/Concept";
-
+import { Concept } from "../src";
 /**
  * Basic assertions about every concept.
  */

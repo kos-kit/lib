@@ -1,5 +1,4 @@
-import { ConceptScheme } from "../../src/models/ConceptScheme";
-
+import { ConceptScheme } from "../src";
 /**
  * Basic assertions about every conceptScheme scheme.
  */
