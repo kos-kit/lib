@@ -1,20 +1,8 @@
 {
   "compilerOptions": {
     "baseUrl": "./src",
-    "declaration": true,
-    "declarationMap": true,
-    "exactOptionalPropertyTypes": false,
-    "experimentalDecorators": true,
-    "noUncheckedIndexedAccess": false,
-    "forceConsistentCasingInFileNames": true,
-    "incremental": true,
-    "outDir": "./dist",
-    "sourceMap": true
+    "outDir": "./dist"
   },
-  "exclude": ["node_modules"],
-  "extends": [
-    "@tsconfig/recommended/tsconfig.json",
-    "@tsconfig/strictest/tsconfig.json"
-  ],
+  "extends": ["../../tsconfig.json"],
   "include": ["src/*.ts"]
 }
