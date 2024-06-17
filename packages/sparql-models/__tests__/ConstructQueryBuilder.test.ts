@@ -6,6 +6,7 @@ import {
 } from "../src";
 import { Concept } from "../src/Concept";
 import { skos } from "@kos-kit/vocabularies";
+import { describe, expect, it } from "vitest";
 
 describe("ConstructQueryBuilder", () => {
   const subject: GraphPatternSubject = {
