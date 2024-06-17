@@ -17,7 +17,7 @@
     "build": "tsc -b && cp LICENSE package.json dist/",
     "clean": "rimraf dist",
     "link": "cd dist && npm link",
-    "publish": "cd dist && npm publish --access public",
+    "publish": "echo $PWD && cd dist && npm publish --access public",
     "rebuild": "rimraf dist && tsc -b && cp LICENSE package.json dist/",
     "test": "vitest run",
     "test:watch": "vitest watch",
@@ -30,5 +30,5 @@
   },
   "type": "module",
   "types": "dist/index.d.ts",
-  "version": "2.0.0"
+  "version": "2.0.1"
 }
