@@ -15,8 +15,10 @@
   "scripts": {
     "build": "tsc -b && cp LICENSE package.json dist/",
     "clean": "rimraf dist",
+    "link": "cd dist && npm link",
     "publish": "cd dist && npm publish --access public",
     "rebuild": "rimraf dist && tsc -b && cp LICENSE package.json dist/",
+    "unlink": "npm unlink -g @kos-kit/models",
     "watch": "mkdir -p dist && cp LICENSE package.json dist/ && tsc -w --preserveWatchOutput"
   },
   "repository": {
