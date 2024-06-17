@@ -29,6 +29,7 @@
     "type": "git",
     "url": "git+https://github.com/kos-kit/lib"
   },
+  "type": "module",
   "types": "dist/index.d.ts",
   "version": "2.0.0"
 }
