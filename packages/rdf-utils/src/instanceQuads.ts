@@ -1,6 +1,6 @@
 import { DatasetCore, NamedNode, Quad } from "@rdfjs/types";
 import TermSet from "@rdfjs/term-set";
-import { rdf, rdfs } from "@kos-kit/vocabularies";
+import { rdf, rdfs } from "@tpluscode/rdf-ns-builders";
 
 /**
  * Get all unique RDF instanceQuads of a given class in the given dataset.

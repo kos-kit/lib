@@ -4,7 +4,7 @@ import { ConceptScheme } from "./ConceptScheme";
 import { Concept as IConcept, NoteProperty } from "@kos-kit/models";
 import { matchLiteral } from "./matchLiteral";
 import { SemanticRelationProperty } from "@kos-kit/models";
-import { skos } from "@kos-kit/vocabularies";
+import { skos } from "@tpluscode/rdf-ns-builders";
 import { Resource } from "@kos-kit/rdf-resource";
 
 export class Concept extends LabeledModel implements IConcept {

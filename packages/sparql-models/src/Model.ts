@@ -3,7 +3,7 @@ import { Model as IModel } from "@kos-kit/models";
 import { BlankNode, Literal, NamedNode } from "@rdfjs/types";
 import { GraphPattern, GraphPatternSubject } from "./GraphPattern";
 import { Kos } from "./Kos";
-import { dc11, dcterms } from "@kos-kit/vocabularies";
+import { dc11, dcterms } from "@tpluscode/rdf-ns-builders";
 
 /**
  * Abstract base class for SPARQL-backed models.

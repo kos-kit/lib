@@ -3,7 +3,7 @@ import { Concept } from "./Concept";
 import { ConceptScheme } from "./ConceptScheme";
 import { paginateIterable } from "./paginateIterable";
 import { LanguageTagSet } from "@kos-kit/models";
-import { skos } from "@kos-kit/vocabularies";
+import { skos } from "@tpluscode/rdf-ns-builders";
 import { Resource } from "@kos-kit/rdf-resource";
 import { instances } from "@kos-kit/rdf-utils";
 import { countIterable } from "./countIterable";

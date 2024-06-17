@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "@kos-kit/vocabularies": "2.0.0",
+    "@tpluscode/rdf-ns-builders": "^4.3.0",
     "@rdfjs/types": "^1.1.0"
   },
   "engines": {

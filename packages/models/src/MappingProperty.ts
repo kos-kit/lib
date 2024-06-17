@@ -1,4 +1,4 @@
-import { skos } from "@kos-kit/vocabularies";
+import { skos } from "@tpluscode/rdf-ns-builders";
 import { SemanticRelationProperty } from "./SemanticRelationProperty";
 
 export class MappingProperty extends SemanticRelationProperty {

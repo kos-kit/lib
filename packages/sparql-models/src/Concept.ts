@@ -12,7 +12,7 @@ import {
   noteProperties,
 } from "@kos-kit/models";
 import { Resource } from "@kos-kit/rdf-resource";
-import { skos } from "@kos-kit/vocabularies";
+import { skos } from "@tpluscode/rdf-ns-builders";
 
 export class Concept extends LabeledModel<MemConcept> implements IConcept {
   async inSchemes(): Promise<readonly ConceptScheme[]> {

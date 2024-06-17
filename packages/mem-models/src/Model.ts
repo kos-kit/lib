@@ -1,5 +1,5 @@
 import { NamedNode, Literal, BlankNode } from "@rdfjs/types";
-import { dc11, dcterms } from "@kos-kit/vocabularies";
+import { dc11, dcterms } from "@tpluscode/rdf-ns-builders";
 import { Model as IModel, LanguageTagSet } from "@kos-kit/models";
 import { Kos } from "./Kos";
 import { Resource } from "@kos-kit/rdf-resource";

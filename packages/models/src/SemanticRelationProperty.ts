@@ -1,4 +1,4 @@
-import { skos } from "@kos-kit/vocabularies";
+import { skos } from "@tpluscode/rdf-ns-builders";
 import { NamedNode } from "@rdfjs/types";
 
 export class SemanticRelationProperty {

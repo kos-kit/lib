@@ -3,7 +3,7 @@ import { LabeledModel } from "./LabeledModel";
 import { Concept } from "./Concept";
 import { Resource } from "@kos-kit/rdf-resource";
 import { ConceptScheme as IConceptScheme } from "@kos-kit/models";
-import { skos } from "@kos-kit/vocabularies";
+import { skos } from "@tpluscode/rdf-ns-builders";
 import { BlankNode, NamedNode } from "@rdfjs/types";
 import { paginateIterable } from "./paginateIterable";
 import { countIterable } from "./countIterable";

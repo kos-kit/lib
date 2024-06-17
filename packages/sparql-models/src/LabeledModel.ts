@@ -6,7 +6,7 @@ import {
   GraphPatternVariable,
 } from "./GraphPattern";
 import { Model } from "./Model";
-import { skos, skosxl } from "@kos-kit/vocabularies";
+import { skos, skosxl } from "@tpluscode/rdf-ns-builders";
 
 export abstract class LabeledModel<MemModelT extends MemLabeledModel>
   extends Model<MemModelT>

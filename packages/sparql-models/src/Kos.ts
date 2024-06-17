@@ -8,7 +8,7 @@ import { mapResultRowsToCount } from "./mapResultRowsToCount";
 import { SparqlClient } from "./SparqlClient";
 import { paginationToAsyncGenerator } from "./paginationToAsyncGenerator";
 import { LanguageTagSet } from "@kos-kit/models";
-import { rdf, rdfs, skos } from "@kos-kit/vocabularies";
+import { rdf, rdfs, skos } from "@tpluscode/rdf-ns-builders";
 import { BlankNode, NamedNode } from "@rdfjs/types";
 import { Resource } from "@kos-kit/rdf-resource";
 import * as mem from "@kos-kit/mem-models";

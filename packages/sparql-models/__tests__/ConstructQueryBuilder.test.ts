@@ -5,7 +5,7 @@ import {
   GraphPatternSubject,
 } from "../src";
 import { Concept } from "../src/Concept";
-import { skos } from "@kos-kit/vocabularies";
+import { skos } from "@tpluscode/rdf-ns-builders";
 import { describe, expect, it } from "vitest";
 
 describe("ConstructQueryBuilder", () => {

@@ -15,7 +15,6 @@
   "private": true,
   "workspaces": [
     "packages/next-utils",
-    "packages/vocabularies",
     "packages/rdf-resource",
     "packages/rdf-utils",
     "packages/models",

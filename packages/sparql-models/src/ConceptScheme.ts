@@ -6,7 +6,7 @@ import { mapResultRowsToIdentifiers } from "./mapResultRowsToIdentifiers";
 import { mapResultRowsToCount } from "./mapResultRowsToCount";
 import { Resource } from "@kos-kit/rdf-resource";
 import { paginationToAsyncGenerator } from "./paginationToAsyncGenerator";
-import { skos } from "@kos-kit/vocabularies";
+import { skos } from "@tpluscode/rdf-ns-builders";
 
 export class ConceptScheme
   extends LabeledModel<MemConceptScheme>

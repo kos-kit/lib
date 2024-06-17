@@ -7,7 +7,7 @@ import {
   LanguageTag,
   LiteralLabel,
 } from "@kos-kit/models";
-import { skos, skosxl } from "@kos-kit/vocabularies";
+import { skos, skosxl } from "@tpluscode/rdf-ns-builders";
 import { Resource } from "@kos-kit/rdf-resource";
 import { matchLiteral } from "./matchLiteral";
 
