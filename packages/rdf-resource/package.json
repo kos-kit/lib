@@ -1,8 +1,7 @@
 {
   "dependencies": {
-    "@rdfjs/types": "^1.1.0",
-    "@types/n3": "^1.16.4",
-    "n3": "^1.17.3"
+    "@rdfjs/data-model": "^2.0.2",
+    "@rdfjs/types": "^1.1.0"
   },
   "engines": {
     "node": ">=20"
@@ -18,7 +17,8 @@
     "clean": "rimraf dist",
     "publish": "cd dist && npm publish --access public",
     "rebuild": "rimraf dist && tsc -b && cp LICENSE package.json dist/",
-    "test": "vitest",
+    "test": "vitest run",
+    "test:watch": "vitest watch",
     "watch": "mkdir -p dist && cp LICENSE package.json dist/ && tsc -w --preserveWatchOutput"
   },
   "repository": {
