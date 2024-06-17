@@ -22,6 +22,6 @@ jobs:
       - name: Test
         run: npm test --if-present --workspaces
       - name: Publish
-        run: npm run publish --if-present --workspaces
+        run: npm run publish:dist --if-present --workspaces
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
