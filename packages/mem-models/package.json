@@ -1,7 +1,7 @@
 {
   "dependencies": {
-    "@kos-kit/rdf-resource": "2.0.2",
-    "@kos-kit/rdf-utils": "2.0.2",
+    "@kos-kit/rdf-resource": "2.0.3",
+    "@kos-kit/rdf-utils": "2.0.3",
     "@rdfjs/types": "^1.1.0",
     "@types/n3": "^1.16.4",
     "n3": "^1.17.3"
@@ -19,7 +19,7 @@
     "build": "tsc -b && cp LICENSE package.json dist/",
     "clean": "rimraf dist",
     "link": "cd dist && npm link",
-    "publish:dist": "echo $PWD && cd dist && npm publish --access public",
+    "publish:dist": "cd dist && npm publish --access public",
     "rebuild": "rimraf dist && tsc -b && cp LICENSE package.json dist/",
     "unlink": "npm unlink -g @kos-kit/mem-models",
     "test": "vitest run",
@@ -32,5 +32,5 @@
   },
   "type": "module",
   "types": "dist/index.d.ts",
-  "version": "2.0.2"
+  "version": "2.0.3"
 }
