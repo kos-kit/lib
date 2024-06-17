@@ -21,6 +21,7 @@
     "build": "tsc -b && cp LICENSE package.json dist/",
     "clean": "rimraf dist",
     "rebuild": "rimraf dist && tsc -b && cp LICENSE package.json dist/",
+    "test": "vitest",
     "watch": "mkdir -p dist && cp LICENSE package.json dist/ && tsc -w --preserveWatchOutput"
   },
   "repository": {
