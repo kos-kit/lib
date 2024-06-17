@@ -2,7 +2,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-namespace */
 import { NamedNode, DatasetCore, BlankNode, Literal } from "@rdfjs/types";
-import { NamedResource } from "./NamedResource";
 import DataFactory from "@rdfjs/data-model";
 
 export class Resource {
@@ -138,17 +137,6 @@ export namespace Resource {
       object: BlankNode | Literal | NamedNode,
     ): Literal | null {
       return object.termType === "Literal" ? object : null;
-    }
-
-    export function namedResource(
-      object: BlankNode | Literal | NamedNode,
-      dataset: DatasetCore,
-    ): NamedResource | null {
-      const iri = Resource.ValueMappers.iri(object);
-      if (iri !== null) {
-        return new NamedResource({ dataset, iri });
-      }
-      return null;
     }
 
     export function resource(
