@@ -8,7 +8,12 @@
   },
   "main": "./dist/index.js",
   "files": [
-    "**/*.ts"
+    "*.d.ts",
+    "*.d.ts.map",
+    "*.js",
+    "*.js.map",
+    "LICENSE",
+    "package.json"
   ],
   "license": "GPL-3.0-only",
   "name": "@kos-kit/next-utils",
@@ -27,5 +32,5 @@
   },
   "type": "module",
   "types": "dist/index.d.ts",
-  "version": "2.0.4"
+  "version": "2.0.5"
 }

@@ -1,7 +1,7 @@
 {
   "dependencies": {
-    "@kos-kit/rdf-resource": "2.0.4",
-    "@kos-kit/rdf-utils": "2.0.4",
+    "@kos-kit/rdf-resource": "2.0.5",
+    "@kos-kit/rdf-utils": "2.0.5",
     "@rdfjs/types": "^1.1.0",
     "@types/n3": "^1.16.4",
     "n3": "^1.17.3"
@@ -11,7 +11,12 @@
   },
   "main": "./dist/index.js",
   "files": [
-    "**/*.ts"
+    "*.d.ts",
+    "*.d.ts.map",
+    "*.js",
+    "*.js.map",
+    "LICENSE",
+    "package.json"
   ],
   "license": "GPL-3.0-only",
   "name": "@kos-kit/mem-models",
@@ -32,5 +37,5 @@
   },
   "type": "module",
   "types": "dist/index.d.ts",
-  "version": "2.0.4"
+  "version": "2.0.5"
 }

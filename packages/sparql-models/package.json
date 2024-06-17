@@ -1,8 +1,8 @@
 {
   "dependencies": {
-    "@kos-kit/mem-models": "2.0.4",
-    "@kos-kit/models": "2.0.4",
-    "@kos-kit/rdf-resource": "2.0.4",
+    "@kos-kit/mem-models": "2.0.5",
+    "@kos-kit/models": "2.0.5",
+    "@kos-kit/rdf-resource": "2.0.5",
     "@tpluscode/rdf-ns-builders": "^4.3.0",
     "@rdfjs/types": "^1.1.0",
     "@types/sparql-http-client": "^3.0.2",
@@ -16,7 +16,12 @@
   },
   "main": "./dist/index.js",
   "files": [
-    "**/*.ts"
+    "*.d.ts",
+    "*.d.ts.map",
+    "*.js",
+    "*.js.map",
+    "LICENSE",
+    "package.json"
   ],
   "license": "GPL-3.0-only",
   "name": "@kos-kit/sparql-models",
@@ -37,5 +42,5 @@
   },
   "type": "module",
   "types": "dist/index.d.ts",
-  "version": "2.0.4"
+  "version": "2.0.5"
 }
