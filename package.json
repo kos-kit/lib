@@ -15,6 +15,13 @@
   "name": "@kos-kit/lib",
   "private": true,
   "workspaces": [
-    "packages/*"
+    "packages/next-utils",
+    "packages/rdf-resource",
+    "packages/rdf-utils",
+    "packages/vocabularies",
+    "packages/models",
+    "packages/mem-models",
+    "packages/search",
+    "packages/sparql-models"
   ]
 }
