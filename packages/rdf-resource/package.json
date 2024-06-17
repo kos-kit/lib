@@ -1,7 +1,8 @@
 {
   "dependencies": {
     "@rdfjs/data-model": "^2.0.2",
-    "@rdfjs/types": "^1.1.0"
+    "@rdfjs/types": "^1.1.0",
+    "@types/rdfjs__data-model": "^2.0.8"
   },
   "engines": {
     "node": ">=20"
