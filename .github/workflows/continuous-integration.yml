@@ -17,6 +17,6 @@ jobs:
       - name: Install dependencies
         run: npm install
       - name: Build
-        run: npm run build
+        run: npm run build --workspaces
       - name: Test
-        run: npm test
+        run: npm test --if-present --workspaces

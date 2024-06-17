@@ -1,0 +1,31 @@
+{
+  "dependencies": {
+    "@tpluscode/rdf-ns-builders": "^4.3.0",
+    "@rdfjs/types": "^1.1.0"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "main": "./dist/index.js",
+  "files": [
+    "**/*.ts"
+  ],
+  "license": "GPL-3.0-only",
+  "name": "@kos-kit/models",
+  "scripts": {
+    "build": "tsc -b && cp LICENSE package.json dist/",
+    "clean": "rimraf dist",
+    "link": "cd dist && npm link",
+    "publish": "cd dist && npm publish --access public",
+    "rebuild": "rimraf dist && tsc -b && cp LICENSE package.json dist/",
+    "unlink": "npm unlink -g @kos-kit/models",
+    "watch": "mkdir -p dist && cp LICENSE package.json dist/ && tsc -w --preserveWatchOutput"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kos-kit/lib"
+  },
+  "type": "module",
+  "types": "dist/index.d.ts",
+  "version": "2.0.0"
+}

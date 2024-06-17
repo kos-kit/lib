@@ -1,0 +1,41 @@
+{
+  "dependencies": {
+    "@kos-kit/mem-models": "2.0.0",
+    "@kos-kit/models": "2.0.0",
+    "@kos-kit/rdf-resource": "2.0.0",
+    "@tpluscode/rdf-ns-builders": "^4.3.0",
+    "@rdfjs/types": "^1.1.0",
+    "@types/sparql-http-client": "^3.0.2",
+    "@types/n3": "^1.16.4",
+    "sparql-http-client": "^3.0.0",
+    "n3": "^1.17.3",
+    "pino": "^9.1.0"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "main": "./dist/index.js",
+  "files": [
+    "**/*.ts"
+  ],
+  "license": "GPL-3.0-only",
+  "name": "@kos-kit/sparql-models",
+  "scripts": {
+    "build": "tsc -b && cp LICENSE package.json dist/",
+    "clean": "rimraf dist",
+    "link": "cd dist && npm link",
+    "publish": "cd dist && npm publish --access public",
+    "rebuild": "rimraf dist && tsc -b && cp LICENSE package.json dist/",
+    "test": "vitest run",
+    "test:watch": "vitest watch",
+    "unlink": "npm unlink -g @kos-kit/sparql-models",
+    "watch": "mkdir -p dist && cp LICENSE package.json dist/ && tsc -w --preserveWatchOutput"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kos-kit/lib"
+  },
+  "type": "module",
+  "types": "dist/index.d.ts",
+  "version": "2.0.0"
+}
