@@ -17,6 +17,7 @@
     "build": "tsc -b && cp LICENSE package.json dist/",
     "clean": "rimraf dist",
     "rebuild": "rimraf dist && tsc -b && cp LICENSE package.json dist/",
+    "publish": "cd dist && npm publish --access public",
     "watch": "mkdir -p dist && cp LICENSE package.json dist/ && tsc -w --preserveWatchOutput"
   },
   "repository": {
