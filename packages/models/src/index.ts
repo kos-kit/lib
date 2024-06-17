@@ -10,5 +10,6 @@ export * from "./MappingProperty";
 export * from "./Model";
 export * from "./noteProperties";
 export * from "./NoteProperty";
+export * from "./NotImplementedKos";
 export * from "./semanticRelationProperties";
 export * from "./SemanticRelationProperty";
