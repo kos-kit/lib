@@ -15,8 +15,8 @@
   "name": "@kos-kit/lib",
   "private": true,
   "workspaces": [
-    "packages/vocabularies",
     "packages/next-utils",
+    "packages/vocabularies",
     "packages/rdf-resource",
     "packages/rdf-utils",
     "packages/models",
