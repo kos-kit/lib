@@ -7,6 +7,7 @@ import {
   NoteProperty,
   SemanticRelationProperty,
 } from "../src";
+import { expect, it } from "vitest";
 
 export const behavesLikeUnescoThesaurusConcept10018 = (
   lazyConcept: (includeLanguageTag: LanguageTag) => Promise<Concept>,

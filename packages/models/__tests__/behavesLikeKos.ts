@@ -1,6 +1,7 @@
 import { Kos } from "../src";
 import { expectConcept } from "./expectConcept";
 import { expectConceptScheme } from "./expectConceptScheme";
+import { expect, it } from "vitest";
 
 export const behavesLikeKos = (kos: Kos) => {
   it("should get concepts", async () => {

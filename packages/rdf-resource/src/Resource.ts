@@ -2,7 +2,8 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-namespace */
 import { NamedNode, DatasetCore, BlankNode, Literal } from "@rdfjs/types";
-import DataFactory from "@rdfjs/data-model";
+import { DataFactory } from "n3";
+// import DataFactory from "@rdfjs/data-model";
 
 export class Resource {
   readonly dataset: DatasetCore;

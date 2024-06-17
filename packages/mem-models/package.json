@@ -19,7 +19,7 @@
     "build": "tsc -b && cp LICENSE package.json dist/",
     "clean": "rimraf dist",
     "rebuild": "rimraf dist && tsc -b && cp LICENSE package.json dist/",
-    "test": "TZ=UTC node --experimental-vm-modules ../../node_modules/jest/bin/jest.js --config ../../jest.config.mjs",
+    "test": "vitest",
     "watch": "mkdir -p dist && cp LICENSE package.json dist/ && tsc -w --preserveWatchOutput"
   },
   "repository": {

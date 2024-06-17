@@ -1,4 +1,6 @@
 import { Concept } from "../src";
+import { expect } from "vitest";
+
 /**
  * Basic assertions about every concept.
  */

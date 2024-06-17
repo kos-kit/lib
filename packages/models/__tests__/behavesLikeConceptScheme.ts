@@ -1,5 +1,6 @@
 import { behavesLikeLabeledModel } from "./behavesLikeLabeledModel";
 import { ConceptScheme, LanguageTag } from "../src";
+import { expect, it } from "vitest";
 
 export const behavesLikeConceptScheme = (
   lazyConceptScheme: (

@@ -1,4 +1,5 @@
 import { Label, LabeledModel, LanguageTag } from "../src";
+import { expect, it } from "vitest";
 
 export const behavesLikeLabeledModel = (
   lazyModel: (includeLanguageTag: LanguageTag) => Promise<LabeledModel>,

@@ -1,4 +1,6 @@
 import { ConceptScheme } from "../src";
+import { expect } from "vitest";
+
 /**
  * Basic assertions about every conceptScheme scheme.
  */
