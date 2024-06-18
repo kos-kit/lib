@@ -1,7 +1,7 @@
 import { behavesLikeConcept } from "./behavesLikeConcept";
 import { DataFactory } from "n3";
 import { expectConcept } from "./expectConcept";
-import { Concept, LanguageTag, SemanticRelationProperty } from "../src";
+import { Concept, LanguageTag, SemanticRelationProperty } from "..";
 import { expect, it } from "vitest";
 
 export const behavesLikeUnescoThesaurusConcept10 = (

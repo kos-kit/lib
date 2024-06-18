@@ -1,6 +1,6 @@
 import { DataFactory, Parser, Store } from "n3";
 import { BlankNode, NamedNode } from "@rdfjs/types";
-import { list } from "../src";
+import { list } from "..";
 import { describe, expect, it } from "vitest";
 
 describe("list", () => {

@@ -1,5 +1,5 @@
 import { behavesLikeLabeledModel } from "./behavesLikeLabeledModel";
-import { Concept, LanguageTag } from "../src";
+import { Concept, LanguageTag } from "..";
 
 export const behavesLikeConcept = (
   lazyConcept: (includeLanguageTag: LanguageTag) => Promise<Concept>,

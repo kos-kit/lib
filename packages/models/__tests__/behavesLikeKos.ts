@@ -1,4 +1,4 @@
-import { Kos } from "../src";
+import { Kos } from "..";
 import { expectConcept } from "./expectConcept";
 import { expectConceptScheme } from "./expectConceptScheme";
 import { expect, it } from "vitest";

@@ -1,4 +1,4 @@
-import { ConceptScheme } from "../src";
+import { ConceptScheme } from "..";
 import { expect } from "vitest";
 
 /**

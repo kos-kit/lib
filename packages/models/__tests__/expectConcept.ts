@@ -1,4 +1,4 @@
-import { Concept } from "../src";
+import { Concept } from "..";
 import { expect } from "vitest";
 
 /**

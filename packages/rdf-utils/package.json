@@ -13,15 +13,13 @@
     "*.d.ts",
     "*.d.ts.map",
     "*.js",
-    "*.js.map",
-    "LICENSE",
-    "package.json"
+    "*.js.map"
   ],
   "license": "GPL-3.0-only",
   "name": "@kos-kit/rdf-utils",
   "scripts": {
     "build": "tsc -b",
-    "clean": "rimraf *.js *.js.map *.d.ts *.d.ts.map",
+    "clean": "tsc -b --clean",
     "rebuild": "run-s clean build",
     "test": "vitest run",
     "test:watch": "vitest watch",

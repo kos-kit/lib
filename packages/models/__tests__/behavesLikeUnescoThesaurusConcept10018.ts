@@ -6,7 +6,7 @@ import {
   LanguageTag,
   NoteProperty,
   SemanticRelationProperty,
-} from "../src";
+} from "..";
 import { expect, it } from "vitest";
 
 export const behavesLikeUnescoThesaurusConcept10018 = (

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { DataFactory, Store } from "n3";
 import { BlankNode, DatasetCore, Literal, NamedNode } from "@rdfjs/types";
-import { Resource } from "../src";
+import { Resource } from "..";
 
 describe("Resource", () => {
   const dataset: DatasetCore = new Store();

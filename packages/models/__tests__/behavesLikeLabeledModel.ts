@@ -1,4 +1,4 @@
-import { Label, LabeledModel, LanguageTag } from "../src";
+import { Label, LabeledModel, LanguageTag } from "..";
 import { expect, it } from "vitest";
 
 export const behavesLikeLabeledModel = (

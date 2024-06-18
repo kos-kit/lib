@@ -1,6 +1,6 @@
 import { behavesLikeConceptScheme } from "./behavesLikeConceptScheme";
 import { expectConceptScheme } from "./expectConceptScheme";
-import { ConceptScheme, LanguageTag } from "../src";
+import { ConceptScheme, LanguageTag } from "..";
 import { expect, it } from "vitest";
 
 export const behavesLikeUnescoThesaurusConceptScheme = (

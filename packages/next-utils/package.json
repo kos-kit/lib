@@ -11,15 +11,13 @@
     "*.d.ts",
     "*.d.ts.map",
     "*.js",
-    "*.js.map",
-    "LICENSE",
-    "package.json"
+    "*.js.map"
   ],
   "license": "GPL-3.0-only",
   "name": "@kos-kit/next-utils",
   "scripts": {
     "build": "tsc -b",
-    "clean": "rimraf *.js *.js.map *.d.ts *.d.ts.map",
+    "clean": "tsc -b --clean",
     "link": "npm link",
     "publish:dist": "cd dist && npm publish --access public",
     "rebuild": "run-s clean build",
