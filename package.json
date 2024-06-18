@@ -17,7 +17,7 @@
   "scripts": {
     "build": "npm run build --workspaces",
     "clean": "npm run clean --workspaces",
-    "link": "npm run link --workspaces",
+    "link": "npm link --workspaces",
     "rebuild": "npm run rebuild --workspaces",
     "test": "npm run test --if-present --workspaces",
     "unlink": "npm run unlink --workspaces",

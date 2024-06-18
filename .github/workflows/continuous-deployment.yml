@@ -20,8 +20,8 @@ jobs:
       - name: Build
         run: npm run build --workspaces
       - name: Test
-        run: npm test --if-present --workspaces
+        run: npm run test
       - name: Publish
-        run: npm run publish:dist --if-present --workspaces
+        run: npm publish --workspaces
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

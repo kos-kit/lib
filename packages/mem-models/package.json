@@ -21,8 +21,6 @@
   "scripts": {
     "build": "tsc -b",
     "clean": "tsc -b --clean",
-    "link": "npm link",
-    "publish:dist": "cd dist && npm publish --access public",
     "rebuild": "run-s clean build",
     "unlink": "npm unlink -g @kos-kit/mem-models",
     "test": "vitest run",
