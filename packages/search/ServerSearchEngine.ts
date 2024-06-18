@@ -1,10 +1,10 @@
 import axios, { AxiosInstance } from "axios";
 
-import { SearchEngine } from "./SearchEngine";
-import { SearchEngineJson } from "./SearchEngineJson";
-import { SearchResult } from "./SearchResult";
+import { SearchEngine } from "./SearchEngine.js";
+import { SearchEngineJson } from "./SearchEngineJson.js";
+import { SearchResult } from "./SearchResult.js";
 import { Parser, Store } from "n3";
-import { SearchResults } from "./SearchResults";
+import { SearchResults } from "./SearchResults.js";
 import { LanguageTag, LanguageTagSet } from "@kos-kit/models";
 import { Kos } from "@kos-kit/mem-models";
 import { Resource } from "@kos-kit/rdf-resource";

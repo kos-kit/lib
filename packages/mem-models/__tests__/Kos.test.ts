@@ -1,5 +1,5 @@
-import { behavesLikeKos } from "../../models/__tests__/behavesLikeKos";
-import { testKosFactory } from "./testKosFactory";
+import { behavesLikeKos } from "../../models/__tests__/behavesLikeKos.js";
+import { testKosFactory } from "./testKosFactory.js";
 import { describe } from "vitest";
 
 describe("mem.Kos", () => {

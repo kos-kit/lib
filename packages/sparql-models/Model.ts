@@ -1,8 +1,8 @@
 import { Model as MemModel } from "@kos-kit/mem-models";
 import { Model as IModel } from "@kos-kit/models";
 import { BlankNode, Literal, NamedNode } from "@rdfjs/types";
-import { GraphPattern, GraphPatternSubject } from "./GraphPattern";
-import { Kos } from "./Kos";
+import { GraphPattern, GraphPatternSubject } from "./GraphPattern.js";
+import { Kos } from "./Kos.js";
 import { dc11, dcterms } from "@tpluscode/rdf-ns-builders";
 
 /**

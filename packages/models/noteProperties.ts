@@ -1,4 +1,4 @@
-import { NoteProperty } from "./NoteProperty";
+import { NoteProperty } from "./NoteProperty.js";
 
 export const noteProperties: readonly NoteProperty[] = [
   NoteProperty.CHANGE_NOTE,

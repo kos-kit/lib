@@ -1,5 +1,5 @@
-import { Concept } from "./Concept";
-import { LabeledModel } from "./LabeledModel";
+import { Concept } from "./Concept.js";
+import { LabeledModel } from "./LabeledModel.js";
 
 export interface ConceptScheme extends LabeledModel {
   topConcepts(): AsyncGenerator<Concept>;

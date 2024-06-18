@@ -1,5 +1,5 @@
-import { Label } from "./Label";
-import { Model } from "./Model";
+import { Label } from "./Label.js";
+import { Model } from "./Model.js";
 import { BlankNode, NamedNode } from "@rdfjs/types";
 
 /**

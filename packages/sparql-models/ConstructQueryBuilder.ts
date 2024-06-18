@@ -1,5 +1,5 @@
 import { LanguageTagSet } from "@kos-kit/models";
-import { GraphPattern, GraphPatternVariable } from "./GraphPattern";
+import { GraphPattern, GraphPatternVariable } from "./GraphPattern.js";
 import { BlankNode, Literal, NamedNode, Variable } from "@rdfjs/types";
 
 const TAB_SPACES = 2;

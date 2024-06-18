@@ -1,5 +1,5 @@
 import { Literal } from "@rdfjs/types";
-import { Label } from "./Label";
+import { Label } from "./Label.js";
 
 /**
  * A Label that only consists of its literal form.

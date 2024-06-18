@@ -1,5 +1,5 @@
 import { skos } from "@tpluscode/rdf-ns-builders";
-import { SemanticRelationProperty } from "./SemanticRelationProperty";
+import { SemanticRelationProperty } from "./SemanticRelationProperty.js";
 
 export class MappingProperty extends SemanticRelationProperty {
   static readonly BROAD_MATCH = new MappingProperty(

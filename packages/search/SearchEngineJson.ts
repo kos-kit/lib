@@ -1,4 +1,4 @@
-import { SearchEngineType } from "./SearchEngineType";
+import { SearchEngineType } from "./SearchEngineType.js";
 
 /**
  * JSON serialization of a SearchEngine.

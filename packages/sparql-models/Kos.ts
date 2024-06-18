@@ -1,12 +1,12 @@
-import { Concept } from "./Concept";
-import { ConceptScheme } from "./ConceptScheme";
+import { Concept } from "./Concept.js";
+import { ConceptScheme } from "./ConceptScheme.js";
 
-import { ConstructQueryBuilder } from "./ConstructQueryBuilder";
-import { GraphPatternVariable } from "./GraphPattern";
-import { mapResultRowsToIdentifiers } from "./mapResultRowsToIdentifiers";
-import { mapResultRowsToCount } from "./mapResultRowsToCount";
-import { SparqlClient } from "./SparqlClient";
-import { paginationToAsyncGenerator } from "./paginationToAsyncGenerator";
+import { ConstructQueryBuilder } from "./ConstructQueryBuilder.js";
+import { GraphPatternVariable } from "./GraphPattern.js";
+import { mapResultRowsToIdentifiers } from "./mapResultRowsToIdentifiers.js";
+import { mapResultRowsToCount } from "./mapResultRowsToCount.js";
+import { SparqlClient } from "./SparqlClient.js";
+import { paginationToAsyncGenerator } from "./paginationToAsyncGenerator.js";
 import { LanguageTagSet } from "@kos-kit/models";
 import { rdf, rdfs, skos } from "@tpluscode/rdf-ns-builders";
 import { BlankNode, NamedNode } from "@rdfjs/types";

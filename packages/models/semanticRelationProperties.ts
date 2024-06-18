@@ -1,5 +1,5 @@
-import { MappingProperty } from "./MappingProperty";
-import { SemanticRelationProperty } from "./SemanticRelationProperty";
+import { MappingProperty } from "./MappingProperty.js";
+import { SemanticRelationProperty } from "./SemanticRelationProperty.js";
 
 export const mappingProperties: readonly MappingProperty[] = [
   MappingProperty.BROAD_MATCH,

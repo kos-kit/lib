@@ -1,4 +1,4 @@
-import { behavesLikeLabeledModel } from "./behavesLikeLabeledModel";
+import { behavesLikeLabeledModel } from "./behavesLikeLabeledModel.js";
 import { ConceptScheme, LanguageTag } from "..";
 import { expect, it } from "vitest";
 

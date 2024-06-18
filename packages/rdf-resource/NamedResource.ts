@@ -1,5 +1,5 @@
 import { DatasetCore, NamedNode } from "@rdfjs/types";
-import { Resource } from "./Resource";
+import { Resource } from "./Resource.js";
 
 export class NamedResource extends Resource {
   constructor({ dataset, iri }: { dataset: DatasetCore; iri: NamedNode }) {

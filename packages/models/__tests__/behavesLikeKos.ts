@@ -1,6 +1,6 @@
 import { Kos } from "..";
-import { expectConcept } from "./expectConcept";
-import { expectConceptScheme } from "./expectConceptScheme";
+import { expectConcept } from "./expectConcept.js";
+import { expectConceptScheme } from "./expectConceptScheme.js";
 import { expect, it } from "vitest";
 
 export const behavesLikeKos = (kos: Kos) => {

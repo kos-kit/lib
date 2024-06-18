@@ -1,7 +1,7 @@
-import { testKosFactory } from "./testKosFactory";
-import { behavesLikeUnescoThesaurusConcept10018 } from "../../models/__tests__/behavesLikeUnescoThesaurusConcept10018";
+import { testKosFactory } from "./testKosFactory.js";
+import { behavesLikeUnescoThesaurusConcept10018 } from "../../models/__tests__/behavesLikeUnescoThesaurusConcept10018.js";
 import { DataFactory } from "n3";
-import { behavesLikeUnescoThesaurusConcept10 } from "../../models/__tests__/behavesLikeUnescoThesaurusConcept10";
+import { behavesLikeUnescoThesaurusConcept10 } from "../../models/__tests__/behavesLikeUnescoThesaurusConcept10.js";
 import { describe } from "vitest";
 
 describe("mem.Concept", () => {

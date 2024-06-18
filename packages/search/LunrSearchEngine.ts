@@ -1,9 +1,9 @@
 import lunr, { Index } from "lunr";
-import { SearchEngine } from "./SearchEngine";
-import { SearchResult } from "./SearchResult";
-import { SearchEngineJson } from "./SearchEngineJson";
-import { LunrIndexCompactor } from "./LunrIndexCompactor";
-import { SearchResults } from "./SearchResults";
+import { SearchEngine } from "./SearchEngine.js";
+import { SearchResult } from "./SearchResult.js";
+import { SearchEngineJson } from "./SearchEngineJson.js";
+import { LunrIndexCompactor } from "./LunrIndexCompactor.js";
+import { SearchResults } from "./SearchResults.js";
 import { Kos, LabeledModel, LanguageTag } from "@kos-kit/models";
 import { BlankNode, NamedNode } from "@rdfjs/types";
 import { Resource } from "@kos-kit/rdf-resource";

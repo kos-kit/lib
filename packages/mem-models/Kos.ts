@@ -1,12 +1,12 @@
 import { BlankNode, DatasetCore, NamedNode } from "@rdfjs/types";
-import { Concept } from "./Concept";
-import { ConceptScheme } from "./ConceptScheme";
-import { paginateIterable } from "./paginateIterable";
+import { Concept } from "./Concept.js";
+import { ConceptScheme } from "./ConceptScheme.js";
+import { paginateIterable } from "./paginateIterable.js";
 import { LanguageTagSet } from "@kos-kit/models";
 import { skos } from "@tpluscode/rdf-ns-builders";
 import { Resource } from "@kos-kit/rdf-resource";
 import { instances } from "@kos-kit/rdf-utils";
-import { countIterable } from "./countIterable";
+import { countIterable } from "./countIterable.js";
 
 export class Kos {
   readonly dataset: DatasetCore;

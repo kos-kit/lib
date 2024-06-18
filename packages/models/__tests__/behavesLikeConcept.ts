@@ -1,4 +1,4 @@
-import { behavesLikeLabeledModel } from "./behavesLikeLabeledModel";
+import { behavesLikeLabeledModel } from "./behavesLikeLabeledModel.js";
 import { Concept, LanguageTag } from "..";
 
 export const behavesLikeConcept = (

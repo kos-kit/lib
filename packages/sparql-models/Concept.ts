@@ -1,9 +1,9 @@
-import { LabeledModel } from "./LabeledModel";
-import { ConceptScheme } from "./ConceptScheme";
+import { LabeledModel } from "./LabeledModel.js";
+import { ConceptScheme } from "./ConceptScheme.js";
 import { Literal } from "@rdfjs/types";
-import { GraphPatternSubject, GraphPattern } from "./GraphPattern";
-import { mapResultRowsToIdentifiers } from "./mapResultRowsToIdentifiers";
-import { mapResultRowsToCount } from "./mapResultRowsToCount";
+import { GraphPatternSubject, GraphPattern } from "./GraphPattern.js";
+import { mapResultRowsToIdentifiers } from "./mapResultRowsToIdentifiers.js";
+import { mapResultRowsToCount } from "./mapResultRowsToCount.js";
 import { Concept as MemConcept } from "@kos-kit/mem-models";
 import {
   Concept as IConcept,

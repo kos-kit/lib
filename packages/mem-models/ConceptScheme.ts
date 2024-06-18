@@ -1,12 +1,12 @@
 import TermSet from "@rdfjs/term-set";
-import { LabeledModel } from "./LabeledModel";
-import { Concept } from "./Concept";
+import { LabeledModel } from "./LabeledModel.js";
+import { Concept } from "./Concept.js";
 import { Resource } from "@kos-kit/rdf-resource";
 import { ConceptScheme as IConceptScheme } from "@kos-kit/models";
 import { skos } from "@tpluscode/rdf-ns-builders";
 import { BlankNode, NamedNode } from "@rdfjs/types";
-import { paginateIterable } from "./paginateIterable";
-import { countIterable } from "./countIterable";
+import { paginateIterable } from "./paginateIterable.js";
+import { countIterable } from "./countIterable.js";
 
 export class ConceptScheme extends LabeledModel implements IConceptScheme {
   private *topConceptIdentifiers(): Iterable<Resource.Identifier> {

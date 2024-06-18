@@ -1,9 +1,9 @@
 import { NamedNode, Literal, BlankNode } from "@rdfjs/types";
 import { dc11, dcterms } from "@tpluscode/rdf-ns-builders";
 import { Model as IModel, LanguageTagSet } from "@kos-kit/models";
-import { Kos } from "./Kos";
+import { Kos } from "./Kos.js";
 import { Resource } from "@kos-kit/rdf-resource";
-import { matchLiteral } from "./matchLiteral";
+import { matchLiteral } from "./matchLiteral.js";
 
 const rightsPredicates = [dcterms.rights, dc11.rights];
 

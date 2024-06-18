@@ -1,5 +1,5 @@
 import { BlankNode, DatasetCore, NamedNode } from "@rdfjs/types";
-import { instanceQuads } from "./instanceQuads";
+import { instanceQuads } from "./instanceQuads.js";
 
 /**
  * Get all unique RDF instances of a given class in the given dataset.

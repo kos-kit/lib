@@ -1,6 +1,6 @@
 import { DataFactory } from "n3";
-import { behavesLikeUnescoThesaurusConceptScheme } from "../../models/__tests__/behavesLikeUnescoThesaurusConceptScheme";
-import { testKosFactory } from "./testKosFactory";
+import { behavesLikeUnescoThesaurusConceptScheme } from "../../models/__tests__/behavesLikeUnescoThesaurusConceptScheme.js";
+import { testKosFactory } from "./testKosFactory.js";
 import { describe } from "vitest";
 
 describe("mem.ConceptScheme", () => {

@@ -1,5 +1,5 @@
-import { behavesLikeConceptScheme } from "./behavesLikeConceptScheme";
-import { expectConceptScheme } from "./expectConceptScheme";
+import { behavesLikeConceptScheme } from "./behavesLikeConceptScheme.js";
+import { expectConceptScheme } from "./expectConceptScheme.js";
 import { ConceptScheme, LanguageTag } from "..";
 import { expect, it } from "vitest";
 

@@ -1,3 +1,3 @@
-export * from "./instanceQuads";
-export * from "./instances";
-export * from "./list";
+export * from "./instanceQuads.js";
+export * from "./instances.js";
+export * from "./list.js";

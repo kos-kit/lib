@@ -1,4 +1,4 @@
-import { SearchResult } from "./SearchResult";
+import { SearchResult } from "./SearchResult.js";
 
 export interface SearchResults {
   readonly page: readonly SearchResult[];

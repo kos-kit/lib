@@ -1,6 +1,6 @@
-import { behavesLikeConcept } from "./behavesLikeConcept";
+import { behavesLikeConcept } from "./behavesLikeConcept.js";
 import { DataFactory } from "n3";
-import { expectConcept } from "./expectConcept";
+import { expectConcept } from "./expectConcept.js";
 import {
   Concept,
   LanguageTag,

@@ -1,2 +1,2 @@
-export * from "./Resource";
-export * from "./NamedResource";
+export * from "./Resource.js";
+export * from "./NamedResource.js";

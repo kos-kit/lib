@@ -1,7 +1,7 @@
 import { Literal } from "@rdfjs/types";
 import { Label as ILabel } from "@kos-kit/models";
-import { Model } from "./Model";
-import { Kos } from "./Kos";
+import { Model } from "./Model.js";
+import { Kos } from "./Kos.js";
 import { Resource } from "@kos-kit/rdf-resource";
 
 export class Label extends Model implements ILabel {

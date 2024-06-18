@@ -1,6 +1,6 @@
 import { NamedNode } from "@rdfjs/types";
-import { Model } from "./Model";
-import { Label } from "./Label";
+import { Model } from "./Model.js";
+import { Label } from "./Label.js";
 import {
   Label as ILabel,
   LabeledModel as ILabeledModel,
@@ -9,7 +9,7 @@ import {
 } from "@kos-kit/models";
 import { skos, skosxl } from "@tpluscode/rdf-ns-builders";
 import { Resource } from "@kos-kit/rdf-resource";
-import { matchLiteral } from "./matchLiteral";
+import { matchLiteral } from "./matchLiteral.js";
 
 export abstract class LabeledModel extends Model implements ILabeledModel {
   get altLabels(): readonly ILabel[] {

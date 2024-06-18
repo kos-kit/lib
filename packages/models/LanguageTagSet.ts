@@ -1,4 +1,4 @@
-import { LanguageTag } from "./LanguageTag";
+import { LanguageTag } from "./LanguageTag.js";
 
 /**
  * Ordered set of language tags.

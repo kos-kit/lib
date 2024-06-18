@@ -4,8 +4,8 @@ import {
   GraphPattern,
   GraphPatternSubject,
   GraphPatternVariable,
-} from "./GraphPattern";
-import { Model } from "./Model";
+} from "./GraphPattern.js";
+import { Model } from "./Model.js";
 import { skos, skosxl } from "@tpluscode/rdf-ns-builders";
 
 export abstract class LabeledModel<MemModelT extends MemLabeledModel>

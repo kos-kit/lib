@@ -1,5 +1,5 @@
 import { ServerSearchEngine } from "..";
-import { behavesLikeSearchEngine } from "./behavesLikeSearchEngine";
+import { behavesLikeSearchEngine } from "./behavesLikeSearchEngine.js";
 import { describe } from "vitest";
 
 (process.env["CI"] ? describe.skip : describe)("ServerSearchEngine", () => {

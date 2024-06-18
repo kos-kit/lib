@@ -1,7 +1,7 @@
 import { BlankNode, NamedNode } from "@rdfjs/types";
-import { Concept } from "./Concept";
-import { ConceptScheme } from "./ConceptScheme";
-import { Kos } from "./Kos";
+import { Concept } from "./Concept.js";
+import { ConceptScheme } from "./ConceptScheme.js";
+import { Kos } from "./Kos.js";
 
 export class NotImplementedKos implements Kos {
   conceptByIdentifier(

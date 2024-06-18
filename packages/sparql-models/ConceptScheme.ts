@@ -1,11 +1,11 @@
 import { ConceptScheme as IConceptScheme } from "@kos-kit/models";
 import { ConceptScheme as MemConceptScheme } from "@kos-kit/mem-models";
-import { LabeledModel as LabeledModel } from "./LabeledModel";
-import { Concept } from "./Concept";
-import { mapResultRowsToIdentifiers } from "./mapResultRowsToIdentifiers";
-import { mapResultRowsToCount } from "./mapResultRowsToCount";
+import { LabeledModel as LabeledModel } from "./LabeledModel.js";
+import { Concept } from "./Concept.js";
+import { mapResultRowsToIdentifiers } from "./mapResultRowsToIdentifiers.js";
+import { mapResultRowsToCount } from "./mapResultRowsToCount.js";
 import { Resource } from "@kos-kit/rdf-resource";
-import { paginationToAsyncGenerator } from "./paginationToAsyncGenerator";
+import { paginationToAsyncGenerator } from "./paginationToAsyncGenerator.js";
 import { skos } from "@tpluscode/rdf-ns-builders";
 
 export class ConceptScheme

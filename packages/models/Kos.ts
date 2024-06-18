@@ -1,6 +1,6 @@
 import { BlankNode, NamedNode } from "@rdfjs/types";
-import { Concept } from "./Concept";
-import { ConceptScheme } from "./ConceptScheme";
+import { Concept } from "./Concept.js";
+import { ConceptScheme } from "./ConceptScheme.js";
 
 export interface Kos {
   conceptByIdentifier(identifier: BlankNode | NamedNode): Promise<Concept>;

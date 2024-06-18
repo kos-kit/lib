@@ -1,8 +1,8 @@
 import { Literal } from "@rdfjs/types";
-import { SemanticRelationProperty } from "./SemanticRelationProperty";
-import { NoteProperty } from "./NoteProperty";
-import { LabeledModel } from "./LabeledModel";
-import { ConceptScheme } from "./ConceptScheme";
+import { SemanticRelationProperty } from "./SemanticRelationProperty.js";
+import { NoteProperty } from "./NoteProperty.js";
+import { LabeledModel } from "./LabeledModel.js";
+import { ConceptScheme } from "./ConceptScheme.js";
 
 export interface Concept extends LabeledModel {
   inSchemes(): Promise<readonly ConceptScheme[]>;

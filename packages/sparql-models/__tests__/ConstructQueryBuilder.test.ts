@@ -4,7 +4,7 @@ import {
   GraphPatternObject,
   GraphPatternSubject,
 } from "..";
-import { Concept } from "../Concept";
+import { Concept } from "../Concept.js";
 import { skos } from "@tpluscode/rdf-ns-builders";
 import { describe, expect, it } from "vitest";
 

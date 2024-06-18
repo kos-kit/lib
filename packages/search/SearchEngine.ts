@@ -1,6 +1,6 @@
 import { LanguageTag } from "@kos-kit/models";
-import { SearchEngineJson } from "./SearchEngineJson";
-import { SearchResults } from "./SearchResults";
+import { SearchEngineJson } from "./SearchEngineJson.js";
+import { SearchResults } from "./SearchResults.js";
 
 export interface SearchEngine {
   search(kwds: {
