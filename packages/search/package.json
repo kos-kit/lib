@@ -1,8 +1,8 @@
 {
   "dependencies": {
-    "@kos-kit/mem-models": "2.0.7",
-    "@kos-kit/models": "2.0.7",
-    "@kos-kit/rdf-resource": "2.0.7",
+    "@kos-kit/mem-models": "2.0.8",
+    "@kos-kit/models": "2.0.8",
+    "@kos-kit/rdf-resource": "2.0.8",
     "@rdfjs/types": "^1.1.0",
     "@types/lunr": "^2.3.7",
     "axios": "^1.7.2",
@@ -11,7 +11,7 @@
   "engines": {
     "node": ">=20"
   },
-  "main": "./dist/index.js",
+  "main": "index.js",
   "files": [
     "*.d.ts",
     "*.d.ts.map",
@@ -38,6 +38,6 @@
     "url": "git+https://github.com/kos-kit/lib"
   },
   "type": "module",
-  "types": "dist/index.d.ts",
-  "version": "2.0.7"
+  "types": "index.d.ts",
+  "version": "2.0.8"
 }
