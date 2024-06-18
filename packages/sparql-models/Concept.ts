@@ -2,8 +2,8 @@ import { LabeledModel } from "./LabeledModel";
 import { ConceptScheme } from "./ConceptScheme";
 import { Literal } from "@rdfjs/types";
 import { GraphPatternSubject, GraphPattern } from "./GraphPattern";
-import { mapResultRowsToIdentifiers } from "./src/mapResultRowsToIdentifiers";
-import { mapResultRowsToCount } from "./src/mapResultRowsToCount";
+import { mapResultRowsToIdentifiers } from "./mapResultRowsToIdentifiers";
+import { mapResultRowsToCount } from "./mapResultRowsToCount";
 import { Concept as MemConcept } from "@kos-kit/mem-models";
 import {
   Concept as IConcept,

@@ -1,6 +1,6 @@
-import { LunrSearchEngine } from "./src/LunrSearchEngine";
-import { SearchEngineType } from "./src/SearchEngineType";
-import { ServerSearchEngine } from "./src/ServerSearchEngine";
+import { LunrSearchEngine } from "./LunrSearchEngine";
+import { SearchEngineType } from "./SearchEngineType";
+import { ServerSearchEngine } from "./ServerSearchEngine";
 
 export const createSearchEngineFromJson = (json: {
   [index: string]: any;
