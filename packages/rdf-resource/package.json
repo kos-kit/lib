@@ -19,15 +19,15 @@
   "license": "GPL-3.0-only",
   "name": "@kos-kit/rdf-resource",
   "scripts": {
-    "build": "tsc -b && cp LICENSE package.json dist/",
-    "clean": "rimraf dist",
-    "link": "cd dist && npm link",
+    "build": "tsc -b",
+    "clean": "rimraf *.js *.js.map *.d.ts *.d.ts.map",
+    "link": "npm link",
     "publish:dist": "cd dist && npm publish --access public",
-    "rebuild": "rimraf dist && tsc -b && cp LICENSE package.json dist/",
+    "rebuild": "run-s clean build",
     "test": "vitest run",
     "test:watch": "vitest watch",
     "unlink": "npm unlink -g @kos-kit/rdf-resource",
-    "watch": "mkdir -p dist && cp LICENSE package.json dist/ && tsc -w --preserveWatchOutput"
+    "watch": "tsc -w --preserveWatchOutput"
   },
   "repository": {
     "type": "git",
