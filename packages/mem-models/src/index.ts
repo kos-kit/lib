@@ -1,5 +1,6 @@
 export * from "./Concept";
 export * from "./ConceptScheme";
+export * from "./countIterable";
 export * from "./Kos";
 export * from "./Label";
 export * from "./LabeledModel";
