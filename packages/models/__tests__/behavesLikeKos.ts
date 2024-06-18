@@ -39,7 +39,7 @@ export const behavesLikeKos = (kos: Kos) => {
       ).toBeTruthy();
       return;
     }
-    fail();
+    expect(false).toBe(true);
   });
 
   it("should get a count of concepts", async () => {
