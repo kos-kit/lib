@@ -83,9 +83,9 @@ export abstract class LabeledModel extends Model implements ILabeledModel {
 
         labels.push(
           new Label({
+            identifier: labelResource.identifier,
             kos: this.kos,
             literalForm,
-            resource: labelResource,
           }),
         );
       }
