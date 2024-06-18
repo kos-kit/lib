@@ -45,8 +45,8 @@ export class ConceptScheme extends LabeledModel implements IConceptScheme {
   async *topConcepts(): AsyncGenerator<Concept> {
     for await (const identifier of this.topConceptIdentifiers()) {
       yield new Concept({
+        identifier,
         kos: this.kos,
-        resource: new Resource({ dataset: this.resource.dataset, identifier }),
       });
     }
   }
@@ -66,11 +66,8 @@ export class ConceptScheme extends LabeledModel implements IConceptScheme {
       })) {
         result.push(
           new Concept({
+            identifier,
             kos: this.kos,
-            resource: new Resource({
-              dataset: this.resource.dataset,
-              identifier,
-            }),
           }),
         );
       }

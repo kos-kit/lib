@@ -9,14 +9,14 @@ export class Label extends Model implements ILabel {
 
   constructor({
     kos,
+    identifier,
     literalForm,
-    resource,
   }: {
+    identifier: Resource.Identifier;
     kos: Kos;
     literalForm: Literal;
-    resource: Resource;
   }) {
-    super({ kos, resource });
+    super({ identifier, kos });
     this.literalForm = literalForm;
   }
 }

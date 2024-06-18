@@ -14,9 +14,9 @@ export class Concept extends LabeledModel implements IConcept {
         [
           ...this.resource.values(
             skos.inScheme,
-            Resource.ValueMappers.resource,
+            Resource.ValueMappers.identifier,
           ),
-        ].map((resource) => new ConceptScheme({ kos: this.kos, resource })),
+        ].map((identifier) => new ConceptScheme({ identifier, kos: this.kos })),
       ),
     );
   }
@@ -52,9 +52,9 @@ export class Concept extends LabeledModel implements IConcept {
         [
           ...this.resource.values(
             property.identifier,
-            Resource.ValueMappers.resource,
+            Resource.ValueMappers.identifier,
           ),
-        ].map((resource) => new Concept({ kos: this.kos, resource })),
+        ].map((identifier) => new Concept({ identifier, kos: this.kos })),
       ),
     );
   }
@@ -76,9 +76,9 @@ export class Concept extends LabeledModel implements IConcept {
         [
           ...this.resource.values(
             skos.topConceptOf,
-            Resource.ValueMappers.resource,
+            Resource.ValueMappers.identifier,
           ),
-        ].map((resource) => new ConceptScheme({ kos: this.kos, resource })),
+        ].map((identifier) => new ConceptScheme({ identifier, kos: this.kos })),
       ),
     );
   }

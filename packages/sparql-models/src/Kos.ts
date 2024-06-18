@@ -90,11 +90,11 @@ OFFSET ${offset}`),
         new Concept({
           kos: this,
           memModel: new mem.Concept({
+            identifier,
             kos: new mem.Kos({
               dataset,
               includeLanguageTags,
             }),
-            resource: new Resource({ dataset, identifier }),
           }),
         }),
     );
@@ -160,8 +160,8 @@ WHERE {
         new ConceptScheme({
           kos: this,
           memModel: new mem.ConceptScheme({
+            identifier,
             kos: new mem.Kos({ dataset, includeLanguageTags }),
-            resource: new Resource({ dataset, identifier }),
           }),
         }),
     );

@@ -14,9 +14,15 @@ export abstract class Model implements IModel {
   protected readonly kos: Kos;
   protected readonly resource: Resource;
 
-  constructor({ kos, resource }: { kos: Kos; resource: Resource }) {
+  constructor({
+    identifier,
+    kos,
+  }: {
+    identifier: Resource.Identifier;
+    kos: Kos;
+  }) {
     this.kos = kos;
-    this.resource = resource;
+    this.resource = new Resource({ dataset: kos.dataset, identifier });
   }
 
   protected get includeLanguageTags(): LanguageTagSet {

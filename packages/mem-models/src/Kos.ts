@@ -9,7 +9,7 @@ import { instances } from "@kos-kit/rdf-utils";
 import { countIterable } from "./countIterable";
 
 export class Kos {
-  private readonly dataset: DatasetCore;
+  readonly dataset: DatasetCore;
   readonly includeLanguageTags: LanguageTagSet;
 
   constructor({
@@ -23,21 +23,13 @@ export class Kos {
     this.includeLanguageTags = includeLanguageTags;
   }
 
-  conceptByIdentifier(identifier: BlankNode | NamedNode): Promise<Concept> {
+  conceptByIdentifier(identifier: Resource.Identifier): Promise<Concept> {
     return new Promise((resolve) =>
-      resolve(
-        new Concept({
-          kos: this,
-          resource: new Resource({
-            dataset: this.dataset,
-            identifier,
-          }),
-        }),
-      ),
+      resolve(new Concept({ identifier, kos: this })),
     );
   }
 
-  private *conceptIdentifiers(): Iterable<BlankNode | NamedNode> {
+  private *conceptIdentifiers(): Iterable<Resource.Identifier> {
     yield* instances({
       class_: skos.Concept,
       dataset: this.dataset,
@@ -47,10 +39,7 @@ export class Kos {
 
   async *concepts(): AsyncGenerator<Concept> {
     for await (const identifier of this.conceptIdentifiers()) {
-      yield new Concept({
-        kos: this,
-        resource: new Resource({ dataset: this.dataset, identifier }),
-      });
+      yield new Concept({ identifier, kos: this });
     }
   }
 
@@ -67,12 +56,7 @@ export class Kos {
         limit,
         offset,
       })) {
-        result.push(
-          new Concept({
-            kos: this,
-            resource: new Resource({ dataset: this.dataset, identifier }),
-          }),
-        );
+        result.push(new Concept({ identifier, kos: this }));
       }
       resolve(result);
     });
@@ -105,10 +89,7 @@ export class Kos {
       dataset: this.dataset,
       includeSubclasses: true,
     })) {
-      yield new ConceptScheme({
-        kos: this,
-        resource: new Resource({ dataset: this.dataset, identifier }),
-      });
+      yield new ConceptScheme({ identifier, kos: this });
     }
   }
 }
