@@ -3,8 +3,8 @@ import {
   ConstructQueryBuilder,
   GraphPatternObject,
   GraphPatternSubject,
-} from "../src";
-import { Concept } from "../src/Concept";
+} from "..";
+import { Concept } from "../Concept";
 import { skos } from "@tpluscode/rdf-ns-builders";
 import { describe, expect, it } from "vitest";
 

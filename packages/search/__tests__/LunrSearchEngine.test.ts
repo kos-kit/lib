@@ -1,6 +1,6 @@
 import { describe } from "vitest";
 import { behavesLikeSearchEngine } from "./behavesLikeSearchEngine";
-import { LunrSearchEngine } from "../src";
+import { LunrSearchEngine } from "..";
 import { testKosFactory } from "../../mem-models/__tests__/testKosFactory";
 
 describe("LunrSearchEngine", () => {

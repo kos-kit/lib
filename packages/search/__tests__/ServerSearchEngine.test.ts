@@ -1,4 +1,4 @@
-import { ServerSearchEngine } from "../src";
+import { ServerSearchEngine } from "..";
 import { behavesLikeSearchEngine } from "./behavesLikeSearchEngine";
 import { describe } from "vitest";
 

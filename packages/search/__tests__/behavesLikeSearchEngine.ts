@@ -1,4 +1,4 @@
-import { createSearchEngineFromJson, SearchEngine } from "../src";
+import { createSearchEngineFromJson, SearchEngine } from "..";
 import { expect, it } from "vitest";
 
 export const behavesLikeSearchEngine = (

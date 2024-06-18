@@ -3,7 +3,7 @@ import path from "node:path";
 import fs from "node:fs";
 import { fileURLToPath } from "node:url";
 import { LanguageTag, LanguageTagSet } from "@kos-kit/models";
-import { Kos } from "../src/Kos";
+import { Kos } from "../Kos";
 
 const ntriplesStringToDataset = (input: string): Store => {
   const parser = new Parser({ format: "N-Triples" });

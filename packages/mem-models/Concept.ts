@@ -1,8 +1,8 @@
 import { Literal } from "@rdfjs/types";
-import { LabeledModel } from "./LabeledModel";
+import { LabeledModel } from "./src/LabeledModel";
 import { ConceptScheme } from "./ConceptScheme";
 import { Concept as IConcept, NoteProperty } from "@kos-kit/models";
-import { matchLiteral } from "./matchLiteral";
+import { matchLiteral } from "./src/matchLiteral";
 import { SemanticRelationProperty } from "@kos-kit/models";
 import { skos } from "@tpluscode/rdf-ns-builders";
 import { Resource } from "@kos-kit/rdf-resource";
