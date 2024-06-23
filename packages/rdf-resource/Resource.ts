@@ -1,8 +1,15 @@
 /* eslint-disable no-inner-declarations */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-namespace */
-import { NamedNode, DatasetCore, BlankNode, Literal } from "@rdfjs/types";
-import DataFactory from "@rdfjs/data-model";
+import {
+  NamedNode,
+  DatasetCore,
+  BlankNode,
+  Literal,
+  DefaultGraph,
+  DataFactory,
+} from "@rdfjs/types";
+import DefaultDataFactory from "@rdfjs/data-model";
 
 export class Resource {
   readonly dataset: DatasetCore;
@@ -80,14 +87,69 @@ export class Resource {
 }
 
 export namespace Resource {
+  export class Builder {
+    private readonly dataFactory: DataFactory;
+    readonly dataset: DatasetCore;
+    readonly identifier: Identifier;
+    readonly graph: DefaultGraph | NamedNode | BlankNode | undefined;
+
+    constructor({
+      dataFactory,
+      dataset,
+      identifier,
+      graph,
+    }: {
+      dataFactory?: DataFactory;
+      dataset: DatasetCore;
+      identifier: Resource.Identifier;
+      graph?: DefaultGraph | NamedNode | BlankNode;
+    }) {
+      this.dataFactory = dataFactory ?? DefaultDataFactory;
+      this.dataset = dataset;
+      this.identifier = identifier;
+      this.graph = graph;
+    }
+
+    add(
+      predicate: NamedNode,
+      object: BlankNode | Literal | NamedNode,
+    ): Builder {
+      this.dataset.add(
+        this.dataFactory.quad(this.identifier, predicate, object, this.graph),
+      );
+      return this;
+    }
+
+    build(): Resource {
+      return new Resource({
+        dataset: this.dataset,
+        identifier: this.identifier,
+      });
+    }
+
+    set(
+      predicate: NamedNode,
+      object: BlankNode | Literal | NamedNode,
+    ): Builder {
+      for (const quad of [...this.dataset.match(this.identifier, predicate)]) {
+        this.dataset.delete(quad);
+      }
+      return this.add(predicate, object);
+    }
+  }
+
   export type Identifier = BlankNode | NamedNode;
 
   export namespace Identifier {
-    export function fromString(str: string) {
+    export function fromString(str: string, dataFactory?: DataFactory) {
       if (str.startsWith("_:")) {
-        return DataFactory.blankNode(str.substring("_:".length));
+        return (dataFactory ?? DefaultDataFactory).blankNode(
+          str.substring("_:".length),
+        );
       } else if (str.startsWith("<") && str.endsWith(">") && str.length > 2) {
-        return DataFactory.namedNode(str.substring(1, str.length - 1));
+        return (dataFactory ?? DefaultDataFactory).namedNode(
+          str.substring(1, str.length - 1),
+        );
       } else {
         throw new RangeError(str);
       }
@@ -129,7 +191,7 @@ export namespace Resource {
 
     export function identity(
       object: BlankNode | Literal | NamedNode,
-    ): BlankNode | Literal | NamedNode {
+    ): BlankNode | Literal | NamedNode | null {
       return object;
     }
 
