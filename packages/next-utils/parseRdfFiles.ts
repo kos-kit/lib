@@ -8,7 +8,7 @@ export async function parseRdfFiles(
 ): Promise<DatasetCore> {
   const intoDataset_ = intoDataset ?? new Store();
   await Promise.all(
-    rdfFilePaths.map((rdfFilePath) => parseRdfFile(rdfFilePath)),
+    rdfFilePaths.map((rdfFilePath) => parseRdfFile(rdfFilePath, intoDataset_)),
   );
   return intoDataset_;
 }
