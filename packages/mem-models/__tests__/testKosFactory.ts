@@ -19,8 +19,8 @@ const testDataset: Store = ntriplesStringToDataset(
         path.dirname(fileURLToPath(import.meta.url)),
         "..",
         "..",
-        "models",
-        "__tests__",
+        "..",
+        "test-data",
         "unesco-thesaurus.nt",
       ),
     )
