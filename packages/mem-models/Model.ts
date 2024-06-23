@@ -4,6 +4,7 @@ import { Model as IModel, LanguageTagSet } from "@kos-kit/models";
 import { Kos } from "./Kos.js";
 import { Resource } from "@kos-kit/rdf-resource";
 import { matchLiteral } from "./matchLiteral.js";
+import O, { Option } from "fp-ts/Option";
 
 const rightsPredicates = [dcterms.rights, dc11.rights];
 
@@ -33,13 +34,13 @@ export abstract class Model implements IModel {
     return this.resource.identifier;
   }
 
-  private literalObject(predicate: NamedNode): Literal | null {
+  private literalObject(predicate: NamedNode): Option<Literal> {
     const literals: readonly Literal[] = [
       ...this.resource.values(predicate, Resource.ValueMappers.literal),
     ];
 
     if (literals.length === 0) {
-      return null;
+      return O.none;
     }
     const literal = literals[0];
     if (
@@ -47,21 +48,23 @@ export abstract class Model implements IModel {
         includeLanguageTags: this.includeLanguageTags,
       })
     ) {
-      return literal;
+      return O.some(literal);
     }
 
-    return null;
+    return O.none;
   }
 
-  get license(): Literal | NamedNode | null {
+  get license(): Option<Literal | NamedNode> {
     const literals: Literal[] = [];
 
     for (const object of this.resource.values(dcterms.license, (term) =>
-      term.termType === "Literal" || term.termType == "NamedNode" ? term : null,
+      term.termType === "Literal" || term.termType == "NamedNode"
+        ? O.some(term)
+        : O.none,
     )) {
       switch (object.termType) {
         case "NamedNode":
-          return object;
+          return O.some(object);
         case "Literal":
           literals.push(object);
           break;
@@ -71,7 +74,7 @@ export abstract class Model implements IModel {
     }
 
     if (literals.length === 0) {
-      return null;
+      return O.none;
     }
     const literal = literals[0];
     if (
@@ -79,30 +82,30 @@ export abstract class Model implements IModel {
         includeLanguageTags: this.includeLanguageTags,
       })
     ) {
-      return literal;
+      return O.some(literal);
     }
 
-    return null;
+    return O.none;
   }
 
-  get modified(): Literal | null {
+  get modified(): Option<Literal> {
     return this.resource.optionalValue(
       dcterms.modified,
       Resource.ValueMappers.literal,
     );
   }
 
-  get rights(): Literal | null {
+  get rights(): Option<Literal> {
     for (const predicate of rightsPredicates) {
       const value = this.literalObject(predicate);
-      if (value !== null) {
+      if (O.isSome(value)) {
         return value;
       }
     }
-    return null;
+    return O.none;
   }
 
-  get rightsHolder(): Literal | null {
+  get rightsHolder(): Option<Literal> {
     return this.literalObject(dcterms.rightsHolder);
   }
 }

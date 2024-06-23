@@ -12,6 +12,7 @@ import { rdf, rdfs, skos } from "@tpluscode/rdf-ns-builders";
 import { BlankNode, NamedNode } from "@rdfjs/types";
 import { Resource } from "@kos-kit/rdf-resource";
 import * as mem from "@kos-kit/mem-models";
+import O, { Option } from "fp-ts/Option";
 
 export class Kos {
   private static readonly CONCEPT_IDENTIFIER_GRAPH_PATTERN = `?concept <${rdf.type.value}>/<${rdfs.subClassOf.value}>* <${skos.Concept.value}> .`;
@@ -33,8 +34,11 @@ export class Kos {
 
   async conceptByIdentifier(
     identifier: BlankNode | NamedNode,
-  ): Promise<Concept> {
-    return (await this.conceptsByIdentifiers([identifier]))[0];
+  ): Promise<Option<Concept>> {
+    for (const concept of await this.conceptsByIdentifiers([identifier])) {
+      return O.some(concept);
+    }
+    return O.none;
   }
 
   private async conceptIdentifiersPage({
@@ -129,8 +133,13 @@ WHERE {
 
   async conceptSchemeByIdentifier(
     identifier: Resource.Identifier,
-  ): Promise<ConceptScheme> {
-    return (await this.conceptSchemesByIdentifiers([identifier]))[0];
+  ): Promise<Option<ConceptScheme>> {
+    for (const conceptScheme of await this.conceptSchemesByIdentifiers([
+      identifier,
+    ])) {
+      return O.some(conceptScheme);
+    }
+    return O.none;
   }
 
   async conceptSchemesByIdentifiers(

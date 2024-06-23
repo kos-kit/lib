@@ -3,6 +3,7 @@ import { DataFactory } from "n3";
 import { expectConcept } from "./expectConcept.js";
 import { Concept, LanguageTag, SemanticRelationProperty } from "..";
 import { expect, it } from "vitest";
+import O from "fp-ts/Option";
 
 export const behavesLikeUnescoThesaurusConcept10 = (
   lazyConcept: (includeLanguageTag: LanguageTag) => Promise<Concept>,
@@ -25,7 +26,9 @@ export const behavesLikeUnescoThesaurusConcept10 = (
 
   it("should have a modified date", async () => {
     const concept = await lazyConcept("en");
-    expect(concept.modified!.value).toStrictEqual("2019-12-15T13:26:49Z");
+    expect(O.toNullable(concept.modified)!.value).toStrictEqual(
+      "2019-12-15T13:26:49Z",
+    );
   });
 
   it("should have multiple prefLabels", async () => {

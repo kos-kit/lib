@@ -6,6 +6,8 @@ import { matchLiteral } from "./matchLiteral.js";
 import { SemanticRelationProperty } from "@kos-kit/models";
 import { skos } from "@tpluscode/rdf-ns-builders";
 import { Resource } from "@kos-kit/rdf-resource";
+import O from "fp-ts/Option";
+import { pipe } from "fp-ts/function";
 
 export class Concept extends LabeledModel implements IConcept {
   inSchemes(): Promise<readonly ConceptScheme[]> {
@@ -30,16 +32,14 @@ export class Concept extends LabeledModel implements IConcept {
   notes(property: NoteProperty): readonly Literal[] {
     return [
       ...this.resource.values(property.identifier, (term) => {
-        const literal = Resource.ValueMappers.literal(term);
-        if (
-          literal !== null &&
-          matchLiteral(literal, {
-            includeLanguageTags: this.includeLanguageTags,
-          })
-        ) {
-          return literal;
-        }
-        return null;
+        return pipe(
+          Resource.ValueMappers.literal(term),
+          O.filter((literal) =>
+            matchLiteral(literal, {
+              includeLanguageTags: this.includeLanguageTags,
+            }),
+          ),
+        );
       }),
     ];
   }

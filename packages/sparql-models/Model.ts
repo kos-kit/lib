@@ -4,6 +4,7 @@ import { BlankNode, Literal, NamedNode } from "@rdfjs/types";
 import { GraphPattern, GraphPatternSubject } from "./GraphPattern.js";
 import { Kos } from "./Kos.js";
 import { dc11, dcterms } from "@tpluscode/rdf-ns-builders";
+import { Option } from "fp-ts/Option";
 
 /**
  * Abstract base class for SPARQL-backed models.
@@ -31,11 +32,11 @@ export abstract class Model<MemModelT extends MemModel> implements IModel {
     return this.memModel.identifier;
   }
 
-  get license(): Literal | NamedNode | null {
+  get license(): Option<Literal | NamedNode> {
     return this.memModel.license;
   }
 
-  get modified(): Literal | null {
+  get modified(): Option<Literal> {
     return this.memModel.modified;
   }
 
@@ -95,11 +96,11 @@ export abstract class Model<MemModelT extends MemModel> implements IModel {
     ];
   }
 
-  get rights(): Literal | null {
+  get rights(): Option<Literal> {
     return this.memModel.rights;
   }
 
-  get rightsHolder(): Literal | null {
+  get rightsHolder(): Option<Literal> {
     return this.memModel.rightsHolder;
   }
 

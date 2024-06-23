@@ -1,9 +1,12 @@
 import { BlankNode, NamedNode } from "@rdfjs/types";
 import { Concept } from "./Concept.js";
 import { ConceptScheme } from "./ConceptScheme.js";
+import { Option } from "fp-ts/Option";
 
 export interface Kos {
-  conceptByIdentifier(identifier: BlankNode | NamedNode): Promise<Concept>;
+  conceptByIdentifier(
+    identifier: BlankNode | NamedNode,
+  ): Promise<Option<Concept>>;
   concepts(): AsyncGenerator<Concept>;
   conceptsPage(kwds: {
     limit: number;
@@ -13,6 +16,6 @@ export interface Kos {
 
   conceptSchemeByIdentifier(
     identifier: BlankNode | NamedNode,
-  ): Promise<ConceptScheme>;
+  ): Promise<Option<ConceptScheme>>;
   conceptSchemes(): Promise<readonly ConceptScheme[]>;
 }

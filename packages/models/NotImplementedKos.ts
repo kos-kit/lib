@@ -2,11 +2,12 @@ import { BlankNode, NamedNode } from "@rdfjs/types";
 import { Concept } from "./Concept.js";
 import { ConceptScheme } from "./ConceptScheme.js";
 import { Kos } from "./Kos.js";
+import { Option } from "fp-ts/Option";
 
 export class NotImplementedKos implements Kos {
   conceptByIdentifier(
     _identifier: BlankNode | NamedNode<string>,
-  ): Promise<Concept> {
+  ): Promise<Option<Concept>> {
     throw new Error("Method not implemented.");
   }
   concepts(): AsyncGenerator<Concept, any, unknown> {
@@ -23,7 +24,7 @@ export class NotImplementedKos implements Kos {
   }
   conceptSchemeByIdentifier(
     _identifier: BlankNode | NamedNode<string>,
-  ): Promise<ConceptScheme> {
+  ): Promise<Option<ConceptScheme>> {
     throw new Error("Method not implemented.");
   }
   conceptSchemes(): Promise<readonly ConceptScheme[]> {

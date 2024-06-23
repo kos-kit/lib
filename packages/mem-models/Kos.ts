@@ -7,6 +7,7 @@ import { skos } from "@tpluscode/rdf-ns-builders";
 import { Resource } from "@kos-kit/rdf-resource";
 import { instances } from "@kos-kit/rdf-utils";
 import { countIterable } from "./countIterable.js";
+import O, { Option } from "fp-ts/Option";
 
 export class Kos {
   readonly dataset: DatasetCore;
@@ -23,9 +24,11 @@ export class Kos {
     this.includeLanguageTags = includeLanguageTags;
   }
 
-  conceptByIdentifier(identifier: Resource.Identifier): Promise<Concept> {
+  conceptByIdentifier(
+    identifier: Resource.Identifier,
+  ): Promise<Option<Concept>> {
     return new Promise((resolve) =>
-      resolve(new Concept({ identifier, kos: this })),
+      resolve(O.some(new Concept({ identifier, kos: this }))),
     );
   }
 
@@ -70,13 +73,13 @@ export class Kos {
 
   async conceptSchemeByIdentifier(
     identifier: BlankNode | NamedNode,
-  ): Promise<ConceptScheme> {
+  ): Promise<Option<ConceptScheme>> {
     for (const conceptScheme of await this.conceptSchemes()) {
       if (conceptScheme.identifier.equals(identifier)) {
-        return conceptScheme;
+        return O.some(conceptScheme);
       }
     }
-    throw new RangeError(Resource.Identifier.toString(identifier));
+    return O.none;
   }
 
   conceptSchemes(): Promise<readonly ConceptScheme[]> {

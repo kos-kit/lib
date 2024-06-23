@@ -9,6 +9,8 @@ import {
   DataFactory,
 } from "@rdfjs/types";
 import DefaultDataFactory from "@rdfjs/data-model";
+import O, { Option } from "fp-ts/Option";
+import { pipe } from "fp-ts/function";
 
 export class Resource {
   readonly dataset: DatasetCore;
@@ -28,19 +30,18 @@ export class Resource {
   optionalValue<T>(
     property: NamedNode,
     mapper: Resource.ValueMapper<T>,
-  ): NonNullable<T> | null {
+  ): Option<NonNullable<T>> {
     for (const value of this.values(property, mapper)) {
-      return value;
+      return O.some(value);
     }
-    return null;
+    return O.none;
   }
 
   requiredValue<T>(
     property: NamedNode,
     mapper: Resource.ValueMapper<T>,
   ): NonNullable<T> {
-    const value = this.optionalValue(property, mapper);
-    if (value !== null) {
+    for (const value of this.values(property, mapper)) {
       return value;
     }
     throw new Error(`no appropriate ${property.value} found`);
@@ -56,13 +57,11 @@ export class Resource {
       null,
       null,
     )) {
-      const mappedObject: T | null = mapper(
+      const mappedObject = mapper(
         quad.object as BlankNode | NamedNode | Literal,
         this.dataset,
       );
-      if (mappedObject !== null) {
-        yield mappedObject as NonNullable<T>;
-      }
+      if (O.isSome(mappedObject)) yield mappedObject.value;
     }
   }
 
@@ -75,8 +74,9 @@ export class Resource {
       null,
     )) {
       if (
-        mapper(quad.object as BlankNode | Literal | NamedNode, this.dataset) !==
-        null
+        O.isSome(
+          mapper(quad.object as BlankNode | Literal | NamedNode, this.dataset),
+        )
       ) {
         count++;
       }
@@ -167,48 +167,50 @@ export namespace Resource {
   export type ValueMapper<T> = (
     object: BlankNode | Literal | NamedNode,
     dataset: DatasetCore,
-  ) => NonNullable<T> | null;
+  ) => Option<NonNullable<T>>;
 
   export namespace ValueMappers {
     export function identifier(
       object: BlankNode | Literal | NamedNode,
-    ): Identifier | null {
+    ): Option<Identifier> {
       switch (object.termType) {
         case "BlankNode":
         case "NamedNode":
-          return object;
+          return O.some(object);
         default:
-          return null;
+          return O.none;
       }
     }
 
     export function iri(
       object: BlankNode | Literal | NamedNode,
-    ): NamedNode | null {
-      return object.termType === "NamedNode" ? object : null;
+    ): Option<NamedNode> {
+      return object.termType === "NamedNode" ? O.some(object) : O.none;
     }
 
     export function identity(
       object: BlankNode | Literal | NamedNode,
-    ): BlankNode | Literal | NamedNode | null {
-      return object;
+    ): Option<BlankNode | Literal | NamedNode> {
+      return O.some(object);
     }
 
     export function literal(
       object: BlankNode | Literal | NamedNode,
-    ): Literal | null {
-      return object.termType === "Literal" ? object : null;
+    ): Option<Literal> {
+      return object.termType === "Literal" ? O.some(object) : O.none;
     }
 
     export function resource(
       object: BlankNode | Literal | NamedNode,
       dataset: DatasetCore,
-    ): Resource | null {
-      const identifier = Resource.ValueMappers.identifier(object);
-      if (identifier !== null) {
-        return new Resource({ dataset, identifier });
-      }
-      return null;
+    ): Option<Resource> {
+      return pipe(
+        Resource.ValueMappers.identifier(object),
+        O.map(
+          (identifier: Resource.Identifier) =>
+            new Resource({ dataset, identifier }),
+        ),
+      );
     }
   }
 }

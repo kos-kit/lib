@@ -3,6 +3,7 @@ import { DataFactory, Store } from "n3";
 import { BlankNode, DatasetCore, Literal, NamedNode } from "@rdfjs/types";
 import { Resource } from "..";
 import { xsd } from "@tpluscode/rdf-ns-builders";
+import O from "fp-ts/Option";
 
 describe("Resource", () => {
   let resource: Resource;
@@ -35,11 +36,13 @@ describe("Resource", () => {
         DataFactory.namedNode("http://example.com/nonexistent"),
         Resource.ValueMappers.identity,
       ),
-    ).toBeNull();
+    ).toEqual(O.none);
 
     expect(
-      resource.optionalValue(predicate, Resource.ValueMappers.iri)!.value,
-    ).toBe(objects["namedNode"].value);
+      O.toNullable(
+        resource.optionalValue(predicate, Resource.ValueMappers.iri),
+      )!.value,
+    ).toStrictEqual(objects["namedNode"].value);
   });
 
   it("should get a required value", () => {
@@ -51,7 +54,7 @@ describe("Resource", () => {
     ).toThrowError();
 
     expect(
-      resource.requiredValue(predicate, Resource.ValueMappers.iri)!.value,
+      resource.requiredValue(predicate, Resource.ValueMappers.iri).value,
     ).toBe(objects["namedNode"].value);
   });
 

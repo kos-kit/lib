@@ -7,6 +7,7 @@ import { skos } from "@tpluscode/rdf-ns-builders";
 import { BlankNode, NamedNode } from "@rdfjs/types";
 import { paginateIterable } from "./paginateIterable.js";
 import { countIterable } from "./countIterable.js";
+import O from "fp-ts/Option";
 
 export class ConceptScheme extends LabeledModel implements IConceptScheme {
   private *topConceptIdentifiers(): Iterable<Resource.Identifier> {
@@ -29,8 +30,8 @@ export class ConceptScheme extends LabeledModel implements IConceptScheme {
       skos.topConceptOf,
       this.identifier,
     )) {
-      const conceptIdentifier = Resource.ValueMappers.identifier(
-        quad.subject as BlankNode | NamedNode,
+      const conceptIdentifier = O.toNullable(
+        Resource.ValueMappers.identifier(quad.subject as BlankNode | NamedNode),
       );
       if (
         conceptIdentifier !== null &&
