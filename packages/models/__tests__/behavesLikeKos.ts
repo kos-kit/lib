@@ -2,7 +2,7 @@ import { Kos } from "..";
 import { expectConcept } from "./expectConcept.js";
 import { expectConceptScheme } from "./expectConceptScheme.js";
 import { expect, it } from "vitest";
-import O from "fp-ts/Option";
+import * as O from "fp-ts/Option";
 
 export const behavesLikeKos = (kos: Kos) => {
   it("should get concepts", async () => {

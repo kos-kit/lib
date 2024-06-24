@@ -3,7 +3,7 @@ import { DataFactory, Store } from "n3";
 import { BlankNode, DatasetCore, Literal, NamedNode } from "@rdfjs/types";
 import { Resource } from "..";
 import { xsd } from "@tpluscode/rdf-ns-builders";
-import O from "fp-ts/Option";
+import * as O from "fp-ts/Option";
 
 describe("Resource", () => {
   let resource: Resource;

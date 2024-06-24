@@ -7,14 +7,14 @@ import { mapResultRowsToIdentifiers } from "./mapResultRowsToIdentifiers.js";
 import { mapResultRowsToCount } from "./mapResultRowsToCount.js";
 import { SparqlClient } from "./SparqlClient.js";
 import { paginationToAsyncGenerator } from "./paginationToAsyncGenerator.js";
-import { LanguageTagSet } from "@kos-kit/models";
+import { LanguageTagSet, Kos as IKos } from "@kos-kit/models";
 import { rdf, rdfs, skos } from "@tpluscode/rdf-ns-builders";
 import { BlankNode, NamedNode } from "@rdfjs/types";
 import { Resource } from "@kos-kit/rdf-resource";
 import * as mem from "@kos-kit/mem-models";
-import O, { Option } from "fp-ts/Option";
+import * as O from "fp-ts/Option";
 
-export class Kos {
+export class Kos implements IKos {
   private static readonly CONCEPT_IDENTIFIER_GRAPH_PATTERN = `?concept <${rdf.type.value}>/<${rdfs.subClassOf.value}>* <${skos.Concept.value}> .`;
   private static readonly CONCEPT_SCHEME_IDENTIFIER_GRAPH_PATTERN = `?conceptScheme <${rdf.type.value}>/<${rdfs.subClassOf.value}>* <${skos.ConceptScheme.value}> .`;
 
@@ -34,7 +34,7 @@ export class Kos {
 
   async conceptByIdentifier(
     identifier: BlankNode | NamedNode,
-  ): Promise<Option<Concept>> {
+  ): Promise<O.Option<Concept>> {
     for (const concept of await this.conceptsByIdentifiers([identifier])) {
       return O.some(concept);
     }
@@ -133,7 +133,7 @@ WHERE {
 
   async conceptSchemeByIdentifier(
     identifier: Resource.Identifier,
-  ): Promise<Option<ConceptScheme>> {
+  ): Promise<O.Option<ConceptScheme>> {
     for (const conceptScheme of await this.conceptSchemesByIdentifiers([
       identifier,
     ])) {

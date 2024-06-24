@@ -4,7 +4,7 @@ import { Model as IModel, LanguageTagSet } from "@kos-kit/models";
 import { Kos } from "./Kos.js";
 import { Resource } from "@kos-kit/rdf-resource";
 import { matchLiteral } from "./matchLiteral.js";
-import O, { Option } from "fp-ts/Option";
+import * as O from "fp-ts/Option";
 
 const rightsPredicates = [dcterms.rights, dc11.rights];
 
@@ -34,7 +34,7 @@ export abstract class Model implements IModel {
     return this.resource.identifier;
   }
 
-  private literalObject(predicate: NamedNode): Option<Literal> {
+  private literalObject(predicate: NamedNode): O.Option<Literal> {
     const literals: readonly Literal[] = [
       ...this.resource.values(predicate, Resource.ValueMappers.literal),
     ];
@@ -54,7 +54,7 @@ export abstract class Model implements IModel {
     return O.none;
   }
 
-  get license(): Option<Literal | NamedNode> {
+  get license(): O.Option<Literal | NamedNode> {
     const literals: Literal[] = [];
 
     for (const object of this.resource.values(dcterms.license, (term) =>
@@ -88,14 +88,14 @@ export abstract class Model implements IModel {
     return O.none;
   }
 
-  get modified(): Option<Literal> {
+  get modified(): O.Option<Literal> {
     return this.resource.optionalValue(
       dcterms.modified,
       Resource.ValueMappers.literal,
     );
   }
 
-  get rights(): Option<Literal> {
+  get rights(): O.Option<Literal> {
     for (const predicate of rightsPredicates) {
       const value = this.literalObject(predicate);
       if (O.isSome(value)) {
@@ -105,7 +105,7 @@ export abstract class Model implements IModel {
     return O.none;
   }
 
-  get rightsHolder(): Option<Literal> {
+  get rightsHolder(): O.Option<Literal> {
     return this.literalObject(dcterms.rightsHolder);
   }
 }

@@ -1,5 +1,4 @@
 import * as envalid from "envalid";
-import { makeStructuredValidator } from "envalid/dist/makers";
 import path from "node:path";
 import fs from "node:fs";
 

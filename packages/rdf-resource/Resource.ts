@@ -9,7 +9,7 @@ import {
   DataFactory,
 } from "@rdfjs/types";
 import DefaultDataFactory from "@rdfjs/data-model";
-import O, { Option } from "fp-ts/Option";
+import * as O from "fp-ts/Option";
 import { pipe } from "fp-ts/function";
 import { NamedResource } from "./NamedResource";
 
@@ -31,7 +31,7 @@ export class Resource {
   optionalValue<T>(
     property: NamedNode,
     mapper: Resource.ValueMapper<T>,
-  ): Option<NonNullable<T>> {
+  ): O.Option<NonNullable<T>> {
     for (const value of this.values(property, mapper)) {
       return O.some(value);
     }
@@ -162,12 +162,12 @@ export namespace Resource {
   export type ValueMapper<T> = (
     object: BlankNode | Literal | NamedNode,
     dataset: DatasetCore,
-  ) => Option<NonNullable<T>>;
+  ) => O.Option<NonNullable<T>>;
 
   export namespace ValueMappers {
     export function identifier(
       object: BlankNode | Literal | NamedNode,
-    ): Option<Identifier> {
+    ): O.Option<Identifier> {
       switch (object.termType) {
         case "BlankNode":
         case "NamedNode":
@@ -179,26 +179,26 @@ export namespace Resource {
 
     export function iri(
       object: BlankNode | Literal | NamedNode,
-    ): Option<NamedNode> {
+    ): O.Option<NamedNode> {
       return object.termType === "NamedNode" ? O.some(object) : O.none;
     }
 
     export function identity(
       object: BlankNode | Literal | NamedNode,
-    ): Option<BlankNode | Literal | NamedNode> {
+    ): O.Option<BlankNode | Literal | NamedNode> {
       return O.some(object);
     }
 
     export function literal(
       object: BlankNode | Literal | NamedNode,
-    ): Option<Literal> {
+    ): O.Option<Literal> {
       return object.termType === "Literal" ? O.some(object) : O.none;
     }
 
     export function namedResource(
       object: BlankNode | Literal | NamedNode,
       dataset: DatasetCore,
-    ): Option<NamedResource> {
+    ): O.Option<NamedResource> {
       return pipe(
         Resource.ValueMappers.iri(object),
         O.map((iri: NamedNode) => new NamedResource({ dataset, iri })),
@@ -208,7 +208,7 @@ export namespace Resource {
     export function resource(
       object: BlankNode | Literal | NamedNode,
       dataset: DatasetCore,
-    ): Option<Resource> {
+    ): O.Option<Resource> {
       return pipe(
         Resource.ValueMappers.identifier(object),
         O.map(
@@ -220,7 +220,7 @@ export namespace Resource {
 
     export function string(
       object: BlankNode | Literal | NamedNode,
-    ): Option<string> {
+    ): O.Option<string> {
       return pipe(
         Resource.ValueMappers.literal(object),
         O.map((literal: Literal) => literal.value),

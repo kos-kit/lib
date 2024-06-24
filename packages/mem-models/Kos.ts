@@ -2,14 +2,14 @@ import { BlankNode, DatasetCore, NamedNode } from "@rdfjs/types";
 import { Concept } from "./Concept.js";
 import { ConceptScheme } from "./ConceptScheme.js";
 import { paginateIterable } from "./paginateIterable.js";
-import { LanguageTagSet } from "@kos-kit/models";
+import { Kos as IKos, LanguageTagSet } from "@kos-kit/models";
 import { skos } from "@tpluscode/rdf-ns-builders";
 import { Resource } from "@kos-kit/rdf-resource";
 import { instances } from "@kos-kit/rdf-utils";
 import { countIterable } from "./countIterable.js";
-import O, { Option } from "fp-ts/Option";
+import * as O from "fp-ts/Option";
 
-export class Kos {
+export class Kos implements IKos {
   readonly dataset: DatasetCore;
   readonly includeLanguageTags: LanguageTagSet;
 
@@ -26,7 +26,7 @@ export class Kos {
 
   conceptByIdentifier(
     identifier: Resource.Identifier,
-  ): Promise<Option<Concept>> {
+  ): Promise<O.Option<Concept>> {
     return new Promise((resolve) => {
       resolve(O.some(new Concept({ identifier, kos: this })));
     });
@@ -73,7 +73,7 @@ export class Kos {
 
   async conceptSchemeByIdentifier(
     identifier: BlankNode | NamedNode,
-  ): Promise<Option<ConceptScheme>> {
+  ): Promise<O.Option<ConceptScheme>> {
     for (const conceptScheme of await this.conceptSchemes()) {
       if (conceptScheme.identifier.equals(identifier)) {
         return O.some(conceptScheme);

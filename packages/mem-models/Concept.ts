@@ -6,7 +6,7 @@ import { matchLiteral } from "./matchLiteral.js";
 import { SemanticRelationProperty } from "@kos-kit/models";
 import { skos } from "@tpluscode/rdf-ns-builders";
 import { Resource } from "@kos-kit/rdf-resource";
-import O from "fp-ts/Option";
+import * as O from "fp-ts/Option";
 import { pipe } from "fp-ts/function";
 
 export class Concept extends LabeledModel implements IConcept {

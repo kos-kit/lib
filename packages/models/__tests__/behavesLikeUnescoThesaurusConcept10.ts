@@ -3,7 +3,7 @@ import { DataFactory } from "n3";
 import { expectConcept } from "./expectConcept.js";
 import { Concept, LanguageTag, SemanticRelationProperty } from "..";
 import { expect, it } from "vitest";
-import O from "fp-ts/Option";
+import * as O from "fp-ts/Option";
 
 export const behavesLikeUnescoThesaurusConcept10 = (
   lazyConcept: (includeLanguageTag: LanguageTag) => Promise<Concept>,

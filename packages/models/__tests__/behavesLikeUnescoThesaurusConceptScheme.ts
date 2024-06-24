@@ -2,7 +2,7 @@ import { behavesLikeConceptScheme } from "./behavesLikeConceptScheme.js";
 import { expectConceptScheme } from "./expectConceptScheme.js";
 import { ConceptScheme, LanguageTag } from "..";
 import { expect, it } from "vitest";
-import O from "fp-ts/Option";
+import * as O from "fp-ts/Option";
 
 export const behavesLikeUnescoThesaurusConceptScheme = (
   lazyConceptScheme: (

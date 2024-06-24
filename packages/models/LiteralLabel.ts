@@ -1,6 +1,6 @@
 import { Literal } from "@rdfjs/types";
 import { Label } from "./Label.js";
-import O from "fp-ts/Option";
+import * as O from "fp-ts/Option";
 
 /**
  * A Label that only consists of its literal form.
