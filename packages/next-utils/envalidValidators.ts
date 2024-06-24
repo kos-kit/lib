@@ -10,8 +10,8 @@ export const directoryPathValidator = envalid.makeExactValidator((value) => {
   return path.resolve(value);
 });
 
-export const existingFilePathArrayValidator: envalid.StructuredValidator =
-  makeStructuredValidator((value) => {
+export const existingFilePathArrayValidator = envalid.makeExactValidator(
+  (value) => {
     if (value.length === 0) {
       return [];
     }
@@ -38,7 +38,8 @@ export const existingFilePathArrayValidator: envalid.StructuredValidator =
         throw new Error(relativePath);
       }
     });
-  });
+  },
+);
 
 export const intValidator = envalid.makeExactValidator<number>(parseInt);
 
