@@ -15,13 +15,17 @@ export const behavesLikeUnescoThesaurusConcept10 = (
 
   it("should be in the single concept scheme", async () => {
     const concept = await lazyConcept("en");
-    const inSchemes = await concept.topConceptOf();
-    expect(inSchemes).toHaveLength(1);
-    expect(
-      inSchemes[0].identifier.equals(
-        DataFactory.namedNode("http://vocabularies.unesco.org/thesaurus"),
-      ),
-    );
+    for (const inSchemes of [
+      await concept.topConceptOf(),
+      await concept.inSchemes(),
+    ]) {
+      expect(inSchemes).toHaveLength(1);
+      expect(
+        inSchemes[0].identifier.equals(
+          DataFactory.namedNode("http://vocabularies.unesco.org/thesaurus"),
+        ),
+      );
+    }
   });
 
   it("should have a modified date", async () => {

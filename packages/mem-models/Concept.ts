@@ -8,19 +8,54 @@ import { skos } from "@tpluscode/rdf-ns-builders";
 import { Resource } from "@kos-kit/rdf-resource";
 import * as O from "fp-ts/Option";
 import { pipe } from "fp-ts/function";
+import TermSet from "@rdfjs/term-set";
 
 export class Concept extends LabeledModel implements IConcept {
   inSchemes(): Promise<readonly ConceptScheme[]> {
     return new Promise((resolve) => {
-      resolve(
-        [
-          ...this.resource.values(
-            skos.inScheme,
-            Resource.ValueMappers.identifier,
-          ),
-        ].map((identifier) => new ConceptScheme({ identifier, kos: this.kos })),
-      );
+      resolve(this._inSchemes({ topOnly: false }));
     });
+  }
+
+  private _inSchemes({
+    topOnly,
+  }: {
+    topOnly: boolean;
+  }): readonly ConceptScheme[] {
+    const conceptSchemeIdentifiers = new TermSet<Resource.Identifier>();
+
+    for (const quad of this.resource.dataset.match(
+      null,
+      skos.hasTopConcept,
+      this.identifier,
+    )) {
+      switch (quad.subject.termType) {
+        case "BlankNode":
+        case "NamedNode":
+          conceptSchemeIdentifiers.add(quad.subject);
+          break;
+      }
+    }
+
+    for (const conceptSchemeIdentifier of this.resource.values(
+      skos.topConceptOf,
+      Resource.ValueMappers.identifier,
+    )) {
+      conceptSchemeIdentifiers.add(conceptSchemeIdentifier);
+    }
+
+    if (!topOnly) {
+      for (const conceptSchemeIdentifier of this.resource.values(
+        skos.inScheme,
+        Resource.ValueMappers.identifier,
+      )) {
+        conceptSchemeIdentifiers.add(conceptSchemeIdentifier);
+      }
+    }
+
+    return [...conceptSchemeIdentifiers].map(
+      (identifier) => new ConceptScheme({ identifier, kos: this.kos }),
+    );
   }
 
   get notations(): readonly Literal[] {
@@ -72,14 +107,7 @@ export class Concept extends LabeledModel implements IConcept {
 
   topConceptOf(): Promise<readonly ConceptScheme[]> {
     return new Promise((resolve) => {
-      resolve(
-        [
-          ...this.resource.values(
-            skos.topConceptOf,
-            Resource.ValueMappers.identifier,
-          ),
-        ].map((identifier) => new ConceptScheme({ identifier, kos: this.kos })),
-      );
+      resolve(this._inSchemes({ topOnly: true }));
     });
   }
 }
