@@ -18,6 +18,7 @@
     "build": "npm run build --workspaces",
     "clean": "npm run clean --workspaces",
     "link": "npm link --workspaces",
+    "lint": "npm run link --workspaces",
     "rebuild": "npm run rebuild --workspaces",
     "test": "npm run test --if-present --workspaces",
     "unlink": "npm run unlink --workspaces",
