@@ -43,8 +43,8 @@ export const existingFilePathArrayValidator = envalid.makeExactValidator(
 
 export const intValidator = envalid.makeExactValidator<number>(parseInt);
 
-export const languageTagArrayValidator: envalid.StructuredValidator =
-  makeStructuredValidator((value) => {
+export const languageTagArrayValidator =
+  envalid.makeExactValidator((value) => {
     if (value.length === 0) {
       return [];
     }
