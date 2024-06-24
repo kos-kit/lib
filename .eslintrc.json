@@ -1,10 +1,10 @@
 {
   "extends": [
     "eslint:recommended",
-    "plugin:@typescript-eslint/recommended",
+    "plugin:@typescript-eslint/strict-type-checked",
+    "plugin:@typescript-eslint/stylistic-type-checked",
     "prettier"
   ],
-  "ignorePatterns": ["jest.config.*", "*.d.ts", "__tests__/*"],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "project": ["./tsconfig.json"]
@@ -21,6 +21,7 @@
         "varsIgnorePattern": "(^jsx$)|(^_)",
         "argsIgnorePattern": "^_"
       }
-    ]
+    ],
+    "@typescript-eslint/restrict-template-expressions": "off"
   }
 }

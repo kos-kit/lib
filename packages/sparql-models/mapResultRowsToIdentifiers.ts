@@ -9,7 +9,7 @@ export function mapResultRowsToIdentifiers(
   for (const resultRow of resultRows) {
     const identifier = resultRow[variable];
     if (
-      identifier &&
+      typeof identifier !== "undefined" &&
       (identifier.termType === "BlankNode" ||
         identifier.termType === "NamedNode")
     ) {

@@ -5,10 +5,8 @@ import { ResultRow } from "sparql-http-client/ResultParser";
 import { Writer } from "n3";
 import { logger } from "./logger.js";
 
-class Query implements ParsingQuery<DatasetCore<Quad, Quad>> {
-  constructor(
-    private readonly delegate: ParsingQuery<DatasetCore<Quad, Quad>>,
-  ) {}
+class Query implements ParsingQuery {
+  constructor(private readonly delegate: ParsingQuery) {}
 
   ask(query: string, options?: QueryOptions | undefined): Promise<boolean> {
     return this.delegate.ask(query, options);

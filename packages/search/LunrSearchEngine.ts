@@ -27,17 +27,17 @@ export class LunrSearchEngine implements SearchEngine {
     languageTag: LanguageTag;
     kos: Kos;
   }): Promise<LunrSearchEngine> {
-    type IndexDocument = {
+    interface IndexDocument {
       readonly identifier: string;
       readonly joinedLabels: string;
       readonly prefLabel: string;
       readonly type: SearchResult["type"];
-    };
+    }
 
-    const toIndexDocument = async (
+    const toIndexDocument = (
       model: LabeledModel & { identifier: BlankNode | NamedNode },
       type: SearchResult["type"],
-    ): Promise<IndexDocument | null> => {
+    ): IndexDocument | null => {
       const prefLabels = model.prefLabels;
       if (prefLabels.length === 0) {
         return null;
@@ -57,7 +57,7 @@ export class LunrSearchEngine implements SearchEngine {
       };
     };
 
-    const indexDocumentPromises: Promise<IndexDocument | null>[] = [];
+    const indexDocuments: (IndexDocument | null)[] = [];
 
     if (conceptsLimit != null) {
       // Don't index all concepts in the set, in testing
@@ -65,23 +65,21 @@ export class LunrSearchEngine implements SearchEngine {
         limit: conceptsLimit,
         offset: 0,
       })) {
-        indexDocumentPromises.push(toIndexDocument(concept, "Concept"));
+        indexDocuments.push(toIndexDocument(concept, "Concept"));
       }
     } else {
       // Index all concepts in the set
       for await (const concept of kos.concepts()) {
-        indexDocumentPromises.push(toIndexDocument(concept, "Concept"));
+        indexDocuments.push(toIndexDocument(concept, "Concept"));
       }
     }
 
     // Index concept schemes
-    indexDocumentPromises.push(
+    indexDocuments.push(
       ...(await kos.conceptSchemes()).map((conceptScheme) =>
         toIndexDocument(conceptScheme, "ConceptScheme"),
       ),
     );
-
-    const indexDocuments = await Promise.all(indexDocumentPromises);
 
     const compactIndexDocuments: Record<string, Record<string, string>> = {};
     const index = lunr(function () {
@@ -95,6 +93,7 @@ export class LunrSearchEngine implements SearchEngine {
 
         let compactIndexDocumentsByIdentifier =
           compactIndexDocuments[indexDocument.type];
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         if (!compactIndexDocumentsByIdentifier) {
           compactIndexDocumentsByIdentifier = compactIndexDocuments[
             indexDocument.type
@@ -111,8 +110,10 @@ export class LunrSearchEngine implements SearchEngine {
   static fromJson(json: SearchEngineJson) {
     const lunrIndexCompactor = new LunrIndexCompactor();
     return new LunrSearchEngine(
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       json["documents"],
       lunrIndexCompactor.expandLunrIndex(json["index"]),
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       json["languageTag"],
     );
   }
@@ -167,6 +168,7 @@ export class LunrSearchEngine implements SearchEngine {
     const lunrIndexCompactor = new LunrIndexCompactor();
     return {
       documents: this.documents,
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       index: lunrIndexCompactor.compactLunrIndex(this.index),
       languageTag: this.languageTag,
       type: "Lunr",

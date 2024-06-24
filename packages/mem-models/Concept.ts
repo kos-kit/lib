@@ -11,7 +11,7 @@ import { pipe } from "fp-ts/function";
 
 export class Concept extends LabeledModel implements IConcept {
   inSchemes(): Promise<readonly ConceptScheme[]> {
-    return new Promise((resolve) =>
+    return new Promise((resolve) => {
       resolve(
         [
           ...this.resource.values(
@@ -19,8 +19,8 @@ export class Concept extends LabeledModel implements IConcept {
             Resource.ValueMappers.identifier,
           ),
         ].map((identifier) => new ConceptScheme({ identifier, kos: this.kos })),
-      ),
-    );
+      );
+    });
   }
 
   get notations(): readonly Literal[] {
@@ -47,7 +47,7 @@ export class Concept extends LabeledModel implements IConcept {
   semanticRelations(
     property: SemanticRelationProperty,
   ): Promise<readonly Concept[]> {
-    return new Promise((resolve) =>
+    return new Promise((resolve) => {
       resolve(
         [
           ...this.resource.values(
@@ -55,23 +55,23 @@ export class Concept extends LabeledModel implements IConcept {
             Resource.ValueMappers.identifier,
           ),
         ].map((identifier) => new Concept({ identifier, kos: this.kos })),
-      ),
-    );
+      );
+    });
   }
 
   semanticRelationsCount(property: SemanticRelationProperty): Promise<number> {
-    return new Promise((resolve) =>
+    return new Promise((resolve) => {
       resolve(
         this.resource.valuesCount(
           property.identifier,
           Resource.ValueMappers.identifier,
         ),
-      ),
-    );
+      );
+    });
   }
 
   topConceptOf(): Promise<readonly ConceptScheme[]> {
-    return new Promise((resolve) =>
+    return new Promise((resolve) => {
       resolve(
         [
           ...this.resource.values(
@@ -79,7 +79,7 @@ export class Concept extends LabeledModel implements IConcept {
             Resource.ValueMappers.identifier,
           ),
         ].map((identifier) => new ConceptScheme({ identifier, kos: this.kos })),
-      ),
-    );
+      );
+    });
   }
 }

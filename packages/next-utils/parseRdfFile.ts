@@ -1,4 +1,4 @@
-import { DatasetCore } from "@rdfjs/types";
+import { DatasetCore, Quad } from "@rdfjs/types";
 import { Store } from "n3";
 import fs from "node:fs";
 import path from "node:path";
@@ -30,7 +30,8 @@ export function parseRdfFile(
     }
 
     const streamParser = new N3.StreamParser();
-    streamParser.on("data", (quads) => intoDataset_.add(quads));
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    streamParser.on("data", (quad: Quad) => intoDataset_.add(quad));
     streamParser.on("end", () => {
       resolve(intoDataset_);
     });

@@ -35,7 +35,7 @@ export const existingFilePathArrayValidator: envalid.StructuredValidator =
         }
         return filePaths;
       } else {
-        throw new Error(`${relativePath}`);
+        throw new Error(relativePath);
       }
     });
   });

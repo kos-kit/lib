@@ -19,7 +19,7 @@
   "scripts": {
     "build": "tsc -b",
     "clean": "tsc -b --clean",
-    "lint": "eslint *.ts",
+    "lint": "tsc -b --clean && eslint *.ts",
     "rebuild": "run-s clean build",
     "unlink": "npm unlink -g @kos-kit/models",
     "watch": "tsc -w --preserveWatchOutput"

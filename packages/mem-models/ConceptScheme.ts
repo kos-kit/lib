@@ -77,8 +77,8 @@ export class ConceptScheme extends LabeledModel implements IConceptScheme {
   }
 
   topConceptsCount(): Promise<number> {
-    return new Promise((resolve) =>
-      resolve(countIterable(this.topConceptIdentifiers())),
-    );
+    return new Promise((resolve) => {
+      resolve(countIterable(this.topConceptIdentifiers()));
+    });
   }
 }

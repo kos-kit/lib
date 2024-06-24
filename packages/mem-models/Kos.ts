@@ -27,9 +27,9 @@ export class Kos {
   conceptByIdentifier(
     identifier: Resource.Identifier,
   ): Promise<Option<Concept>> {
-    return new Promise((resolve) =>
-      resolve(O.some(new Concept({ identifier, kos: this }))),
-    );
+    return new Promise((resolve) => {
+      resolve(O.some(new Concept({ identifier, kos: this })));
+    });
   }
 
   private *conceptIdentifiers(): Iterable<Resource.Identifier> {
@@ -66,9 +66,9 @@ export class Kos {
   }
 
   conceptsCount(): Promise<number> {
-    return new Promise((resolve) =>
-      resolve(countIterable(this.conceptIdentifiers())),
-    );
+    return new Promise((resolve) => {
+      resolve(countIterable(this.conceptIdentifiers()));
+    });
   }
 
   async conceptSchemeByIdentifier(
@@ -83,7 +83,9 @@ export class Kos {
   }
 
   conceptSchemes(): Promise<readonly ConceptScheme[]> {
-    return new Promise((resolve) => resolve([...this._conceptSchemes()]));
+    return new Promise((resolve) => {
+      resolve([...this._conceptSchemes()]);
+    });
   }
 
   private *_conceptSchemes(): Iterable<ConceptScheme> {

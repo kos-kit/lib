@@ -6,11 +6,11 @@ import { Option } from "fp-ts/Option";
 
 export class NotImplementedKos implements Kos {
   conceptByIdentifier(
-    _identifier: BlankNode | NamedNode<string>,
+    _identifier: BlankNode | NamedNode,
   ): Promise<Option<Concept>> {
     throw new Error("Method not implemented.");
   }
-  concepts(): AsyncGenerator<Concept, any, unknown> {
+  concepts(): AsyncGenerator<Concept> {
     throw new Error("Method not implemented.");
   }
   conceptsPage(_kwds: {
@@ -23,7 +23,7 @@ export class NotImplementedKos implements Kos {
     throw new Error("Method not implemented.");
   }
   conceptSchemeByIdentifier(
-    _identifier: BlankNode | NamedNode<string>,
+    _identifier: BlankNode | NamedNode,
   ): Promise<Option<ConceptScheme>> {
     throw new Error("Method not implemented.");
   }

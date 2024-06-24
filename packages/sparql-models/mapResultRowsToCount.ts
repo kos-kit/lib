@@ -11,7 +11,7 @@ export function mapResultRowsToCount(
     throw new Error("more than one result row");
   }
   const count = resultRows[0][variable];
-  if (!count) {
+  if (typeof count === "undefined") {
     throw new Error("no 'count' variable in result row");
   }
   if (count.termType !== "Literal") {

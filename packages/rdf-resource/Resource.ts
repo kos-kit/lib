@@ -109,10 +109,7 @@ export namespace Resource {
       this.graph = graph;
     }
 
-    add(
-      predicate: NamedNode,
-      object: BlankNode | Literal | NamedNode,
-    ): Builder {
+    add(predicate: NamedNode, object: BlankNode | Literal | NamedNode): this {
       this.dataset.add(
         this.dataFactory.quad(this.identifier, predicate, object, this.graph),
       );
@@ -126,10 +123,7 @@ export namespace Resource {
       });
     }
 
-    set(
-      predicate: NamedNode,
-      object: BlankNode | Literal | NamedNode,
-    ): Builder {
+    set(predicate: NamedNode, object: BlankNode | Literal | NamedNode): this {
       for (const quad of [...this.dataset.match(this.identifier, predicate)]) {
         this.dataset.delete(quad);
       }
