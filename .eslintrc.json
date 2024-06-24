@@ -4,7 +4,7 @@
     "plugin:@typescript-eslint/recommended",
     "prettier"
   ],
-  "ignorePatterns": ["jest.config.*", "__tests__/*"],
+  "ignorePatterns": ["jest.config.*", "*.d.ts", "__tests__/*"],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "project": ["./tsconfig.json"]
