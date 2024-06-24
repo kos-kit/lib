@@ -11,7 +11,6 @@ import {
 import DefaultDataFactory from "@rdfjs/data-model";
 import * as O from "fp-ts/Option";
 import { pipe } from "fp-ts/function";
-import { NamedResource } from "./NamedResource";
 
 export class Resource {
   readonly dataset: DatasetCore;
@@ -193,16 +192,6 @@ export namespace Resource {
       object: BlankNode | Literal | NamedNode,
     ): O.Option<Literal> {
       return object.termType === "Literal" ? O.some(object) : O.none;
-    }
-
-    export function namedResource(
-      object: BlankNode | Literal | NamedNode,
-      dataset: DatasetCore,
-    ): O.Option<NamedResource> {
-      return pipe(
-        Resource.ValueMappers.iri(object),
-        O.map((iri: NamedNode) => new NamedResource({ dataset, iri })),
-      );
     }
 
     export function resource(
