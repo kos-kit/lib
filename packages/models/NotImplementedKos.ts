@@ -10,7 +10,7 @@ export class NotImplementedKos implements Kos {
   ): Promise<Option<Concept>> {
     throw new Error("Method not implemented.");
   }
-  concepts(): AsyncGenerator<Concept> {
+  concepts(): AsyncIterable<Concept> {
     throw new Error("Method not implemented.");
   }
   conceptsPage(_kwds: {

@@ -6,7 +6,7 @@ import { GraphPatternVariable } from "./GraphPattern.js";
 import { mapResultRowsToIdentifiers } from "./mapResultRowsToIdentifiers.js";
 import { mapResultRowsToCount } from "./mapResultRowsToCount.js";
 import { SparqlClient } from "./SparqlClient.js";
-import { paginationToAsyncGenerator } from "./paginationToAsyncGenerator.js";
+import { paginationToAsyncIterable } from "./paginationToAsyncIterable.js";
 import { LanguageTagSet, Kos as IKos } from "@kos-kit/models";
 import { rdf, rdfs, skos } from "@tpluscode/rdf-ns-builders";
 import { BlankNode, NamedNode } from "@rdfjs/types";
@@ -60,8 +60,8 @@ OFFSET ${offset}`),
     );
   }
 
-  async *concepts(): AsyncGenerator<Concept> {
-    yield* paginationToAsyncGenerator({
+  async *concepts(): AsyncIterable<Concept> {
+    yield* paginationToAsyncIterable({
       getPage: ({ offset }) => this.conceptsPage({ limit: 100, offset }),
       totalCount: await this.conceptsCount(),
     });

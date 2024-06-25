@@ -40,7 +40,7 @@ export class Kos implements IKos {
     });
   }
 
-  async *concepts(): AsyncGenerator<Concept> {
+  async *concepts(): AsyncIterable<Concept> {
     for await (const identifier of this.conceptIdentifiers()) {
       yield new Concept({ identifier, kos: this });
     }

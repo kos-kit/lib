@@ -7,7 +7,7 @@ export interface Kos {
   conceptByIdentifier(
     identifier: BlankNode | NamedNode,
   ): Promise<Option<Concept>>;
-  concepts(): AsyncGenerator<Concept>;
+  concepts(): AsyncIterable<Concept>;
   conceptsPage(kwds: {
     limit: number;
     offset: number;

@@ -4,7 +4,7 @@ import { LabeledModel as LabeledModel } from "./LabeledModel.js";
 import { mapResultRowsToIdentifiers } from "./mapResultRowsToIdentifiers.js";
 import { mapResultRowsToCount } from "./mapResultRowsToCount.js";
 import { Resource } from "@kos-kit/rdf-resource";
-import { paginationToAsyncGenerator } from "./paginationToAsyncGenerator.js";
+import { paginationToAsyncIterable } from "./paginationToAsyncIterable.js";
 import { skos } from "@tpluscode/rdf-ns-builders";
 import { BlankNode, NamedNode } from "@rdfjs/types";
 import * as O from "fp-ts/Option";
@@ -68,8 +68,8 @@ OFFSET ${offset}`),
     );
   }
 
-  async *_concepts({ topOnly }: { topOnly: boolean }): AsyncGenerator<Concept> {
-    yield* paginationToAsyncGenerator({
+  async *_concepts({ topOnly }: { topOnly: boolean }): AsyncIterable<Concept> {
+    yield* paginationToAsyncIterable({
       getPage: ({ offset }) =>
         this._conceptsPage({ limit: 100, offset, topOnly }),
       totalCount: await this._conceptsCount({ topOnly }),
@@ -101,7 +101,7 @@ WHERE {
     );
   }
 
-  concepts(): AsyncGenerator<Concept> {
+  concepts(): AsyncIterable<Concept> {
     return this._concepts({ topOnly: false });
   }
 
@@ -123,7 +123,7 @@ WHERE {
     return this._conceptsCount({ topOnly: true });
   }
 
-  topConcepts(): AsyncGenerator<Concept> {
+  topConcepts(): AsyncIterable<Concept> {
     return this._concepts({ topOnly: true });
   }
 

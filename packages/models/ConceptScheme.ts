@@ -7,14 +7,14 @@ export interface ConceptScheme extends LabeledModel {
   conceptByIdentifier(
     identifier: BlankNode | NamedNode,
   ): Promise<Option<Concept>>;
-  concepts(): AsyncGenerator<Concept>;
+  concepts(): AsyncIterable<Concept>;
   conceptsCount(): Promise<number>;
   conceptsPage(kwds: {
     limit: number;
     offset: number;
   }): Promise<readonly Concept[]>;
 
-  topConcepts(): AsyncGenerator<Concept>;
+  topConcepts(): AsyncIterable<Concept>;
   topConceptsCount(): Promise<number>;
   topConceptsPage(kwds: {
     limit: number;

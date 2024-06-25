@@ -50,7 +50,7 @@ export class ConceptScheme extends LabeledModel implements IConceptScheme {
     });
   }
 
-  async *concepts(): AsyncGenerator<Concept> {
+  async *concepts(): AsyncIterable<Concept> {
     yield* this._concepts({ topOnly: false });
   }
 
@@ -107,7 +107,7 @@ export class ConceptScheme extends LabeledModel implements IConceptScheme {
       }
   }
 
-  async *_concepts({ topOnly }: { topOnly: boolean }): AsyncGenerator<Concept> {
+  async *_concepts({ topOnly }: { topOnly: boolean }): AsyncIterable<Concept> {
     for await (const identifier of this._conceptIdentifiers({ topOnly })) {
       yield new Concept({
         identifier,
@@ -151,7 +151,7 @@ export class ConceptScheme extends LabeledModel implements IConceptScheme {
     });
   }
 
-  async *topConcepts(): AsyncGenerator<Concept> {
+  async *topConcepts(): AsyncIterable<Concept> {
     yield* this._concepts({ topOnly: true });
   }
 
