@@ -8,7 +8,6 @@ import {
   DefaultGraph,
   DataFactory,
 } from "@rdfjs/types";
-import DefaultDataFactory from "@rdfjs/data-model";
 import * as O from "fp-ts/Option";
 import { pipe } from "fp-ts/function";
 
@@ -98,12 +97,12 @@ export namespace Resource {
       identifier,
       graph,
     }: {
-      dataFactory?: DataFactory;
+      dataFactory: DataFactory;
       dataset: DatasetCore;
       identifier: Resource.Identifier;
       graph?: DefaultGraph | NamedNode | BlankNode;
     }) {
-      this.dataFactory = dataFactory ?? DefaultDataFactory;
+      this.dataFactory = dataFactory;
       this.dataset = dataset;
       this.identifier = identifier;
       this.graph = graph;
