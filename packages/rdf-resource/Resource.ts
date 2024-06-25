@@ -133,15 +133,11 @@ export namespace Resource {
   export type Identifier = BlankNode | NamedNode;
 
   export namespace Identifier {
-    export function fromString(str: string, dataFactory?: DataFactory) {
+    export function fromString(dataFactory: DataFactory, str: string) {
       if (str.startsWith("_:")) {
-        return (dataFactory ?? DefaultDataFactory).blankNode(
-          str.substring("_:".length),
-        );
+        return dataFactory.blankNode(str.substring("_:".length));
       } else if (str.startsWith("<") && str.endsWith(">") && str.length > 2) {
-        return (dataFactory ?? DefaultDataFactory).namedNode(
-          str.substring(1, str.length - 1),
-        );
+        return dataFactory.namedNode(str.substring(1, str.length - 1));
       } else {
         throw new RangeError(str);
       }
