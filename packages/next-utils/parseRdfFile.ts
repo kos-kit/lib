@@ -1,5 +1,4 @@
 import { DatasetCore, Quad } from "@rdfjs/types";
-import { Store } from "n3";
 import fs from "node:fs";
 import path from "node:path";
 import { Readable } from "node:stream";
@@ -9,11 +8,9 @@ import N3 from "n3";
 
 export function parseRdfFile(
   rdfFilePath: string,
-  intoDataset?: DatasetCore,
+  intoDataset: DatasetCore,
 ): Promise<DatasetCore> {
   return new Promise((resolve, reject) => {
-    const intoDataset_ = intoDataset ?? new Store();
-
     let rdfFileStream: Readable = fs.createReadStream(rdfFilePath);
 
     const rdfFileExt = path.extname(rdfFilePath).toLowerCase();
@@ -31,9 +28,9 @@ export function parseRdfFile(
 
     const streamParser = new N3.StreamParser();
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    streamParser.on("data", (quad: Quad) => intoDataset_.add(quad));
+    streamParser.on("data", (quad: Quad) => intoDataset.add(quad));
     streamParser.on("end", () => {
-      resolve(intoDataset_);
+      resolve(intoDataset);
     });
     streamParser.on("error", reject);
     rdfFileStream.pipe(streamParser);
