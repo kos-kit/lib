@@ -1,12 +1,30 @@
 import { behavesLikeLabeledModel } from "./behavesLikeLabeledModel.js";
 import { ConceptScheme, LanguageTag } from "..";
 import { expect, it } from "vitest";
+import * as O from "fp-ts/Option";
 
 export const behavesLikeConceptScheme = (
   lazyConceptScheme: (
     includeLanguageTag: LanguageTag,
   ) => Promise<ConceptScheme>,
 ) => {
+  it("should get a concept by its identifier", async () => {
+    const conceptScheme = await lazyConceptScheme("en");
+
+    const firstConcepts = await conceptScheme.conceptsPage({
+      limit: 1,
+      offset: 0,
+    });
+    expect(firstConcepts).toHaveLength(1);
+    const firstConcept = firstConcepts[0];
+
+    const conceptByIdentifier = O.toNullable(
+      await conceptScheme.conceptByIdentifier(firstConcept.identifier),
+    );
+    expect(conceptByIdentifier).not.toBeNull();
+    expect(conceptByIdentifier?.identifier.equals(firstConcept.identifier));
+  });
+
   it("should get concept pages", async () => {
     const conceptScheme = await lazyConceptScheme("en");
 

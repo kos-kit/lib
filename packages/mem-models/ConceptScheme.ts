@@ -10,6 +10,46 @@ import { countIterable } from "./countIterable.js";
 import * as O from "fp-ts/Option";
 
 export class ConceptScheme extends LabeledModel implements IConceptScheme {
+  conceptByIdentifier(
+    identifier: BlankNode | NamedNode,
+  ): Promise<O.Option<Concept>> {
+    return new Promise((resolve) => {
+      for (const _ of this.resource.dataset.match(
+        this.identifier,
+        skos.hasTopConcept,
+        identifier,
+      )) {
+        resolve(
+          O.some(
+            new Concept({
+              identifier,
+              kos: this.kos,
+            }),
+          ),
+        );
+        return;
+      }
+
+      for (const predicate of [skos.inScheme, skos.topConceptOf]) {
+        for (const _ of this.resource.dataset.match(
+          identifier,
+          predicate,
+          this.identifier,
+        )) {
+          resolve(
+            O.some(
+              new Concept({
+                identifier,
+                kos: this.kos,
+              }),
+            ),
+          );
+          return;
+        }
+      }
+    });
+  }
+
   async *concepts(): AsyncGenerator<Concept> {
     yield* this._concepts({ topOnly: false });
   }

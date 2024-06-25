@@ -1,36 +1,66 @@
-import { ConceptScheme as IConceptScheme } from "@kos-kit/models";
+import { Concept, ConceptScheme as IConceptScheme } from "@kos-kit/models";
 import { ConceptScheme as MemConceptScheme } from "@kos-kit/mem-models";
 import { LabeledModel as LabeledModel } from "./LabeledModel.js";
-import { Concept } from "./Concept.js";
 import { mapResultRowsToIdentifiers } from "./mapResultRowsToIdentifiers.js";
 import { mapResultRowsToCount } from "./mapResultRowsToCount.js";
 import { Resource } from "@kos-kit/rdf-resource";
 import { paginationToAsyncGenerator } from "./paginationToAsyncGenerator.js";
 import { skos } from "@tpluscode/rdf-ns-builders";
+import { BlankNode, NamedNode } from "@rdfjs/types";
+import * as O from "fp-ts/Option";
 
 export class ConceptScheme
   extends LabeledModel<MemConceptScheme>
   implements IConceptScheme
 {
-  private get conceptGraphPatterns(): readonly string[] {
-    const identifierString = Resource.Identifier.toString(this.identifier);
-    return this.topConceptGraphPatterns.concat(
-      `{ ?concept <${skos.inScheme.value}> ${identifierString} . }`,
-    );
+  async conceptByIdentifier(
+    identifier: BlankNode | NamedNode,
+  ): Promise<O.Option<Concept>> {
+    if (
+      await this.sparqlClient.query.ask(`\
+ASK {
+  VALUES ?concept { ${Resource.Identifier.toString(identifier)}}
+  ${this.conceptGraphPatterns({ topOnly: false }).join(" UNION ")}
+}`)
+    ) {
+      return this.kos.conceptByIdentifier(identifier);
+    } else {
+      return O.none;
+    }
   }
 
-  private async conceptIdentifiersPage({
+  private conceptGraphPatterns({
+    topOnly,
+  }: {
+    topOnly: boolean;
+  }): readonly string[] {
+    const identifierString = Resource.Identifier.toString(this.identifier);
+    const conceptGraphPatterns = [
+      `{ ${identifierString} <${skos.hasTopConcept.value}> ?concept . }`,
+      `{ ?concept <${skos.topConceptOf.value}> ${identifierString} . }`,
+    ];
+    if (!topOnly) {
+      conceptGraphPatterns.push(
+        `{ ?concept <${skos.inScheme.value}> ${identifierString} . }`,
+      );
+    }
+    return conceptGraphPatterns;
+  }
+
+  private async _conceptIdentifiersPage({
     limit,
     offset,
+    topOnly,
   }: {
     limit: number;
     offset: number;
+    topOnly: boolean;
   }): Promise<readonly Resource.Identifier[]> {
     return mapResultRowsToIdentifiers(
       await this.sparqlClient.query.select(`\
 SELECT DISTINCT ?concept
 WHERE {
-  ${this.conceptGraphPatterns.join(" UNION ")}  
+  ${this.conceptGraphPatterns({ topOnly }).join(" UNION ")}  
 }
 LIMIT ${limit}
 OFFSET ${offset}`),
@@ -38,79 +68,63 @@ OFFSET ${offset}`),
     );
   }
 
-  async *concepts(): AsyncGenerator<Concept> {
+  async *_concepts({ topOnly }: { topOnly: boolean }): AsyncGenerator<Concept> {
     yield* paginationToAsyncGenerator({
-      getPage: ({ offset }) => this.conceptsPage({ limit: 100, offset }),
-      totalCount: await this.conceptsCount(),
+      getPage: ({ offset }) =>
+        this._conceptsPage({ limit: 100, offset, topOnly }),
+      totalCount: await this._conceptsCount({ topOnly }),
     });
   }
 
-  async conceptsPage({
+  async _conceptsCount({ topOnly }: { topOnly: boolean }): Promise<number> {
+    return mapResultRowsToCount(
+      await this.sparqlClient.query.select(`\
+SELECT (COUNT(DISTINCT ?concept) AS ?count)
+WHERE {
+  ${this.conceptGraphPatterns({ topOnly }).join(" UNION ")}
+}`),
+      "count",
+    );
+  }
+
+  async _conceptsPage({
+    limit,
+    offset,
+    topOnly,
+  }: {
+    limit: number;
+    offset: number;
+    topOnly: boolean;
+  }): Promise<readonly Concept[]> {
+    return this.kos.conceptsByIdentifiers(
+      await this._conceptIdentifiersPage({ limit, offset, topOnly }),
+    );
+  }
+
+  concepts(): AsyncGenerator<Concept> {
+    return this._concepts({ topOnly: false });
+  }
+
+  conceptsPage({
     limit,
     offset,
   }: {
     limit: number;
     offset: number;
   }): Promise<readonly Concept[]> {
-    return this.kos.conceptsByIdentifiers(
-      await this.conceptIdentifiersPage({ limit, offset }),
-    );
+    return this._conceptsPage({ limit, offset, topOnly: false });
   }
 
-  async conceptsCount(): Promise<number> {
-    return mapResultRowsToCount(
-      await this.sparqlClient.query.select(`\
-SELECT (COUNT(DISTINCT ?concept) AS ?count)
-WHERE {
-  ${this.conceptGraphPatterns.join(" UNION ")}
-}`),
-      "count",
-    );
+  conceptsCount(): Promise<number> {
+    return this._conceptsCount({ topOnly: false });
   }
 
   async topConceptsCount(): Promise<number> {
-    return mapResultRowsToCount(
-      await this.sparqlClient.query.select(`\
-SELECT (COUNT(DISTINCT ?concept) AS ?count)
-WHERE {
-  ${this.topConceptGraphPatterns.join(" UNION ")}
-}`),
-      "count",
-    );
+    return this._conceptsCount({ topOnly: true });
   }
 
-  private get topConceptGraphPatterns(): readonly string[] {
-    const identifierString = Resource.Identifier.toString(this.identifier);
-    return [
-      `{ ${identifierString} <${skos.hasTopConcept.value}> ?concept . }`,
-      `{ ?concept <${skos.topConceptOf.value}> ${identifierString} . }`,
-    ];
-  }
-
-  private async topConceptIdentifiersPage({
-    limit,
-    offset,
-  }: {
-    limit: number;
-    offset: number;
-  }): Promise<readonly Resource.Identifier[]> {
-    return mapResultRowsToIdentifiers(
-      await this.sparqlClient.query.select(`\
-SELECT DISTINCT ?concept
-WHERE {
-  ${this.topConceptGraphPatterns.join(" UNION ")}  
-}
-LIMIT ${limit}
-OFFSET ${offset}`),
-      "concept",
-    );
-  }
-
-  async *topConcepts(): AsyncGenerator<Concept> {
-    yield* paginationToAsyncGenerator({
-      getPage: ({ offset }) => this.topConceptsPage({ limit: 100, offset }),
-      totalCount: await this.topConceptsCount(),
-    });
+  topConcepts(): AsyncGenerator<Concept> {
+    return this._concepts({ topOnly: true });
   }
 
   async topConceptsPage({
@@ -120,8 +134,6 @@ OFFSET ${offset}`),
     limit: number;
     offset: number;
   }): Promise<readonly Concept[]> {
-    return this.kos.conceptsByIdentifiers(
-      await this.topConceptIdentifiersPage({ limit, offset }),
-    );
+    return this._conceptsPage({ limit, offset, topOnly: true });
   }
 }
