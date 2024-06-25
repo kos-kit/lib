@@ -21,6 +21,7 @@ describe("Resource", () => {
   beforeAll(() => {
     const dataset: DatasetCore = new Store();
     const resourceBuilder = new Resource.Builder({
+      dataFactory: DataFactory,
       dataset,
       identifier: DataFactory.namedNode("http://example.com/subject"),
     });
@@ -100,6 +101,7 @@ describe("Resource", () => {
   it("should set with the builder", () => {
     const dataset = new Store();
     const resourceBuilder = new Resource.Builder({
+      dataFactory: DataFactory,
       dataset,
       identifier: DataFactory.blankNode(),
     });
