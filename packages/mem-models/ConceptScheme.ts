@@ -10,7 +10,26 @@ import { countIterable } from "./countIterable.js";
 import * as O from "fp-ts/Option";
 
 export class ConceptScheme extends LabeledModel implements IConceptScheme {
-  private *topConceptIdentifiers(): Iterable<Resource.Identifier> {
+  async *concepts(): AsyncGenerator<Concept> {
+    yield* this._concepts({ topOnly: false });
+  }
+
+  conceptsPage(kwds: {
+    limit: number;
+    offset: number;
+  }): Promise<readonly Concept[]> {
+    return this._conceptsPage({ ...kwds, topOnly: false });
+  }
+
+  conceptsCount(): Promise<number> {
+    return this._conceptsCount({ topOnly: false });
+  }
+
+  private *_conceptIdentifiers({
+    topOnly,
+  }: {
+    topOnly: boolean;
+  }): Iterable<Resource.Identifier> {
     const conceptIdentifierSet = new TermSet<Resource.Identifier>();
 
     // ConceptScheme -> Concept statement
@@ -25,26 +44,31 @@ export class ConceptScheme extends LabeledModel implements IConceptScheme {
     }
 
     // Concept -> ConceptScheme statement
-    for (const quad of this.resource.dataset.match(
-      null,
-      skos.topConceptOf,
-      this.identifier,
-    )) {
-      const conceptIdentifier = O.toNullable(
-        Resource.ValueMappers.identifier(quad.subject as BlankNode | NamedNode),
-      );
-      if (
-        conceptIdentifier !== null &&
-        !conceptIdentifierSet.has(conceptIdentifier)
-      ) {
-        yield conceptIdentifier;
-        conceptIdentifierSet.add(conceptIdentifier);
+    for (const predicate of topOnly
+      ? [skos.topConceptOf]
+      : [skos.inScheme, skos.topConceptOf])
+      for (const quad of this.resource.dataset.match(
+        null,
+        predicate,
+        this.identifier,
+      )) {
+        const conceptIdentifier = O.toNullable(
+          Resource.ValueMappers.identifier(
+            quad.subject as BlankNode | NamedNode,
+          ),
+        );
+        if (
+          conceptIdentifier !== null &&
+          !conceptIdentifierSet.has(conceptIdentifier)
+        ) {
+          yield conceptIdentifier;
+          conceptIdentifierSet.add(conceptIdentifier);
+        }
       }
-    }
   }
 
-  async *topConcepts(): AsyncGenerator<Concept> {
-    for await (const identifier of this.topConceptIdentifiers()) {
+  async *_concepts({ topOnly }: { topOnly: boolean }): AsyncGenerator<Concept> {
+    for await (const identifier of this._conceptIdentifiers({ topOnly })) {
       yield new Concept({
         identifier,
         kos: this.kos,
@@ -52,19 +76,24 @@ export class ConceptScheme extends LabeledModel implements IConceptScheme {
     }
   }
 
-  topConceptsPage({
+  _conceptsPage({
     limit,
     offset,
+    topOnly,
   }: {
     limit: number;
     offset: number;
+    topOnly: boolean;
   }): Promise<readonly Concept[]> {
     return new Promise((resolve) => {
       const result: Concept[] = [];
-      for (const identifier of paginateIterable(this.topConceptIdentifiers(), {
-        limit,
-        offset,
-      })) {
+      for (const identifier of paginateIterable(
+        this._conceptIdentifiers({ topOnly }),
+        {
+          limit,
+          offset,
+        },
+      )) {
         result.push(
           new Concept({
             identifier,
@@ -76,9 +105,24 @@ export class ConceptScheme extends LabeledModel implements IConceptScheme {
     });
   }
 
-  topConceptsCount(): Promise<number> {
+  _conceptsCount({ topOnly }: { topOnly: boolean }): Promise<number> {
     return new Promise((resolve) => {
-      resolve(countIterable(this.topConceptIdentifiers()));
+      resolve(countIterable(this._conceptIdentifiers({ topOnly })));
     });
+  }
+
+  async *topConcepts(): AsyncGenerator<Concept> {
+    yield* this._concepts({ topOnly: true });
+  }
+
+  topConceptsPage(kwds: {
+    limit: number;
+    offset: number;
+  }): Promise<readonly Concept[]> {
+    return this._conceptsPage({ ...kwds, topOnly: true });
+  }
+
+  topConceptsCount(): Promise<number> {
+    return this._conceptsCount({ topOnly: true });
   }
 }

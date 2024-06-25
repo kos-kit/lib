@@ -7,6 +7,43 @@ export const behavesLikeConceptScheme = (
     includeLanguageTag: LanguageTag,
   ) => Promise<ConceptScheme>,
 ) => {
+  it("should get concept pages", async () => {
+    const conceptScheme = await lazyConceptScheme("en");
+
+    const firstConcepts = await conceptScheme.conceptsPage({
+      limit: 10,
+      offset: 0,
+    });
+    expect(firstConcepts).toHaveLength(10);
+
+    const nextConcepts = await conceptScheme.conceptsPage({
+      limit: 10,
+      offset: 10,
+    });
+    expect(nextConcepts).toHaveLength(10);
+    for (const nextConcept of nextConcepts) {
+      expect(
+        firstConcepts.every(
+          (firstConcept) =>
+            !firstConcept.identifier.equals(nextConcept.identifier),
+        ),
+      ).toBeTruthy();
+    }
+  });
+
+  it("should get concepts", async () => {
+    const conceptScheme = await lazyConceptScheme("en");
+    for await (const concept of conceptScheme.concepts()) {
+      expect(concept.displayLabel);
+      return;
+    }
+  });
+
+  it("should get concepts count", async () => {
+    const conceptScheme = await lazyConceptScheme("en");
+    expect(await conceptScheme.conceptsCount()).toStrictEqual(4577);
+  });
+
   it("should get top concept pages", async () => {
     const conceptScheme = await lazyConceptScheme("en");
 
@@ -35,8 +72,8 @@ export const behavesLikeConceptScheme = (
     const conceptScheme = await lazyConceptScheme("en");
     for await (const topConcept of conceptScheme.topConcepts()) {
       expect(topConcept.displayLabel);
+      return;
     }
-    return;
   });
 
   it("should get top concepts count", async () => {

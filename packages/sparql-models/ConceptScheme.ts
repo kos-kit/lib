@@ -12,18 +12,79 @@ export class ConceptScheme
   extends LabeledModel<MemConceptScheme>
   implements IConceptScheme
 {
-  async topConceptsCount(): Promise<number> {
+  private get conceptGraphPatterns(): readonly string[] {
     const identifierString = Resource.Identifier.toString(this.identifier);
+    return this.topConceptGraphPatterns.concat(
+      `{ ?concept <${skos.inScheme.value}> ${identifierString} . }`,
+    );
+  }
+
+  private async conceptIdentifiersPage({
+    limit,
+    offset,
+  }: {
+    limit: number;
+    offset: number;
+  }): Promise<readonly Resource.Identifier[]> {
+    return mapResultRowsToIdentifiers(
+      await this.sparqlClient.query.select(`\
+SELECT DISTINCT ?concept
+WHERE {
+  ${this.conceptGraphPatterns.join(" UNION ")}  
+}
+LIMIT ${limit}
+OFFSET ${offset}`),
+      "concept",
+    );
+  }
+
+  async *concepts(): AsyncGenerator<Concept> {
+    yield* paginationToAsyncGenerator({
+      getPage: ({ offset }) => this.conceptsPage({ limit: 100, offset }),
+      totalCount: await this.conceptsCount(),
+    });
+  }
+
+  async conceptsPage({
+    limit,
+    offset,
+  }: {
+    limit: number;
+    offset: number;
+  }): Promise<readonly Concept[]> {
+    return this.kos.conceptsByIdentifiers(
+      await this.conceptIdentifiersPage({ limit, offset }),
+    );
+  }
+
+  async conceptsCount(): Promise<number> {
     return mapResultRowsToCount(
       await this.sparqlClient.query.select(`\
 SELECT (COUNT(DISTINCT ?concept) AS ?count)
 WHERE {
-  { ${identifierString} <${skos.hasTopConcept.value}> ?concept . }
-  UNION
-  { ?concept <${skos.topConceptOf.value}> ${identifierString} . }
+  ${this.conceptGraphPatterns.join(" UNION ")}
 }`),
       "count",
     );
+  }
+
+  async topConceptsCount(): Promise<number> {
+    return mapResultRowsToCount(
+      await this.sparqlClient.query.select(`\
+SELECT (COUNT(DISTINCT ?concept) AS ?count)
+WHERE {
+  ${this.topConceptGraphPatterns.join(" UNION ")}
+}`),
+      "count",
+    );
+  }
+
+  private get topConceptGraphPatterns(): readonly string[] {
+    const identifierString = Resource.Identifier.toString(this.identifier);
+    return [
+      `{ ${identifierString} <${skos.hasTopConcept.value}> ?concept . }`,
+      `{ ?concept <${skos.topConceptOf.value}> ${identifierString} . }`,
+    ];
   }
 
   private async topConceptIdentifiersPage({
@@ -33,14 +94,11 @@ WHERE {
     limit: number;
     offset: number;
   }): Promise<readonly Resource.Identifier[]> {
-    const identifierString = Resource.Identifier.toString(this.identifier);
     return mapResultRowsToIdentifiers(
       await this.sparqlClient.query.select(`\
 SELECT DISTINCT ?concept
 WHERE {
-  { ${identifierString} <${skos.hasTopConcept.value}> ?concept . }
-  UNION
-  { ?concept <${skos.topConceptOf.value}> ${identifierString} . }
+  ${this.topConceptGraphPatterns.join(" UNION ")}  
 }
 LIMIT ${limit}
 OFFSET ${offset}`),

@@ -1,7 +1,7 @@
 import { Kos } from "..";
 import { expectConcept } from "./expectConcept.js";
 import { expectConceptScheme } from "./expectConceptScheme.js";
-import { expect, it } from "vitest";
+import { assert, expect, it } from "vitest";
 import * as O from "fp-ts/Option";
 
 export const behavesLikeKos = (kos: Kos) => {
@@ -41,7 +41,7 @@ export const behavesLikeKos = (kos: Kos) => {
       ).toBeTruthy();
       return;
     }
-    expect(false).toBe(true);
+    assert.fail("no concepts");
   });
 
   it("should get a count of concepts", async () => {
