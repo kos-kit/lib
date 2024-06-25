@@ -3,8 +3,10 @@
     "@kos-kit/rdf-resource": "2.0.10",
     "@kos-kit/rdf-utils": "2.0.10",
     "@rdfjs/types": "^1.1.0",
+    "fp-ts": "^2.16.6"
+  },
+  "devDependencies": {
     "@types/n3": "^1.16.4",
-    "fp-ts": "^2.16.6",
     "n3": "^1.17.3"
   },
   "engines": {
