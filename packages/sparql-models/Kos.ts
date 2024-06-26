@@ -1,34 +1,38 @@
 import { Concept } from "./Concept.js";
 import { ConceptScheme } from "./ConceptScheme.js";
 
+import * as mem from "@kos-kit/mem-models";
+import { Kos as IKos, LanguageTagSet } from "@kos-kit/models";
+import { Resource } from "@kos-kit/rdf-resource";
+import { BlankNode, DatasetCore, NamedNode } from "@rdfjs/types";
+import { rdf, rdfs, skos } from "@tpluscode/rdf-ns-builders";
+import * as O from "fp-ts/Option";
 import { ConstructQueryBuilder } from "./ConstructQueryBuilder.js";
 import { GraphPatternVariable } from "./GraphPattern.js";
-import { mapResultRowsToIdentifiers } from "./mapResultRowsToIdentifiers.js";
-import { mapResultRowsToCount } from "./mapResultRowsToCount.js";
 import { SparqlClient } from "./SparqlClient.js";
+import { mapResultRowsToCount } from "./mapResultRowsToCount.js";
+import { mapResultRowsToIdentifiers } from "./mapResultRowsToIdentifiers.js";
 import { paginationToAsyncIterable } from "./paginationToAsyncIterable.js";
-import { LanguageTagSet, Kos as IKos } from "@kos-kit/models";
-import { rdf, rdfs, skos } from "@tpluscode/rdf-ns-builders";
-import { BlankNode, NamedNode } from "@rdfjs/types";
-import { Resource } from "@kos-kit/rdf-resource";
-import * as mem from "@kos-kit/mem-models";
-import * as O from "fp-ts/Option";
 
 export class Kos implements IKos {
   private static readonly CONCEPT_IDENTIFIER_GRAPH_PATTERN = `?concept <${rdf.type.value}>/<${rdfs.subClassOf.value}>* <${skos.Concept.value}> .`;
   private static readonly CONCEPT_SCHEME_IDENTIFIER_GRAPH_PATTERN = `?conceptScheme <${rdf.type.value}>/<${rdfs.subClassOf.value}>* <${skos.ConceptScheme.value}> .`;
 
   readonly includeLanguageTags: LanguageTagSet;
+  protected readonly memModelFactory: mem.ModelFactory;
   readonly sparqlClient: SparqlClient;
 
   constructor({
     includeLanguageTags,
+    memModelFactory,
     sparqlClient,
   }: {
     includeLanguageTags: LanguageTagSet;
+    memModelFactory?: mem.ModelFactory;
     sparqlClient: SparqlClient;
   }) {
     this.includeLanguageTags = includeLanguageTags;
+    this.memModelFactory = memModelFactory ?? new mem.ModelFactory();
     this.sparqlClient = sparqlClient;
   }
 
@@ -89,18 +93,8 @@ OFFSET ${offset}`),
         .build(),
       { operation: "postDirect" },
     );
-    return identifiers.map(
-      (identifier) =>
-        new Concept({
-          kos: this,
-          memModel: new mem.Concept({
-            identifier,
-            kos: new mem.Kos({
-              dataset,
-              includeLanguageTags,
-            }),
-          }),
-        }),
+    return identifiers.map((identifier) =>
+      this.createConcept({ dataset, identifier }),
     );
   }
 
@@ -164,15 +158,8 @@ WHERE {
         .build(),
       { operation: "postDirect" },
     );
-    return identifiers.map(
-      (identifier) =>
-        new ConceptScheme({
-          kos: this,
-          memModel: new mem.ConceptScheme({
-            identifier,
-            kos: new mem.Kos({ dataset, includeLanguageTags }),
-          }),
-        }),
+    return identifiers.map((identifier) =>
+      this.createConceptScheme({ dataset, identifier }),
     );
   }
 
@@ -193,5 +180,45 @@ WHERE {
     return this.conceptSchemesByIdentifiers(
       await this.conceptSchemeIdentifiers(),
     );
+  }
+
+  protected createConcept({
+    dataset,
+    identifier,
+  }: {
+    dataset: DatasetCore;
+    identifier: BlankNode | NamedNode;
+  }): Concept {
+    return new Concept({
+      kos: this,
+      memModel: this.memModelFactory.createConcept({
+        identifier,
+        kos: new mem.Kos({
+          dataset,
+          includeLanguageTags: this.includeLanguageTags,
+          modelFactory: this.memModelFactory,
+        }),
+      }),
+    });
+  }
+
+  protected createConceptScheme({
+    dataset,
+    identifier,
+  }: {
+    dataset: DatasetCore;
+    identifier: BlankNode | NamedNode;
+  }): ConceptScheme {
+    return new ConceptScheme({
+      kos: this,
+      memModel: this.memModelFactory.createConceptScheme({
+        identifier,
+        kos: new mem.Kos({
+          dataset,
+          includeLanguageTags: this.includeLanguageTags,
+          modelFactory: this.memModelFactory,
+        }),
+      }),
+    });
   }
 }
