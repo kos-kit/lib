@@ -1,34 +1,41 @@
-import { BlankNode, DatasetCore, NamedNode } from "@rdfjs/types";
-import { Concept } from "./Concept.js";
-import { ConceptScheme } from "./ConceptScheme.js";
-import { paginateIterable } from "./paginateIterable.js";
 import { Kos as IKos, LanguageTagSet } from "@kos-kit/models";
-import { skos } from "@tpluscode/rdf-ns-builders";
 import { Resource } from "@kos-kit/rdf-resource";
 import { instances } from "@kos-kit/rdf-utils";
-import { countIterable } from "./countIterable.js";
+import { BlankNode, DatasetCore, NamedNode } from "@rdfjs/types";
+import { skos } from "@tpluscode/rdf-ns-builders";
 import * as O from "fp-ts/Option";
+import { Concept } from "./Concept.js";
+import { ConceptScheme } from "./ConceptScheme.js";
+import { ModelFactory } from "./ModelFactory.js";
+import { countIterable } from "./countIterable.js";
+import { paginateIterable } from "./paginateIterable.js";
 
 export class Kos implements IKos {
   readonly dataset: DatasetCore;
   readonly includeLanguageTags: LanguageTagSet;
+  readonly modelFactory: ModelFactory;
 
   constructor({
     dataset,
     includeLanguageTags,
+    modelFactory,
   }: {
     dataset: DatasetCore;
     includeLanguageTags: LanguageTagSet;
+    modelFactory?: ModelFactory;
   }) {
     this.dataset = dataset;
     this.includeLanguageTags = includeLanguageTags;
+    this.modelFactory = modelFactory ?? new ModelFactory();
   }
 
   conceptByIdentifier(
     identifier: Resource.Identifier,
   ): Promise<O.Option<Concept>> {
     return new Promise((resolve) => {
-      resolve(O.some(new Concept({ identifier, kos: this })));
+      resolve(
+        O.some(this.modelFactory.createConcept({ identifier, kos: this })),
+      );
     });
   }
 
@@ -42,7 +49,7 @@ export class Kos implements IKos {
 
   async *concepts(): AsyncIterable<Concept> {
     for await (const identifier of this.conceptIdentifiers()) {
-      yield new Concept({ identifier, kos: this });
+      yield this.modelFactory.createConcept({ identifier, kos: this });
     }
   }
 
@@ -59,7 +66,7 @@ export class Kos implements IKos {
         limit,
         offset,
       })) {
-        result.push(new Concept({ identifier, kos: this }));
+        result.push(this.modelFactory.createConcept({ identifier, kos: this }));
       }
       resolve(result);
     });
@@ -94,7 +101,7 @@ export class Kos implements IKos {
       dataset: this.dataset,
       includeSubclasses: true,
     })) {
-      yield new ConceptScheme({ identifier, kos: this });
+      yield this.modelFactory.createConceptScheme({ identifier, kos: this });
     }
   }
 }

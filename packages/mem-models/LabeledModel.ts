@@ -1,14 +1,13 @@
-import { NamedNode } from "@rdfjs/types";
-import { Model } from "./Model.js";
-import { Label } from "./Label.js";
 import {
   Label as ILabel,
   LabeledModel as ILabeledModel,
   LanguageTag,
   LiteralLabel,
 } from "@kos-kit/models";
-import { skos, skosxl } from "@tpluscode/rdf-ns-builders";
 import { Resource } from "@kos-kit/rdf-resource";
+import { NamedNode } from "@rdfjs/types";
+import { skos, skosxl } from "@tpluscode/rdf-ns-builders";
+import { Model } from "./Model.js";
 import { matchLiteral } from "./matchLiteral.js";
 
 export abstract class LabeledModel extends Model implements ILabeledModel {
@@ -82,7 +81,7 @@ export abstract class LabeledModel extends Model implements ILabeledModel {
         }
 
         labels.push(
-          new Label({
+          this.kos.modelFactory.createLabel({
             identifier: labelResource.identifier,
             kos: this.kos,
             literalForm,

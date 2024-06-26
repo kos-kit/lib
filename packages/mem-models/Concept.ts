@@ -1,14 +1,17 @@
-import { Literal } from "@rdfjs/types";
-import { LabeledModel } from "./LabeledModel.js";
-import { ConceptScheme } from "./ConceptScheme.js";
-import { Concept as IConcept, NoteProperty } from "@kos-kit/models";
-import { matchLiteral } from "./matchLiteral.js";
-import { SemanticRelationProperty } from "@kos-kit/models";
-import { skos } from "@tpluscode/rdf-ns-builders";
+import {
+  Concept as IConcept,
+  NoteProperty,
+  SemanticRelationProperty,
+} from "@kos-kit/models";
 import { Resource } from "@kos-kit/rdf-resource";
+import TermSet from "@rdfjs/term-set";
+import { Literal } from "@rdfjs/types";
+import { skos } from "@tpluscode/rdf-ns-builders";
 import * as O from "fp-ts/Option";
 import { pipe } from "fp-ts/function";
-import TermSet from "@rdfjs/term-set";
+import { ConceptScheme } from "./ConceptScheme.js";
+import { LabeledModel } from "./LabeledModel.js";
+import { matchLiteral } from "./matchLiteral.js";
 
 export class Concept extends LabeledModel implements IConcept {
   inSchemes(): Promise<readonly ConceptScheme[]> {
@@ -53,8 +56,8 @@ export class Concept extends LabeledModel implements IConcept {
       }
     }
 
-    return [...conceptSchemeIdentifiers].map(
-      (identifier) => new ConceptScheme({ identifier, kos: this.kos }),
+    return [...conceptSchemeIdentifiers].map((identifier) =>
+      this.kos.modelFactory.createConceptScheme({ identifier, kos: this.kos }),
     );
   }
 
@@ -89,7 +92,9 @@ export class Concept extends LabeledModel implements IConcept {
             property.identifier,
             Resource.ValueMappers.identifier,
           ),
-        ].map((identifier) => new Concept({ identifier, kos: this.kos })),
+        ].map((identifier) =>
+          this.kos.modelFactory.createConcept({ identifier, kos: this.kos }),
+        ),
       );
     });
   }

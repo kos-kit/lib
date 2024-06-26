@@ -1,13 +1,13 @@
-import TermSet from "@rdfjs/term-set";
-import { LabeledModel } from "./LabeledModel.js";
-import { Concept } from "./Concept.js";
-import { Resource } from "@kos-kit/rdf-resource";
 import { ConceptScheme as IConceptScheme } from "@kos-kit/models";
-import { skos } from "@tpluscode/rdf-ns-builders";
+import { Resource } from "@kos-kit/rdf-resource";
+import TermSet from "@rdfjs/term-set";
 import { BlankNode, NamedNode } from "@rdfjs/types";
-import { paginateIterable } from "./paginateIterable.js";
-import { countIterable } from "./countIterable.js";
+import { skos } from "@tpluscode/rdf-ns-builders";
 import * as O from "fp-ts/Option";
+import { Concept } from "./Concept.js";
+import { LabeledModel } from "./LabeledModel.js";
+import { countIterable } from "./countIterable.js";
+import { paginateIterable } from "./paginateIterable.js";
 
 export class ConceptScheme extends LabeledModel implements IConceptScheme {
   conceptByIdentifier(
@@ -21,7 +21,7 @@ export class ConceptScheme extends LabeledModel implements IConceptScheme {
       )) {
         resolve(
           O.some(
-            new Concept({
+            this.kos.modelFactory.createConcept({
               identifier,
               kos: this.kos,
             }),
@@ -38,7 +38,7 @@ export class ConceptScheme extends LabeledModel implements IConceptScheme {
         )) {
           resolve(
             O.some(
-              new Concept({
+              this.kos.modelFactory.createConcept({
                 identifier,
                 kos: this.kos,
               }),
@@ -109,7 +109,7 @@ export class ConceptScheme extends LabeledModel implements IConceptScheme {
 
   async *_concepts({ topOnly }: { topOnly: boolean }): AsyncIterable<Concept> {
     for await (const identifier of this._conceptIdentifiers({ topOnly })) {
-      yield new Concept({
+      yield this.kos.modelFactory.createConcept({
         identifier,
         kos: this.kos,
       });
@@ -135,7 +135,7 @@ export class ConceptScheme extends LabeledModel implements IConceptScheme {
         },
       )) {
         result.push(
-          new Concept({
+          this.kos.modelFactory.createConcept({
             identifier,
             kos: this.kos,
           }),
