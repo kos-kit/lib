@@ -5,6 +5,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { Concept } from "../Concept.js";
 import { ConceptScheme } from "../ConceptScheme.js";
+import { ConstructorModelFactory } from "../ConstructorModelFactory.js";
 import { Kos } from "../Kos.js";
 import { Label } from "../Label.js";
 
@@ -32,9 +33,12 @@ const testDataset: Store = ntriplesStringToDataset(
 
 export const testKosFactory = (includeLanguageTag: LanguageTag) =>
   new Kos({
-    conceptFactory: Concept,
-    conceptSchemeFactory: ConceptScheme,
     dataset: testDataset,
-    includeLanguageTags: new LanguageTagSet(includeLanguageTag, ""),
-    labelFactory: Label,
+    modelFactory: new ConstructorModelFactory({
+      conceptConstructor: Concept,
+      conceptSchemeConstructor: ConceptScheme,
+      dataset: testDataset,
+      includeLanguageTags: new LanguageTagSet(includeLanguageTag, ""),
+      labelConstructor: Label,
+    }),
   });
