@@ -1,18 +1,51 @@
-import { ConceptScheme as IConceptScheme } from "@kos-kit/models";
+import {
+  Concept as IConcept,
+  ConceptScheme as IConceptScheme,
+} from "@kos-kit/models";
 import { Resource } from "@kos-kit/rdf-resource";
 import TermSet from "@rdfjs/term-set";
 import { BlankNode, NamedNode } from "@rdfjs/types";
 import { skos } from "@tpluscode/rdf-ns-builders";
 import * as O from "fp-ts/Option";
 import { Concept } from "./Concept.js";
+import { Label } from "./Label.js";
 import { LabeledModel } from "./LabeledModel.js";
 import { countIterable } from "./countIterable.js";
 import { paginateIterable } from "./paginateIterable.js";
 
-export class ConceptScheme extends LabeledModel implements IConceptScheme {
+export class ConceptScheme<
+    ConceptT extends IConcept,
+    ConceptSchemeT extends IConceptScheme,
+    LabelT extends Label,
+  >
+  extends LabeledModel<LabelT>
+  implements IConceptScheme
+{
+  private readonly conceptFactory: Concept.Factory<
+    ConceptT,
+    ConceptSchemeT,
+    LabelT
+  >;
+
+  private readonly conceptSchemeFactory: ConceptScheme.Factory<
+    ConceptT,
+    ConceptSchemeT,
+    LabelT
+  >;
+
+  constructor({
+    conceptFactory,
+    conceptSchemeFactory,
+    ...labeledModelParameters
+  }: ConceptScheme.Parameters<ConceptT, ConceptSchemeT, LabelT>) {
+    super(labeledModelParameters);
+    this.conceptFactory = conceptFactory;
+    this.conceptSchemeFactory = conceptSchemeFactory;
+  }
+
   conceptByIdentifier(
     identifier: BlankNode | NamedNode,
-  ): Promise<O.Option<Concept>> {
+  ): Promise<O.Option<ConceptT>> {
     return new Promise((resolve) => {
       for (const _ of this.resource.dataset.match(
         this.identifier,
@@ -21,9 +54,13 @@ export class ConceptScheme extends LabeledModel implements IConceptScheme {
       )) {
         resolve(
           O.some(
-            this.kos.modelFactory.createConcept({
+            new this.conceptFactory({
+              conceptFactory: this.conceptFactory,
+              conceptSchemeFactory: this.conceptSchemeFactory,
+              dataset: this.dataset,
               identifier,
-              kos: this.kos,
+              includeLanguageTags: this.includeLanguageTags,
+              labelFactory: this.labelFactory,
             }),
           ),
         );
@@ -36,28 +73,21 @@ export class ConceptScheme extends LabeledModel implements IConceptScheme {
           predicate,
           this.identifier,
         )) {
-          resolve(
-            O.some(
-              this.kos.modelFactory.createConcept({
-                identifier,
-                kos: this.kos,
-              }),
-            ),
-          );
+          resolve(O.some(this.createConcept(identifier)));
           return;
         }
       }
     });
   }
 
-  async *concepts(): AsyncIterable<Concept> {
+  async *concepts(): AsyncIterable<ConceptT> {
     yield* this._concepts({ topOnly: false });
   }
 
   conceptsPage(kwds: {
     limit: number;
     offset: number;
-  }): Promise<readonly Concept[]> {
+  }): Promise<readonly ConceptT[]> {
     return this._conceptsPage({ ...kwds, topOnly: false });
   }
 
@@ -107,12 +137,9 @@ export class ConceptScheme extends LabeledModel implements IConceptScheme {
       }
   }
 
-  async *_concepts({ topOnly }: { topOnly: boolean }): AsyncIterable<Concept> {
+  async *_concepts({ topOnly }: { topOnly: boolean }): AsyncIterable<ConceptT> {
     for await (const identifier of this._conceptIdentifiers({ topOnly })) {
-      yield this.kos.modelFactory.createConcept({
-        identifier,
-        kos: this.kos,
-      });
+      yield this.createConcept(identifier);
     }
   }
 
@@ -124,9 +151,9 @@ export class ConceptScheme extends LabeledModel implements IConceptScheme {
     limit: number;
     offset: number;
     topOnly: boolean;
-  }): Promise<readonly Concept[]> {
+  }): Promise<readonly ConceptT[]> {
     return new Promise((resolve) => {
-      const result: Concept[] = [];
+      const result: ConceptT[] = [];
       for (const identifier of paginateIterable(
         this._conceptIdentifiers({ topOnly }),
         {
@@ -134,12 +161,7 @@ export class ConceptScheme extends LabeledModel implements IConceptScheme {
           offset,
         },
       )) {
-        result.push(
-          this.kos.modelFactory.createConcept({
-            identifier,
-            kos: this.kos,
-          }),
-        );
+        result.push(this.createConcept(identifier));
       }
       resolve(result);
     });
@@ -151,18 +173,53 @@ export class ConceptScheme extends LabeledModel implements IConceptScheme {
     });
   }
 
-  async *topConcepts(): AsyncIterable<Concept> {
+  protected createConcept(identifier: BlankNode | NamedNode): ConceptT {
+    return new this.conceptFactory({
+      conceptFactory: this.conceptFactory,
+      conceptSchemeFactory: this.conceptSchemeFactory,
+      dataset: this.dataset,
+      identifier,
+      includeLanguageTags: this.includeLanguageTags,
+      labelFactory: this.labelFactory,
+    });
+  }
+
+  async *topConcepts(): AsyncIterable<ConceptT> {
     yield* this._concepts({ topOnly: true });
   }
 
   topConceptsPage(kwds: {
     limit: number;
     offset: number;
-  }): Promise<readonly Concept[]> {
+  }): Promise<readonly ConceptT[]> {
     return this._conceptsPage({ ...kwds, topOnly: true });
   }
 
   topConceptsCount(): Promise<number> {
     return this._conceptsCount({ topOnly: true });
   }
+}
+
+export namespace ConceptScheme {
+  export interface Parameters<
+    ConceptT extends IConcept,
+    ConceptSchemeT extends IConceptScheme,
+    LabelT extends Label,
+  > extends LabeledModel.Parameters<LabelT> {
+    conceptFactory: Concept.Factory<ConceptT, ConceptSchemeT, LabelT>;
+
+    conceptSchemeFactory: ConceptScheme.Factory<
+      ConceptT,
+      ConceptSchemeT,
+      LabelT
+    >;
+  }
+
+  export type Factory<
+    ConceptT extends IConcept,
+    ConceptSchemeT extends IConceptScheme,
+    LabelT extends Label,
+  > = new (
+    parameters: Parameters<ConceptT, ConceptSchemeT, LabelT>,
+  ) => ConceptSchemeT;
 }

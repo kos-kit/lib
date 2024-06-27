@@ -1,33 +1,25 @@
-import { NamedNode, Literal, BlankNode } from "@rdfjs/types";
-import { dc11, dcterms } from "@tpluscode/rdf-ns-builders";
 import { Model as IModel, LanguageTagSet } from "@kos-kit/models";
-import { Kos } from "./Kos.js";
 import { Resource } from "@kos-kit/rdf-resource";
-import { matchLiteral } from "./matchLiteral.js";
+import { BlankNode, DatasetCore, Literal, NamedNode } from "@rdfjs/types";
+import { dc11, dcterms } from "@tpluscode/rdf-ns-builders";
 import * as O from "fp-ts/Option";
+import { matchLiteral } from "./matchLiteral.js";
 
 const rightsPredicates = [dcterms.rights, dc11.rights];
-
 /**
  * Abstract base class for RDF/JS Dataset-backed models.
  */
 export abstract class Model implements IModel {
-  protected readonly kos: Kos;
+  protected readonly includeLanguageTags: LanguageTagSet;
   protected readonly resource: Resource;
 
-  constructor({
-    identifier,
-    kos,
-  }: {
-    identifier: Resource.Identifier;
-    kos: Kos;
-  }) {
-    this.kos = kos;
-    this.resource = new Resource({ dataset: kos.dataset, identifier });
+  constructor({ dataset, identifier, includeLanguageTags }: Model.Parameters) {
+    this.resource = new Resource({ dataset, identifier });
+    this.includeLanguageTags = includeLanguageTags;
   }
 
-  protected get includeLanguageTags(): LanguageTagSet {
-    return this.kos.includeLanguageTags;
+  protected get dataset(): DatasetCore {
+    return this.resource.dataset;
   }
 
   get identifier(): BlankNode | NamedNode {
@@ -107,5 +99,13 @@ export abstract class Model implements IModel {
 
   get rightsHolder(): O.Option<Literal> {
     return this.literalObject(dcterms.rightsHolder);
+  }
+}
+
+export namespace Model {
+  export interface Parameters {
+    dataset: DatasetCore;
+    identifier: Resource.Identifier;
+    includeLanguageTags: LanguageTagSet;
   }
 }

@@ -7,10 +7,24 @@ import {
 import { Resource } from "@kos-kit/rdf-resource";
 import { NamedNode } from "@rdfjs/types";
 import { skos, skosxl } from "@tpluscode/rdf-ns-builders";
+import { Label } from "./Label.js";
 import { Model } from "./Model.js";
 import { matchLiteral } from "./matchLiteral.js";
 
-export abstract class LabeledModel extends Model implements ILabeledModel {
+export abstract class LabeledModel<LabelT extends Label>
+  extends Model
+  implements ILabeledModel
+{
+  protected readonly labelFactory: Label.Factory<LabelT>;
+
+  constructor({
+    labelFactory,
+    ...modelParameters
+  }: LabeledModel.Parameters<LabelT>) {
+    super(modelParameters);
+    this.labelFactory = labelFactory;
+  }
+
   get altLabels(): readonly ILabel[] {
     return this.labels({
       skosPredicate: skos.altLabel,
@@ -81,9 +95,10 @@ export abstract class LabeledModel extends Model implements ILabeledModel {
         }
 
         labels.push(
-          this.kos.modelFactory.createLabel({
+          new this.labelFactory({
+            dataset: this.dataset,
+            includeLanguageTags: this.includeLanguageTags,
             identifier: labelResource.identifier,
-            kos: this.kos,
             literalForm,
           }),
         );
@@ -98,5 +113,11 @@ export abstract class LabeledModel extends Model implements ILabeledModel {
       skosPredicate: skos.prefLabel,
       skosXlPredicate: skosxl.prefLabel,
     });
+  }
+}
+
+export namespace LabeledModel {
+  export interface Parameters<LabelT extends Label> extends Model.Parameters {
+    labelFactory: Label.Factory<LabelT>;
   }
 }
