@@ -1,6 +1,7 @@
 import {
   Concept as IConcept,
   ConceptScheme as IConceptScheme,
+  Label as ILabel,
 } from "@kos-kit/models";
 import { Resource } from "@kos-kit/rdf-resource";
 import TermSet from "@rdfjs/term-set";
@@ -8,7 +9,6 @@ import { BlankNode, NamedNode } from "@rdfjs/types";
 import { skos } from "@tpluscode/rdf-ns-builders";
 import * as O from "fp-ts/Option";
 import { Concept } from "./Concept.js";
-import { Label } from "./Label.js";
 import { LabeledModel } from "./LabeledModel.js";
 import { countIterable } from "./countIterable.js";
 import { paginateIterable } from "./paginateIterable.js";
@@ -16,7 +16,7 @@ import { paginateIterable } from "./paginateIterable.js";
 export class ConceptScheme<
     ConceptT extends IConcept,
     ConceptSchemeT extends IConceptScheme,
-    LabelT extends Label,
+    LabelT extends ILabel,
   >
   extends LabeledModel<LabelT>
   implements IConceptScheme
@@ -204,7 +204,7 @@ export namespace ConceptScheme {
   export interface Parameters<
     ConceptT extends IConcept,
     ConceptSchemeT extends IConceptScheme,
-    LabelT extends Label,
+    LabelT extends ILabel,
   > extends LabeledModel.Parameters<LabelT> {
     conceptFactory: Concept.Factory<ConceptT, ConceptSchemeT, LabelT>;
 
@@ -218,7 +218,7 @@ export namespace ConceptScheme {
   export type Factory<
     ConceptT extends IConcept,
     ConceptSchemeT extends IConceptScheme,
-    LabelT extends Label,
+    LabelT extends ILabel,
   > = new (
     parameters: Parameters<ConceptT, ConceptSchemeT, LabelT>,
   ) => ConceptSchemeT;

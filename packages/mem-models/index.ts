@@ -4,6 +4,5 @@ export * from "./Kos.js";
 export * from "./Label.js";
 export * from "./LabeledModel.js";
 export * from "./Model.js";
-export * from "./ModelFactory.js";
 export * from "./countIterable.js";
 export * from "./matchLiteral.js";

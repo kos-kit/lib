@@ -11,7 +11,7 @@ import { Label } from "./Label.js";
 import { Model } from "./Model.js";
 import { matchLiteral } from "./matchLiteral.js";
 
-export abstract class LabeledModel<LabelT extends Label>
+export abstract class LabeledModel<LabelT extends ILabel>
   extends Model
   implements ILabeledModel
 {
@@ -117,7 +117,7 @@ export abstract class LabeledModel<LabelT extends Label>
 }
 
 export namespace LabeledModel {
-  export interface Parameters<LabelT extends Label> extends Model.Parameters {
+  export interface Parameters<LabelT extends ILabel> extends Model.Parameters {
     labelFactory: Label.Factory<LabelT>;
   }
 }

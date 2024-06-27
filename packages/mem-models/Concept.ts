@@ -1,6 +1,7 @@
 import {
   Concept as IConcept,
   ConceptScheme as IConceptScheme,
+  Label as ILabel,
   NoteProperty,
   SemanticRelationProperty,
 } from "@kos-kit/models";
@@ -11,14 +12,13 @@ import { skos } from "@tpluscode/rdf-ns-builders";
 import * as O from "fp-ts/Option";
 import { pipe } from "fp-ts/function";
 import { ConceptScheme } from "./ConceptScheme.js";
-import { Label } from "./Label.js";
 import { LabeledModel } from "./LabeledModel.js";
 import { matchLiteral } from "./matchLiteral.js";
 
 export class Concept<
     ConceptT extends IConcept,
     ConceptSchemeT extends IConceptScheme,
-    LabelT extends Label,
+    LabelT extends ILabel,
   >
   extends LabeledModel<LabelT>
   implements IConcept
@@ -174,7 +174,7 @@ export namespace Concept {
   export interface Parameters<
     ConceptT extends IConcept,
     ConceptSchemeT extends IConceptScheme,
-    LabelT extends Label,
+    LabelT extends ILabel,
   > extends LabeledModel.Parameters<LabelT> {
     conceptFactory: Concept.Factory<ConceptT, ConceptSchemeT, LabelT>;
 
@@ -188,7 +188,7 @@ export namespace Concept {
   export type Factory<
     ConceptT extends IConcept,
     ConceptSchemeT extends IConceptScheme,
-    LabelT extends Label,
+    LabelT extends ILabel,
   > = new (
     parameters: Parameters<ConceptT, ConceptSchemeT, LabelT>,
   ) => ConceptT;

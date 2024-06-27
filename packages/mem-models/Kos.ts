@@ -2,6 +2,7 @@ import {
   Concept as IConcept,
   ConceptScheme as IConceptScheme,
   Kos as IKos,
+  Label as ILabel,
   LanguageTagSet,
 } from "@kos-kit/models";
 import { Resource } from "@kos-kit/rdf-resource";
@@ -18,7 +19,7 @@ import { paginateIterable } from "./paginateIterable.js";
 export class Kos<
   ConceptT extends IConcept,
   ConceptSchemeT extends IConceptScheme,
-  LabelT extends Label,
+  LabelT extends ILabel,
 > implements IKos
 {
   readonly conceptFactory: Concept.Factory<ConceptT, ConceptSchemeT, LabelT>;

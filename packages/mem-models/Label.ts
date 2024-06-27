@@ -16,7 +16,7 @@ export namespace Label {
     literalForm: Literal;
   }
 
-  export type Factory<LabelT extends Label> = new (
+  export type Factory<LabelT extends ILabel> = new (
     parameters: Parameters,
   ) => LabelT;
 }
