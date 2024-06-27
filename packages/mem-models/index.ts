@@ -1,6 +1,6 @@
 export * from "./Concept.js";
 export * from "./ConceptScheme.js";
-export * from "./ConstructorModelFactory.js";
+export * from "./DefaultModelFactory.js";
 export * from "./Kos.js";
 export * from "./Label.js";
 export * from "./LabeledModel.js";
