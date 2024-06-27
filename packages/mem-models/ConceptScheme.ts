@@ -29,7 +29,13 @@ export class ConceptScheme<
         skos.hasTopConcept,
         identifier,
       )) {
-        resolve(O.some(this.modelFactory.createConcept(identifier)));
+        resolve(
+          O.some(
+            this.modelFactory.createConcept(
+              new Resource({ dataset: this.dataset, identifier }),
+            ),
+          ),
+        );
         return;
       }
 
@@ -39,7 +45,13 @@ export class ConceptScheme<
           predicate,
           this.identifier,
         )) {
-          resolve(O.some(this.modelFactory.createConcept(identifier)));
+          resolve(
+            O.some(
+              this.modelFactory.createConcept(
+                new Resource({ dataset: this.dataset, identifier }),
+              ),
+            ),
+          );
           return;
         }
       }
@@ -105,7 +117,9 @@ export class ConceptScheme<
 
   async *_concepts({ topOnly }: { topOnly: boolean }): AsyncIterable<ConceptT> {
     for await (const identifier of this._conceptIdentifiers({ topOnly })) {
-      yield this.modelFactory.createConcept(identifier);
+      yield this.modelFactory.createConcept(
+        new Resource({ dataset: this.dataset, identifier }),
+      );
     }
   }
 
@@ -127,7 +141,11 @@ export class ConceptScheme<
           offset,
         },
       )) {
-        result.push(this.modelFactory.createConcept(identifier));
+        result.push(
+          this.modelFactory.createConcept(
+            new Resource({ dataset: this.dataset, identifier }),
+          ),
+        );
       }
       resolve(result);
     });

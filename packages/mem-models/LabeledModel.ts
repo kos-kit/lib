@@ -106,8 +106,8 @@ export abstract class LabeledModel<
 
         labels.push(
           this.modelFactory.createLabel({
-            identifier: labelResource.identifier,
             literalForm,
+            resource: labelResource,
           }),
         );
       }

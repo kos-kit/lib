@@ -5,7 +5,7 @@ import {
   LanguageTagSet,
 } from "@kos-kit/models";
 import { Resource } from "@kos-kit/rdf-resource";
-import { DatasetCore, Literal } from "@rdfjs/types";
+import { Literal } from "@rdfjs/types";
 import { Label } from "./Label";
 import { LabeledModel } from "./LabeledModel.js";
 import { ModelFactory } from "./ModelFactory.js";
@@ -22,7 +22,6 @@ export class ConstructorModelFactory<
   private readonly conceptSchemeConstructor: new (
     parameters: LabeledModel.Parameters<ConceptT, ConceptSchemeT, LabelT>,
   ) => ConceptSchemeT;
-  private readonly dataset: DatasetCore;
   private readonly includeLanguageTags: LanguageTagSet;
   private readonly labelConstructor: new (
     parameters: Label.Parameters,
@@ -31,7 +30,6 @@ export class ConstructorModelFactory<
   constructor({
     conceptConstructor,
     conceptSchemeConstructor,
-    dataset,
     includeLanguageTags,
     labelConstructor,
   }: {
@@ -41,47 +39,42 @@ export class ConstructorModelFactory<
     conceptSchemeConstructor: new (
       parameters: LabeledModel.Parameters<ConceptT, ConceptSchemeT, LabelT>,
     ) => ConceptSchemeT;
-    dataset: DatasetCore;
     includeLanguageTags: LanguageTagSet;
     labelConstructor: new (parameters: Label.Parameters) => LabelT;
   }) {
     this.conceptConstructor = conceptConstructor;
     this.conceptSchemeConstructor = conceptSchemeConstructor;
-    this.dataset = dataset;
     this.includeLanguageTags = includeLanguageTags;
     this.labelConstructor = labelConstructor;
   }
 
-  createConcept(identifier: Resource.Identifier): ConceptT {
+  createConcept(resource: Resource): ConceptT {
     return new this.conceptConstructor({
-      dataset: this.dataset,
-      identifier,
       includeLanguageTags: this.includeLanguageTags,
       modelFactory: this,
+      resource,
     });
   }
 
-  createConceptScheme(identifier: Resource.Identifier): ConceptSchemeT {
+  createConceptScheme(resource: Resource): ConceptSchemeT {
     return new this.conceptSchemeConstructor({
-      dataset: this.dataset,
-      identifier,
       includeLanguageTags: this.includeLanguageTags,
       modelFactory: this,
+      resource,
     });
   }
 
   createLabel({
-    identifier,
     literalForm,
+    resource,
   }: {
-    identifier: Resource.Identifier;
     literalForm: Literal;
+    resource: Resource;
   }): LabelT {
     return new this.labelConstructor({
-      dataset: this.dataset,
-      identifier,
       includeLanguageTags: this.includeLanguageTags,
       literalForm,
+      resource,
     });
   }
 }

@@ -37,7 +37,6 @@ export const testKosFactory = (includeLanguageTag: LanguageTag) =>
     modelFactory: new ConstructorModelFactory({
       conceptConstructor: Concept,
       conceptSchemeConstructor: ConceptScheme,
-      dataset: testDataset,
       includeLanguageTags: new LanguageTagSet(includeLanguageTag, ""),
       labelConstructor: Label,
     }),

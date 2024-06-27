@@ -6,7 +6,7 @@ import {
 } from "@kos-kit/models";
 import { Resource } from "@kos-kit/rdf-resource";
 import { instances } from "@kos-kit/rdf-utils";
-import { BlankNode, DatasetCore, NamedNode } from "@rdfjs/types";
+import { DatasetCore } from "@rdfjs/types";
 import { skos } from "@tpluscode/rdf-ns-builders";
 import * as O from "fp-ts/Option";
 import { ModelFactory } from "./ModelFactory.js";
@@ -37,7 +37,13 @@ export class Kos<
     identifier: Resource.Identifier,
   ): Promise<O.Option<ConceptT>> {
     return new Promise((resolve) => {
-      resolve(O.some(this.modelFactory.createConcept(identifier)));
+      resolve(
+        O.some(
+          this.modelFactory.createConcept(
+            new Resource({ dataset: this.dataset, identifier }),
+          ),
+        ),
+      );
     });
   }
 
@@ -51,7 +57,9 @@ export class Kos<
 
   async *concepts(): AsyncIterable<ConceptT> {
     for await (const identifier of this.conceptIdentifiers()) {
-      yield this.modelFactory.createConcept(identifier);
+      yield this.modelFactory.createConcept(
+        new Resource({ dataset: this.dataset, identifier }),
+      );
     }
   }
 
@@ -68,7 +76,11 @@ export class Kos<
         limit,
         offset,
       })) {
-        result.push(this.modelFactory.createConcept(identifier));
+        result.push(
+          this.modelFactory.createConcept(
+            new Resource({ dataset: this.dataset, identifier }),
+          ),
+        );
       }
       resolve(result);
     });
@@ -81,7 +93,7 @@ export class Kos<
   }
 
   async conceptSchemeByIdentifier(
-    identifier: BlankNode | NamedNode,
+    identifier: Resource.Identifier,
   ): Promise<O.Option<ConceptSchemeT>> {
     for (const conceptScheme of await this.conceptSchemes()) {
       if (conceptScheme.identifier.equals(identifier)) {
@@ -103,7 +115,9 @@ export class Kos<
       dataset: this.dataset,
       includeSubclasses: true,
     })) {
-      yield this.modelFactory.createConceptScheme(identifier);
+      yield this.modelFactory.createConceptScheme(
+        new Resource({ dataset: this.dataset, identifier }),
+      );
     }
   }
 }

@@ -13,8 +13,8 @@ export abstract class Model implements IModel {
   protected readonly includeLanguageTags: LanguageTagSet;
   protected readonly resource: Resource;
 
-  constructor({ dataset, identifier, includeLanguageTags }: Model.Parameters) {
-    this.resource = new Resource({ dataset, identifier });
+  constructor({ includeLanguageTags, resource }: Model.Parameters) {
+    this.resource = resource;
     this.includeLanguageTags = includeLanguageTags;
   }
 
@@ -104,8 +104,7 @@ export abstract class Model implements IModel {
 
 export namespace Model {
   export interface Parameters {
-    dataset: DatasetCore;
-    identifier: Resource.Identifier;
     includeLanguageTags: LanguageTagSet;
+    resource: Resource;
   }
 }

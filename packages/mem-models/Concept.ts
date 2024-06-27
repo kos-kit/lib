@@ -65,7 +65,9 @@ export class Concept<
     }
 
     return [...conceptSchemeIdentifiers].map((identifier) =>
-      this.modelFactory.createConceptScheme(identifier),
+      this.modelFactory.createConceptScheme(
+        new Resource({ dataset: this.dataset, identifier }),
+      ),
     );
   }
 
@@ -100,7 +102,11 @@ export class Concept<
             property.identifier,
             Resource.ValueMappers.identifier,
           ),
-        ].map((identifier) => this.modelFactory.createConcept(identifier)),
+        ].map((identifier) =>
+          this.modelFactory.createConcept(
+            new Resource({ dataset: this.dataset, identifier }),
+          ),
+        ),
       );
     });
   }
