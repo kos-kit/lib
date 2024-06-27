@@ -15,4 +15,8 @@ export namespace Label {
   export interface Parameters extends Model.Parameters {
     literalForm: Literal;
   }
+
+  export type Factory<LabelT extends ILabel> = new (
+    parameters: Parameters,
+  ) => LabelT;
 }

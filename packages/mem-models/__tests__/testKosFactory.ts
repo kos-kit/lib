@@ -32,9 +32,9 @@ const testDataset: Store = ntriplesStringToDataset(
 
 export const testKosFactory = (includeLanguageTag: LanguageTag) =>
   new Kos({
-    conceptConstructor: Concept,
-    conceptSchemeConstructor: ConceptScheme,
+    conceptFactory: Concept,
+    conceptSchemeFactory: ConceptScheme,
     dataset: testDataset,
     includeLanguageTags: new LanguageTagSet(includeLanguageTag, ""),
-    labelConstructor: Label,
+    labelFactory: Label,
   });

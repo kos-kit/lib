@@ -7,7 +7,7 @@ import {
 } from "@kos-kit/models";
 import { Resource } from "@kos-kit/rdf-resource";
 import { instances } from "@kos-kit/rdf-utils";
-import { BlankNode, DatasetCore, Literal, NamedNode } from "@rdfjs/types";
+import { BlankNode, DatasetCore, NamedNode } from "@rdfjs/types";
 import { skos } from "@tpluscode/rdf-ns-builders";
 import * as O from "fp-ts/Option";
 import { Concept } from "./Concept.js";
@@ -22,40 +22,38 @@ export class Kos<
   LabelT extends ILabel,
 > implements IKos
 {
-  private readonly conceptConstructor: new (
-    parameters: Concept.Parameters<ConceptT, ConceptSchemeT, LabelT>,
-  ) => ConceptT;
-  private readonly conceptSchemeConstructor: new (
-    parameters: ConceptScheme.Parameters<ConceptT, LabelT>,
-  ) => ConceptSchemeT;
+  readonly conceptFactory: Concept.Factory<ConceptT, ConceptSchemeT, LabelT>;
+  readonly conceptSchemeFactory: ConceptScheme.Factory<
+    ConceptT,
+    ConceptSchemeT,
+    LabelT
+  >;
   readonly dataset: DatasetCore;
   readonly includeLanguageTags: LanguageTagSet;
-  private readonly labelConstructor: new (
-    parameters: Label.Parameters,
-  ) => LabelT;
+  readonly labelFactory: Label.Factory<LabelT>;
 
   constructor({
-    conceptConstructor,
-    conceptSchemeConstructor,
+    conceptFactory,
+    conceptSchemeFactory,
     dataset,
     includeLanguageTags,
-    labelConstructor,
+    labelFactory,
   }: {
-    conceptConstructor: new (
-      parameters: Concept.Parameters<ConceptT, ConceptSchemeT, LabelT>,
-    ) => ConceptT;
-    conceptSchemeConstructor: new (
-      parameters: ConceptScheme.Parameters<ConceptT, LabelT>,
-    ) => ConceptSchemeT;
+    readonly conceptFactory: Concept.Factory<ConceptT, ConceptSchemeT, LabelT>;
+    readonly conceptSchemeFactory: ConceptScheme.Factory<
+      ConceptT,
+      ConceptSchemeT,
+      LabelT
+    >;
     dataset: DatasetCore;
     includeLanguageTags: LanguageTagSet;
-    labelConstructor: new (parameters: Label.Parameters) => LabelT;
+    readonly labelFactory: Label.Factory<LabelT>;
   }) {
-    this.conceptConstructor = conceptConstructor;
-    this.conceptSchemeConstructor = conceptSchemeConstructor;
+    this.conceptFactory = conceptFactory;
+    this.conceptSchemeFactory = conceptSchemeFactory;
     this.dataset = dataset;
     this.includeLanguageTags = includeLanguageTags;
-    this.labelConstructor = labelConstructor;
+    this.labelFactory = labelFactory;
   }
 
   conceptByIdentifier(
@@ -132,41 +130,27 @@ export class Kos<
     }
   }
 
-  protected createConcept(identifier: Resource.Identifier): ConceptT {
-    return new this.conceptConstructor({
-      createConcept: this.createConcept,
-      createConceptScheme: this.createConceptScheme,
-      createLabel: this.createLabel,
+  protected createConcept(identifier: BlankNode | NamedNode): ConceptT {
+    return new this.conceptFactory({
+      conceptFactory: this.conceptFactory,
+      conceptSchemeFactory: this.conceptSchemeFactory,
       dataset: this.dataset,
       identifier,
       includeLanguageTags: this.includeLanguageTags,
+      labelFactory: this.labelFactory,
     });
   }
 
   protected createConceptScheme(
-    identifier: Resource.Identifier,
+    identifier: BlankNode | NamedNode,
   ): ConceptSchemeT {
-    return new this.conceptSchemeConstructor({
-      createConcept: this.createConcept,
-      createLabel: this.createLabel,
+    return new this.conceptSchemeFactory({
+      conceptFactory: this.conceptFactory,
+      conceptSchemeFactory: this.conceptSchemeFactory,
       dataset: this.dataset,
       identifier,
       includeLanguageTags: this.includeLanguageTags,
-    });
-  }
-
-  protected createLabel({
-    identifier,
-    literalForm,
-  }: {
-    identifier: Resource.Identifier;
-    literalForm: Literal;
-  }): LabelT {
-    return new this.labelConstructor({
-      dataset: this.dataset,
-      identifier,
-      includeLanguageTags: this.includeLanguageTags,
-      literalForm,
+      labelFactory: this.labelFactory,
     });
   }
 }
