@@ -6,6 +6,8 @@ import {
   LanguageTagSet,
 } from "@kos-kit/models";
 import { Resource } from "@kos-kit/rdf-resource";
+import { Concept } from "./Concept.js";
+import { ConceptScheme } from "./ConceptScheme.js";
 import { ConstructQueryBuilder } from "./ConstructQueryBuilder.js";
 import { GraphPatternVariable } from "./GraphPattern.js";
 import { LabeledModel } from "./LabeledModel.js";
