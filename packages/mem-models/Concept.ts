@@ -7,11 +7,10 @@ import {
 } from "@kos-kit/models";
 import { Resource } from "@kos-kit/rdf-resource";
 import TermSet from "@rdfjs/term-set";
-import { BlankNode, Literal, NamedNode } from "@rdfjs/types";
+import { Literal } from "@rdfjs/types";
 import { skos } from "@tpluscode/rdf-ns-builders";
 import * as O from "fp-ts/Option";
 import { pipe } from "fp-ts/function";
-import { ConceptScheme } from "./ConceptScheme.js";
 import { LabeledModel } from "./LabeledModel.js";
 import { matchLiteral } from "./matchLiteral.js";
 
@@ -23,50 +22,26 @@ export class Concept<
   extends LabeledModel<LabelT>
   implements IConcept
 {
-  private readonly conceptFactory: Concept.Factory<
+  private readonly createConcept: Concept.Parameters<
     ConceptT,
     ConceptSchemeT,
     LabelT
-  >;
+  >["createConcept"];
 
-  private readonly conceptSchemeFactory: ConceptScheme.Factory<
+  private readonly createConceptScheme: Concept.Parameters<
     ConceptT,
     ConceptSchemeT,
     LabelT
-  >;
+  >["createConceptScheme"];
 
   constructor({
-    conceptFactory,
-    conceptSchemeFactory,
+    createConcept,
+    createConceptScheme,
     ...labeledModelParameters
   }: Concept.Parameters<ConceptT, ConceptSchemeT, LabelT>) {
     super(labeledModelParameters);
-    this.conceptFactory = conceptFactory;
-    this.conceptSchemeFactory = conceptSchemeFactory;
-  }
-
-  protected createConcept(identifier: BlankNode | NamedNode): ConceptT {
-    return new this.conceptFactory({
-      conceptFactory: this.conceptFactory,
-      conceptSchemeFactory: this.conceptSchemeFactory,
-      dataset: this.dataset,
-      identifier,
-      includeLanguageTags: this.includeLanguageTags,
-      labelFactory: this.labelFactory,
-    });
-  }
-
-  protected createConceptScheme(
-    identifier: BlankNode | NamedNode,
-  ): ConceptSchemeT {
-    return new this.conceptSchemeFactory({
-      conceptFactory: this.conceptFactory,
-      conceptSchemeFactory: this.conceptSchemeFactory,
-      dataset: this.dataset,
-      identifier,
-      includeLanguageTags: this.includeLanguageTags,
-      labelFactory: this.labelFactory,
-    });
+    this.createConcept = createConcept;
+    this.createConceptScheme = createConceptScheme;
   }
 
   inSchemes(): Promise<readonly ConceptSchemeT[]> {
@@ -176,20 +151,7 @@ export namespace Concept {
     ConceptSchemeT extends IConceptScheme,
     LabelT extends ILabel,
   > extends LabeledModel.Parameters<LabelT> {
-    conceptFactory: Concept.Factory<ConceptT, ConceptSchemeT, LabelT>;
-
-    conceptSchemeFactory: ConceptScheme.Factory<
-      ConceptT,
-      ConceptSchemeT,
-      LabelT
-    >;
+    createConcept(identifier: Resource.Identifier): ConceptT;
+    createConceptScheme(identifier: Resource.Identifier): ConceptSchemeT;
   }
-
-  export type Factory<
-    ConceptT extends IConcept,
-    ConceptSchemeT extends IConceptScheme,
-    LabelT extends ILabel,
-  > = new (
-    parameters: Parameters<ConceptT, ConceptSchemeT, LabelT>,
-  ) => ConceptT;
 }

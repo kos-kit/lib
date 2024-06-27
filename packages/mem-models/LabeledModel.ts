@@ -5,9 +5,8 @@ import {
   LiteralLabel,
 } from "@kos-kit/models";
 import { Resource } from "@kos-kit/rdf-resource";
-import { NamedNode } from "@rdfjs/types";
+import { Literal, NamedNode } from "@rdfjs/types";
 import { skos, skosxl } from "@tpluscode/rdf-ns-builders";
-import { Label } from "./Label.js";
 import { Model } from "./Model.js";
 import { matchLiteral } from "./matchLiteral.js";
 
@@ -15,14 +14,14 @@ export abstract class LabeledModel<LabelT extends ILabel>
   extends Model
   implements ILabeledModel
 {
-  protected readonly labelFactory: Label.Factory<LabelT>;
+  protected readonly createLabel: LabeledModel.Parameters<LabelT>["createLabel"];
 
   constructor({
-    labelFactory,
+    createLabel,
     ...modelParameters
   }: LabeledModel.Parameters<LabelT>) {
     super(modelParameters);
-    this.labelFactory = labelFactory;
+    this.createLabel = createLabel;
   }
 
   get altLabels(): readonly ILabel[] {
@@ -95,9 +94,7 @@ export abstract class LabeledModel<LabelT extends ILabel>
         }
 
         labels.push(
-          new this.labelFactory({
-            dataset: this.dataset,
-            includeLanguageTags: this.includeLanguageTags,
+          this.createLabel({
             identifier: labelResource.identifier,
             literalForm,
           }),
@@ -118,6 +115,9 @@ export abstract class LabeledModel<LabelT extends ILabel>
 
 export namespace LabeledModel {
   export interface Parameters<LabelT extends ILabel> extends Model.Parameters {
-    labelFactory: Label.Factory<LabelT>;
+    createLabel(kwds: {
+      identifier: Resource.Identifier;
+      literalForm: Literal;
+    }): LabelT;
   }
 }

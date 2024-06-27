@@ -21,30 +21,22 @@ export class ConceptScheme<
   extends LabeledModel<LabelT>
   implements IConceptScheme
 {
-  private readonly conceptFactory: Concept.Factory<
+  private readonly createConcept: Concept.Parameters<
     ConceptT,
     ConceptSchemeT,
     LabelT
-  >;
-
-  private readonly conceptSchemeFactory: ConceptScheme.Factory<
-    ConceptT,
-    ConceptSchemeT,
-    LabelT
-  >;
+  >["createConcept"];
 
   constructor({
-    conceptFactory,
-    conceptSchemeFactory,
+    createConcept,
     ...labeledModelParameters
-  }: ConceptScheme.Parameters<ConceptT, ConceptSchemeT, LabelT>) {
+  }: ConceptScheme.Parameters<ConceptT, LabelT>) {
     super(labeledModelParameters);
-    this.conceptFactory = conceptFactory;
-    this.conceptSchemeFactory = conceptSchemeFactory;
+    this.createConcept = createConcept;
   }
 
   conceptByIdentifier(
-    identifier: BlankNode | NamedNode,
+    identifier: Resource.Identifier,
   ): Promise<O.Option<ConceptT>> {
     return new Promise((resolve) => {
       for (const _ of this.resource.dataset.match(
@@ -52,18 +44,7 @@ export class ConceptScheme<
         skos.hasTopConcept,
         identifier,
       )) {
-        resolve(
-          O.some(
-            new this.conceptFactory({
-              conceptFactory: this.conceptFactory,
-              conceptSchemeFactory: this.conceptSchemeFactory,
-              dataset: this.dataset,
-              identifier,
-              includeLanguageTags: this.includeLanguageTags,
-              labelFactory: this.labelFactory,
-            }),
-          ),
-        );
+        resolve(O.some(this.createConcept(identifier)));
         return;
       }
 
@@ -173,17 +154,6 @@ export class ConceptScheme<
     });
   }
 
-  protected createConcept(identifier: BlankNode | NamedNode): ConceptT {
-    return new this.conceptFactory({
-      conceptFactory: this.conceptFactory,
-      conceptSchemeFactory: this.conceptSchemeFactory,
-      dataset: this.dataset,
-      identifier,
-      includeLanguageTags: this.includeLanguageTags,
-      labelFactory: this.labelFactory,
-    });
-  }
-
   async *topConcepts(): AsyncIterable<ConceptT> {
     yield* this._concepts({ topOnly: true });
   }
@@ -201,25 +171,8 @@ export class ConceptScheme<
 }
 
 export namespace ConceptScheme {
-  export interface Parameters<
-    ConceptT extends IConcept,
-    ConceptSchemeT extends IConceptScheme,
-    LabelT extends ILabel,
-  > extends LabeledModel.Parameters<LabelT> {
-    conceptFactory: Concept.Factory<ConceptT, ConceptSchemeT, LabelT>;
-
-    conceptSchemeFactory: ConceptScheme.Factory<
-      ConceptT,
-      ConceptSchemeT,
-      LabelT
-    >;
+  export interface Parameters<ConceptT extends IConcept, LabelT extends ILabel>
+    extends LabeledModel.Parameters<LabelT> {
+    createConcept(identifier: Resource.Identifier): ConceptT;
   }
-
-  export type Factory<
-    ConceptT extends IConcept,
-    ConceptSchemeT extends IConceptScheme,
-    LabelT extends ILabel,
-  > = new (
-    parameters: Parameters<ConceptT, ConceptSchemeT, LabelT>,
-  ) => ConceptSchemeT;
 }
