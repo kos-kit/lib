@@ -1,13 +1,13 @@
 import axios, { AxiosInstance } from "axios";
 
+import * as mem from "@kos-kit/mem-models";
+import { LanguageTag, LanguageTagSet } from "@kos-kit/models";
+import { Resource } from "@kos-kit/rdf-resource";
+import { Parser, Store } from "n3";
 import { SearchEngine } from "./SearchEngine.js";
 import { SearchEngineJson } from "./SearchEngineJson.js";
 import { SearchResult } from "./SearchResult.js";
-import { Parser, Store } from "n3";
 import { SearchResults } from "./SearchResults.js";
-import { LanguageTag, LanguageTagSet } from "@kos-kit/models";
-import { Kos } from "@kos-kit/mem-models";
-import { Resource } from "@kos-kit/rdf-resource";
 
 /**
  * A SearchEngine implementation that makes HTTP requests to a kos-kit/server search endpoint.
@@ -43,9 +43,14 @@ export class ServerSearchEngine implements SearchEngine {
     const store = new Store();
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     store.addQuads(parser.parse(response.data));
-    const kos = new Kos({
+    const kos = new mem.Kos({
       dataset: store,
-      includeLanguageTags: new LanguageTagSet(params.languageTag, ""),
+      modelFactory: new mem.DefaultModelFactory({
+        conceptConstructor: mem.Concept,
+        conceptSchemeConstructor: mem.ConceptScheme,
+        includeLanguageTags: new LanguageTagSet(params.languageTag, ""),
+        labelConstructor: mem.Label,
+      }),
     });
 
     const page: SearchResult[] = [];
