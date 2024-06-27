@@ -1,17 +1,47 @@
-import { LabeledModel as ILabeledModel, Label } from "@kos-kit/models";
-import { LabeledModel as MemLabeledModel } from "@kos-kit/mem-models";
+import {
+  Concept as IConcept,
+  ConceptScheme as IConceptScheme,
+  LabeledModel as ILabeledModel,
+  Label,
+} from "@kos-kit/models";
+import { skos, skosxl } from "@tpluscode/rdf-ns-builders";
 import {
   GraphPattern,
   GraphPatternSubject,
   GraphPatternVariable,
 } from "./GraphPattern.js";
 import { Model } from "./Model.js";
-import { skos, skosxl } from "@tpluscode/rdf-ns-builders";
+import { ModelFetcher } from "./ModelFetcher.js";
+import { SparqlClient } from "./SparqlClient.js";
 
-export abstract class LabeledModel<MemModelT extends MemLabeledModel>
-  extends Model<MemModelT>
+export abstract class LabeledModel<
+    MemLabeledModelT extends ILabeledModel,
+    SparqlConceptT extends IConcept,
+    SparqlConceptSchemeT extends IConceptScheme,
+  >
+  extends Model<MemLabeledModelT>
   implements ILabeledModel
 {
+  protected readonly modelFetcher: ModelFetcher<
+    SparqlConceptT,
+    SparqlConceptSchemeT
+  >;
+  protected readonly sparqlClient: SparqlClient;
+
+  constructor({
+    modelFetcher,
+    sparqlClient,
+    ...modelParameters
+  }: LabeledModel.Parameters<
+    MemLabeledModelT,
+    SparqlConceptT,
+    SparqlConceptSchemeT
+  >) {
+    super(modelParameters);
+    this.modelFetcher = modelFetcher;
+    this.sparqlClient = sparqlClient;
+  }
+
   get altLabels(): readonly Label[] {
     return this.memModel.altLabels;
   }
@@ -107,4 +137,15 @@ export abstract class LabeledModel<MemModelT extends MemLabeledModel>
   // }
   // `;
   //   }
+}
+
+export namespace LabeledModel {
+  export interface Parameters<
+    MemLabeledModelT extends ILabeledModel,
+    SparqlConceptT extends IConcept,
+    SparqlConceptSchemeT extends IConceptScheme,
+  > extends Model.Parameters<MemLabeledModelT> {
+    modelFetcher: ModelFetcher<SparqlConceptT, SparqlConceptSchemeT>;
+    sparqlClient: SparqlClient;
+  }
 }

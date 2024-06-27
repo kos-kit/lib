@@ -1,10 +1,9 @@
-import { Model as MemModel } from "@kos-kit/mem-models";
 import { Model as IModel } from "@kos-kit/models";
+import { Resource } from "@kos-kit/rdf-resource";
 import { BlankNode, Literal, NamedNode } from "@rdfjs/types";
-import { GraphPattern, GraphPatternSubject } from "./GraphPattern.js";
-import { Kos } from "./Kos.js";
 import { dc11, dcterms } from "@tpluscode/rdf-ns-builders";
 import { Option } from "fp-ts/Option";
+import { GraphPattern, GraphPatternSubject } from "./GraphPattern.js";
 
 /**
  * Abstract base class for SPARQL-backed models.
@@ -19,12 +18,13 @@ import { Option } from "fp-ts/Option";
  * - Not all literals attached to an instance have to be "properties". Literals that would take up significant space (long strings, large arrays, etc.) can be retrieved via asynchronous methods instead.
  * - Related RDF resources such as skosxl:Label instances can be retrieved as "properties".
  */
-export abstract class Model<MemModelT extends MemModel> implements IModel {
-  protected readonly kos: Kos;
+export abstract class Model<
+  MemModelT extends IModel & { identifier: Resource.Identifier },
+> implements IModel
+{
   protected readonly memModel: MemModelT;
 
-  constructor({ kos, memModel }: { kos: Kos; memModel: MemModelT }) {
-    this.kos = kos;
+  constructor({ memModel }: Model.Parameters<MemModelT>) {
     this.memModel = memModel;
   }
 
@@ -103,8 +103,10 @@ export abstract class Model<MemModelT extends MemModel> implements IModel {
   get rightsHolder(): Option<Literal> {
     return this.memModel.rightsHolder;
   }
+}
 
-  protected get sparqlClient() {
-    return this.kos.sparqlClient;
+export namespace Model {
+  export interface Parameters<MemModelT extends IModel> {
+    memModel: MemModelT;
   }
 }

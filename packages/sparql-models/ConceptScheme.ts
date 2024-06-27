@@ -1,16 +1,23 @@
-import { Concept, ConceptScheme as IConceptScheme } from "@kos-kit/models";
-import { ConceptScheme as MemConceptScheme } from "@kos-kit/mem-models";
-import { LabeledModel as LabeledModel } from "./LabeledModel.js";
-import { mapResultRowsToIdentifiers } from "./mapResultRowsToIdentifiers.js";
-import { mapResultRowsToCount } from "./mapResultRowsToCount.js";
+import {
+  Concept,
+  Concept as IConcept,
+  ConceptScheme as IConceptScheme,
+} from "@kos-kit/models";
 import { Resource } from "@kos-kit/rdf-resource";
-import { paginationToAsyncIterable } from "./paginationToAsyncIterable.js";
-import { skos } from "@tpluscode/rdf-ns-builders";
 import { BlankNode, NamedNode } from "@rdfjs/types";
+import { skos } from "@tpluscode/rdf-ns-builders";
 import * as O from "fp-ts/Option";
+import { LabeledModel } from "./LabeledModel.js";
+import { mapResultRowsToCount } from "./mapResultRowsToCount.js";
+import { mapResultRowsToIdentifiers } from "./mapResultRowsToIdentifiers.js";
+import { paginationToAsyncIterable } from "./paginationToAsyncIterable.js";
 
-export class ConceptScheme
-  extends LabeledModel<MemConceptScheme>
+export class ConceptScheme<
+    MemConceptSchemeT extends IConceptScheme,
+    SparqlConceptT extends IConcept,
+    SparqlConceptSchemeT extends IConceptScheme,
+  >
+  extends LabeledModel<MemConceptSchemeT, SparqlConceptT, SparqlConceptSchemeT>
   implements IConceptScheme
 {
   async conceptByIdentifier(
@@ -23,7 +30,9 @@ ASK {
   ${this.conceptGraphPatterns({ topOnly: false }).join(" UNION ")}
 }`)
     ) {
-      return this.kos.conceptByIdentifier(identifier);
+      return O.some(
+        (await this.modelFetcher.fetchConceptsByIdentifiers([identifier]))[0],
+      );
     } else {
       return O.none;
     }
@@ -96,7 +105,7 @@ WHERE {
     offset: number;
     topOnly: boolean;
   }): Promise<readonly Concept[]> {
-    return this.kos.conceptsByIdentifiers(
+    return this.modelFetcher.fetchConceptsByIdentifiers(
       await this._conceptIdentifiersPage({ limit, offset, topOnly }),
     );
   }
