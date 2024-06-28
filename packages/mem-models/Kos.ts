@@ -5,7 +5,7 @@ import {
   Label as ILabel,
 } from "@kos-kit/models";
 import { Resource } from "@kos-kit/rdf-resource";
-import { instances } from "@kos-kit/rdf-utils";
+import { instances, isInstanceOf } from "@kos-kit/rdf-utils";
 import { DatasetCore } from "@rdfjs/types";
 import { skos } from "@tpluscode/rdf-ns-builders";
 import * as O from "fp-ts/Option";
@@ -37,12 +37,34 @@ export class Kos<
     identifier: Resource.Identifier,
   ): Promise<O.Option<ConceptT>> {
     return new Promise((resolve) => {
-      resolve(
-        O.some(
-          this.modelFactory.createConcept(
-            new Resource({ dataset: this.dataset, identifier }),
-          ),
+      resolve(this._conceptByIdentifier(identifier));
+    });
+  }
+
+  _conceptByIdentifier(identifier: Resource.Identifier): O.Option<ConceptT> {
+    if (
+      isInstanceOf({
+        class_: skos.Concept,
+        dataset: this.dataset,
+        instance: identifier,
+      })
+    ) {
+      return O.some(
+        this.modelFactory.createConcept(
+          new Resource({ dataset: this.dataset, identifier }),
         ),
+      );
+    } else {
+      return O.none;
+    }
+  }
+
+  conceptsByIdentifiers(
+    identifiers: readonly Resource.Identifier[],
+  ): Promise<readonly O.Option<IConcept>[]> {
+    return new Promise((resolve) => {
+      resolve(
+        identifiers.map((identifier) => this._conceptByIdentifier(identifier)),
       );
     });
   }
