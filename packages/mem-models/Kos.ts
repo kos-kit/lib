@@ -61,7 +61,7 @@ export class Kos<
 
   conceptsByIdentifiers(
     identifiers: readonly Resource.Identifier[],
-  ): Promise<readonly O.Option<IConcept>[]> {
+  ): Promise<readonly O.Option<ConceptT>[]> {
     return new Promise((resolve) => {
       resolve(
         identifiers.map((identifier) => this._conceptByIdentifier(identifier)),
