@@ -90,6 +90,54 @@ export class DefaultModelFetcher<
     this.sparqlClient = sparqlClient;
   }
 
+  protected conceptPropertyGraphPatterns({
+    subject,
+    variablePrefix,
+  }: {
+    subject: GraphPatternSubject;
+    variablePrefix: string;
+  }): readonly GraphPattern[] {
+    const graphPatterns: GraphPattern[] = [];
+
+    graphPatterns.push({
+      subject,
+      predicate: skos.notation,
+      object: {
+        termType: "Variable",
+        value: variablePrefix + "Notation",
+      },
+      optional: true,
+    });
+
+    for (const noteProperty of noteProperties) {
+      graphPatterns.push({
+        subject,
+        predicate: noteProperty.identifier,
+        object: {
+          plainLiteral: true,
+          termType: "Variable",
+          value:
+            variablePrefix +
+            noteProperty.name[0].toUpperCase() +
+            noteProperty.name.substring(1),
+        },
+        optional: true,
+      });
+    }
+
+    return this.labeledModelPropertyGraphPatterns({
+      subject,
+      variablePrefix,
+    }).concat(graphPatterns);
+  }
+
+  protected conceptSchemePropertyGraphPatterns(kwds: {
+    subject: GraphPatternSubject;
+    variablePrefix: string;
+  }): readonly GraphPattern[] {
+    return this.labeledModelPropertyGraphPatterns(kwds);
+  }
+
   async fetchConceptsByIdentifiers(
     identifiers: readonly Resource.Identifier[],
   ): Promise<readonly O.Option<SparqlConceptT>[]> {
@@ -130,6 +178,7 @@ export class DefaultModelFetcher<
           }),
         );
       } else {
+        console.warn("tried to fetch missing concept", identifier.value);
         return O.none;
       }
     });
@@ -175,57 +224,10 @@ export class DefaultModelFetcher<
           }),
         );
       } else {
+        console.warn("tried to fetch missing concept scheme", identifier.value);
         return O.none;
       }
     });
-  }
-
-  conceptPropertyGraphPatterns({
-    subject,
-    variablePrefix,
-  }: {
-    subject: GraphPatternSubject;
-    variablePrefix: string;
-  }): readonly GraphPattern[] {
-    const graphPatterns: GraphPattern[] = [];
-
-    graphPatterns.push({
-      subject,
-      predicate: skos.notation,
-      object: {
-        termType: "Variable",
-        value: variablePrefix + "Notation",
-      },
-      optional: true,
-    });
-
-    for (const noteProperty of noteProperties) {
-      graphPatterns.push({
-        subject,
-        predicate: noteProperty.identifier,
-        object: {
-          plainLiteral: true,
-          termType: "Variable",
-          value:
-            variablePrefix +
-            noteProperty.name[0].toUpperCase() +
-            noteProperty.name.substring(1),
-        },
-        optional: true,
-      });
-    }
-
-    return this.labeledModelPropertyGraphPatterns({
-      subject,
-      variablePrefix,
-    }).concat(graphPatterns);
-  }
-
-  conceptSchemePropertyGraphPatterns(kwds: {
-    subject: GraphPatternSubject;
-    variablePrefix: string;
-  }): readonly GraphPattern[] {
-    return this.labeledModelPropertyGraphPatterns(kwds);
   }
 
   protected labeledModelPropertyGraphPatterns({

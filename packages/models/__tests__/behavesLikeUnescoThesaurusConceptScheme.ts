@@ -1,8 +1,8 @@
+import * as O from "fp-ts/Option";
+import { expect, it } from "vitest";
+import { ConceptScheme, LanguageTag } from "..";
 import { behavesLikeConceptScheme } from "./behavesLikeConceptScheme.js";
 import { expectConceptScheme } from "./expectConceptScheme.js";
-import { ConceptScheme, LanguageTag } from "..";
-import { expect, it } from "vitest";
-import * as O from "fp-ts/Option";
 
 export const behavesLikeUnescoThesaurusConceptScheme = (
   lazyConceptScheme: (
@@ -16,7 +16,7 @@ export const behavesLikeUnescoThesaurusConceptScheme = (
 
   it("should have a modified date", async () => {
     const conceptScheme = await lazyConceptScheme("en");
-    expect(O.toNullable(conceptScheme.modified)!.value).toStrictEqual(
+    expect(O.toNullable(conceptScheme.modified)?.value).toStrictEqual(
       "2024-03-25T14:24:28.295+01:00",
     );
   });
@@ -25,8 +25,8 @@ export const behavesLikeUnescoThesaurusConceptScheme = (
     const conceptScheme = await lazyConceptScheme("en");
     const license = O.toNullable(conceptScheme.license);
     expect(license).toBeDefined();
-    expect(license!.termType).toStrictEqual("NamedNode");
-    expect(license!.value).toStrictEqual(
+    expect(license?.termType).toStrictEqual("NamedNode");
+    expect(license?.value).toStrictEqual(
       "http://creativecommons.org/licenses/by-sa/3.0/igo/",
     );
   });
@@ -50,14 +50,14 @@ export const behavesLikeUnescoThesaurusConceptScheme = (
     const conceptScheme = await lazyConceptScheme("en");
     const rights = O.toNullable(conceptScheme.rights);
     expect(rights).toBeDefined();
-    expect(rights!.value).toStrictEqual("CC-BY-SA");
+    expect(rights?.value).toStrictEqual("CC-BY-SA");
   });
 
   it("should have a rights holder", async () => {
     const conceptScheme = await lazyConceptScheme("en");
     const rightsHolder = O.toNullable(conceptScheme.rightsHolder);
     expect(rightsHolder).toBeDefined();
-    expect(rightsHolder!.value).toStrictEqual("UNESCO");
+    expect(rightsHolder?.value).toStrictEqual("UNESCO");
   });
 
   behavesLikeConceptScheme(lazyConceptScheme);

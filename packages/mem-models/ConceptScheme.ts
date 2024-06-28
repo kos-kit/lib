@@ -4,6 +4,7 @@ import {
   Label as ILabel,
 } from "@kos-kit/models";
 import { Resource } from "@kos-kit/rdf-resource";
+import { isInstanceOf } from "@kos-kit/rdf-utils";
 import TermSet from "@rdfjs/term-set";
 import { skos } from "@tpluscode/rdf-ns-builders";
 import * as O from "fp-ts/Option";
@@ -23,6 +24,8 @@ export class ConceptScheme<
     identifier: Resource.Identifier,
   ): Promise<O.Option<ConceptT>> {
     return new Promise((resolve) => {
+      // conceptScheme skos:hasTopConcept resource entails resource is a skos:Concept because of
+      // the range of skos:hasTopConcept
       for (const _ of this.resource.dataset.match(
         this.identifier,
         skos.hasTopConcept,
@@ -38,20 +41,33 @@ export class ConceptScheme<
         return;
       }
 
+      // resource skos:topConceptOf conceptScheme entails resource is a skos:Concept because of the
+      // domain of skos:topConceptOf
+      // resource skos:inScheme conceptScheme does not entail resource is a skos:Concept, since
+      // skos:inScheme has an open domain
       for (const predicate of [skos.inScheme, skos.topConceptOf]) {
         for (const _ of this.resource.dataset.match(
           identifier,
           predicate,
           this.identifier,
         )) {
-          resolve(
-            O.some(
-              this.modelFactory.createConcept(
-                new Resource({ dataset: this.dataset, identifier }),
+          if (
+            predicate.equals(skos.topConceptOf) ||
+            isInstanceOf({
+              class_: skos.Concept,
+              dataset: this.dataset,
+              instance: identifier,
+            })
+          ) {
+            resolve(
+              O.some(
+                this.modelFactory.createConcept(
+                  new Resource({ dataset: this.dataset, identifier }),
+                ),
               ),
-            ),
-          );
-          return;
+            );
+            return;
+          }
         }
       }
     });
@@ -102,13 +118,28 @@ export class ConceptScheme<
         const conceptIdentifier = O.toNullable(
           Resource.ValueMappers.identifier(quad.subject as Resource.Identifier),
         );
-        if (
-          conceptIdentifier !== null &&
-          !conceptIdentifierSet.has(conceptIdentifier)
-        ) {
-          yield conceptIdentifier;
-          conceptIdentifierSet.add(conceptIdentifier);
+        if (conceptIdentifier === null) {
+          continue;
         }
+
+        // See note in conceptByIdentifier about skos:inScheme
+        if (
+          predicate.equals(skos.inScheme) &&
+          !isInstanceOf({
+            class_: skos.Concept,
+            dataset: this.dataset,
+            instance: conceptIdentifier,
+          })
+        ) {
+          continue;
+        }
+
+        if (conceptIdentifierSet.has(conceptIdentifier)) {
+          continue;
+        }
+
+        yield conceptIdentifier;
+        conceptIdentifierSet.add(conceptIdentifier);
       }
   }
 

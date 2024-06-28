@@ -1,7 +1,7 @@
-import { behavesLikeLabeledModel } from "./behavesLikeLabeledModel.js";
-import { ConceptScheme, LanguageTag } from "..";
-import { expect, it } from "vitest";
 import * as O from "fp-ts/Option";
+import { expect, it } from "vitest";
+import { ConceptScheme, LanguageTag } from "..";
+import { behavesLikeLabeledModel } from "./behavesLikeLabeledModel.js";
 
 export const behavesLikeConceptScheme = (
   lazyConceptScheme: (
@@ -59,7 +59,7 @@ export const behavesLikeConceptScheme = (
 
   it("should get concepts count", async () => {
     const conceptScheme = await lazyConceptScheme("en");
-    expect(await conceptScheme.conceptsCount()).toStrictEqual(4577);
+    expect(await conceptScheme.conceptsCount()).toStrictEqual(4482);
   });
 
   it("should get top concept pages", async () => {

@@ -4,7 +4,7 @@ import {
   ConceptScheme as IConceptScheme,
 } from "@kos-kit/models";
 import { Resource } from "@kos-kit/rdf-resource";
-import { skos } from "@tpluscode/rdf-ns-builders";
+import { rdf, rdfs, skos } from "@tpluscode/rdf-ns-builders";
 import * as O from "fp-ts/Option";
 import { LabeledModel } from "./LabeledModel.js";
 import { mapResultRowsToCount } from "./mapResultRowsToCount.js";
@@ -38,8 +38,9 @@ export class ConceptScheme<
       `{ ?concept <${skos.topConceptOf.value}> ${identifierString} . }`,
     ];
     if (!topOnly) {
+      // skos:inScheme has an open domain, so we also have to check the rdf:type
       conceptGraphPatterns.push(
-        `{ ?concept <${skos.inScheme.value}> ${identifierString} . }`,
+        `{ ?concept <${skos.inScheme.value}> ${identifierString} . ?concept <${rdf.type.value}>/<${rdfs.subClassOf.value}>* <${skos.Concept.value}> . }`,
       );
     }
     return conceptGraphPatterns;
