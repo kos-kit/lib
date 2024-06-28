@@ -1,15 +1,18 @@
 /* eslint-disable no-inner-declarations */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import {
-  NamedNode,
-  DatasetCore,
   BlankNode,
-  Literal,
-  DefaultGraph,
   DataFactory,
+  DatasetCore,
+  DefaultGraph,
+  Literal,
+  NamedNode,
 } from "@rdfjs/types";
 import * as O from "fp-ts/Option";
 import { pipe } from "fp-ts/function";
+
+const xsdNamespace = "http://www.w3.org/2001/XMLSchema#";
+const xsdBooleanIri = xsdNamespace + "boolean";
 
 export class Resource {
   readonly dataset: DatasetCore;
@@ -171,6 +174,27 @@ export namespace Resource {
   ) => O.Option<NonNullable<T>>;
 
   export namespace ValueMappers {
+    export function boolean(
+      object: BlankNode | Literal | NamedNode,
+    ): O.Option<boolean> {
+      if (object.termType !== "Literal") {
+        return O.none;
+      }
+      if (object.datatype.value !== xsdBooleanIri) {
+        return O.none;
+      }
+      switch (object.value.toLowerCase()) {
+        case "1":
+        case "true":
+          return O.some(true);
+        case "0":
+        case "false":
+          return O.some(false);
+        default:
+          return O.none;
+      }
+    }
+
     export function identifier(
       object: BlankNode | Literal | NamedNode,
     ): O.Option<Identifier> {
