@@ -1,8 +1,8 @@
 import { BlankNode, NamedNode } from "@rdfjs/types";
+import { Option } from "fp-ts/Option";
 import { Concept } from "./Concept.js";
 import { ConceptScheme } from "./ConceptScheme.js";
 import { Kos } from "./Kos.js";
-import { Option } from "fp-ts/Option";
 
 export class NotImplementedKos implements Kos {
   conceptByIdentifier(
@@ -11,6 +11,11 @@ export class NotImplementedKos implements Kos {
     throw new Error("Method not implemented.");
   }
   concepts(): AsyncIterable<Concept> {
+    throw new Error("Method not implemented.");
+  }
+  conceptsByIdentifiers(
+    _identifiers: readonly (BlankNode | NamedNode)[],
+  ): Promise<readonly Option<Concept>[]> {
     throw new Error("Method not implemented.");
   }
   conceptsPage(_kwds: {

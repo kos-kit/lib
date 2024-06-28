@@ -8,6 +8,9 @@ export interface Kos {
     identifier: BlankNode | NamedNode,
   ): Promise<Option<Concept>>;
   concepts(): AsyncIterable<Concept>;
+  conceptsByIdentifiers(
+    identifiers: readonly (BlankNode | NamedNode)[],
+  ): Promise<readonly Option<Concept>[]>;
   conceptsPage(kwds: {
     limit: number;
     offset: number;
@@ -18,7 +21,4 @@ export interface Kos {
     identifier: BlankNode | NamedNode,
   ): Promise<Option<ConceptScheme>>;
   conceptSchemes(): Promise<readonly ConceptScheme[]>;
-  conceptSchemseByIdentifiers(
-    identifier: BlankNode | NamedNode,
-  ): Promise<Option<ConceptScheme>>;
 }
