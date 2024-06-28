@@ -1,9 +1,7 @@
 import { Model as IModel } from "@kos-kit/models";
 import { Resource } from "@kos-kit/rdf-resource";
 import { Literal, NamedNode } from "@rdfjs/types";
-import { dc11, dcterms } from "@tpluscode/rdf-ns-builders";
 import { Option } from "fp-ts/Option";
-import { GraphPattern, GraphPatternSubject } from "./GraphPattern.js";
 
 /**
  * Abstract base class for SPARQL-backed models.
@@ -38,62 +36,6 @@ export abstract class Model<
 
   get modified(): Option<Literal> {
     return this.memModel.modified;
-  }
-
-  static propertyGraphPatterns({
-    subject,
-    variablePrefix,
-  }: {
-    subject: GraphPatternSubject;
-    variablePrefix: string;
-  }): readonly GraphPattern[] {
-    return [
-      {
-        subject,
-        predicate: dcterms.license,
-        object: {
-          termType: "Variable",
-          value: variablePrefix + "License",
-        },
-        optional: true,
-      },
-      {
-        subject,
-        predicate: dcterms.modified,
-        object: { termType: "Variable", value: variablePrefix + "Modified" },
-        optional: true,
-      },
-      {
-        subject,
-        predicate: dc11.rights,
-        object: {
-          termType: "Variable",
-          plainLiteral: true,
-          value: variablePrefix + "DcRights",
-        },
-        optional: true,
-      },
-      {
-        subject,
-        predicate: dcterms.rights,
-        object: {
-          termType: "Variable",
-          plainLiteral: true,
-          value: variablePrefix + "DctermsRights",
-        },
-        optional: true,
-      },
-      {
-        subject,
-        predicate: dcterms.rightsHolder,
-        object: {
-          termType: "Variable",
-          plainLiteral: true,
-          value: variablePrefix + "RightsHolder",
-        },
-        optional: true,
-      },
-    ];
   }
 
   get rights(): Option<Literal> {

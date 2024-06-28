@@ -22,19 +22,9 @@ export class ConceptScheme<
   async conceptByIdentifier(
     identifier: Resource.Identifier,
   ): Promise<O.Option<Concept>> {
-    if (
-      await this.sparqlClient.query.ask(`\
-ASK {
-  VALUES ?concept { ${Resource.Identifier.toString(identifier)}}
-  ${this.conceptGraphPatterns({ topOnly: false }).join(" UNION ")}
-}`)
-    ) {
-      return O.some(
-        (await this.modelFetcher.fetchConceptsByIdentifiers([identifier]))[0],
-      );
-    } else {
-      return O.none;
-    }
+    return (
+      await this.modelFetcher.fetchConceptsByIdentifiers([identifier])
+    )[0];
   }
 
   private conceptGraphPatterns({
@@ -104,9 +94,11 @@ WHERE {
     offset: number;
     topOnly: boolean;
   }): Promise<readonly Concept[]> {
-    return this.modelFetcher.fetchConceptsByIdentifiers(
-      await this._conceptIdentifiersPage({ limit, offset, topOnly }),
-    );
+    return (
+      await this.modelFetcher.fetchConceptsByIdentifiers(
+        await this._conceptIdentifiersPage({ limit, offset, topOnly }),
+      )
+    ).flatMap((concept) => (O.isSome(concept) ? [concept.value] : []));
   }
 
   concepts(): AsyncIterable<Concept> {

@@ -4,12 +4,18 @@ import {
   ConceptScheme as IConceptScheme,
   Label as ILabel,
   LanguageTagSet,
+  noteProperties,
 } from "@kos-kit/models";
 import { Resource } from "@kos-kit/rdf-resource";
-import { Concept } from "./Concept.js";
-import { ConceptScheme } from "./ConceptScheme.js";
+import { isInstanceOf } from "@kos-kit/rdf-utils";
+import { dc11, dcterms, rdf, skos, skosxl } from "@tpluscode/rdf-ns-builders";
+import * as O from "fp-ts/Option";
 import { ConstructQueryBuilder } from "./ConstructQueryBuilder.js";
-import { GraphPatternVariable } from "./GraphPattern.js";
+import {
+  GraphPattern,
+  GraphPatternSubject,
+  GraphPatternVariable,
+} from "./GraphPattern.js";
 import { LabeledModel } from "./LabeledModel.js";
 import { ModelFetcher } from "./ModelFetcher.js";
 import { SparqlClient } from "./SparqlClient.js";
@@ -86,7 +92,7 @@ export class DefaultModelFetcher<
 
   async fetchConceptsByIdentifiers(
     identifiers: readonly Resource.Identifier[],
-  ): Promise<readonly SparqlConceptT[]> {
+  ): Promise<readonly O.Option<SparqlConceptT>[]> {
     const conceptVariable: GraphPatternVariable = {
       termType: "Variable",
       value: "concept",
@@ -97,7 +103,7 @@ export class DefaultModelFetcher<
         includeLanguageTags,
       })
         .addGraphPatterns(
-          ...Concept.propertyGraphPatterns({
+          ...this.conceptPropertyGraphPatterns({
             subject: conceptVariable,
             variablePrefix: conceptVariable.value,
           }),
@@ -106,21 +112,32 @@ export class DefaultModelFetcher<
         .build(),
       { operation: "postDirect" },
     );
-    return identifiers.map(
-      (identifier) =>
-        new this.conceptConstructor({
-          memModel: this.memModelFactory.createConcept(
-            new Resource({ dataset, identifier }),
-          ),
-          modelFetcher: this,
-          sparqlClient: this.sparqlClient,
-        }),
-    );
+    return identifiers.map((identifier) => {
+      if (
+        isInstanceOf({
+          class_: skos.Concept,
+          dataset,
+          instance: identifier,
+        })
+      ) {
+        return O.some(
+          new this.conceptConstructor({
+            memModel: this.memModelFactory.createConcept(
+              new Resource({ dataset, identifier }),
+            ),
+            modelFetcher: this,
+            sparqlClient: this.sparqlClient,
+          }),
+        );
+      } else {
+        return O.none;
+      }
+    });
   }
 
   async fetchConceptSchemesByIdentifiers(
     identifiers: readonly Resource.Identifier[],
-  ): Promise<readonly SparqlConceptSchemeT[]> {
+  ): Promise<readonly O.Option<SparqlConceptSchemeT>[]> {
     const conceptSchemeVariable: GraphPatternVariable = {
       termType: "Variable",
       value: "conceptScheme",
@@ -131,7 +148,7 @@ export class DefaultModelFetcher<
         includeLanguageTags,
       })
         .addGraphPatterns(
-          ...ConceptScheme.propertyGraphPatterns({
+          ...this.conceptSchemePropertyGraphPatterns({
             subject: conceptSchemeVariable,
             variablePrefix: conceptSchemeVariable.value,
           }),
@@ -140,15 +157,206 @@ export class DefaultModelFetcher<
         .build(),
       { operation: "postDirect" },
     );
-    return identifiers.map(
-      (identifier) =>
-        new this.conceptSchemeConstructor({
-          memModel: this.memModelFactory.createConceptScheme(
-            new Resource({ dataset, identifier }),
-          ),
-          modelFetcher: this,
-          sparqlClient: this.sparqlClient,
-        }),
+    return identifiers.map((identifier) => {
+      if (
+        isInstanceOf({
+          class_: skos.ConceptScheme,
+          dataset,
+          instance: identifier,
+        })
+      ) {
+        return O.some(
+          new this.conceptSchemeConstructor({
+            memModel: this.memModelFactory.createConceptScheme(
+              new Resource({ dataset, identifier }),
+            ),
+            modelFetcher: this,
+            sparqlClient: this.sparqlClient,
+          }),
+        );
+      } else {
+        return O.none;
+      }
+    });
+  }
+
+  conceptPropertyGraphPatterns({
+    subject,
+    variablePrefix,
+  }: {
+    subject: GraphPatternSubject;
+    variablePrefix: string;
+  }): readonly GraphPattern[] {
+    const graphPatterns: GraphPattern[] = [];
+
+    graphPatterns.push({
+      subject,
+      predicate: skos.notation,
+      object: {
+        termType: "Variable",
+        value: variablePrefix + "Notation",
+      },
+      optional: true,
+    });
+
+    for (const noteProperty of noteProperties) {
+      graphPatterns.push({
+        subject,
+        predicate: noteProperty.identifier,
+        object: {
+          plainLiteral: true,
+          termType: "Variable",
+          value:
+            variablePrefix +
+            noteProperty.name[0].toUpperCase() +
+            noteProperty.name.substring(1),
+        },
+        optional: true,
+      });
+    }
+
+    return this.labeledModelPropertyGraphPatterns({
+      subject,
+      variablePrefix,
+    }).concat(graphPatterns);
+  }
+
+  conceptSchemePropertyGraphPatterns(kwds: {
+    subject: GraphPatternSubject;
+    variablePrefix: string;
+  }): readonly GraphPattern[] {
+    return this.labeledModelPropertyGraphPatterns(kwds);
+  }
+
+  protected labeledModelPropertyGraphPatterns({
+    subject,
+    variablePrefix,
+  }: {
+    subject: GraphPatternSubject;
+    variablePrefix: string;
+  }): readonly GraphPattern[] {
+    const graphPatterns: GraphPattern[] = [];
+    for (const { skosPredicate, skosxlPredicate, variableName } of [
+      {
+        skosPredicate: skos.altLabel,
+        skosxlPredicate: skosxl.altLabel,
+        variableName: "AltLabel",
+      },
+      {
+        skosPredicate: skos.hiddenLabel,
+        skosxlPredicate: skosxl.hiddenLabel,
+        variableName: "HiddenLabel",
+      },
+      {
+        skosPredicate: skos.prefLabel,
+        skosxlPredicate: skosxl.prefLabel,
+        variableName: "PrefLabel",
+      },
+    ]) {
+      graphPatterns.push({
+        subject,
+        predicate: skosPredicate,
+        object: {
+          plainLiteral: true,
+          termType: "Variable",
+          value: variablePrefix + variableName,
+        },
+        optional: true,
+      });
+
+      const skosxlLabelVariable: GraphPatternVariable = {
+        termType: "Variable",
+        value: variablePrefix + variableName + "Resource",
+      };
+      graphPatterns.push({
+        subject,
+        predicate: skosxlPredicate,
+        object: skosxlLabelVariable,
+        optional: true,
+        subGraphPatterns: this.modelPropertyGraphPatterns({
+          subject: skosxlLabelVariable,
+          variablePrefix: skosxlLabelVariable.value,
+        }).concat([
+          {
+            subject: skosxlLabelVariable,
+            predicate: skosxl.literalForm,
+            object: {
+              termType: "Variable",
+              value: variablePrefix + variableName + "LiteralForm",
+            },
+            optional: false,
+          },
+        ]),
+      });
+    }
+
+    return this.modelPropertyGraphPatterns({ subject, variablePrefix }).concat(
+      graphPatterns,
     );
+  }
+
+  protected modelPropertyGraphPatterns({
+    subject,
+    variablePrefix,
+  }: {
+    subject: GraphPatternSubject;
+    variablePrefix: string;
+  }): readonly GraphPattern[] {
+    return [
+      {
+        subject,
+        predicate: rdf.type,
+        object: {
+          termType: "Variable",
+          value: variablePrefix + "Type",
+        },
+        optional: true,
+      },
+      {
+        subject,
+        predicate: dcterms.license,
+        object: {
+          termType: "Variable",
+          value: variablePrefix + "License",
+        },
+        optional: true,
+      },
+      {
+        subject,
+        predicate: dcterms.modified,
+        object: { termType: "Variable", value: variablePrefix + "Modified" },
+        optional: true,
+      },
+      {
+        subject,
+        predicate: dc11.rights,
+        object: {
+          termType: "Variable",
+          plainLiteral: true,
+          value: variablePrefix + "DcRights",
+        },
+        optional: true,
+      },
+      {
+        subject,
+        predicate: dcterms.rights,
+        object: {
+          termType: "Variable",
+          plainLiteral: true,
+          value: variablePrefix + "DctermsRights",
+        },
+        optional: true,
+      },
+      {
+        subject,
+        predicate: dcterms.rightsHolder,
+        object: {
+          termType: "Variable",
+          plainLiteral: true,
+          value: variablePrefix + "RightsHolder",
+        },
+        optional: true,
+      },
+    ];
   }
 }

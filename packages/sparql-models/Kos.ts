@@ -40,12 +40,9 @@ export class Kos<
   async conceptByIdentifier(
     identifier: Resource.Identifier,
   ): Promise<O.Option<SparqlConceptT>> {
-    for (const concept of await this.modelFetcher.fetchConceptsByIdentifiers([
-      identifier,
-    ])) {
-      return O.some(concept);
-    }
-    return O.none;
+    return (
+      await this.modelFetcher.fetchConceptsByIdentifiers([identifier])
+    )[0];
   }
 
   private async conceptIdentifiersPage({
@@ -74,6 +71,12 @@ OFFSET ${offset}`),
     });
   }
 
+  conceptsByIdentifiers(
+    identifiers: readonly Resource.Identifier[],
+  ): Promise<readonly O.Option<SparqlConceptT>[]> {
+    return this.modelFetcher.fetchConceptsByIdentifiers(identifiers);
+  }
+
   async conceptsCount(): Promise<number> {
     return mapResultRowsToCount(
       await this.sparqlClient.query.select(`\
@@ -93,23 +96,22 @@ WHERE {
     limit: number;
     offset: number;
   }): Promise<readonly SparqlConceptT[]> {
-    return this.modelFetcher.fetchConceptsByIdentifiers(
-      await this.conceptIdentifiersPage({
-        limit,
-        offset,
-      }),
-    );
+    return (
+      await this.modelFetcher.fetchConceptsByIdentifiers(
+        await this.conceptIdentifiersPage({
+          limit,
+          offset,
+        }),
+      )
+    ).flatMap((concept) => (O.isSome(concept) ? [concept.value] : []));
   }
 
   async conceptSchemeByIdentifier(
     identifier: Resource.Identifier,
   ): Promise<O.Option<SparqlConceptSchemeT>> {
-    for (const conceptScheme of await this.modelFetcher.fetchConceptSchemesByIdentifiers(
-      [identifier],
-    )) {
-      return O.some(conceptScheme);
-    }
-    return O.none;
+    return (
+      await this.modelFetcher.fetchConceptSchemesByIdentifiers([identifier])
+    )[0];
   }
 
   private async conceptSchemeIdentifiers(): Promise<
@@ -126,8 +128,12 @@ WHERE {
   }
 
   async conceptSchemes(): Promise<readonly SparqlConceptSchemeT[]> {
-    return this.modelFetcher.fetchConceptSchemesByIdentifiers(
-      await this.conceptSchemeIdentifiers(),
+    return (
+      await this.modelFetcher.fetchConceptSchemesByIdentifiers(
+        await this.conceptSchemeIdentifiers(),
+      )
+    ).flatMap((conceptScheme) =>
+      O.isSome(conceptScheme) ? [conceptScheme.value] : [],
     );
   }
 }

@@ -3,6 +3,7 @@ import {
   ConceptScheme as IConceptScheme,
 } from "@kos-kit/models";
 import { Resource } from "@kos-kit/rdf-resource";
+import { Option } from "fp-ts/Option";
 
 export interface ModelFetcher<
   SparqlConceptT extends IConcept,
@@ -10,9 +11,9 @@ export interface ModelFetcher<
 > {
   fetchConceptsByIdentifiers(
     identifiers: readonly Resource.Identifier[],
-  ): Promise<readonly SparqlConceptT[]>;
+  ): Promise<readonly Option<SparqlConceptT>[]>;
 
   fetchConceptSchemesByIdentifiers(
     identifiers: readonly Resource.Identifier[],
-  ): Promise<readonly SparqlConceptSchemeT[]>;
+  ): Promise<readonly Option<SparqlConceptSchemeT>[]>;
 }
