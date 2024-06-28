@@ -4,7 +4,6 @@ import {
   Kos as IKos,
 } from "@kos-kit/models";
 import { Resource } from "@kos-kit/rdf-resource";
-import { BlankNode, NamedNode } from "@rdfjs/types";
 import { rdf, rdfs, skos } from "@tpluscode/rdf-ns-builders";
 import * as O from "fp-ts/Option";
 import { ModelFetcher } from "./ModelFetcher.js";
@@ -39,7 +38,7 @@ export class Kos<
   }
 
   async conceptByIdentifier(
-    identifier: BlankNode | NamedNode,
+    identifier: Resource.Identifier,
   ): Promise<O.Option<SparqlConceptT>> {
     for (const concept of await this.modelFetcher.fetchConceptsByIdentifiers([
       identifier,

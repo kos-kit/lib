@@ -1,6 +1,6 @@
 import { Model as IModel } from "@kos-kit/models";
 import { Resource } from "@kos-kit/rdf-resource";
-import { BlankNode, Literal, NamedNode } from "@rdfjs/types";
+import { Literal, NamedNode } from "@rdfjs/types";
 import { dc11, dcterms } from "@tpluscode/rdf-ns-builders";
 import { Option } from "fp-ts/Option";
 import { GraphPattern, GraphPatternSubject } from "./GraphPattern.js";
@@ -28,7 +28,7 @@ export abstract class Model<
     this.memModel = memModel;
   }
 
-  get identifier(): BlankNode | NamedNode {
+  get identifier(): Resource.Identifier {
     return this.memModel.identifier;
   }
 

@@ -1,7 +1,7 @@
 import { BlankNode, NamedNode } from "@rdfjs/types";
+import { Option } from "fp-ts/Option";
 import { Concept } from "./Concept.js";
 import { ConceptScheme } from "./ConceptScheme.js";
-import { Option } from "fp-ts/Option";
 
 export interface Kos {
   conceptByIdentifier(
@@ -18,4 +18,7 @@ export interface Kos {
     identifier: BlankNode | NamedNode,
   ): Promise<Option<ConceptScheme>>;
   conceptSchemes(): Promise<readonly ConceptScheme[]>;
+  conceptSchemseByIdentifiers(
+    identifier: BlankNode | NamedNode,
+  ): Promise<Option<ConceptScheme>>;
 }

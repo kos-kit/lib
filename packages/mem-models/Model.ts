@@ -1,6 +1,6 @@
 import { Model as IModel, LanguageTagSet } from "@kos-kit/models";
 import { Resource } from "@kos-kit/rdf-resource";
-import { BlankNode, DatasetCore, Literal, NamedNode } from "@rdfjs/types";
+import { DatasetCore, Literal, NamedNode } from "@rdfjs/types";
 import { dc11, dcterms } from "@tpluscode/rdf-ns-builders";
 import * as O from "fp-ts/Option";
 import { matchLiteral } from "./matchLiteral.js";
@@ -22,7 +22,7 @@ export abstract class Model implements IModel {
     return this.resource.dataset;
   }
 
-  get identifier(): BlankNode | NamedNode {
+  get identifier(): Resource.Identifier {
     return this.resource.identifier;
   }
 

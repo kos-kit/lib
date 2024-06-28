@@ -4,7 +4,6 @@ import {
   ConceptScheme as IConceptScheme,
 } from "@kos-kit/models";
 import { Resource } from "@kos-kit/rdf-resource";
-import { BlankNode, NamedNode } from "@rdfjs/types";
 import { skos } from "@tpluscode/rdf-ns-builders";
 import * as O from "fp-ts/Option";
 import { LabeledModel } from "./LabeledModel.js";
@@ -21,7 +20,7 @@ export class ConceptScheme<
   implements IConceptScheme
 {
   async conceptByIdentifier(
-    identifier: BlankNode | NamedNode,
+    identifier: Resource.Identifier,
   ): Promise<O.Option<Concept>> {
     if (
       await this.sparqlClient.query.ask(`\

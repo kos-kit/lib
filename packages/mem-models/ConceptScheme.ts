@@ -5,7 +5,6 @@ import {
 } from "@kos-kit/models";
 import { Resource } from "@kos-kit/rdf-resource";
 import TermSet from "@rdfjs/term-set";
-import { BlankNode, NamedNode } from "@rdfjs/types";
 import { skos } from "@tpluscode/rdf-ns-builders";
 import * as O from "fp-ts/Option";
 import { LabeledModel } from "./LabeledModel.js";
@@ -21,7 +20,7 @@ export class ConceptScheme<
   implements IConceptScheme
 {
   conceptByIdentifier(
-    identifier: BlankNode | NamedNode,
+    identifier: Resource.Identifier,
   ): Promise<O.Option<ConceptT>> {
     return new Promise((resolve) => {
       for (const _ of this.resource.dataset.match(
@@ -101,9 +100,7 @@ export class ConceptScheme<
         this.identifier,
       )) {
         const conceptIdentifier = O.toNullable(
-          Resource.ValueMappers.identifier(
-            quad.subject as BlankNode | NamedNode,
-          ),
+          Resource.ValueMappers.identifier(quad.subject as Resource.Identifier),
         );
         if (
           conceptIdentifier !== null &&

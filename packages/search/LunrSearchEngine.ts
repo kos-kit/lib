@@ -1,12 +1,11 @@
-import lunr, { Index } from "lunr";
-import { SearchEngine } from "./SearchEngine.js";
-import { SearchResult } from "./SearchResult.js";
-import { SearchEngineJson } from "./SearchEngineJson.js";
-import { LunrIndexCompactor } from "./LunrIndexCompactor.js";
-import { SearchResults } from "./SearchResults.js";
 import { Kos, LabeledModel, LanguageTag } from "@kos-kit/models";
-import { BlankNode, NamedNode } from "@rdfjs/types";
 import { Resource } from "@kos-kit/rdf-resource";
+import lunr, { Index } from "lunr";
+import { LunrIndexCompactor } from "./LunrIndexCompactor.js";
+import { SearchEngine } from "./SearchEngine.js";
+import { SearchEngineJson } from "./SearchEngineJson.js";
+import { SearchResult } from "./SearchResult.js";
+import { SearchResults } from "./SearchResults.js";
 
 /**
  * A SearchEngine implementation built with Lunr.js, so it can be used in the browser.
@@ -35,7 +34,7 @@ export class LunrSearchEngine implements SearchEngine {
     }
 
     const toIndexDocument = (
-      model: LabeledModel & { identifier: BlankNode | NamedNode },
+      model: LabeledModel,
       type: SearchResult["type"],
     ): IndexDocument | null => {
       const prefLabels = model.prefLabels;
