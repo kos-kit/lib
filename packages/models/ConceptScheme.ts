@@ -13,7 +13,6 @@ export interface ConceptScheme extends LabeledModel {
     limit: number;
     offset: number;
   }): Promise<readonly Concept[]>;
-
   topConcepts(): AsyncIterable<Concept>;
   topConceptsCount(): Promise<number>;
   topConceptsPage(kwds: {

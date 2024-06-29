@@ -1,139 +1,156 @@
-import {
-  Concept as IConcept,
-  ConceptScheme as IConceptScheme,
-  Kos as IKos,
-} from "@kos-kit/models";
-import { Resource } from "@kos-kit/rdf-resource";
-import { rdf, rdfs, skos } from "@tpluscode/rdf-ns-builders";
-import * as O from "fp-ts/Option";
-import { ModelFetcher } from "./ModelFetcher.js";
-import { SparqlClient } from "./SparqlClient.js";
-import { mapResultRowsToCount } from "./mapResultRowsToCount.js";
-import { mapResultRowsToIdentifiers } from "./mapResultRowsToIdentifiers.js";
-import { paginationToAsyncIterable } from "./paginationToAsyncIterable.js";
+// File: /Users/minor/projects/kos-kit/explorer/app/[languageTag]/search/page.tsx
+import type {
+  ResolvingMetadata,
+  ResolvingViewport,
+} from "next/dist/lib/metadata/types/metadata-interface.js";
+import * as entry from "../../../../../app/[languageTag]/search/page.js";
 
-export class Kos<
-  SparqlConceptT extends IConcept,
-  SparqlConceptSchemeT extends IConceptScheme,
-> implements IKos
-{
-  private static readonly CONCEPT_IDENTIFIER_GRAPH_PATTERN = `?concept <${rdf.type.value}>/<${rdfs.subClassOf.value}>* <${skos.Concept.value}> .`;
-  private static readonly CONCEPT_SCHEME_IDENTIFIER_GRAPH_PATTERN = `?conceptScheme <${rdf.type.value}>/<${rdfs.subClassOf.value}>* <${skos.ConceptScheme.value}> .`;
+type TEntry = typeof import("../../../../../app/[languageTag]/search/page.js");
 
-  private readonly modelFetcher: ModelFetcher<
-    SparqlConceptT,
-    SparqlConceptSchemeT
-  >;
-  private readonly sparqlClient: SparqlClient;
+// Check that the entry is a valid entry
+checkFields<
+  Diff<
+    {
+      default: Function;
+      config?: {};
+      generateStaticParams?: Function;
+      revalidate?: RevalidateRange<TEntry> | false;
+      dynamic?: "auto" | "force-dynamic" | "error" | "force-static";
+      dynamicParams?: boolean;
+      fetchCache?:
+        | "auto"
+        | "force-no-store"
+        | "only-no-store"
+        | "default-no-store"
+        | "default-cache"
+        | "only-cache"
+        | "force-cache";
+      preferredRegion?: "auto" | "global" | "home" | string | string[];
+      runtime?: "nodejs" | "experimental-edge" | "edge";
+      maxDuration?: number;
 
-  constructor({
-    modelFetcher,
-    sparqlClient,
-  }: {
-    modelFetcher: ModelFetcher<SparqlConceptT, SparqlConceptSchemeT>;
-    sparqlClient: SparqlClient;
-  }) {
-    this.modelFetcher = modelFetcher;
-    this.sparqlClient = sparqlClient;
-  }
+      metadata?: any;
+      generateMetadata?: Function;
+      viewport?: any;
+      generateViewport?: Function;
+    },
+    TEntry,
+    ""
+  >
+>();
 
-  async conceptByIdentifier(
-    identifier: Resource.Identifier,
-  ): Promise<O.Option<SparqlConceptT>> {
-    return (
-      await this.modelFetcher.fetchConceptsByIdentifiers([identifier])
-    )[0];
-  }
+// Check the prop type of the entry function
+checkFields<Diff<PageProps, FirstArg<TEntry["default"]>, "default">>();
 
-  async conceptSchemeByIdentifier(
-    identifier: Resource.Identifier,
-  ): Promise<O.Option<SparqlConceptSchemeT>> {
-    return (
-      await this.modelFetcher.fetchConceptSchemesByIdentifiers([identifier])
-    )[0];
-  }
-
-  async conceptSchemes(): Promise<readonly SparqlConceptSchemeT[]> {
-    return (
-      await this.modelFetcher.fetchConceptSchemesByIdentifiers(
-        await this.conceptSchemeIdentifiers(),
-      )
-    ).flatMap((conceptScheme) =>
-      O.isSome(conceptScheme) ? [conceptScheme.value] : [],
-    );
-  }
-
-  async *concepts(): AsyncIterable<SparqlConceptT> {
-    yield* paginationToAsyncIterable({
-      getPage: ({ offset }) => this.conceptsPage({ limit: 100, offset }),
-      totalCount: await this.conceptsCount(),
-    });
-  }
-
-  conceptsByIdentifiers(
-    identifiers: readonly Resource.Identifier[],
-  ): Promise<readonly O.Option<SparqlConceptT>[]> {
-    return this.modelFetcher.fetchConceptsByIdentifiers(identifiers);
-  }
-
-  async conceptsCount(): Promise<number> {
-    return mapResultRowsToCount(
-      await this.sparqlClient.query.select(`\
-SELECT (COUNT(?concept) AS ?count)
-WHERE {
-  ${Kos.CONCEPT_IDENTIFIER_GRAPH_PATTERN}
-}`),
-      "count",
-    );
-  }
-
-  // eslint-disable-next-line no-empty-pattern
-  async conceptsPage({
-    limit,
-    offset,
-  }: {
-    limit: number;
-    offset: number;
-  }): Promise<readonly SparqlConceptT[]> {
-    return (
-      await this.modelFetcher.fetchConceptsByIdentifiers(
-        await this.conceptIdentifiersPage({
-          limit,
-          offset,
-        }),
-      )
-    ).flatMap((concept) => (O.isSome(concept) ? [concept.value] : []));
-  }
-
-  private async conceptIdentifiersPage({
-    limit,
-    offset,
-  }: {
-    limit: number;
-    offset: number;
-  }): Promise<readonly Resource.Identifier[]> {
-    return mapResultRowsToIdentifiers(
-      await this.sparqlClient.query.select(`\
-SELECT ?concept
-WHERE {
-  ${Kos.CONCEPT_IDENTIFIER_GRAPH_PATTERN}
+// Check the arguments and return type of the generateMetadata function
+if ("generateMetadata" in entry) {
+  checkFields<
+    Diff<
+      PageProps,
+      FirstArg<MaybeField<TEntry, "generateMetadata">>,
+      "generateMetadata"
+    >
+  >();
+  checkFields<
+    Diff<
+      ResolvingMetadata,
+      SecondArg<MaybeField<TEntry, "generateMetadata">>,
+      "generateMetadata"
+    >
+  >();
 }
-LIMIT ${limit}
-OFFSET ${offset}`),
-      "concept",
-    );
-  }
 
-  private async conceptSchemeIdentifiers(): Promise<
-    readonly Resource.Identifier[]
-  > {
-    return mapResultRowsToIdentifiers(
-      await this.sparqlClient.query.select(`\
-SELECT ?conceptScheme
-WHERE {
-  ${Kos.CONCEPT_SCHEME_IDENTIFIER_GRAPH_PATTERN}
-}`),
-      "conceptScheme",
-    );
-  }
+// Check the arguments and return type of the generateViewport function
+if ("generateViewport" in entry) {
+  checkFields<
+    Diff<
+      PageProps,
+      FirstArg<MaybeField<TEntry, "generateViewport">>,
+      "generateViewport"
+    >
+  >();
+  checkFields<
+    Diff<
+      ResolvingViewport,
+      SecondArg<MaybeField<TEntry, "generateViewport">>,
+      "generateViewport"
+    >
+  >();
 }
+
+// Check the arguments and return type of the generateStaticParams function
+if ("generateStaticParams" in entry) {
+  checkFields<
+    Diff<
+      { params: PageParams },
+      FirstArg<MaybeField<TEntry, "generateStaticParams">>,
+      "generateStaticParams"
+    >
+  >();
+  checkFields<
+    Diff<
+      {
+        __tag__: "generateStaticParams";
+        __return_type__: any[] | Promise<any[]>;
+      },
+      {
+        __tag__: "generateStaticParams";
+        __return_type__: ReturnType<MaybeField<TEntry, "generateStaticParams">>;
+      }
+    >
+  >();
+}
+
+type PageParams = any;
+export interface PageProps {
+  params?: any;
+  searchParams?: any;
+}
+export interface LayoutProps {
+  children?: React.ReactNode;
+  params?: any;
+}
+
+// =============
+// Utility types
+type RevalidateRange<T> = T extends { revalidate: any }
+  ? NonNegative<T["revalidate"]>
+  : never;
+
+// If T is unknown or any, it will be an empty {} type. Otherwise, it will be the same as Omit<T, keyof Base>.
+type OmitWithTag<T, K extends keyof any, _M> = Omit<T, K>;
+type Diff<Base, T extends Base, Message extends string = ""> = 0 extends 1 & T
+  ? {}
+  : OmitWithTag<T, keyof Base, Message>;
+
+type FirstArg<T extends Function> = T extends (...args: [infer T, any]) => any
+  ? unknown extends T
+    ? any
+    : T
+  : never;
+type SecondArg<T extends Function> = T extends (...args: [any, infer T]) => any
+  ? unknown extends T
+    ? any
+    : T
+  : never;
+type MaybeField<T, K extends string> = T extends { [k in K]: infer G }
+  ? G extends Function
+    ? G
+    : never
+  : never;
+
+function checkFields<_ extends { [k in keyof any]: never }>() {}
+
+// https://github.com/sindresorhus/type-fest
+type Numeric = number | bigint;
+type Zero = 0 | 0n;
+type Negative<T extends Numeric> = T extends Zero
+  ? never
+  : `${T}` extends `-${string}`
+    ? T
+    : never;
+type NonNegative<T extends Numeric> = T extends Zero
+  ? T
+  : Negative<T> extends never
+    ? T
+    : "__invalid_negative_number__";

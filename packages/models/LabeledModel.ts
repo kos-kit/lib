@@ -10,16 +10,12 @@ export interface LabeledModel extends Model {
    * Alternate labels, equivalent to skos:altLabel.
    */
   readonly altLabels: readonly Label[];
-
   readonly displayLabel: string;
-
-  readonly identifier: BlankNode | NamedNode;
-
   /**
    * Hidden labels, equivalent to skos:hiddenLabel.
    */
   readonly hiddenLabels: readonly Label[];
-
+  readonly identifier: BlankNode | NamedNode;
   /**
    * Preferred labels, equivalent to skos:prefLabel.
    */
