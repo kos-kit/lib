@@ -35,7 +35,6 @@ export class DefaultModelFetcher<
       SparqlConceptSchemeT
     >,
   ) => SparqlConceptT;
-
   private readonly conceptSchemeConstructor: new (
     parameters: LabeledModel.Parameters<
       MemConceptSchemeT,
@@ -43,15 +42,12 @@ export class DefaultModelFetcher<
       SparqlConceptSchemeT
     >,
   ) => SparqlConceptSchemeT;
-
   private readonly includeLanguageTags: LanguageTagSet;
-
   private readonly memModelFactory: mem.ModelFactory<
     MemConceptT,
     MemConceptSchemeT,
     MemLabelT
   >;
-
   private readonly sparqlClient: SparqlClient;
 
   constructor({
@@ -90,52 +86,50 @@ export class DefaultModelFetcher<
     this.sparqlClient = sparqlClient;
   }
 
-  protected conceptPropertyGraphPatterns({
-    subject,
-    variablePrefix,
-  }: {
-    subject: GraphPatternSubject;
-    variablePrefix: string;
-  }): readonly GraphPattern[] {
-    const graphPatterns: GraphPattern[] = [];
-
-    graphPatterns.push({
-      subject,
-      predicate: skos.notation,
-      object: {
-        termType: "Variable",
-        value: variablePrefix + "Notation",
-      },
-      optional: true,
+  async fetchConceptSchemesByIdentifiers(
+    identifiers: readonly Resource.Identifier[],
+  ): Promise<readonly O.Option<SparqlConceptSchemeT>[]> {
+    const conceptSchemeVariable: GraphPatternVariable = {
+      termType: "Variable",
+      value: "conceptScheme",
+    };
+    const includeLanguageTags = this.includeLanguageTags;
+    const dataset = await this.sparqlClient.query.construct(
+      new ConstructQueryBuilder({
+        includeLanguageTags,
+      })
+        .addGraphPatterns(
+          ...this.conceptSchemePropertyGraphPatterns({
+            subject: conceptSchemeVariable,
+            variablePrefix: conceptSchemeVariable.value,
+          }),
+        )
+        .addValues(conceptSchemeVariable, ...identifiers)
+        .build(),
+      { operation: "postDirect" },
+    );
+    return identifiers.map((identifier) => {
+      if (
+        isInstanceOf({
+          class_: skos.ConceptScheme,
+          dataset,
+          instance: identifier,
+        })
+      ) {
+        return O.some(
+          new this.conceptSchemeConstructor({
+            memModel: this.memModelFactory.createConceptScheme(
+              new Resource({ dataset, identifier }),
+            ),
+            modelFetcher: this,
+            sparqlClient: this.sparqlClient,
+          }),
+        );
+      } else {
+        console.warn("tried to fetch missing concept scheme", identifier.value);
+        return O.none;
+      }
     });
-
-    for (const noteProperty of noteProperties) {
-      graphPatterns.push({
-        subject,
-        predicate: noteProperty.identifier,
-        object: {
-          plainLiteral: true,
-          termType: "Variable",
-          value:
-            variablePrefix +
-            noteProperty.name[0].toUpperCase() +
-            noteProperty.name.substring(1),
-        },
-        optional: true,
-      });
-    }
-
-    return this.labeledModelPropertyGraphPatterns({
-      subject,
-      variablePrefix,
-    }).concat(graphPatterns);
-  }
-
-  protected conceptSchemePropertyGraphPatterns(kwds: {
-    subject: GraphPatternSubject;
-    variablePrefix: string;
-  }): readonly GraphPattern[] {
-    return this.labeledModelPropertyGraphPatterns(kwds);
   }
 
   async fetchConceptsByIdentifiers(
@@ -184,50 +178,52 @@ export class DefaultModelFetcher<
     });
   }
 
-  async fetchConceptSchemesByIdentifiers(
-    identifiers: readonly Resource.Identifier[],
-  ): Promise<readonly O.Option<SparqlConceptSchemeT>[]> {
-    const conceptSchemeVariable: GraphPatternVariable = {
-      termType: "Variable",
-      value: "conceptScheme",
-    };
-    const includeLanguageTags = this.includeLanguageTags;
-    const dataset = await this.sparqlClient.query.construct(
-      new ConstructQueryBuilder({
-        includeLanguageTags,
-      })
-        .addGraphPatterns(
-          ...this.conceptSchemePropertyGraphPatterns({
-            subject: conceptSchemeVariable,
-            variablePrefix: conceptSchemeVariable.value,
-          }),
-        )
-        .addValues(conceptSchemeVariable, ...identifiers)
-        .build(),
-      { operation: "postDirect" },
-    );
-    return identifiers.map((identifier) => {
-      if (
-        isInstanceOf({
-          class_: skos.ConceptScheme,
-          dataset,
-          instance: identifier,
-        })
-      ) {
-        return O.some(
-          new this.conceptSchemeConstructor({
-            memModel: this.memModelFactory.createConceptScheme(
-              new Resource({ dataset, identifier }),
-            ),
-            modelFetcher: this,
-            sparqlClient: this.sparqlClient,
-          }),
-        );
-      } else {
-        console.warn("tried to fetch missing concept scheme", identifier.value);
-        return O.none;
-      }
+  protected conceptPropertyGraphPatterns({
+    subject,
+    variablePrefix,
+  }: {
+    subject: GraphPatternSubject;
+    variablePrefix: string;
+  }): readonly GraphPattern[] {
+    const graphPatterns: GraphPattern[] = [];
+
+    graphPatterns.push({
+      subject,
+      predicate: skos.notation,
+      object: {
+        termType: "Variable",
+        value: variablePrefix + "Notation",
+      },
+      optional: true,
     });
+
+    for (const noteProperty of noteProperties) {
+      graphPatterns.push({
+        subject,
+        predicate: noteProperty.identifier,
+        object: {
+          plainLiteral: true,
+          termType: "Variable",
+          value:
+            variablePrefix +
+            noteProperty.name[0].toUpperCase() +
+            noteProperty.name.substring(1),
+        },
+        optional: true,
+      });
+    }
+
+    return this.labeledModelPropertyGraphPatterns({
+      subject,
+      variablePrefix,
+    }).concat(graphPatterns);
+  }
+
+  protected conceptSchemePropertyGraphPatterns(kwds: {
+    subject: GraphPatternSubject;
+    variablePrefix: string;
+  }): readonly GraphPattern[] {
+    return this.labeledModelPropertyGraphPatterns(kwds);
   }
 
   protected labeledModelPropertyGraphPatterns({

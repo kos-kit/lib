@@ -90,9 +90,10 @@ export class Resource {
 export namespace Resource {
   export class Builder {
     private readonly dataFactory: DataFactory;
+
     readonly dataset: DatasetCore;
-    readonly identifier: Identifier;
     readonly graph: DefaultGraph | NamedNode | BlankNode | undefined;
+    readonly identifier: Identifier;
 
     constructor({
       dataFactory,
