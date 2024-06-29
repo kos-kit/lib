@@ -64,6 +64,13 @@ export abstract class LabeledModel<
     });
   }
 
+  get prefLabels(): readonly ILabel[] {
+    return this.labels({
+      skosPredicate: skos.prefLabel,
+      skosXlPredicate: skosxl.prefLabel,
+    });
+  }
+
   private labels({
     skosPredicate,
     skosXlPredicate,
@@ -114,13 +121,6 @@ export abstract class LabeledModel<
     }
 
     return labels;
-  }
-
-  get prefLabels(): readonly ILabel[] {
-    return this.labels({
-      skosPredicate: skos.prefLabel,
-      skosXlPredicate: skosxl.prefLabel,
-    });
   }
 }
 

@@ -19,8 +19,9 @@ export class Kos<
   LabelT extends ILabel,
 > implements IKos
 {
-  readonly dataset: DatasetCore;
   private readonly modelFactory: ModelFactory<ConceptT, ConceptSchemeT, LabelT>;
+
+  readonly dataset: DatasetCore;
 
   constructor({
     dataset,
@@ -31,14 +32,6 @@ export class Kos<
   }) {
     this.dataset = dataset;
     this.modelFactory = modelFactory;
-  }
-
-  conceptByIdentifier(
-    identifier: Resource.Identifier,
-  ): Promise<O.Option<ConceptT>> {
-    return new Promise((resolve) => {
-      resolve(this._conceptByIdentifier(identifier));
-    });
   }
 
   _conceptByIdentifier(identifier: Resource.Identifier): O.Option<ConceptT> {
@@ -59,6 +52,39 @@ export class Kos<
     }
   }
 
+  conceptByIdentifier(
+    identifier: Resource.Identifier,
+  ): Promise<O.Option<ConceptT>> {
+    return new Promise((resolve) => {
+      resolve(this._conceptByIdentifier(identifier));
+    });
+  }
+
+  async conceptSchemeByIdentifier(
+    identifier: Resource.Identifier,
+  ): Promise<O.Option<ConceptSchemeT>> {
+    for (const conceptScheme of await this.conceptSchemes()) {
+      if (conceptScheme.identifier.equals(identifier)) {
+        return O.some(conceptScheme);
+      }
+    }
+    return O.none;
+  }
+
+  conceptSchemes(): Promise<readonly ConceptSchemeT[]> {
+    return new Promise((resolve) => {
+      resolve([...this._conceptSchemes()]);
+    });
+  }
+
+  async *concepts(): AsyncIterable<ConceptT> {
+    for await (const identifier of this.conceptIdentifiers()) {
+      yield this.modelFactory.createConcept(
+        new Resource({ dataset: this.dataset, identifier }),
+      );
+    }
+  }
+
   conceptsByIdentifiers(
     identifiers: readonly Resource.Identifier[],
   ): Promise<readonly O.Option<ConceptT>[]> {
@@ -69,20 +95,10 @@ export class Kos<
     });
   }
 
-  private *conceptIdentifiers(): Iterable<Resource.Identifier> {
-    yield* instances({
-      class_: skos.Concept,
-      dataset: this.dataset,
-      includeSubclasses: true,
+  conceptsCount(): Promise<number> {
+    return new Promise((resolve) => {
+      resolve(countIterable(this.conceptIdentifiers()));
     });
-  }
-
-  async *concepts(): AsyncIterable<ConceptT> {
-    for await (const identifier of this.conceptIdentifiers()) {
-      yield this.modelFactory.createConcept(
-        new Resource({ dataset: this.dataset, identifier }),
-      );
-    }
   }
 
   conceptsPage({
@@ -108,29 +124,6 @@ export class Kos<
     });
   }
 
-  conceptsCount(): Promise<number> {
-    return new Promise((resolve) => {
-      resolve(countIterable(this.conceptIdentifiers()));
-    });
-  }
-
-  async conceptSchemeByIdentifier(
-    identifier: Resource.Identifier,
-  ): Promise<O.Option<ConceptSchemeT>> {
-    for (const conceptScheme of await this.conceptSchemes()) {
-      if (conceptScheme.identifier.equals(identifier)) {
-        return O.some(conceptScheme);
-      }
-    }
-    return O.none;
-  }
-
-  conceptSchemes(): Promise<readonly ConceptSchemeT[]> {
-    return new Promise((resolve) => {
-      resolve([...this._conceptSchemes()]);
-    });
-  }
-
   private *_conceptSchemes(): Iterable<ConceptSchemeT> {
     for (const identifier of instances({
       class_: skos.ConceptScheme,
@@ -141,5 +134,13 @@ export class Kos<
         new Resource({ dataset: this.dataset, identifier }),
       );
     }
+  }
+
+  private *conceptIdentifiers(): Iterable<Resource.Identifier> {
+    yield* instances({
+      class_: skos.Concept,
+      dataset: this.dataset,
+      includeSubclasses: true,
+    });
   }
 }

@@ -22,59 +22,16 @@ export class Concept<
   extends LabeledModel<ConceptT, ConceptSchemeT, LabelT>
   implements IConcept
 {
-  inSchemes(): Promise<readonly ConceptSchemeT[]> {
-    return new Promise((resolve) => {
-      resolve(this._inSchemes({ topOnly: false }));
-    });
-  }
-
-  private _inSchemes({
-    topOnly,
-  }: {
-    topOnly: boolean;
-  }): readonly ConceptSchemeT[] {
-    const conceptSchemeIdentifiers = new TermSet<Resource.Identifier>();
-
-    for (const quad of this.resource.dataset.match(
-      null,
-      skos.hasTopConcept,
-      this.identifier,
-    )) {
-      switch (quad.subject.termType) {
-        case "BlankNode":
-        case "NamedNode":
-          conceptSchemeIdentifiers.add(quad.subject);
-          break;
-      }
-    }
-
-    for (const conceptSchemeIdentifier of this.resource.values(
-      skos.topConceptOf,
-      Resource.ValueMappers.identifier,
-    )) {
-      conceptSchemeIdentifiers.add(conceptSchemeIdentifier);
-    }
-
-    if (!topOnly) {
-      for (const conceptSchemeIdentifier of this.resource.values(
-        skos.inScheme,
-        Resource.ValueMappers.identifier,
-      )) {
-        conceptSchemeIdentifiers.add(conceptSchemeIdentifier);
-      }
-    }
-
-    return [...conceptSchemeIdentifiers].map((identifier) =>
-      this.modelFactory.createConceptScheme(
-        new Resource({ dataset: this.dataset, identifier }),
-      ),
-    );
-  }
-
   get notations(): readonly Literal[] {
     return [
       ...this.resource.values(skos.notation, Resource.ValueMappers.literal),
     ];
+  }
+
+  inSchemes(): Promise<readonly ConceptSchemeT[]> {
+    return new Promise((resolve) => {
+      resolve(this._inSchemes({ topOnly: false }));
+    });
   }
 
   notes(property: NoteProperty): readonly Literal[] {
@@ -126,5 +83,48 @@ export class Concept<
     return new Promise((resolve) => {
       resolve(this._inSchemes({ topOnly: true }));
     });
+  }
+
+  private _inSchemes({
+    topOnly,
+  }: {
+    topOnly: boolean;
+  }): readonly ConceptSchemeT[] {
+    const conceptSchemeIdentifiers = new TermSet<Resource.Identifier>();
+
+    for (const quad of this.resource.dataset.match(
+      null,
+      skos.hasTopConcept,
+      this.identifier,
+    )) {
+      switch (quad.subject.termType) {
+        case "BlankNode":
+        case "NamedNode":
+          conceptSchemeIdentifiers.add(quad.subject);
+          break;
+      }
+    }
+
+    for (const conceptSchemeIdentifier of this.resource.values(
+      skos.topConceptOf,
+      Resource.ValueMappers.identifier,
+    )) {
+      conceptSchemeIdentifiers.add(conceptSchemeIdentifier);
+    }
+
+    if (!topOnly) {
+      for (const conceptSchemeIdentifier of this.resource.values(
+        skos.inScheme,
+        Resource.ValueMappers.identifier,
+      )) {
+        conceptSchemeIdentifiers.add(conceptSchemeIdentifier);
+      }
+    }
+
+    return [...conceptSchemeIdentifiers].map((identifier) =>
+      this.modelFactory.createConceptScheme(
+        new Resource({ dataset: this.dataset, identifier }),
+      ),
+    );
   }
 }

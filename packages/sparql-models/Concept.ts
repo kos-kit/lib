@@ -20,6 +20,10 @@ export class Concept<
   extends LabeledModel<MemConceptT, SparqlConceptT, SparqlConceptSchemeT>
   implements IConcept
 {
+  get notations(): readonly Literal[] {
+    return this.memModel.notations;
+  }
+
   async inSchemes(): Promise<readonly SparqlConceptSchemeT[]> {
     // Could do this in a single CONSTRUCT as an optimization. This code is simpler.
     const identifierString = Resource.Identifier.toString(this.identifier);
@@ -39,10 +43,6 @@ WHERE {
         ),
       )
     ).flatMap((concept) => (O.isSome(concept) ? [concept.value] : []));
-  }
-
-  get notations(): readonly Literal[] {
-    return this.memModel.notations;
   }
 
   notes(property: NoteProperty): readonly Literal[] {

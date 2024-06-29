@@ -20,6 +20,48 @@ export class ConceptScheme<
   extends LabeledModel<ConceptT, ConceptSchemeT, LabelT>
   implements IConceptScheme
 {
+  async *_concepts({ topOnly }: { topOnly: boolean }): AsyncIterable<ConceptT> {
+    for await (const identifier of this._conceptIdentifiers({ topOnly })) {
+      yield this.modelFactory.createConcept(
+        new Resource({ dataset: this.dataset, identifier }),
+      );
+    }
+  }
+
+  _conceptsCount({ topOnly }: { topOnly: boolean }): Promise<number> {
+    return new Promise((resolve) => {
+      resolve(countIterable(this._conceptIdentifiers({ topOnly })));
+    });
+  }
+
+  _conceptsPage({
+    limit,
+    offset,
+    topOnly,
+  }: {
+    limit: number;
+    offset: number;
+    topOnly: boolean;
+  }): Promise<readonly ConceptT[]> {
+    return new Promise((resolve) => {
+      const result: ConceptT[] = [];
+      for (const identifier of paginateIterable(
+        this._conceptIdentifiers({ topOnly }),
+        {
+          limit,
+          offset,
+        },
+      )) {
+        result.push(
+          this.modelFactory.createConcept(
+            new Resource({ dataset: this.dataset, identifier }),
+          ),
+        );
+      }
+      resolve(result);
+    });
+  }
+
   conceptByIdentifier(
     identifier: Resource.Identifier,
   ): Promise<O.Option<ConceptT>> {
@@ -77,6 +119,10 @@ export class ConceptScheme<
     yield* this._concepts({ topOnly: false });
   }
 
+  conceptsCount(): Promise<number> {
+    return this._conceptsCount({ topOnly: false });
+  }
+
   conceptsPage(kwds: {
     limit: number;
     offset: number;
@@ -84,8 +130,19 @@ export class ConceptScheme<
     return this._conceptsPage({ ...kwds, topOnly: false });
   }
 
-  conceptsCount(): Promise<number> {
-    return this._conceptsCount({ topOnly: false });
+  async *topConcepts(): AsyncIterable<ConceptT> {
+    yield* this._concepts({ topOnly: true });
+  }
+
+  topConceptsCount(): Promise<number> {
+    return this._conceptsCount({ topOnly: true });
+  }
+
+  topConceptsPage(kwds: {
+    limit: number;
+    offset: number;
+  }): Promise<readonly ConceptT[]> {
+    return this._conceptsPage({ ...kwds, topOnly: true });
   }
 
   private *_conceptIdentifiers({
@@ -141,62 +198,5 @@ export class ConceptScheme<
         yield conceptIdentifier;
         conceptIdentifierSet.add(conceptIdentifier);
       }
-  }
-
-  async *_concepts({ topOnly }: { topOnly: boolean }): AsyncIterable<ConceptT> {
-    for await (const identifier of this._conceptIdentifiers({ topOnly })) {
-      yield this.modelFactory.createConcept(
-        new Resource({ dataset: this.dataset, identifier }),
-      );
-    }
-  }
-
-  _conceptsPage({
-    limit,
-    offset,
-    topOnly,
-  }: {
-    limit: number;
-    offset: number;
-    topOnly: boolean;
-  }): Promise<readonly ConceptT[]> {
-    return new Promise((resolve) => {
-      const result: ConceptT[] = [];
-      for (const identifier of paginateIterable(
-        this._conceptIdentifiers({ topOnly }),
-        {
-          limit,
-          offset,
-        },
-      )) {
-        result.push(
-          this.modelFactory.createConcept(
-            new Resource({ dataset: this.dataset, identifier }),
-          ),
-        );
-      }
-      resolve(result);
-    });
-  }
-
-  _conceptsCount({ topOnly }: { topOnly: boolean }): Promise<number> {
-    return new Promise((resolve) => {
-      resolve(countIterable(this._conceptIdentifiers({ topOnly })));
-    });
-  }
-
-  async *topConcepts(): AsyncIterable<ConceptT> {
-    yield* this._concepts({ topOnly: true });
-  }
-
-  topConceptsPage(kwds: {
-    limit: number;
-    offset: number;
-  }): Promise<readonly ConceptT[]> {
-    return this._conceptsPage({ ...kwds, topOnly: true });
-  }
-
-  topConceptsCount(): Promise<number> {
-    return this._conceptsCount({ topOnly: true });
   }
 }

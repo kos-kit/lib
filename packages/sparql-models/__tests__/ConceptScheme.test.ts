@@ -1,8 +1,8 @@
+import { orFail } from "@kos-kit/models/__tests__/orFail.js";
 import { DataFactory } from "n3";
+import { describe } from "vitest";
 import { behavesLikeUnescoThesaurusConceptScheme } from "../../models/__tests__/behavesLikeUnescoThesaurusConceptScheme.js";
 import { testKosFactory } from "./testKosFactory.js";
-import { describe } from "vitest";
-import { orFail } from "@kos-kit/models/__tests__/orFail.js";
 
 (process.env["CI"] ? describe.skip : describe)("sparql.ConceptScheme", () => {
   behavesLikeUnescoThesaurusConceptScheme((includeLanguageTag) =>

@@ -9,11 +9,10 @@ export interface ModelFetcher<
   SparqlConceptT extends IConcept,
   SparqlConceptSchemeT extends IConceptScheme,
 > {
-  fetchConceptsByIdentifiers(
-    identifiers: readonly Resource.Identifier[],
-  ): Promise<readonly Option<SparqlConceptT>[]>;
-
   fetchConceptSchemesByIdentifiers(
     identifiers: readonly Resource.Identifier[],
   ): Promise<readonly Option<SparqlConceptSchemeT>[]>;
+  fetchConceptsByIdentifiers(
+    identifiers: readonly Resource.Identifier[],
+  ): Promise<readonly Option<SparqlConceptT>[]>;
 }

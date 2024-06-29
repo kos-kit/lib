@@ -18,32 +18,8 @@ export abstract class Model implements IModel {
     this.includeLanguageTags = includeLanguageTags;
   }
 
-  protected get dataset(): DatasetCore {
-    return this.resource.dataset;
-  }
-
   get identifier(): Resource.Identifier {
     return this.resource.identifier;
-  }
-
-  private literalObject(predicate: NamedNode): O.Option<Literal> {
-    const literals: readonly Literal[] = [
-      ...this.resource.values(predicate, Resource.ValueMappers.literal),
-    ];
-
-    if (literals.length === 0) {
-      return O.none;
-    }
-    const literal = literals[0];
-    if (
-      matchLiteral(literal, {
-        includeLanguageTags: this.includeLanguageTags,
-      })
-    ) {
-      return O.some(literal);
-    }
-
-    return O.none;
   }
 
   get license(): O.Option<Literal | NamedNode> {
@@ -99,6 +75,30 @@ export abstract class Model implements IModel {
 
   get rightsHolder(): O.Option<Literal> {
     return this.literalObject(dcterms.rightsHolder);
+  }
+
+  protected get dataset(): DatasetCore {
+    return this.resource.dataset;
+  }
+
+  private literalObject(predicate: NamedNode): O.Option<Literal> {
+    const literals: readonly Literal[] = [
+      ...this.resource.values(predicate, Resource.ValueMappers.literal),
+    ];
+
+    if (literals.length === 0) {
+      return O.none;
+    }
+    const literal = literals[0];
+    if (
+      matchLiteral(literal, {
+        includeLanguageTags: this.includeLanguageTags,
+      })
+    ) {
+      return O.some(literal);
+    }
+
+    return O.none;
   }
 }
 

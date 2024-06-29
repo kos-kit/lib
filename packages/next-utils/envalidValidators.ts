@@ -1,6 +1,6 @@
 import * as envalid from "envalid";
-import path from "node:path";
 import fs from "node:fs";
+import path from "node:path";
 
 export const directoryPathValidator = envalid.makeExactValidator((value) => {
   if (value.length === 0) {
@@ -42,10 +42,9 @@ export const existingFilePathArrayValidator = envalid.makeExactValidator(
 
 export const intValidator = envalid.makeExactValidator<number>(parseInt);
 
-export const languageTagArrayValidator =
-  envalid.makeExactValidator((value) => {
-    if (value.length === 0) {
-      return [];
-    }
-    return value.split(",").map((subValue) => subValue.trim());
-  });
+export const languageTagArrayValidator = envalid.makeExactValidator((value) => {
+  if (value.length === 0) {
+    return [];
+  }
+  return value.split(",").map((subValue) => subValue.trim());
+});

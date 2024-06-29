@@ -45,22 +45,21 @@ export class Kos<
     )[0];
   }
 
-  private async conceptIdentifiersPage({
-    limit,
-    offset,
-  }: {
-    limit: number;
-    offset: number;
-  }): Promise<readonly Resource.Identifier[]> {
-    return mapResultRowsToIdentifiers(
-      await this.sparqlClient.query.select(`\
-SELECT ?concept
-WHERE {
-  ${Kos.CONCEPT_IDENTIFIER_GRAPH_PATTERN}
-}
-LIMIT ${limit}
-OFFSET ${offset}`),
-      "concept",
+  async conceptSchemeByIdentifier(
+    identifier: Resource.Identifier,
+  ): Promise<O.Option<SparqlConceptSchemeT>> {
+    return (
+      await this.modelFetcher.fetchConceptSchemesByIdentifiers([identifier])
+    )[0];
+  }
+
+  async conceptSchemes(): Promise<readonly SparqlConceptSchemeT[]> {
+    return (
+      await this.modelFetcher.fetchConceptSchemesByIdentifiers(
+        await this.conceptSchemeIdentifiers(),
+      )
+    ).flatMap((conceptScheme) =>
+      O.isSome(conceptScheme) ? [conceptScheme.value] : [],
     );
   }
 
@@ -106,12 +105,23 @@ WHERE {
     ).flatMap((concept) => (O.isSome(concept) ? [concept.value] : []));
   }
 
-  async conceptSchemeByIdentifier(
-    identifier: Resource.Identifier,
-  ): Promise<O.Option<SparqlConceptSchemeT>> {
-    return (
-      await this.modelFetcher.fetchConceptSchemesByIdentifiers([identifier])
-    )[0];
+  private async conceptIdentifiersPage({
+    limit,
+    offset,
+  }: {
+    limit: number;
+    offset: number;
+  }): Promise<readonly Resource.Identifier[]> {
+    return mapResultRowsToIdentifiers(
+      await this.sparqlClient.query.select(`\
+SELECT ?concept
+WHERE {
+  ${Kos.CONCEPT_IDENTIFIER_GRAPH_PATTERN}
+}
+LIMIT ${limit}
+OFFSET ${offset}`),
+      "concept",
+    );
   }
 
   private async conceptSchemeIdentifiers(): Promise<
@@ -124,16 +134,6 @@ WHERE {
   ${Kos.CONCEPT_SCHEME_IDENTIFIER_GRAPH_PATTERN}
 }`),
       "conceptScheme",
-    );
-  }
-
-  async conceptSchemes(): Promise<readonly SparqlConceptSchemeT[]> {
-    return (
-      await this.modelFetcher.fetchConceptSchemesByIdentifiers(
-        await this.conceptSchemeIdentifiers(),
-      )
-    ).flatMap((conceptScheme) =>
-      O.isSome(conceptScheme) ? [conceptScheme.value] : [],
     );
   }
 }

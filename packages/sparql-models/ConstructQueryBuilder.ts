@@ -1,35 +1,10 @@
 import { LanguageTagSet } from "@kos-kit/models";
-import { GraphPattern, GraphPatternVariable } from "./GraphPattern.js";
 import { BlankNode, Literal, NamedNode, Variable } from "@rdfjs/types";
-
-const TAB_SPACES = 2;
+import { GraphPattern, GraphPatternVariable } from "./GraphPattern.js";
 
 interface IndentedString {
   indent: number;
   string: string;
-}
-
-function indentedStringsToString(
-  indentedStrings: readonly IndentedString[],
-): string {
-  return indentedStrings
-    .map(({ indent, string }) => " ".repeat(indent) + string)
-    .join("\n");
-}
-
-function sortGraphPatterns(
-  graphPatterns: readonly GraphPattern[],
-): readonly GraphPattern[] {
-  const sortedGraphPatterns = graphPatterns.concat();
-  sortedGraphPatterns.sort((left, right) => {
-    // Required then optional.
-    if (left.optional) {
-      return right.optional ? 0 : 1;
-    } else {
-      return right.optional ? -1 : 0;
-    }
-  });
-  return sortedGraphPatterns;
 }
 
 export class ConstructQueryBuilder {
@@ -210,3 +185,28 @@ ${valuesString.length > 0 ? " ".repeat(TAB_SPACES) + valuesString + "\n" : ""}${
     return `VALUES ?${variable.value} { ${values.map((value) => this.termToString(value)).join(" ")} }`;
   }
 }
+
+function indentedStringsToString(
+  indentedStrings: readonly IndentedString[],
+): string {
+  return indentedStrings
+    .map(({ indent, string }) => " ".repeat(indent) + string)
+    .join("\n");
+}
+
+function sortGraphPatterns(
+  graphPatterns: readonly GraphPattern[],
+): readonly GraphPattern[] {
+  const sortedGraphPatterns = graphPatterns.concat();
+  sortedGraphPatterns.sort((left, right) => {
+    // Required then optional.
+    if (left.optional) {
+      return right.optional ? 0 : 1;
+    } else {
+      return right.optional ? -1 : 0;
+    }
+  });
+  return sortedGraphPatterns;
+}
+
+const TAB_SPACES = 2;

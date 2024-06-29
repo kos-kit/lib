@@ -1,8 +1,8 @@
-import { describe, expect, it } from "vitest";
+import { Store } from "n3";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { describe, expect, it } from "vitest";
 import { parseRdfFiles } from "../parseRdfFiles";
-import { Store } from "n3";
 
 describe("parseRdfFiles", () => {
   const testDataDirPath = path.resolve(

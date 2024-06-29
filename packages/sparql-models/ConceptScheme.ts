@@ -19,54 +19,6 @@ export class ConceptScheme<
   extends LabeledModel<MemConceptSchemeT, SparqlConceptT, SparqlConceptSchemeT>
   implements IConceptScheme
 {
-  async conceptByIdentifier(
-    identifier: Resource.Identifier,
-  ): Promise<O.Option<Concept>> {
-    return (
-      await this.modelFetcher.fetchConceptsByIdentifiers([identifier])
-    )[0];
-  }
-
-  private conceptGraphPatterns({
-    topOnly,
-  }: {
-    topOnly: boolean;
-  }): readonly string[] {
-    const identifierString = Resource.Identifier.toString(this.identifier);
-    const conceptGraphPatterns = [
-      `{ ${identifierString} <${skos.hasTopConcept.value}> ?concept . }`,
-      `{ ?concept <${skos.topConceptOf.value}> ${identifierString} . }`,
-    ];
-    if (!topOnly) {
-      // skos:inScheme has an open domain, so we also have to check the rdf:type
-      conceptGraphPatterns.push(
-        `{ ?concept <${skos.inScheme.value}> ${identifierString} . ?concept <${rdf.type.value}>/<${rdfs.subClassOf.value}>* <${skos.Concept.value}> . }`,
-      );
-    }
-    return conceptGraphPatterns;
-  }
-
-  private async _conceptIdentifiersPage({
-    limit,
-    offset,
-    topOnly,
-  }: {
-    limit: number;
-    offset: number;
-    topOnly: boolean;
-  }): Promise<readonly Resource.Identifier[]> {
-    return mapResultRowsToIdentifiers(
-      await this.sparqlClient.query.select(`\
-SELECT DISTINCT ?concept
-WHERE {
-  ${this.conceptGraphPatterns({ topOnly }).join(" UNION ")}  
-}
-LIMIT ${limit}
-OFFSET ${offset}`),
-      "concept",
-    );
-  }
-
   async *_concepts({ topOnly }: { topOnly: boolean }): AsyncIterable<Concept> {
     yield* paginationToAsyncIterable({
       getPage: ({ offset }) =>
@@ -102,8 +54,20 @@ WHERE {
     ).flatMap((concept) => (O.isSome(concept) ? [concept.value] : []));
   }
 
+  async conceptByIdentifier(
+    identifier: Resource.Identifier,
+  ): Promise<O.Option<Concept>> {
+    return (
+      await this.modelFetcher.fetchConceptsByIdentifiers([identifier])
+    )[0];
+  }
+
   concepts(): AsyncIterable<Concept> {
     return this._concepts({ topOnly: false });
+  }
+
+  conceptsCount(): Promise<number> {
+    return this._conceptsCount({ topOnly: false });
   }
 
   conceptsPage({
@@ -116,16 +80,12 @@ WHERE {
     return this._conceptsPage({ limit, offset, topOnly: false });
   }
 
-  conceptsCount(): Promise<number> {
-    return this._conceptsCount({ topOnly: false });
+  topConcepts(): AsyncIterable<Concept> {
+    return this._concepts({ topOnly: true });
   }
 
   async topConceptsCount(): Promise<number> {
     return this._conceptsCount({ topOnly: true });
-  }
-
-  topConcepts(): AsyncIterable<Concept> {
-    return this._concepts({ topOnly: true });
   }
 
   async topConceptsPage({
@@ -136,5 +96,45 @@ WHERE {
     offset: number;
   }): Promise<readonly Concept[]> {
     return this._conceptsPage({ limit, offset, topOnly: true });
+  }
+
+  private async _conceptIdentifiersPage({
+    limit,
+    offset,
+    topOnly,
+  }: {
+    limit: number;
+    offset: number;
+    topOnly: boolean;
+  }): Promise<readonly Resource.Identifier[]> {
+    return mapResultRowsToIdentifiers(
+      await this.sparqlClient.query.select(`\
+SELECT DISTINCT ?concept
+WHERE {
+  ${this.conceptGraphPatterns({ topOnly }).join(" UNION ")}  
+}
+LIMIT ${limit}
+OFFSET ${offset}`),
+      "concept",
+    );
+  }
+
+  private conceptGraphPatterns({
+    topOnly,
+  }: {
+    topOnly: boolean;
+  }): readonly string[] {
+    const identifierString = Resource.Identifier.toString(this.identifier);
+    const conceptGraphPatterns = [
+      `{ ${identifierString} <${skos.hasTopConcept.value}> ?concept . }`,
+      `{ ?concept <${skos.topConceptOf.value}> ${identifierString} . }`,
+    ];
+    if (!topOnly) {
+      // skos:inScheme has an open domain, so we also have to check the rdf:type
+      conceptGraphPatterns.push(
+        `{ ?concept <${skos.inScheme.value}> ${identifierString} . ?concept <${rdf.type.value}>/<${rdfs.subClassOf.value}>* <${skos.Concept.value}> . }`,
+      );
+    }
+    return conceptGraphPatterns;
   }
 }
