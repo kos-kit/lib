@@ -11,8 +11,26 @@ import {
 import * as O from "fp-ts/Option";
 import { pipe } from "fp-ts/function";
 
-const xsdNamespace = "http://www.w3.org/2001/XMLSchema#";
-const xsdBooleanIri = xsdNamespace + "boolean";
+namespace xsd {
+  const ns = "http://www.w3.org/2001/XMLSchema#";
+  export const boolean = ns + "boolean";
+  export const byte = ns + "byte";
+  export const decimal = ns + "decimal";
+  export const double = ns + "decimal";
+  export const float = ns + "float";
+  export const int = ns + "int";
+  export const integer = ns + "integer";
+  export const long = ns + "long";
+  export const negativeInteger = ns + "negativeInteger";
+  export const nonNegativeInteger = ns + "nonNegativeInteger";
+  export const nonPositiveInteger = ns + "nonPositiveInteger";
+  export const positiveInteger = ns + "positiveInteger";
+  export const short = ns + "short";
+  export const unsignedByte = ns + "unsignedByte";
+  export const unsignedInt = ns + "unsignedInt";
+  export const unsignedLong = ns + "unsignedLong";
+  export const unsignedShort = ns + "unsignedShort";
+}
 
 export class Resource {
   readonly dataset: DatasetCore;
@@ -181,7 +199,7 @@ export namespace Resource {
       if (object.termType !== "Literal") {
         return O.none;
       }
-      if (object.datatype.value !== xsdBooleanIri) {
+      if (object.datatype.value !== xsd.boolean) {
         return O.none;
       }
       switch (object.value.toLowerCase()) {
@@ -193,6 +211,18 @@ export namespace Resource {
           return O.some(false);
         default:
           return O.none;
+      }
+    }
+
+    export function float(
+      object: BlankNode | Literal | NamedNode,
+    ): O.Option<number> {
+      const literal = Resource.ValueMappers.numericLiteral(object);
+      if (O.isSome(literal)) {
+        const value = parseFloat(literal.value.value);
+        return !isNaN(value) ? O.some(value) : O.none;
+      } else {
+        return O.none;
       }
     }
 
@@ -208,22 +238,64 @@ export namespace Resource {
       }
     }
 
-    export function iri(
-      object: BlankNode | Literal | NamedNode,
-    ): O.Option<NamedNode> {
-      return object.termType === "NamedNode" ? O.some(object) : O.none;
-    }
-
     export function identity(
       object: BlankNode | Literal | NamedNode,
     ): O.Option<BlankNode | Literal | NamedNode> {
       return O.some(object);
     }
 
+    export function int(
+      object: BlankNode | Literal | NamedNode,
+    ): O.Option<number> {
+      const literal = Resource.ValueMappers.numericLiteral(object);
+      if (O.isSome(literal)) {
+        const value = parseInt(literal.value.value);
+        return !isNaN(value) ? O.some(value) : O.none;
+      } else {
+        return O.none;
+      }
+    }
+
+    export function iri(
+      object: BlankNode | Literal | NamedNode,
+    ): O.Option<NamedNode> {
+      return object.termType === "NamedNode" ? O.some(object) : O.none;
+    }
+
     export function literal(
       object: BlankNode | Literal | NamedNode,
     ): O.Option<Literal> {
       return object.termType === "Literal" ? O.some(object) : O.none;
+    }
+
+    export function numericLiteral(
+      object: BlankNode | Literal | NamedNode,
+    ): O.Option<Literal> {
+      if (object.termType !== "Literal") {
+        return O.none;
+      }
+      switch (object.datatype.value) {
+        case xsd.byte:
+        case xsd.decimal:
+        case xsd.double:
+        case xsd.float:
+        case xsd.int:
+        case xsd.integer:
+        case xsd.long:
+        case xsd.negativeInteger:
+        case xsd.nonNegativeInteger:
+        case xsd.nonPositiveInteger:
+        case xsd.positiveInteger:
+        case xsd.short:
+        case xsd.unsignedByte:
+        case xsd.unsignedInt:
+        case xsd.unsignedLong:
+        case xsd.unsignedShort: {
+          return O.some(object);
+        }
+        default:
+          return O.none;
+      }
     }
 
     export function resource(
