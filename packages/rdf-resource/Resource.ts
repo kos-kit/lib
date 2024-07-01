@@ -10,27 +10,7 @@ import {
 } from "@rdfjs/types";
 import * as O from "fp-ts/Option";
 import { pipe } from "fp-ts/function";
-
-namespace xsd {
-  const ns = "http://www.w3.org/2001/XMLSchema#";
-  export const boolean = ns + "boolean";
-  export const byte = ns + "byte";
-  export const decimal = ns + "decimal";
-  export const double = ns + "decimal";
-  export const float = ns + "float";
-  export const int = ns + "int";
-  export const integer = ns + "integer";
-  export const long = ns + "long";
-  export const negativeInteger = ns + "negativeInteger";
-  export const nonNegativeInteger = ns + "nonNegativeInteger";
-  export const nonPositiveInteger = ns + "nonPositiveInteger";
-  export const positiveInteger = ns + "positiveInteger";
-  export const short = ns + "short";
-  export const unsignedByte = ns + "unsignedByte";
-  export const unsignedInt = ns + "unsignedInt";
-  export const unsignedLong = ns + "unsignedLong";
-  export const unsignedShort = ns + "unsignedShort";
-}
+import { fromRdf } from "rdf-literal";
 
 export class Resource {
   readonly dataset: DatasetCore;
@@ -196,34 +176,23 @@ export namespace Resource {
     export function boolean(
       object: BlankNode | Literal | NamedNode,
     ): O.Option<boolean> {
-      if (object.termType !== "Literal") {
-        return O.none;
-      }
-      if (object.datatype.value !== xsd.boolean) {
-        return O.none;
-      }
-      switch (object.value.toLowerCase()) {
-        case "1":
-        case "true":
-          return O.some(true);
-        case "0":
-        case "false":
-          return O.some(false);
-        default:
-          return O.none;
-      }
+      return pipe(
+        primitive(object),
+        O.flatMap((primitive) =>
+          typeof primitive === "boolean" ? O.some(primitive) : O.none,
+        ),
+      );
     }
 
-    export function float(
+    export function date(
       object: BlankNode | Literal | NamedNode,
-    ): O.Option<number> {
-      const literal = Resource.ValueMappers.numericLiteral(object);
-      if (O.isSome(literal)) {
-        const value = parseFloat(literal.value.value);
-        return !isNaN(value) ? O.some(value) : O.none;
-      } else {
-        return O.none;
-      }
+    ): O.Option<Date> {
+      return pipe(
+        primitive(object),
+        O.flatMap((primitive) =>
+          primitive instanceof Date ? O.some(primitive) : O.none,
+        ),
+      );
     }
 
     export function identifier(
@@ -244,18 +213,6 @@ export namespace Resource {
       return O.some(object);
     }
 
-    export function int(
-      object: BlankNode | Literal | NamedNode,
-    ): O.Option<number> {
-      const literal = Resource.ValueMappers.numericLiteral(object);
-      if (O.isSome(literal)) {
-        const value = parseInt(literal.value.value);
-        return !isNaN(value) ? O.some(value) : O.none;
-      } else {
-        return O.none;
-      }
-    }
-
     export function iri(
       object: BlankNode | Literal | NamedNode,
     ): O.Option<NamedNode> {
@@ -268,34 +225,23 @@ export namespace Resource {
       return object.termType === "Literal" ? O.some(object) : O.none;
     }
 
-    export function numericLiteral(
+    export function number(
       object: BlankNode | Literal | NamedNode,
-    ): O.Option<Literal> {
-      if (object.termType !== "Literal") {
-        return O.none;
-      }
-      switch (object.datatype.value) {
-        case xsd.byte:
-        case xsd.decimal:
-        case xsd.double:
-        case xsd.float:
-        case xsd.int:
-        case xsd.integer:
-        case xsd.long:
-        case xsd.negativeInteger:
-        case xsd.nonNegativeInteger:
-        case xsd.nonPositiveInteger:
-        case xsd.positiveInteger:
-        case xsd.short:
-        case xsd.unsignedByte:
-        case xsd.unsignedInt:
-        case xsd.unsignedLong:
-        case xsd.unsignedShort: {
-          return O.some(object);
-        }
-        default:
-          return O.none;
-      }
+    ): O.Option<number> {
+      return pipe(
+        primitive(object),
+        O.flatMap((primitive) =>
+          typeof primitive === "number" ? O.some(primitive) : O.none,
+        ),
+      );
+    }
+
+    export function primitive(
+      object: BlankNode | Literal | NamedNode,
+    ): O.Option<boolean | Date | number | string> {
+      return object.termType === "Literal"
+        ? O.tryCatch(() => fromRdf(object, true))
+        : O.none;
     }
 
     export function resource(
@@ -315,8 +261,10 @@ export namespace Resource {
       object: BlankNode | Literal | NamedNode,
     ): O.Option<string> {
       return pipe(
-        Resource.ValueMappers.literal(object),
-        O.map((literal: Literal) => literal.value),
+        primitive(object),
+        O.flatMap((primitive) =>
+          typeof primitive === "string" ? O.some(primitive) : O.none,
+        ),
       );
     }
   }
