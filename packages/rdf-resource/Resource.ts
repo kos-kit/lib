@@ -117,6 +117,18 @@ export namespace Resource {
       return this;
     }
 
+    delete(
+      predicate: NamedNode,
+      object?: BlankNode | Literal | NamedNode,
+    ): this {
+      for (const quad of [
+        ...this.dataset.match(this.identifier, predicate, object),
+      ]) {
+        this.dataset.delete(quad);
+      }
+      return this;
+    }
+
     build(): Resource {
       return new Resource({
         dataset: this.dataset,
