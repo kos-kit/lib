@@ -1,7 +1,7 @@
 import * as mem from "@kos-kit/mem-models";
 import { LanguageTag, LanguageTagSet } from "@kos-kit/models";
 import { Concept, ConceptScheme, Kos, SparqlClient } from "..";
-import { DefaultModelFetcher } from "../DefaultModelFetcher";
+import { DefaultModelFetcher } from "../DefaultModelFetcher.js";
 
 export const testKosFactory = (includeLanguageTag: LanguageTag) => {
   const includeLanguageTags = new LanguageTagSet(includeLanguageTag, "");
