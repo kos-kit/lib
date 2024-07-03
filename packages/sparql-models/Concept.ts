@@ -7,7 +7,6 @@ import {
 import { Resource } from "@kos-kit/rdf-resource";
 import { Literal } from "@rdfjs/types";
 import { skos } from "@tpluscode/rdf-ns-builders";
-import * as O from "fp-ts/Option";
 import { LabeledModel } from "./LabeledModel.js";
 import { mapResultRowsToCount } from "./mapResultRowsToCount.js";
 import { mapResultRowsToIdentifiers } from "./mapResultRowsToIdentifiers.js";
@@ -42,7 +41,7 @@ WHERE {
           "conceptScheme",
         ),
       )
-    ).flatMap((concept) => (O.isSome(concept) ? [concept.value] : []));
+    ).flatMap((concept) => concept.toList());
   }
 
   notes(property: NoteProperty): readonly Literal[] {
@@ -64,7 +63,7 @@ WHERE {
           "concept",
         ),
       )
-    ).flatMap((concept) => (O.isSome(concept) ? [concept.value] : []));
+    ).flatMap((concept) => concept.toList());
   }
 
   async semanticRelationsCount(
@@ -95,6 +94,6 @@ WHERE {
           "conceptScheme",
         ),
       )
-    ).flatMap((concept) => (O.isSome(concept) ? [concept.value] : []));
+    ).flatMap((concept) => concept.toList());
   }
 }

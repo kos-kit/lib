@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import * as O from "fp-ts/Option";
 import { assert, expect, it } from "vitest";
 import { Kos } from "..";
 import { expectConcept } from "./expectConcept.js";
@@ -32,9 +31,9 @@ export const behavesLikeKos = (kos: Kos) => {
       offset: 0,
     })) {
       expectConcept(concept);
-      const conceptByIdentifier = O.toNullable(
-        await kos.conceptByIdentifier(concept.identifier),
-      );
+      const conceptByIdentifier = (
+        await kos.conceptByIdentifier(concept.identifier)
+      ).extractNullable();
       expect(conceptByIdentifier).not.toBeNull();
       expectConcept(conceptByIdentifier!);
       expect(
@@ -56,7 +55,7 @@ export const behavesLikeKos = (kos: Kos) => {
     );
     expect(conceptsByIdentifiers).toHaveLength(5);
     conceptsPage.forEach((leftConcept, conceptI) => {
-      const rightConcept = O.toNullable(conceptsByIdentifiers[conceptI]);
+      const rightConcept = conceptsByIdentifiers[conceptI].extractNullable();
       expect(rightConcept).not.toBeNull();
       expect(
         leftConcept.identifier.equals(rightConcept!.identifier),
@@ -77,9 +76,9 @@ export const behavesLikeKos = (kos: Kos) => {
   it("should get a concept scheme by an identifier", async () => {
     for (const conceptScheme of await kos.conceptSchemes()) {
       expectConceptScheme(conceptScheme);
-      const conceptSchemeByIdentifier = O.toNullable(
-        await kos.conceptSchemeByIdentifier(conceptScheme.identifier),
-      );
+      const conceptSchemeByIdentifier = (
+        await kos.conceptSchemeByIdentifier(conceptScheme.identifier)
+      ).extractNullable();
       expect(conceptSchemeByIdentifier).not.toBeNull();
       expectConceptScheme(conceptSchemeByIdentifier!);
       expect(

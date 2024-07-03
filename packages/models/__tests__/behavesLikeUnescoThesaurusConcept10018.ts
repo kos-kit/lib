@@ -8,7 +8,6 @@ import {
   SemanticRelationProperty,
 } from "..";
 import { expect, it } from "vitest";
-import * as O from "fp-ts/Option";
 
 export const behavesLikeUnescoThesaurusConcept10018 = (
   lazyConcept: (includeLanguageTag: LanguageTag) => Promise<Concept>,
@@ -31,7 +30,7 @@ export const behavesLikeUnescoThesaurusConcept10018 = (
 
   it("should have a modified date", async () => {
     const concept = await lazyConcept("en");
-    expect(O.toNullable(concept.modified)!.value).toStrictEqual(
+    expect(concept.modified.extractNullable()?.value).toStrictEqual(
       "2019-12-15T13:44:31Z",
     );
   });

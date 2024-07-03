@@ -5,12 +5,12 @@ import {
 } from "@kos-kit/models";
 import { Resource } from "@kos-kit/rdf-resource";
 import { rdf, rdfs, skos } from "@tpluscode/rdf-ns-builders";
-import * as O from "fp-ts/Option";
 import { ModelFetcher } from "./ModelFetcher.js";
 import { SparqlClient } from "./SparqlClient.js";
 import { mapResultRowsToCount } from "./mapResultRowsToCount.js";
 import { mapResultRowsToIdentifiers } from "./mapResultRowsToIdentifiers.js";
 import { paginationToAsyncIterable } from "./paginationToAsyncIterable.js";
+import { Maybe } from "purify-ts";
 
 export class Kos<
   SparqlConceptT extends IConcept,
@@ -39,7 +39,7 @@ export class Kos<
 
   async conceptByIdentifier(
     identifier: Resource.Identifier,
-  ): Promise<O.Option<SparqlConceptT>> {
+  ): Promise<Maybe<SparqlConceptT>> {
     return (
       await this.modelFetcher.fetchConceptsByIdentifiers([identifier])
     )[0];
@@ -73,7 +73,7 @@ OFFSET ${offset}`),
 
   conceptsByIdentifiers(
     identifiers: readonly Resource.Identifier[],
-  ): Promise<readonly O.Option<SparqlConceptT>[]> {
+  ): Promise<readonly Maybe<SparqlConceptT>[]> {
     return this.modelFetcher.fetchConceptsByIdentifiers(identifiers);
   }
 
@@ -103,12 +103,12 @@ WHERE {
           offset,
         }),
       )
-    ).flatMap((concept) => (O.isSome(concept) ? [concept.value] : []));
+    ).flatMap((concept) => concept.toList());
   }
 
   async conceptSchemeByIdentifier(
     identifier: Resource.Identifier,
-  ): Promise<O.Option<SparqlConceptSchemeT>> {
+  ): Promise<Maybe<SparqlConceptSchemeT>> {
     return (
       await this.modelFetcher.fetchConceptSchemesByIdentifiers([identifier])
     )[0];
@@ -132,8 +132,6 @@ WHERE {
       await this.modelFetcher.fetchConceptSchemesByIdentifiers(
         await this.conceptSchemeIdentifiers(),
       )
-    ).flatMap((conceptScheme) =>
-      O.isSome(conceptScheme) ? [conceptScheme.value] : [],
-    );
+    ).flatMap((conceptScheme) => conceptScheme.toList());
   }
 }

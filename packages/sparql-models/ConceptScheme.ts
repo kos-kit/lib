@@ -5,11 +5,11 @@ import {
 } from "@kos-kit/models";
 import { Resource } from "@kos-kit/rdf-resource";
 import { rdf, rdfs, skos } from "@tpluscode/rdf-ns-builders";
-import * as O from "fp-ts/Option";
 import { LabeledModel } from "./LabeledModel.js";
 import { mapResultRowsToCount } from "./mapResultRowsToCount.js";
 import { mapResultRowsToIdentifiers } from "./mapResultRowsToIdentifiers.js";
 import { paginationToAsyncIterable } from "./paginationToAsyncIterable.js";
+import { Maybe } from "purify-ts";
 
 export class ConceptScheme<
     MemConceptSchemeT extends IConceptScheme,
@@ -51,12 +51,12 @@ WHERE {
       await this.modelFetcher.fetchConceptsByIdentifiers(
         await this._conceptIdentifiersPage({ limit, offset, topOnly }),
       )
-    ).flatMap((concept) => (O.isSome(concept) ? [concept.value] : []));
+    ).flatMap((concept) => concept.toList());
   }
 
   async conceptByIdentifier(
     identifier: Resource.Identifier,
-  ): Promise<O.Option<Concept>> {
+  ): Promise<Maybe<Concept>> {
     return (
       await this.modelFetcher.fetchConceptsByIdentifiers([identifier])
     )[0];

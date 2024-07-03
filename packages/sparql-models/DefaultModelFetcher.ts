@@ -9,7 +9,6 @@ import {
 import { Resource } from "@kos-kit/rdf-resource";
 import { isInstanceOf } from "@kos-kit/rdf-utils";
 import { dc11, dcterms, rdf, skos, skosxl } from "@tpluscode/rdf-ns-builders";
-import * as O from "fp-ts/Option";
 import { ConstructQueryBuilder } from "./ConstructQueryBuilder.js";
 import {
   GraphPattern,
@@ -19,6 +18,7 @@ import {
 import { LabeledModel } from "./LabeledModel.js";
 import { ModelFetcher } from "./ModelFetcher.js";
 import { SparqlClient } from "./SparqlClient.js";
+import { Just, Maybe, Nothing } from "purify-ts";
 
 export class DefaultModelFetcher<
   MemConceptT extends IConcept,
@@ -88,7 +88,7 @@ export class DefaultModelFetcher<
 
   async fetchConceptSchemesByIdentifiers(
     identifiers: readonly Resource.Identifier[],
-  ): Promise<readonly O.Option<SparqlConceptSchemeT>[]> {
+  ): Promise<readonly Maybe<SparqlConceptSchemeT>[]> {
     const conceptSchemeVariable: GraphPatternVariable = {
       termType: "Variable",
       value: "conceptScheme",
@@ -116,7 +116,7 @@ export class DefaultModelFetcher<
           instance: identifier,
         })
       ) {
-        return O.some(
+        return Just(
           new this.conceptSchemeConstructor({
             memModel: this.memModelFactory.createConceptScheme(
               new Resource({ dataset, identifier }),
@@ -127,14 +127,14 @@ export class DefaultModelFetcher<
         );
       } else {
         console.warn("tried to fetch missing concept scheme", identifier.value);
-        return O.none;
+        return Nothing;
       }
     });
   }
 
   async fetchConceptsByIdentifiers(
     identifiers: readonly Resource.Identifier[],
-  ): Promise<readonly O.Option<SparqlConceptT>[]> {
+  ): Promise<readonly Maybe<SparqlConceptT>[]> {
     const conceptVariable: GraphPatternVariable = {
       termType: "Variable",
       value: "concept",
@@ -162,7 +162,7 @@ export class DefaultModelFetcher<
           instance: identifier,
         })
       ) {
-        return O.some(
+        return Just(
           new this.conceptConstructor({
             memModel: this.memModelFactory.createConcept(
               new Resource({ dataset, identifier }),
@@ -173,7 +173,7 @@ export class DefaultModelFetcher<
         );
       } else {
         console.warn("tried to fetch missing concept", identifier.value);
-        return O.none;
+        return Nothing;
       }
     });
   }

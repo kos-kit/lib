@@ -8,8 +8,7 @@ import {
   Literal,
   NamedNode,
 } from "@rdfjs/types";
-import * as O from "fp-ts/Option";
-import { pipe } from "fp-ts/function";
+import { Just, Maybe, Nothing } from "purify-ts";
 import { fromRdf } from "rdf-literal";
 
 export class Resource {
@@ -30,11 +29,11 @@ export class Resource {
   optionalValue<T>(
     property: NamedNode,
     mapper: Resource.ValueMapper<T>,
-  ): O.Option<NonNullable<T>> {
+  ): Maybe<NonNullable<T>> {
     for (const value of this.values(property, mapper)) {
-      return O.some(value);
+      return Just(value);
     }
-    return O.none;
+    return Nothing;
   }
 
   requiredValue<T>(
@@ -61,7 +60,7 @@ export class Resource {
         quad.object as BlankNode | NamedNode | Literal,
         this.dataset,
       );
-      if (O.isSome(mappedObject)) yield mappedObject.value;
+      if (mappedObject.isJust()) yield mappedObject.extract();
     }
   }
 
@@ -74,9 +73,10 @@ export class Resource {
       null,
     )) {
       if (
-        O.isSome(
-          mapper(quad.object as BlankNode | Literal | NamedNode, this.dataset),
-        )
+        mapper(
+          quad.object as BlankNode | Literal | NamedNode,
+          this.dataset,
+        ).isJust()
       ) {
         count++;
       }
@@ -182,101 +182,89 @@ export namespace Resource {
   export type ValueMapper<T> = (
     object: BlankNode | Literal | NamedNode,
     dataset: DatasetCore,
-  ) => O.Option<NonNullable<T>>;
+  ) => Maybe<NonNullable<T>>;
 
   export namespace ValueMappers {
     export function boolean(
       object: BlankNode | Literal | NamedNode,
-    ): O.Option<boolean> {
-      return pipe(
-        primitive(object),
-        O.flatMap((primitive) =>
-          typeof primitive === "boolean" ? O.some(primitive) : O.none,
-        ),
+    ): Maybe<boolean> {
+      return primitive(object).chain((primitive) =>
+        typeof primitive === "boolean" ? Just(primitive) : Nothing,
       );
     }
 
-    export function date(
-      object: BlankNode | Literal | NamedNode,
-    ): O.Option<Date> {
-      return pipe(
-        primitive(object),
-        O.flatMap((primitive) =>
-          primitive instanceof Date ? O.some(primitive) : O.none,
-        ),
+    export function date(object: BlankNode | Literal | NamedNode): Maybe<Date> {
+      return primitive(object).chain((primitive) =>
+        primitive instanceof Date ? Just(primitive) : Nothing,
       );
     }
 
     export function identifier(
       object: BlankNode | Literal | NamedNode,
-    ): O.Option<Identifier> {
+    ): Maybe<Identifier> {
       switch (object.termType) {
         case "BlankNode":
         case "NamedNode":
-          return O.some(object);
+          return Just(object);
         default:
-          return O.none;
+          return Nothing;
       }
     }
 
     export function identity(
       object: BlankNode | Literal | NamedNode,
-    ): O.Option<BlankNode | Literal | NamedNode> {
-      return O.some(object);
+    ): Maybe<BlankNode | Literal | NamedNode> {
+      return Just(object);
     }
 
     export function iri(
       object: BlankNode | Literal | NamedNode,
-    ): O.Option<NamedNode> {
-      return object.termType === "NamedNode" ? O.some(object) : O.none;
+    ): Maybe<NamedNode> {
+      return object.termType === "NamedNode" ? Just(object) : Nothing;
     }
 
     export function literal(
       object: BlankNode | Literal | NamedNode,
-    ): O.Option<Literal> {
-      return object.termType === "Literal" ? O.some(object) : O.none;
+    ): Maybe<Literal> {
+      return object.termType === "Literal" ? Just(object) : Nothing;
     }
 
     export function number(
       object: BlankNode | Literal | NamedNode,
-    ): O.Option<number> {
-      return pipe(
-        primitive(object),
-        O.flatMap((primitive) =>
-          typeof primitive === "number" ? O.some(primitive) : O.none,
-        ),
+    ): Maybe<number> {
+      return primitive(object).chain((primitive) =>
+        typeof primitive === "number" ? Just(primitive) : Nothing,
       );
     }
 
     export function primitive(
       object: BlankNode | Literal | NamedNode,
-    ): O.Option<boolean | Date | number | string> {
-      return object.termType === "Literal"
-        ? O.tryCatch(() => fromRdf(object, true))
-        : O.none;
+    ): Maybe<boolean | Date | number | string> {
+      if (object.termType !== "Literal") {
+        return Nothing;
+      }
+
+      try {
+        return Just(fromRdf(object, true));
+      } catch {
+        return Nothing;
+      }
     }
 
     export function resource(
       object: BlankNode | Literal | NamedNode,
       dataset: DatasetCore,
-    ): O.Option<Resource> {
-      return pipe(
-        Resource.ValueMappers.identifier(object),
-        O.map(
-          (identifier: Resource.Identifier) =>
-            new Resource({ dataset, identifier }),
-        ),
+    ): Maybe<Resource> {
+      return identifier(object).map(
+        (identifier) => new Resource({ dataset, identifier }),
       );
     }
 
     export function string(
       object: BlankNode | Literal | NamedNode,
-    ): O.Option<string> {
-      return pipe(
-        primitive(object),
-        O.flatMap((primitive) =>
-          typeof primitive === "string" ? O.some(primitive) : O.none,
-        ),
+    ): Maybe<string> {
+      return primitive(object).chain((primitive) =>
+        typeof primitive === "string" ? Just(primitive as string) : Nothing,
       );
     }
   }

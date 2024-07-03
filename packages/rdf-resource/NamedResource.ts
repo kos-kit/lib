@@ -1,7 +1,6 @@
 import { BlankNode, DatasetCore, Literal, NamedNode } from "@rdfjs/types";
 import { Resource } from "./Resource.js";
-import * as O from "fp-ts/Option";
-import { pipe } from "fp-ts/function";
+import { Maybe } from "purify-ts";
 
 export class NamedResource extends Resource {
   constructor({ dataset, iri }: { dataset: DatasetCore; iri: NamedNode }) {
@@ -15,10 +14,9 @@ export class NamedResource extends Resource {
   static valueMapper(
     object: BlankNode | Literal | NamedNode,
     dataset: DatasetCore,
-  ): O.Option<NamedResource> {
-    return pipe(
-      Resource.ValueMappers.iri(object),
-      O.map((iri: NamedNode) => new NamedResource({ dataset, iri })),
+  ): Maybe<NamedResource> {
+    return Resource.ValueMappers.iri(object).map(
+      (iri) => new NamedResource({ dataset, iri }),
     );
   }
 }
