@@ -1,15 +1,18 @@
 {
   "dependencies": {
-    "@kos-kit/mem-models": "2.0.9",
-    "@kos-kit/models": "2.0.9",
-    "@kos-kit/rdf-resource": "2.0.9",
-    "@tpluscode/rdf-ns-builders": "^4.3.0",
+    "@kos-kit/mem-models": "2.0.10",
+    "@kos-kit/models": "2.0.10",
+    "@kos-kit/rdf-resource": "2.0.10",
     "@rdfjs/types": "^1.1.0",
+    "@tpluscode/rdf-ns-builders": "^4.3.0",
     "@types/sparql-http-client": "^3.0.2",
-    "@types/n3": "^1.16.4",
-    "sparql-http-client": "^3.0.0",
+    "fp-ts": "^2.16.6",
+    "pino": "^9.1.0",
+    "sparql-http-client": "^3.0.0"
+  },
+  "devDependencies": {
     "n3": "^1.17.3",
-    "pino": "^9.1.0"
+    "@types/n3": "^1.16.4"
   },
   "engines": {
     "node": ">=20"
@@ -26,6 +29,7 @@
   "scripts": {
     "build": "tsc -b",
     "clean": "tsc -b --clean",
+    "lint": "tsc -b --clean && eslint *.ts",
     "rebuild": "run-s clean build",
     "test": "vitest run",
     "test:watch": "vitest watch",
@@ -38,5 +42,5 @@
   },
   "type": "module",
   "types": "index.d.ts",
-  "version": "2.0.9"
+  "version": "2.0.10"
 }

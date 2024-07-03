@@ -1,9 +1,7 @@
-import { Model as MemModel } from "@kos-kit/mem-models";
 import { Model as IModel } from "@kos-kit/models";
-import { BlankNode, Literal, NamedNode } from "@rdfjs/types";
-import { GraphPattern, GraphPatternSubject } from "./GraphPattern.js";
-import { Kos } from "./Kos.js";
-import { dc11, dcterms } from "@tpluscode/rdf-ns-builders";
+import { Resource } from "@kos-kit/rdf-resource";
+import { Literal, NamedNode } from "@rdfjs/types";
+import { Option } from "fp-ts/Option";
 
 /**
  * Abstract base class for SPARQL-backed models.
@@ -18,92 +16,39 @@ import { dc11, dcterms } from "@tpluscode/rdf-ns-builders";
  * - Not all literals attached to an instance have to be "properties". Literals that would take up significant space (long strings, large arrays, etc.) can be retrieved via asynchronous methods instead.
  * - Related RDF resources such as skosxl:Label instances can be retrieved as "properties".
  */
-export abstract class Model<MemModelT extends MemModel> implements IModel {
-  protected readonly kos: Kos;
+export abstract class Model<
+  MemModelT extends IModel & { identifier: Resource.Identifier },
+> implements IModel
+{
   protected readonly memModel: MemModelT;
 
-  constructor({ kos, memModel }: { kos: Kos; memModel: MemModelT }) {
-    this.kos = kos;
+  constructor({ memModel }: Model.Parameters<MemModelT>) {
     this.memModel = memModel;
   }
 
-  get identifier(): BlankNode | NamedNode {
+  get identifier(): Resource.Identifier {
     return this.memModel.identifier;
   }
 
-  get license(): Literal | NamedNode | null {
+  get license(): Option<Literal | NamedNode> {
     return this.memModel.license;
   }
 
-  get modified(): Literal | null {
+  get modified(): Option<Literal> {
     return this.memModel.modified;
   }
 
-  static propertyGraphPatterns({
-    subject,
-    variablePrefix,
-  }: {
-    subject: GraphPatternSubject;
-    variablePrefix: string;
-  }): readonly GraphPattern[] {
-    return [
-      {
-        subject,
-        predicate: dcterms.license,
-        object: {
-          termType: "Variable",
-          value: variablePrefix + "License",
-        },
-        optional: true,
-      },
-      {
-        subject,
-        predicate: dcterms.modified,
-        object: { termType: "Variable", value: variablePrefix + "Modified" },
-        optional: true,
-      },
-      {
-        subject,
-        predicate: dc11.rights,
-        object: {
-          termType: "Variable",
-          plainLiteral: true,
-          value: variablePrefix + "DcRights",
-        },
-        optional: true,
-      },
-      {
-        subject,
-        predicate: dcterms.rights,
-        object: {
-          termType: "Variable",
-          plainLiteral: true,
-          value: variablePrefix + "DctermsRights",
-        },
-        optional: true,
-      },
-      {
-        subject,
-        predicate: dcterms.rightsHolder,
-        object: {
-          termType: "Variable",
-          plainLiteral: true,
-          value: variablePrefix + "RightsHolder",
-        },
-        optional: true,
-      },
-    ];
-  }
-
-  get rights(): Literal | null {
+  get rights(): Option<Literal> {
     return this.memModel.rights;
   }
 
-  get rightsHolder(): Literal | null {
+  get rightsHolder(): Option<Literal> {
     return this.memModel.rightsHolder;
   }
+}
 
-  protected get sparqlClient() {
-    return this.kos.sparqlClient;
+export namespace Model {
+  export interface Parameters<MemModelT extends IModel> {
+    memModel: MemModelT;
   }
 }

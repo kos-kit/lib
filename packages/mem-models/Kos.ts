@@ -1,46 +1,104 @@
-import { BlankNode, DatasetCore, NamedNode } from "@rdfjs/types";
-import { Concept } from "./Concept.js";
-import { ConceptScheme } from "./ConceptScheme.js";
-import { paginateIterable } from "./paginateIterable.js";
-import { LanguageTagSet } from "@kos-kit/models";
-import { skos } from "@tpluscode/rdf-ns-builders";
+import {
+  Concept as IConcept,
+  ConceptScheme as IConceptScheme,
+  Kos as IKos,
+  Label as ILabel,
+} from "@kos-kit/models";
 import { Resource } from "@kos-kit/rdf-resource";
-import { instances } from "@kos-kit/rdf-utils";
+import { instances, isInstanceOf } from "@kos-kit/rdf-utils";
+import { DatasetCore } from "@rdfjs/types";
+import { skos } from "@tpluscode/rdf-ns-builders";
+import * as O from "fp-ts/Option";
+import { ModelFactory } from "./ModelFactory.js";
 import { countIterable } from "./countIterable.js";
+import { paginateIterable } from "./paginateIterable.js";
 
-export class Kos {
+export class Kos<
+  ConceptT extends IConcept,
+  ConceptSchemeT extends IConceptScheme,
+  LabelT extends ILabel,
+> implements IKos
+{
+  private readonly modelFactory: ModelFactory<ConceptT, ConceptSchemeT, LabelT>;
+
   readonly dataset: DatasetCore;
-  readonly includeLanguageTags: LanguageTagSet;
 
   constructor({
     dataset,
-    includeLanguageTags,
+    modelFactory,
   }: {
     dataset: DatasetCore;
-    includeLanguageTags: LanguageTagSet;
+    modelFactory: ModelFactory<ConceptT, ConceptSchemeT, LabelT>;
   }) {
     this.dataset = dataset;
-    this.includeLanguageTags = includeLanguageTags;
+    this.modelFactory = modelFactory;
   }
 
-  conceptByIdentifier(identifier: Resource.Identifier): Promise<Concept> {
-    return new Promise((resolve) =>
-      resolve(new Concept({ identifier, kos: this })),
-    );
+  _conceptByIdentifier(identifier: Resource.Identifier): O.Option<ConceptT> {
+    if (
+      isInstanceOf({
+        class_: skos.Concept,
+        dataset: this.dataset,
+        instance: identifier,
+      })
+    ) {
+      return O.some(
+        this.modelFactory.createConcept(
+          new Resource({ dataset: this.dataset, identifier }),
+        ),
+      );
+    } else {
+      return O.none;
+    }
   }
 
-  private *conceptIdentifiers(): Iterable<Resource.Identifier> {
-    yield* instances({
-      class_: skos.Concept,
-      dataset: this.dataset,
-      includeSubclasses: true,
+  conceptByIdentifier(
+    identifier: Resource.Identifier,
+  ): Promise<O.Option<ConceptT>> {
+    return new Promise((resolve) => {
+      resolve(this._conceptByIdentifier(identifier));
     });
   }
 
-  async *concepts(): AsyncGenerator<Concept> {
-    for await (const identifier of this.conceptIdentifiers()) {
-      yield new Concept({ identifier, kos: this });
+  async conceptSchemeByIdentifier(
+    identifier: Resource.Identifier,
+  ): Promise<O.Option<ConceptSchemeT>> {
+    for (const conceptScheme of await this.conceptSchemes()) {
+      if (conceptScheme.identifier.equals(identifier)) {
+        return O.some(conceptScheme);
+      }
     }
+    return O.none;
+  }
+
+  conceptSchemes(): Promise<readonly ConceptSchemeT[]> {
+    return new Promise((resolve) => {
+      resolve([...this._conceptSchemes()]);
+    });
+  }
+
+  async *concepts(): AsyncIterable<ConceptT> {
+    for await (const identifier of this.conceptIdentifiers()) {
+      yield this.modelFactory.createConcept(
+        new Resource({ dataset: this.dataset, identifier }),
+      );
+    }
+  }
+
+  conceptsByIdentifiers(
+    identifiers: readonly Resource.Identifier[],
+  ): Promise<readonly O.Option<ConceptT>[]> {
+    return new Promise((resolve) => {
+      resolve(
+        identifiers.map((identifier) => this._conceptByIdentifier(identifier)),
+      );
+    });
+  }
+
+  conceptsCount(): Promise<number> {
+    return new Promise((resolve) => {
+      resolve(countIterable(this.conceptIdentifiers()));
+    });
   }
 
   conceptsPage({
@@ -49,47 +107,40 @@ export class Kos {
   }: {
     limit: number;
     offset: number;
-  }): Promise<readonly Concept[]> {
+  }): Promise<readonly ConceptT[]> {
     return new Promise((resolve) => {
-      const result: Concept[] = [];
+      const result: ConceptT[] = [];
       for (const identifier of paginateIterable(this.conceptIdentifiers(), {
         limit,
         offset,
       })) {
-        result.push(new Concept({ identifier, kos: this }));
+        result.push(
+          this.modelFactory.createConcept(
+            new Resource({ dataset: this.dataset, identifier }),
+          ),
+        );
       }
       resolve(result);
     });
   }
 
-  conceptsCount(): Promise<number> {
-    return new Promise((resolve) =>
-      resolve(countIterable(this.conceptIdentifiers())),
-    );
-  }
-
-  async conceptSchemeByIdentifier(
-    identifier: BlankNode | NamedNode,
-  ): Promise<ConceptScheme> {
-    for (const conceptScheme of await this.conceptSchemes()) {
-      if (conceptScheme.identifier.equals(identifier)) {
-        return conceptScheme;
-      }
-    }
-    throw new RangeError(Resource.Identifier.toString(identifier));
-  }
-
-  conceptSchemes(): Promise<readonly ConceptScheme[]> {
-    return new Promise((resolve) => resolve([...this._conceptSchemes()]));
-  }
-
-  private *_conceptSchemes(): Iterable<ConceptScheme> {
+  private *_conceptSchemes(): Iterable<ConceptSchemeT> {
     for (const identifier of instances({
       class_: skos.ConceptScheme,
       dataset: this.dataset,
       includeSubclasses: true,
     })) {
-      yield new ConceptScheme({ identifier, kos: this });
+      yield this.modelFactory.createConceptScheme(
+        new Resource({ dataset: this.dataset, identifier }),
+      );
     }
+  }
+
+  private *conceptIdentifiers(): Iterable<Resource.Identifier> {
+    yield* instances({
+      class_: skos.Concept,
+      dataset: this.dataset,
+      includeSubclasses: true,
+    });
   }
 }

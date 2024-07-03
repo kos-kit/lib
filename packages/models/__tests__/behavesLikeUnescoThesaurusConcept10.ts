@@ -3,6 +3,7 @@ import { DataFactory } from "n3";
 import { expectConcept } from "./expectConcept.js";
 import { Concept, LanguageTag, SemanticRelationProperty } from "..";
 import { expect, it } from "vitest";
+import * as O from "fp-ts/Option";
 
 export const behavesLikeUnescoThesaurusConcept10 = (
   lazyConcept: (includeLanguageTag: LanguageTag) => Promise<Concept>,
@@ -14,18 +15,24 @@ export const behavesLikeUnescoThesaurusConcept10 = (
 
   it("should be in the single concept scheme", async () => {
     const concept = await lazyConcept("en");
-    const inSchemes = await concept.topConceptOf();
-    expect(inSchemes).toHaveLength(1);
-    expect(
-      inSchemes[0].identifier.equals(
-        DataFactory.namedNode("http://vocabularies.unesco.org/thesaurus"),
-      ),
-    );
+    for (const inSchemes of [
+      await concept.topConceptOf(),
+      await concept.inSchemes(),
+    ]) {
+      expect(inSchemes).toHaveLength(1);
+      expect(
+        inSchemes[0].identifier.equals(
+          DataFactory.namedNode("http://vocabularies.unesco.org/thesaurus"),
+        ),
+      );
+    }
   });
 
   it("should have a modified date", async () => {
     const concept = await lazyConcept("en");
-    expect(concept.modified!.value).toStrictEqual("2019-12-15T13:26:49Z");
+    expect(O.toNullable(concept.modified)!.value).toStrictEqual(
+      "2019-12-15T13:26:49Z",
+    );
   });
 
   it("should have multiple prefLabels", async () => {

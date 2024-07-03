@@ -1,9 +1,13 @@
-import { Parser, Store } from "n3";
-import path from "node:path";
-import fs from "node:fs";
-import { fileURLToPath } from "node:url";
 import { LanguageTag, LanguageTagSet } from "@kos-kit/models";
+import { Parser, Store } from "n3";
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import { Concept } from "../Concept.js";
+import { ConceptScheme } from "../ConceptScheme.js";
+import { DefaultModelFactory } from "../DefaultModelFactory.js";
 import { Kos } from "../Kos.js";
+import { Label } from "../Label.js";
 
 const ntriplesStringToDataset = (input: string): Store => {
   const parser = new Parser({ format: "N-Triples" });
@@ -19,8 +23,8 @@ const testDataset: Store = ntriplesStringToDataset(
         path.dirname(fileURLToPath(import.meta.url)),
         "..",
         "..",
-        "models",
-        "__tests__",
+        "..",
+        "test-data",
         "unesco-thesaurus.nt",
       ),
     )
@@ -30,5 +34,10 @@ const testDataset: Store = ntriplesStringToDataset(
 export const testKosFactory = (includeLanguageTag: LanguageTag) =>
   new Kos({
     dataset: testDataset,
-    includeLanguageTags: new LanguageTagSet(includeLanguageTag, ""),
+    modelFactory: new DefaultModelFactory({
+      conceptConstructor: Concept,
+      conceptSchemeConstructor: ConceptScheme,
+      includeLanguageTags: new LanguageTagSet(includeLanguageTag, ""),
+      labelConstructor: Label,
+    }),
   });

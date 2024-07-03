@@ -19,12 +19,10 @@ export const semanticRelationProperties: readonly SemanticRelationProperty[] = [
 ].concat(mappingProperties);
 
 export const semanticRelationPropertiesByName =
-  semanticRelationProperties.reduce(
+  semanticRelationProperties.reduce<Record<string, SemanticRelationProperty>>(
     (map, semanticRelationProperty) => {
       map[semanticRelationProperty.name] = semanticRelationProperty;
       return map;
     },
-    {} as {
-      [index: string]: SemanticRelationProperty;
-    },
+    {},
   );

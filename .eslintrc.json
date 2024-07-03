@@ -2,16 +2,16 @@
   "extends": [
     "eslint:recommended",
     "plugin:@typescript-eslint/recommended",
-    "prettier"
+    "plugin:@typescript-eslint/strict",
+    "plugin:@typescript-eslint/stylistic"
   ],
-  "ignorePatterns": ["jest.config.*", "__tests__/*"],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "project": ["./tsconfig.json"]
   },
   "rules": {
-    "@typescript-eslint/no-floating-promises": "error",
     "@typescript-eslint/no-explicit-any": "off",
+    "@typescript-eslint/no-namespace": "off",
     "@typescript-eslint/no-unused-vars": [
       2,
       {
@@ -20,6 +20,7 @@
         "varsIgnorePattern": "(^jsx$)|(^_)",
         "argsIgnorePattern": "^_"
       }
-    ]
+    ],
+    "@typescript-eslint/restrict-template-expressions": "off"
   }
 }

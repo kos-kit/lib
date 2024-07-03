@@ -1,19 +1,35 @@
-import { describe, expect, it } from "vitest";
+import { beforeAll, describe, expect, it } from "vitest";
 import { DataFactory, Store } from "n3";
 import { BlankNode, DatasetCore, Literal, NamedNode } from "@rdfjs/types";
 import { Resource } from "..";
+import { xsd } from "@tpluscode/rdf-ns-builders";
+import * as O from "fp-ts/Option";
 
 describe("Resource", () => {
-  const dataset: DatasetCore = new Store();
-  const subject = DataFactory.namedNode("http://example.com/subject");
-  const predicate = DataFactory.namedNode("http://example.com/predicate");
-  const blankNodeObject = DataFactory.blankNode();
-  const literalObject = DataFactory.literal("literal");
-  const namedNodeObject = DataFactory.namedNode("http://example.com/object");
-  dataset.add(DataFactory.quad(subject, predicate, blankNodeObject));
-  dataset.add(DataFactory.quad(subject, predicate, literalObject));
-  dataset.add(DataFactory.quad(subject, predicate, namedNodeObject));
-  const resource = new Resource({ dataset, identifier: subject });
+  let resource: Resource;
+
+  const objects: Record<string, BlankNode | Literal | NamedNode> = {
+    blankNode: DataFactory.blankNode(),
+    booleanLiteral: DataFactory.literal(1, xsd.boolean),
+    intLiteral: DataFactory.literal(1),
+    namedNode: DataFactory.namedNode("http://example.com/namedNodeObject"),
+    stringLiteral: DataFactory.literal("stringLiteralObject"),
+  };
+
+  const predicate = DataFactory.namedNode(`http://example.com/predicate`);
+
+  beforeAll(() => {
+    const dataset: DatasetCore = new Store();
+    const resourceBuilder = new Resource.Builder({
+      dataFactory: DataFactory,
+      dataset,
+      identifier: DataFactory.namedNode("http://example.com/subject"),
+    });
+    for (const object of Object.values(objects)) {
+      resourceBuilder.add(predicate, object);
+    }
+    resource = resourceBuilder.build();
+  });
 
   it("should get an optional value", () => {
     expect(
@@ -21,11 +37,13 @@ describe("Resource", () => {
         DataFactory.namedNode("http://example.com/nonexistent"),
         Resource.ValueMappers.identity,
       ),
-    ).toBeNull();
+    ).toEqual(O.none);
 
     expect(
-      resource.optionalValue(predicate, Resource.ValueMappers.literal)!.value,
-    ).toBe(literalObject.value);
+      O.toNullable(
+        resource.optionalValue(predicate, Resource.ValueMappers.iri),
+      )!.value,
+    ).toStrictEqual(objects["namedNode"].value);
   });
 
   it("should get a required value", () => {
@@ -37,8 +55,8 @@ describe("Resource", () => {
     ).toThrowError();
 
     expect(
-      resource.requiredValue(predicate, Resource.ValueMappers.iri)!.value,
-    ).toBe(namedNodeObject.value);
+      resource.requiredValue(predicate, Resource.ValueMappers.iri).value,
+    ).toBe(objects["namedNode"].value);
   });
 
   it("should get all values", () => {
@@ -48,10 +66,10 @@ describe("Resource", () => {
         Resource.ValueMappers.identity,
       ),
     ];
-    expect(values).toHaveLength(3);
-    expect(values.find((value) => value.equals(blankNodeObject))).toBeDefined();
-    expect(values.find((value) => value.equals(literalObject))).toBeDefined();
-    expect(values.find((value) => value.equals(namedNodeObject))).toBeDefined();
+    expect(values).toHaveLength(Object.keys(objects).length);
+    for (const object of Object.values(objects)) {
+      expect(values.find((value) => value.equals(object))).toBeDefined();
+    }
   });
 
   it("should get identifier values", () => {
@@ -59,8 +77,12 @@ describe("Resource", () => {
       ...resource.values(predicate, Resource.ValueMappers.identifier),
     ];
     expect(values).toHaveLength(2);
-    expect(values.find((value) => value.equals(blankNodeObject))).toBeDefined();
-    expect(values.find((value) => value.equals(namedNodeObject))).toBeDefined();
+    expect(
+      values.find((value) => value.equals(objects["blankNode"])),
+    ).toBeDefined();
+    expect(
+      values.find((value) => value.equals(objects["namedNode"])),
+    ).toBeDefined();
   });
 
   it("should get resource values", () => {
@@ -69,10 +91,29 @@ describe("Resource", () => {
     ];
     expect(values).toHaveLength(2);
     expect(
-      values.find((value) => value.identifier.equals(blankNodeObject)),
+      values.find((value) => value.identifier.equals(objects["blankNode"])),
     ).toBeDefined();
     expect(
-      values.find((value) => value.identifier.equals(namedNodeObject)),
+      values.find((value) => value.identifier.equals(objects["namedNode"])),
     ).toBeDefined();
+  });
+
+  it("should set with the builder", () => {
+    const dataset = new Store();
+    const resourceBuilder = new Resource.Builder({
+      dataFactory: DataFactory,
+      dataset,
+      identifier: DataFactory.blankNode(),
+    });
+    resourceBuilder.add(predicate, objects["stringLiteral"]);
+    expect(dataset.size).toStrictEqual(1);
+    resourceBuilder.set(predicate, objects["intLiteral"]);
+    expect(dataset.size).toStrictEqual(1);
+    const resource = resourceBuilder.build();
+    const values = [
+      ...resource.values(predicate, Resource.ValueMappers.identity),
+    ];
+    expect(values).toHaveLength(1);
+    expect(values[0].equals(objects["intLiteral"])).toBeTruthy();
   });
 });

@@ -1,12 +1,11 @@
 import { LanguageTagSet } from "@kos-kit/models";
+import { skos } from "@tpluscode/rdf-ns-builders";
+import { describe, expect, it } from "vitest";
 import {
   ConstructQueryBuilder,
   GraphPatternObject,
   GraphPatternSubject,
 } from "..";
-import { Concept } from "../Concept.js";
-import { skos } from "@tpluscode/rdf-ns-builders";
-import { describe, expect, it } from "vitest";
 
 describe("ConstructQueryBuilder", () => {
   const subject: GraphPatternSubject = {
@@ -78,20 +77,20 @@ CONSTRUCT {
 }`);
   });
 
-  it("should translate a conceptByIdentifier query", () => {
-    const subject: GraphPatternSubject = {
-      termType: "NamedNode",
-      value: "http://example.com/concept",
-    };
-    const actual = new ConstructQueryBuilder()
-      .addGraphPatterns(
-        ...Concept.propertyGraphPatterns({
-          subject,
-          variablePrefix: "concept",
-        }),
-      )
-      .build();
-    // console.log("\n", actual);
-    expect(actual).not.toHaveLength(0);
-  });
+  // it("should translate a conceptByIdentifier query", () => {
+  //   const subject: GraphPatternSubject = {
+  //     termType: "NamedNode",
+  //     value: "http://example.com/concept",
+  //   };
+  //   const actual = new ConstructQueryBuilder()
+  //     .addGraphPatterns(
+  //       ...Concept.propertyGraphPatterns({
+  //         subject,
+  //         variablePrefix: "concept",
+  //       }),
+  //     )
+  //     .build();
+  //   // console.log("\n", actual);
+  //   expect(actual).not.toHaveLength(0);
+  // });
 });

@@ -1,17 +1,40 @@
-import { NamedNode } from "@rdfjs/types";
-import { Model } from "./Model.js";
-import { Label } from "./Label.js";
 import {
+  Concept as IConcept,
+  ConceptScheme as IConceptScheme,
   Label as ILabel,
   LabeledModel as ILabeledModel,
   LanguageTag,
   LiteralLabel,
 } from "@kos-kit/models";
-import { skos, skosxl } from "@tpluscode/rdf-ns-builders";
 import { Resource } from "@kos-kit/rdf-resource";
+import { NamedNode } from "@rdfjs/types";
+import { skos, skosxl } from "@tpluscode/rdf-ns-builders";
+import { Model } from "./Model.js";
+import { ModelFactory } from "./ModelFactory.js";
 import { matchLiteral } from "./matchLiteral.js";
 
-export abstract class LabeledModel extends Model implements ILabeledModel {
+export abstract class LabeledModel<
+    ConceptT extends IConcept,
+    ConceptSchemeT extends IConceptScheme,
+    LabelT extends ILabel,
+  >
+  extends Model
+  implements ILabeledModel
+{
+  protected readonly modelFactory: ModelFactory<
+    ConceptT,
+    ConceptSchemeT,
+    LabelT
+  >;
+
+  constructor({
+    modelFactory,
+    ...modelParameters
+  }: LabeledModel.Parameters<ConceptT, ConceptSchemeT, LabelT>) {
+    super(modelParameters);
+    this.modelFactory = modelFactory;
+  }
+
   get altLabels(): readonly ILabel[] {
     return this.labels({
       skosPredicate: skos.altLabel,
@@ -38,6 +61,13 @@ export abstract class LabeledModel extends Model implements ILabeledModel {
     return this.labels({
       skosPredicate: skos.hiddenLabel,
       skosXlPredicate: skosxl.hiddenLabel,
+    });
+  }
+
+  get prefLabels(): readonly ILabel[] {
+    return this.labels({
+      skosPredicate: skos.prefLabel,
+      skosXlPredicate: skosxl.prefLabel,
     });
   }
 
@@ -82,10 +112,9 @@ export abstract class LabeledModel extends Model implements ILabeledModel {
         }
 
         labels.push(
-          new Label({
-            identifier: labelResource.identifier,
-            kos: this.kos,
+          this.modelFactory.createLabel({
             literalForm,
+            resource: labelResource,
           }),
         );
       }
@@ -93,11 +122,14 @@ export abstract class LabeledModel extends Model implements ILabeledModel {
 
     return labels;
   }
+}
 
-  get prefLabels(): readonly ILabel[] {
-    return this.labels({
-      skosPredicate: skos.prefLabel,
-      skosXlPredicate: skosxl.prefLabel,
-    });
+export namespace LabeledModel {
+  export interface Parameters<
+    ConceptT extends IConcept,
+    ConceptSchemeT extends IConceptScheme,
+    LabelT extends ILabel,
+  > extends Model.Parameters {
+    modelFactory: ModelFactory<ConceptT, ConceptSchemeT, LabelT>;
   }
 }

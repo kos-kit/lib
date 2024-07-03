@@ -1,22 +1,18 @@
-import { Literal } from "@rdfjs/types";
 import { Label as ILabel } from "@kos-kit/models";
+import { Literal } from "@rdfjs/types";
 import { Model } from "./Model.js";
-import { Kos } from "./Kos.js";
-import { Resource } from "@kos-kit/rdf-resource";
 
 export class Label extends Model implements ILabel {
   readonly literalForm: Literal;
 
-  constructor({
-    kos,
-    identifier,
-    literalForm,
-  }: {
-    identifier: Resource.Identifier;
-    kos: Kos;
-    literalForm: Literal;
-  }) {
-    super({ identifier, kos });
+  constructor({ literalForm, ...modelParameters }: Label.Parameters) {
+    super(modelParameters);
     this.literalForm = literalForm;
+  }
+}
+
+export namespace Label {
+  export interface Parameters extends Model.Parameters {
+    literalForm: Literal;
   }
 }

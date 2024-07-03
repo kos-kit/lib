@@ -1,14 +1,15 @@
 import { Literal } from "@rdfjs/types";
 import { Label } from "./Label.js";
+import * as O from "fp-ts/Option";
 
 /**
  * A Label that only consists of its literal form.
  */
 export class LiteralLabel implements Label {
-  constructor(readonly literalForm: Literal) {}
+  readonly license = O.none;
+  readonly modified = O.none;
+  readonly rights = O.none;
+  readonly rightsHolder = O.none;
 
-  readonly license = null;
-  readonly modified = null;
-  readonly rights = null;
-  readonly rightsHolder = null;
+  constructor(readonly literalForm: Literal) {}
 }

@@ -9,10 +9,12 @@ export class GlobalRef<T> {
   }
 
   get value(): T | undefined {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     return (global as any)[this.sym] as NonUndefined<T> | undefined;
   }
 
   set value(value: NonUndefined<T>) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     (global as any)[this.sym] = value;
   }
 }

@@ -1,40 +1,48 @@
-import { Concept } from "./Concept.js";
-import { ConceptScheme } from "./ConceptScheme.js";
-
-import { ConstructQueryBuilder } from "./ConstructQueryBuilder.js";
-import { GraphPatternVariable } from "./GraphPattern.js";
-import { mapResultRowsToIdentifiers } from "./mapResultRowsToIdentifiers.js";
-import { mapResultRowsToCount } from "./mapResultRowsToCount.js";
-import { SparqlClient } from "./SparqlClient.js";
-import { paginationToAsyncGenerator } from "./paginationToAsyncGenerator.js";
-import { LanguageTagSet } from "@kos-kit/models";
-import { rdf, rdfs, skos } from "@tpluscode/rdf-ns-builders";
-import { BlankNode, NamedNode } from "@rdfjs/types";
+import {
+  Concept as IConcept,
+  ConceptScheme as IConceptScheme,
+  Kos as IKos,
+} from "@kos-kit/models";
 import { Resource } from "@kos-kit/rdf-resource";
-import * as mem from "@kos-kit/mem-models";
+import { rdf, rdfs, skos } from "@tpluscode/rdf-ns-builders";
+import * as O from "fp-ts/Option";
+import { ModelFetcher } from "./ModelFetcher.js";
+import { SparqlClient } from "./SparqlClient.js";
+import { mapResultRowsToCount } from "./mapResultRowsToCount.js";
+import { mapResultRowsToIdentifiers } from "./mapResultRowsToIdentifiers.js";
+import { paginationToAsyncIterable } from "./paginationToAsyncIterable.js";
 
-export class Kos {
+export class Kos<
+  SparqlConceptT extends IConcept,
+  SparqlConceptSchemeT extends IConceptScheme,
+> implements IKos
+{
   private static readonly CONCEPT_IDENTIFIER_GRAPH_PATTERN = `?concept <${rdf.type.value}>/<${rdfs.subClassOf.value}>* <${skos.Concept.value}> .`;
   private static readonly CONCEPT_SCHEME_IDENTIFIER_GRAPH_PATTERN = `?conceptScheme <${rdf.type.value}>/<${rdfs.subClassOf.value}>* <${skos.ConceptScheme.value}> .`;
 
-  readonly includeLanguageTags: LanguageTagSet;
-  readonly sparqlClient: SparqlClient;
+  private readonly modelFetcher: ModelFetcher<
+    SparqlConceptT,
+    SparqlConceptSchemeT
+  >;
+  private readonly sparqlClient: SparqlClient;
 
   constructor({
-    includeLanguageTags,
+    modelFetcher,
     sparqlClient,
   }: {
-    includeLanguageTags: LanguageTagSet;
+    modelFetcher: ModelFetcher<SparqlConceptT, SparqlConceptSchemeT>;
     sparqlClient: SparqlClient;
   }) {
-    this.includeLanguageTags = includeLanguageTags;
+    this.modelFetcher = modelFetcher;
     this.sparqlClient = sparqlClient;
   }
 
   async conceptByIdentifier(
-    identifier: BlankNode | NamedNode,
-  ): Promise<Concept> {
-    return (await this.conceptsByIdentifiers([identifier]))[0];
+    identifier: Resource.Identifier,
+  ): Promise<O.Option<SparqlConceptT>> {
+    return (
+      await this.modelFetcher.fetchConceptsByIdentifiers([identifier])
+    )[0];
   }
 
   private async conceptIdentifiersPage({
@@ -56,48 +64,17 @@ OFFSET ${offset}`),
     );
   }
 
-  async *concepts(): AsyncGenerator<Concept> {
-    yield* paginationToAsyncGenerator({
+  async *concepts(): AsyncIterable<SparqlConceptT> {
+    yield* paginationToAsyncIterable({
       getPage: ({ offset }) => this.conceptsPage({ limit: 100, offset }),
       totalCount: await this.conceptsCount(),
     });
   }
 
-  async conceptsByIdentifiers(
+  conceptsByIdentifiers(
     identifiers: readonly Resource.Identifier[],
-  ): Promise<readonly Concept[]> {
-    const conceptVariable: GraphPatternVariable = {
-      termType: "Variable",
-      value: "concept",
-    };
-    const includeLanguageTags = this.includeLanguageTags;
-    const dataset = await this.sparqlClient.query.construct(
-      new ConstructQueryBuilder({
-        includeLanguageTags,
-      })
-        .addGraphPatterns(
-          ...Concept.propertyGraphPatterns({
-            subject: conceptVariable,
-            variablePrefix: conceptVariable.value,
-          }),
-        )
-        .addValues(conceptVariable, ...identifiers)
-        .build(),
-      { operation: "postDirect" },
-    );
-    return identifiers.map(
-      (identifier) =>
-        new Concept({
-          kos: this,
-          memModel: new mem.Concept({
-            identifier,
-            kos: new mem.Kos({
-              dataset,
-              includeLanguageTags,
-            }),
-          }),
-        }),
-    );
+  ): Promise<readonly O.Option<SparqlConceptT>[]> {
+    return this.modelFetcher.fetchConceptsByIdentifiers(identifiers);
   }
 
   async conceptsCount(): Promise<number> {
@@ -118,53 +95,23 @@ WHERE {
   }: {
     limit: number;
     offset: number;
-  }): Promise<readonly Concept[]> {
-    return this.conceptsByIdentifiers(
-      await this.conceptIdentifiersPage({
-        limit,
-        offset,
-      }),
-    );
+  }): Promise<readonly SparqlConceptT[]> {
+    return (
+      await this.modelFetcher.fetchConceptsByIdentifiers(
+        await this.conceptIdentifiersPage({
+          limit,
+          offset,
+        }),
+      )
+    ).flatMap((concept) => (O.isSome(concept) ? [concept.value] : []));
   }
 
   async conceptSchemeByIdentifier(
     identifier: Resource.Identifier,
-  ): Promise<ConceptScheme> {
-    return (await this.conceptSchemesByIdentifiers([identifier]))[0];
-  }
-
-  async conceptSchemesByIdentifiers(
-    identifiers: readonly Resource.Identifier[],
-  ): Promise<readonly ConceptScheme[]> {
-    const conceptSchemeVariable: GraphPatternVariable = {
-      termType: "Variable",
-      value: "conceptScheme",
-    };
-    const includeLanguageTags = this.includeLanguageTags;
-    const dataset = await this.sparqlClient.query.construct(
-      new ConstructQueryBuilder({
-        includeLanguageTags,
-      })
-        .addGraphPatterns(
-          ...ConceptScheme.propertyGraphPatterns({
-            subject: conceptSchemeVariable,
-            variablePrefix: conceptSchemeVariable.value,
-          }),
-        )
-        .addValues(conceptSchemeVariable, ...identifiers)
-        .build(),
-      { operation: "postDirect" },
-    );
-    return identifiers.map(
-      (identifier) =>
-        new ConceptScheme({
-          kos: this,
-          memModel: new mem.ConceptScheme({
-            identifier,
-            kos: new mem.Kos({ dataset, includeLanguageTags }),
-          }),
-        }),
-    );
+  ): Promise<O.Option<SparqlConceptSchemeT>> {
+    return (
+      await this.modelFetcher.fetchConceptSchemesByIdentifiers([identifier])
+    )[0];
   }
 
   private async conceptSchemeIdentifiers(): Promise<
@@ -180,9 +127,13 @@ WHERE {
     );
   }
 
-  async conceptSchemes(): Promise<readonly ConceptScheme[]> {
-    return this.conceptSchemesByIdentifiers(
-      await this.conceptSchemeIdentifiers(),
+  async conceptSchemes(): Promise<readonly SparqlConceptSchemeT[]> {
+    return (
+      await this.modelFetcher.fetchConceptSchemesByIdentifiers(
+        await this.conceptSchemeIdentifiers(),
+      )
+    ).flatMap((conceptScheme) =>
+      O.isSome(conceptScheme) ? [conceptScheme.value] : [],
     );
   }
 }

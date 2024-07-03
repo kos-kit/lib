@@ -10,6 +10,14 @@ export class LanguageTagSet {
     this.languageTags = languageTags;
   }
 
+  get size(): number {
+    return this.languageTags.length;
+  }
+
+  [Symbol.iterator]() {
+    return this.languageTags[Symbol.iterator]();
+  }
+
   has(languageTag: LanguageTag): boolean {
     for (const languageTag_ of this.languageTags) {
       if (languageTag_ === languageTag) {
@@ -17,13 +25,5 @@ export class LanguageTagSet {
       }
     }
     return false;
-  }
-
-  [Symbol.iterator]() {
-    return this.languageTags[Symbol.iterator]();
-  }
-
-  get size(): number {
-    return this.languageTags.length;
   }
 }

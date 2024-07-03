@@ -1,8 +1,16 @@
 /* eslint-disable no-inner-declarations */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable @typescript-eslint/no-namespace */
-import { NamedNode, DatasetCore, BlankNode, Literal } from "@rdfjs/types";
-import DataFactory from "@rdfjs/data-model";
+import {
+  BlankNode,
+  DataFactory,
+  DatasetCore,
+  DefaultGraph,
+  Literal,
+  NamedNode,
+} from "@rdfjs/types";
+import * as O from "fp-ts/Option";
+import { pipe } from "fp-ts/function";
+import { fromRdf } from "rdf-literal";
 
 export class Resource {
   readonly dataset: DatasetCore;
@@ -22,19 +30,18 @@ export class Resource {
   optionalValue<T>(
     property: NamedNode,
     mapper: Resource.ValueMapper<T>,
-  ): NonNullable<T> | null {
+  ): O.Option<NonNullable<T>> {
     for (const value of this.values(property, mapper)) {
-      return value;
+      return O.some(value);
     }
-    return null;
+    return O.none;
   }
 
   requiredValue<T>(
     property: NamedNode,
     mapper: Resource.ValueMapper<T>,
   ): NonNullable<T> {
-    const value = this.optionalValue(property, mapper);
-    if (value !== null) {
+    for (const value of this.values(property, mapper)) {
       return value;
     }
     throw new Error(`no appropriate ${property.value} found`);
@@ -50,13 +57,11 @@ export class Resource {
       null,
       null,
     )) {
-      const mappedObject: T | null = mapper(
+      const mappedObject = mapper(
         quad.object as BlankNode | NamedNode | Literal,
         this.dataset,
       );
-      if (mappedObject !== null) {
-        yield mappedObject as NonNullable<T>;
-      }
+      if (O.isSome(mappedObject)) yield mappedObject.value;
     }
   }
 
@@ -69,8 +74,9 @@ export class Resource {
       null,
     )) {
       if (
-        mapper(quad.object as BlankNode | Literal | NamedNode, this.dataset) !==
-        null
+        O.isSome(
+          mapper(quad.object as BlankNode | Literal | NamedNode, this.dataset),
+        )
       ) {
         count++;
       }
@@ -80,16 +86,86 @@ export class Resource {
 }
 
 export namespace Resource {
+  export class Builder {
+    private readonly dataFactory: DataFactory;
+
+    readonly dataset: DatasetCore;
+    readonly graph: DefaultGraph | NamedNode | BlankNode | undefined;
+    readonly identifier: Identifier;
+
+    constructor({
+      dataFactory,
+      dataset,
+      identifier,
+      graph,
+    }: {
+      dataFactory: DataFactory;
+      dataset: DatasetCore;
+      identifier: Resource.Identifier;
+      graph?: DefaultGraph | NamedNode | BlankNode;
+    }) {
+      this.dataFactory = dataFactory;
+      this.dataset = dataset;
+      this.identifier = identifier;
+      this.graph = graph;
+    }
+
+    add(predicate: NamedNode, object: BlankNode | Literal | NamedNode): this {
+      this.dataset.add(
+        this.dataFactory.quad(this.identifier, predicate, object, this.graph),
+      );
+      return this;
+    }
+
+    delete(
+      predicate: NamedNode,
+      object?: BlankNode | Literal | NamedNode,
+    ): this {
+      for (const quad of [
+        ...this.dataset.match(this.identifier, predicate, object),
+      ]) {
+        this.dataset.delete(quad);
+      }
+      return this;
+    }
+
+    build(): Resource {
+      return new Resource({
+        dataset: this.dataset,
+        identifier: this.identifier,
+      });
+    }
+
+    set(predicate: NamedNode, object: BlankNode | Literal | NamedNode): this {
+      for (const quad of [...this.dataset.match(this.identifier, predicate)]) {
+        this.dataset.delete(quad);
+      }
+      return this.add(predicate, object);
+    }
+  }
+
   export type Identifier = BlankNode | NamedNode;
 
   export namespace Identifier {
-    export function fromString(str: string) {
-      if (str.startsWith("_:")) {
-        return DataFactory.blankNode(str.substring("_:".length));
-      } else if (str.startsWith("<") && str.endsWith(">") && str.length > 2) {
-        return DataFactory.namedNode(str.substring(1, str.length - 1));
+    export function fromString({
+      dataFactory,
+      identifier,
+    }: {
+      dataFactory: DataFactory;
+      identifier: string;
+    }) {
+      if (identifier.startsWith("_:")) {
+        return dataFactory.blankNode(identifier.substring("_:".length));
+      } else if (
+        identifier.startsWith("<") &&
+        identifier.endsWith(">") &&
+        identifier.length > 2
+      ) {
+        return dataFactory.namedNode(
+          identifier.substring(1, identifier.length - 1),
+        );
       } else {
-        throw new RangeError(str);
+        throw new RangeError(identifier);
       }
     }
 
@@ -106,48 +182,102 @@ export namespace Resource {
   export type ValueMapper<T> = (
     object: BlankNode | Literal | NamedNode,
     dataset: DatasetCore,
-  ) => NonNullable<T> | null;
+  ) => O.Option<NonNullable<T>>;
 
   export namespace ValueMappers {
+    export function boolean(
+      object: BlankNode | Literal | NamedNode,
+    ): O.Option<boolean> {
+      return pipe(
+        primitive(object),
+        O.flatMap((primitive) =>
+          typeof primitive === "boolean" ? O.some(primitive) : O.none,
+        ),
+      );
+    }
+
+    export function date(
+      object: BlankNode | Literal | NamedNode,
+    ): O.Option<Date> {
+      return pipe(
+        primitive(object),
+        O.flatMap((primitive) =>
+          primitive instanceof Date ? O.some(primitive) : O.none,
+        ),
+      );
+    }
+
     export function identifier(
       object: BlankNode | Literal | NamedNode,
-    ): Identifier | null {
+    ): O.Option<Identifier> {
       switch (object.termType) {
         case "BlankNode":
         case "NamedNode":
-          return object;
+          return O.some(object);
         default:
-          return null;
+          return O.none;
       }
-    }
-
-    export function iri(
-      object: BlankNode | Literal | NamedNode,
-    ): NamedNode | null {
-      return object.termType === "NamedNode" ? object : null;
     }
 
     export function identity(
       object: BlankNode | Literal | NamedNode,
-    ): BlankNode | Literal | NamedNode {
-      return object;
+    ): O.Option<BlankNode | Literal | NamedNode> {
+      return O.some(object);
+    }
+
+    export function iri(
+      object: BlankNode | Literal | NamedNode,
+    ): O.Option<NamedNode> {
+      return object.termType === "NamedNode" ? O.some(object) : O.none;
     }
 
     export function literal(
       object: BlankNode | Literal | NamedNode,
-    ): Literal | null {
-      return object.termType === "Literal" ? object : null;
+    ): O.Option<Literal> {
+      return object.termType === "Literal" ? O.some(object) : O.none;
+    }
+
+    export function number(
+      object: BlankNode | Literal | NamedNode,
+    ): O.Option<number> {
+      return pipe(
+        primitive(object),
+        O.flatMap((primitive) =>
+          typeof primitive === "number" ? O.some(primitive) : O.none,
+        ),
+      );
+    }
+
+    export function primitive(
+      object: BlankNode | Literal | NamedNode,
+    ): O.Option<boolean | Date | number | string> {
+      return object.termType === "Literal"
+        ? O.tryCatch(() => fromRdf(object, true))
+        : O.none;
     }
 
     export function resource(
       object: BlankNode | Literal | NamedNode,
       dataset: DatasetCore,
-    ): Resource | null {
-      const identifier = Resource.ValueMappers.identifier(object);
-      if (identifier !== null) {
-        return new Resource({ dataset, identifier });
-      }
-      return null;
+    ): O.Option<Resource> {
+      return pipe(
+        Resource.ValueMappers.identifier(object),
+        O.map(
+          (identifier: Resource.Identifier) =>
+            new Resource({ dataset, identifier }),
+        ),
+      );
+    }
+
+    export function string(
+      object: BlankNode | Literal | NamedNode,
+    ): O.Option<string> {
+      return pipe(
+        primitive(object),
+        O.flatMap((primitive) =>
+          typeof primitive === "string" ? O.some(primitive) : O.none,
+        ),
+      );
     }
   }
 }

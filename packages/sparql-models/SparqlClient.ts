@@ -2,13 +2,10 @@ import { DatasetCore, Quad } from "@rdfjs/types";
 import { ParsingQuery, QueryOptions } from "sparql-http-client";
 import ParsingSparqlClient from "sparql-http-client/ParsingClient";
 import { ResultRow } from "sparql-http-client/ResultParser";
-import { Writer } from "n3";
 import { logger } from "./logger.js";
 
-class Query implements ParsingQuery<DatasetCore<Quad, Quad>> {
-  constructor(
-    private readonly delegate: ParsingQuery<DatasetCore<Quad, Quad>>,
-  ) {}
+class Query implements ParsingQuery {
+  constructor(private readonly delegate: ParsingQuery) {}
 
   ask(query: string, options?: QueryOptions | undefined): Promise<boolean> {
     return this.delegate.ask(query, options);
@@ -20,12 +17,12 @@ class Query implements ParsingQuery<DatasetCore<Quad, Quad>> {
   ): Promise<DatasetCore<Quad, Quad>> {
     logger.trace("CONSTRUCT query:\n%s", query);
     const resultDataset = await this.delegate.construct(query, options);
-    if (logger.isLevelEnabled("trace")) {
-      const resultDatasetString = new Writer({
-        format: "Turtle",
-      }).quadsToString([...resultDataset]);
-      logger.trace("CONSTRUCT query result:\n%s", resultDatasetString);
-    }
+    // if (logger.isLevelEnabled("trace")) {
+    //   const resultDatasetString = new Writer({
+    //     format: "Turtle",
+    //   }).quadsToString([...resultDataset]);
+    // logger.trace("CONSTRUCT query result:\n%s", resultDatasetString);
+    // }
     return resultDataset;
   }
 

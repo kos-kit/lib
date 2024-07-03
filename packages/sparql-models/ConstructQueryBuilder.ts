@@ -1,35 +1,10 @@
 import { LanguageTagSet } from "@kos-kit/models";
-import { GraphPattern, GraphPatternVariable } from "./GraphPattern.js";
 import { BlankNode, Literal, NamedNode, Variable } from "@rdfjs/types";
-
-const TAB_SPACES = 2;
+import { GraphPattern, GraphPatternVariable } from "./GraphPattern.js";
 
 interface IndentedString {
   indent: number;
   string: string;
-}
-
-function indentedStringsToString(
-  indentedStrings: readonly IndentedString[],
-): string {
-  return indentedStrings
-    .map(({ indent, string }) => " ".repeat(indent) + string)
-    .join("\n");
-}
-
-function sortGraphPatterns(
-  graphPatterns: readonly GraphPattern[],
-): readonly GraphPattern[] {
-  const sortedGraphPatterns = graphPatterns.concat();
-  sortedGraphPatterns.sort((left, right) => {
-    // Required then optional.
-    if (left.optional) {
-      return right.optional ? 0 : 1;
-    } else {
-      return right.optional ? -1 : 0;
-    }
-  });
-  return sortedGraphPatterns;
 }
 
 export class ConstructQueryBuilder {
@@ -45,7 +20,7 @@ export class ConstructQueryBuilder {
       options?.includeLanguageTags ?? new LanguageTagSet();
   }
 
-  addGraphPatterns(...graphPatterns: GraphPattern[]): ConstructQueryBuilder {
+  addGraphPatterns(...graphPatterns: GraphPattern[]): this {
     this.graphPatterns.push(...graphPatterns);
     return this;
   }
@@ -53,7 +28,7 @@ export class ConstructQueryBuilder {
   addValues(
     variable: GraphPatternVariable,
     ...values: (Literal | BlankNode | NamedNode)[]
-  ): ConstructQueryBuilder {
+  ): this {
     for (const variableValues of this.values) {
       if (variableValues[0].value === variable.value) {
         variableValues[1].push(...values);
@@ -181,7 +156,7 @@ ${valuesString.length > 0 ? " ".repeat(TAB_SPACES) + valuesString + "\n" : ""}${
           '"' +
           literalValue.value +
           '"' +
-          (literalValue.datatype &&
+          (literalValue.datatype.value.length > 0 &&
           literalValue.datatype.value !==
             "http://www.w3.org/2001/XMLSchema#string" &&
           literalValue.datatype.value !==
@@ -210,3 +185,28 @@ ${valuesString.length > 0 ? " ".repeat(TAB_SPACES) + valuesString + "\n" : ""}${
     return `VALUES ?${variable.value} { ${values.map((value) => this.termToString(value)).join(" ")} }`;
   }
 }
+
+function indentedStringsToString(
+  indentedStrings: readonly IndentedString[],
+): string {
+  return indentedStrings
+    .map(({ indent, string }) => " ".repeat(indent) + string)
+    .join("\n");
+}
+
+function sortGraphPatterns(
+  graphPatterns: readonly GraphPattern[],
+): readonly GraphPattern[] {
+  const sortedGraphPatterns = graphPatterns.concat();
+  sortedGraphPatterns.sort((left, right) => {
+    // Required then optional.
+    if (left.optional) {
+      return right.optional ? 0 : 1;
+    } else {
+      return right.optional ? -1 : 0;
+    }
+  });
+  return sortedGraphPatterns;
+}
+
+const TAB_SPACES = 2;

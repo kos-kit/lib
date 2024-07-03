@@ -9,6 +9,5 @@ export interface SearchEngine {
     offset: number;
     query: string;
   }): Promise<SearchResults>;
-
   toJson(): SearchEngineJson;
 }

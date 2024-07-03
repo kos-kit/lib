@@ -1,8 +1,11 @@
 {
   "dependencies": {
-    "@kos-kit/rdf-resource": "2.0.9",
-    "@kos-kit/rdf-utils": "2.0.9",
+    "@kos-kit/rdf-resource": "2.0.10",
+    "@kos-kit/rdf-utils": "2.0.10",
     "@rdfjs/types": "^1.1.0",
+    "fp-ts": "^2.16.6"
+  },
+  "devDependencies": {
     "@types/n3": "^1.16.4",
     "n3": "^1.17.3"
   },
@@ -21,6 +24,7 @@
   "scripts": {
     "build": "tsc -b",
     "clean": "tsc -b --clean",
+    "lint": "tsc -b --clean && eslint *.ts",
     "rebuild": "run-s clean build",
     "unlink": "npm unlink -g @kos-kit/mem-models",
     "test": "vitest run",
@@ -33,5 +37,5 @@
   },
   "type": "module",
   "types": "index.d.ts",
-  "version": "2.0.9"
+  "version": "2.0.10"
 }
