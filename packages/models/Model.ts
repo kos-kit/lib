@@ -1,9 +1,9 @@
 import { Literal, NamedNode } from "@rdfjs/types";
-import { Option } from "fp-ts/Option";
+import { Maybe } from "purify-ts";
 
 export interface Model {
-  readonly license: Option<Literal | NamedNode>;
-  readonly modified: Option<Literal>;
-  readonly rights: Option<Literal>;
-  readonly rightsHolder: Option<Literal>;
+  readonly license: Maybe<Literal | NamedNode>;
+  readonly modified: Maybe<Literal>;
+  readonly rights: Maybe<Literal>;
+  readonly rightsHolder: Maybe<Literal>;
 }

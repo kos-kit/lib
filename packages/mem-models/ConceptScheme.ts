@@ -7,10 +7,10 @@ import { Resource } from "@kos-kit/rdf-resource";
 import { isInstanceOf } from "@kos-kit/rdf-utils";
 import TermSet from "@rdfjs/term-set";
 import { skos } from "@tpluscode/rdf-ns-builders";
-import * as O from "fp-ts/Option";
 import { LabeledModel } from "./LabeledModel.js";
 import { countIterable } from "./countIterable.js";
 import { paginateIterable } from "./paginateIterable.js";
+import { Just, Maybe } from "purify-ts";
 
 export class ConceptScheme<
     ConceptT extends IConcept,
@@ -64,7 +64,7 @@ export class ConceptScheme<
 
   conceptByIdentifier(
     identifier: Resource.Identifier,
-  ): Promise<O.Option<ConceptT>> {
+  ): Promise<Maybe<ConceptT>> {
     return new Promise((resolve) => {
       // conceptScheme skos:hasTopConcept resource entails resource is a skos:Concept because of
       // the range of skos:hasTopConcept
@@ -74,7 +74,7 @@ export class ConceptScheme<
         identifier,
       )) {
         resolve(
-          O.some(
+          Just(
             this.modelFactory.createConcept(
               new Resource({ dataset: this.dataset, identifier }),
             ),
@@ -102,7 +102,7 @@ export class ConceptScheme<
             })
           ) {
             resolve(
-              O.some(
+              Just(
                 this.modelFactory.createConcept(
                   new Resource({ dataset: this.dataset, identifier }),
                 ),
@@ -172,9 +172,9 @@ export class ConceptScheme<
         predicate,
         this.identifier,
       )) {
-        const conceptIdentifier = O.toNullable(
-          Resource.ValueMappers.identifier(quad.subject as Resource.Identifier),
-        );
+        const conceptIdentifier = Resource.ValueMappers.identifier(
+          quad.subject as Resource.Identifier,
+        ).extractNullable();
         if (conceptIdentifier === null) {
           continue;
         }

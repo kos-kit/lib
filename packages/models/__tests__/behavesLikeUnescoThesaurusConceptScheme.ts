@@ -1,4 +1,3 @@
-import * as O from "fp-ts/Option";
 import { expect, it } from "vitest";
 import { ConceptScheme, LanguageTag } from "..";
 import { behavesLikeConceptScheme } from "./behavesLikeConceptScheme.js";
@@ -16,14 +15,14 @@ export const behavesLikeUnescoThesaurusConceptScheme = (
 
   it("should have a modified date", async () => {
     const conceptScheme = await lazyConceptScheme("en");
-    expect(O.toNullable(conceptScheme.modified)?.value).toStrictEqual(
+    expect(conceptScheme.modified.extract()?.value).toStrictEqual(
       "2024-03-25T14:24:28.295+01:00",
     );
   });
 
   it("should have a license", async () => {
     const conceptScheme = await lazyConceptScheme("en");
-    const license = O.toNullable(conceptScheme.license);
+    const license = conceptScheme.license.extract();
     expect(license).toBeDefined();
     expect(license?.termType).toStrictEqual("NamedNode");
     expect(license?.value).toStrictEqual(
@@ -48,14 +47,14 @@ export const behavesLikeUnescoThesaurusConceptScheme = (
 
   it("should have rights", async () => {
     const conceptScheme = await lazyConceptScheme("en");
-    const rights = O.toNullable(conceptScheme.rights);
+    const rights = conceptScheme.rights.extract();
     expect(rights).toBeDefined();
     expect(rights?.value).toStrictEqual("CC-BY-SA");
   });
 
   it("should have a rights holder", async () => {
     const conceptScheme = await lazyConceptScheme("en");
-    const rightsHolder = O.toNullable(conceptScheme.rightsHolder);
+    const rightsHolder = conceptScheme.rightsHolder.extract();
     expect(rightsHolder).toBeDefined();
     expect(rightsHolder?.value).toStrictEqual("UNESCO");
   });

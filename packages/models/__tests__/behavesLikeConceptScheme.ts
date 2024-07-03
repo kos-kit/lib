@@ -1,4 +1,3 @@
-import * as O from "fp-ts/Option";
 import { expect, it } from "vitest";
 import { ConceptScheme, LanguageTag } from "..";
 import { behavesLikeLabeledModel } from "./behavesLikeLabeledModel.js";
@@ -18,9 +17,9 @@ export const behavesLikeConceptScheme = (
     expect(firstConcepts).toHaveLength(1);
     const firstConcept = firstConcepts[0];
 
-    const conceptByIdentifier = O.toNullable(
-      await conceptScheme.conceptByIdentifier(firstConcept.identifier),
-    );
+    const conceptByIdentifier = (
+      await conceptScheme.conceptByIdentifier(firstConcept.identifier)
+    ).extractNullable();
     expect(conceptByIdentifier).not.toBeNull();
     expect(conceptByIdentifier?.identifier.equals(firstConcept.identifier));
   });

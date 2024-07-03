@@ -1,19 +1,19 @@
 import { BlankNode, NamedNode } from "@rdfjs/types";
-import { Option } from "fp-ts/Option";
 import { Concept } from "./Concept.js";
 import { ConceptScheme } from "./ConceptScheme.js";
 import { Kos } from "./Kos.js";
+import { Maybe } from "purify-ts";
 
 export class NotImplementedKos implements Kos {
   conceptByIdentifier(
     _identifier: BlankNode | NamedNode,
-  ): Promise<Option<Concept>> {
+  ): Promise<Maybe<Concept>> {
     throw new Error("Method not implemented.");
   }
 
   conceptSchemeByIdentifier(
     _identifier: BlankNode | NamedNode,
-  ): Promise<Option<ConceptScheme>> {
+  ): Promise<Maybe<ConceptScheme>> {
     throw new Error("Method not implemented.");
   }
 
@@ -27,7 +27,7 @@ export class NotImplementedKos implements Kos {
 
   conceptsByIdentifiers(
     _identifiers: readonly (BlankNode | NamedNode)[],
-  ): Promise<readonly Option<Concept>[]> {
+  ): Promise<readonly Maybe<Concept>[]> {
     throw new Error("Method not implemented.");
   }
 

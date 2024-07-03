@@ -2,8 +2,8 @@ import { Model as IModel, LanguageTagSet } from "@kos-kit/models";
 import { Resource } from "@kos-kit/rdf-resource";
 import { DatasetCore, Literal, NamedNode } from "@rdfjs/types";
 import { dc11, dcterms } from "@tpluscode/rdf-ns-builders";
-import * as O from "fp-ts/Option";
 import { matchLiteral } from "./matchLiteral.js";
+import { Just, Maybe, Nothing } from "purify-ts";
 
 const rightsPredicates = [dcterms.rights, dc11.rights];
 /**
@@ -22,17 +22,17 @@ export abstract class Model implements IModel {
     return this.resource.identifier;
   }
 
-  get license(): O.Option<Literal | NamedNode> {
+  get license(): Maybe<Literal | NamedNode> {
     const literals: Literal[] = [];
 
     for (const object of this.resource.values(dcterms.license, (term) =>
       term.termType === "Literal" || term.termType == "NamedNode"
-        ? O.some(term)
-        : O.none,
+        ? Just(term)
+        : Nothing,
     )) {
       switch (object.termType) {
         case "NamedNode":
-          return O.some(object);
+          return Just(object);
         case "Literal":
           literals.push(object);
           break;
@@ -42,7 +42,7 @@ export abstract class Model implements IModel {
     }
 
     if (literals.length === 0) {
-      return O.none;
+      return Nothing;
     }
     const literal = literals[0];
     if (
@@ -50,30 +50,30 @@ export abstract class Model implements IModel {
         includeLanguageTags: this.includeLanguageTags,
       })
     ) {
-      return O.some(literal);
+      return Just(literal);
     }
 
-    return O.none;
+    return Nothing;
   }
 
-  get modified(): O.Option<Literal> {
+  get modified(): Maybe<Literal> {
     return this.resource.optionalValue(
       dcterms.modified,
       Resource.ValueMappers.literal,
     );
   }
 
-  get rights(): O.Option<Literal> {
+  get rights(): Maybe<Literal> {
     for (const predicate of rightsPredicates) {
       const value = this.literalObject(predicate);
-      if (O.isSome(value)) {
+      if (value.isJust()) {
         return value;
       }
     }
-    return O.none;
+    return Nothing;
   }
 
-  get rightsHolder(): O.Option<Literal> {
+  get rightsHolder(): Maybe<Literal> {
     return this.literalObject(dcterms.rightsHolder);
   }
 
@@ -81,13 +81,13 @@ export abstract class Model implements IModel {
     return this.resource.dataset;
   }
 
-  private literalObject(predicate: NamedNode): O.Option<Literal> {
+  private literalObject(predicate: NamedNode): Maybe<Literal> {
     const literals: readonly Literal[] = [
       ...this.resource.values(predicate, Resource.ValueMappers.literal),
     ];
 
     if (literals.length === 0) {
-      return O.none;
+      return Nothing;
     }
     const literal = literals[0];
     if (
@@ -95,10 +95,10 @@ export abstract class Model implements IModel {
         includeLanguageTags: this.includeLanguageTags,
       })
     ) {
-      return O.some(literal);
+      return Just(literal);
     }
 
-    return O.none;
+    return Nothing;
   }
 }
 

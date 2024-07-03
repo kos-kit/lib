@@ -1,12 +1,12 @@
 import { BlankNode, NamedNode } from "@rdfjs/types";
 import { Concept } from "./Concept.js";
 import { LabeledModel } from "./LabeledModel.js";
-import { Option } from "fp-ts/Option";
+import { Maybe } from "purify-ts";
 
 export interface ConceptScheme extends LabeledModel {
   conceptByIdentifier(
     identifier: BlankNode | NamedNode,
-  ): Promise<Option<Concept>>;
+  ): Promise<Maybe<Concept>>;
   concepts(): AsyncIterable<Concept>;
   conceptsCount(): Promise<number>;
   conceptsPage(kwds: {

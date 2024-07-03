@@ -1,7 +1,6 @@
 import { DataFactory } from "n3";
 import { describe } from "vitest";
 import { behavesLikeUnescoThesaurusConceptScheme } from "../../models/__tests__/behavesLikeUnescoThesaurusConceptScheme.js";
-import { orFail } from "../../models/__tests__/orFail.js";
 import { testKosFactory } from "./testKosFactory.js";
 
 describe("mem.ConceptScheme", () => {
@@ -10,6 +9,10 @@ describe("mem.ConceptScheme", () => {
       .conceptSchemeByIdentifier(
         DataFactory.namedNode("http://vocabularies.unesco.org/thesaurus"),
       )
-      .then(orFail),
+      .then((conceptScheme) =>
+        conceptScheme.orDefaultLazy(() => {
+          throw new Error("missing concept scheme");
+        }),
+      ),
   );
 });

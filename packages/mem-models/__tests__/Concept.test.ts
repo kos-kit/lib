@@ -2,7 +2,6 @@ import { DataFactory } from "n3";
 import { describe } from "vitest";
 import { behavesLikeUnescoThesaurusConcept10 } from "../../models/__tests__/behavesLikeUnescoThesaurusConcept10.js";
 import { behavesLikeUnescoThesaurusConcept10018 } from "../../models/__tests__/behavesLikeUnescoThesaurusConcept10018.js";
-import { orFail } from "../../models/__tests__/orFail.js";
 import { testKosFactory } from "./testKosFactory.js";
 
 describe("mem.Concept", () => {
@@ -13,7 +12,11 @@ describe("mem.Concept", () => {
           "http://vocabularies.unesco.org/thesaurus/concept10",
         ),
       )
-      .then(orFail),
+      .then((concept) =>
+        concept.orDefaultLazy(() => {
+          throw new Error("missing concept");
+        }),
+      ),
   );
 
   behavesLikeUnescoThesaurusConcept10018((includeLanguageTag) =>
@@ -23,6 +26,10 @@ describe("mem.Concept", () => {
           "http://vocabularies.unesco.org/thesaurus/concept10018",
         ),
       )
-      .then(orFail),
+      .then((concept) =>
+        concept.orDefaultLazy(() => {
+          throw new Error("missing concept");
+        }),
+      ),
   );
 });

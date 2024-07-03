@@ -1,7 +1,7 @@
 import { Model as IModel } from "@kos-kit/models";
 import { Resource } from "@kos-kit/rdf-resource";
 import { Literal, NamedNode } from "@rdfjs/types";
-import { Option } from "fp-ts/Option";
+import { Maybe } from "purify-ts";
 
 /**
  * Abstract base class for SPARQL-backed models.
@@ -30,19 +30,19 @@ export abstract class Model<
     return this.memModel.identifier;
   }
 
-  get license(): Option<Literal | NamedNode> {
+  get license(): Maybe<Literal | NamedNode> {
     return this.memModel.license;
   }
 
-  get modified(): Option<Literal> {
+  get modified(): Maybe<Literal> {
     return this.memModel.modified;
   }
 
-  get rights(): Option<Literal> {
+  get rights(): Maybe<Literal> {
     return this.memModel.rights;
   }
 
-  get rightsHolder(): Option<Literal> {
+  get rightsHolder(): Maybe<Literal> {
     return this.memModel.rightsHolder;
   }
 }

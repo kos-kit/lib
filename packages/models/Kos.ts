@@ -1,20 +1,20 @@
 import { BlankNode, NamedNode } from "@rdfjs/types";
-import { Option } from "fp-ts/Option";
 import { Concept } from "./Concept.js";
 import { ConceptScheme } from "./ConceptScheme.js";
+import { Maybe } from "purify-ts";
 
 export interface Kos {
   conceptByIdentifier(
     identifier: BlankNode | NamedNode,
-  ): Promise<Option<Concept>>;
+  ): Promise<Maybe<Concept>>;
   conceptSchemeByIdentifier(
     identifier: BlankNode | NamedNode,
-  ): Promise<Option<ConceptScheme>>;
+  ): Promise<Maybe<ConceptScheme>>;
   conceptSchemes(): Promise<readonly ConceptScheme[]>;
   concepts(): AsyncIterable<Concept>;
   conceptsByIdentifiers(
     identifiers: readonly (BlankNode | NamedNode)[],
-  ): Promise<readonly Option<Concept>[]>;
+  ): Promise<readonly Maybe<Concept>[]>;
   conceptsCount(): Promise<number>;
   conceptsPage(kwds: {
     limit: number;

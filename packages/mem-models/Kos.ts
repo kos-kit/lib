@@ -8,10 +8,10 @@ import { Resource } from "@kos-kit/rdf-resource";
 import { instances, isInstanceOf } from "@kos-kit/rdf-utils";
 import { DatasetCore } from "@rdfjs/types";
 import { skos } from "@tpluscode/rdf-ns-builders";
-import * as O from "fp-ts/Option";
 import { ModelFactory } from "./ModelFactory.js";
 import { countIterable } from "./countIterable.js";
 import { paginateIterable } from "./paginateIterable.js";
+import { Just, Maybe, Nothing } from "purify-ts";
 
 export class Kos<
   ConceptT extends IConcept,
@@ -34,7 +34,7 @@ export class Kos<
     this.modelFactory = modelFactory;
   }
 
-  _conceptByIdentifier(identifier: Resource.Identifier): O.Option<ConceptT> {
+  _conceptByIdentifier(identifier: Resource.Identifier): Maybe<ConceptT> {
     if (
       isInstanceOf({
         class_: skos.Concept,
@@ -42,19 +42,19 @@ export class Kos<
         instance: identifier,
       })
     ) {
-      return O.some(
+      return Just(
         this.modelFactory.createConcept(
           new Resource({ dataset: this.dataset, identifier }),
         ),
       );
     } else {
-      return O.none;
+      return Nothing;
     }
   }
 
   conceptByIdentifier(
     identifier: Resource.Identifier,
-  ): Promise<O.Option<ConceptT>> {
+  ): Promise<Maybe<ConceptT>> {
     return new Promise((resolve) => {
       resolve(this._conceptByIdentifier(identifier));
     });
@@ -62,13 +62,13 @@ export class Kos<
 
   async conceptSchemeByIdentifier(
     identifier: Resource.Identifier,
-  ): Promise<O.Option<ConceptSchemeT>> {
+  ): Promise<Maybe<ConceptSchemeT>> {
     for (const conceptScheme of await this.conceptSchemes()) {
       if (conceptScheme.identifier.equals(identifier)) {
-        return O.some(conceptScheme);
+        return Just(conceptScheme);
       }
     }
-    return O.none;
+    return Nothing;
   }
 
   conceptSchemes(): Promise<readonly ConceptSchemeT[]> {
@@ -87,7 +87,7 @@ export class Kos<
 
   conceptsByIdentifiers(
     identifiers: readonly Resource.Identifier[],
-  ): Promise<readonly O.Option<ConceptT>[]> {
+  ): Promise<readonly Maybe<ConceptT>[]> {
     return new Promise((resolve) => {
       resolve(
         identifiers.map((identifier) => this._conceptByIdentifier(identifier)),
