@@ -9,7 +9,7 @@ import N3 from "n3";
 export function parseRdfFile(
   rdfFilePath: string,
   intoDataset: DatasetCore,
-): Promise<DatasetCore> {
+): Promise<void> {
   return new Promise((resolve, reject) => {
     let rdfFileStream: Readable = fs.createReadStream(rdfFilePath);
 
@@ -29,8 +29,9 @@ export function parseRdfFile(
     const streamParser = new N3.StreamParser();
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     streamParser.on("data", (quad: Quad) => intoDataset.add(quad));
+    streamParser.on("error", reject);
     streamParser.on("end", () => {
-      resolve(intoDataset);
+      resolve();
     });
     streamParser.on("error", reject);
     rdfFileStream.pipe(streamParser);
