@@ -7,7 +7,7 @@
     "@tpluscode/rdf-ns-builders": "^4.3.0",
     "@types/sparql-http-client": "^3.0.2",
     "pino": "^9.1.0",
-    "purify-ts": "^2.0.3",
+    "purify-ts": "~2.1.0",
     "sparql-http-client": "^3.0.0"
   },
   "devDependencies": {
