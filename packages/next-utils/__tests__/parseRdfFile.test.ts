@@ -16,10 +16,8 @@ describe("parseRdfFile", () => {
   for (const fileName of fs.readdirSync(testDataDirPath)) {
     if (fileName.startsWith("unesco-thesaurus")) {
       it(`should parse ${fileName}`, async () => {
-        const dataset = await parseRdfFile(
-          path.resolve(testDataDirPath, fileName),
-          new Store(),
-        );
+        const dataset = new Store();
+        await parseRdfFile(path.resolve(testDataDirPath, fileName), dataset);
         expect(dataset.size).toBe(88482);
       });
     }
