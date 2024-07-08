@@ -1,4 +1,4 @@
-import { Store } from "n3";
+import { DataFactory, Store } from "n3";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -17,7 +17,11 @@ describe("parseRdfFile", () => {
     if (fileName.startsWith("unesco-thesaurus")) {
       it(`should parse ${fileName}`, async () => {
         const dataset = new Store();
-        await parseRdfFile(path.resolve(testDataDirPath, fileName), dataset);
+        await parseRdfFile({
+          dataFactory: DataFactory,
+          dataset,
+          rdfFilePath: path.resolve(testDataDirPath, fileName),
+        });
         expect(dataset.size).toBe(88482);
       });
     }
