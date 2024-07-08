@@ -1,13 +1,13 @@
 import { beforeAll, describe, expect, it } from "vitest";
 import { DataFactory, Store } from "n3";
-import { BlankNode, DatasetCore, Literal, NamedNode } from "@rdfjs/types";
+import { DatasetCore, Quad, Quad_Object, Variable } from "@rdfjs/types";
 import { Resource } from "..";
 import { xsd } from "@tpluscode/rdf-ns-builders";
 
 describe("Resource", () => {
   let resource: Resource;
 
-  const objects: Record<string, BlankNode | Literal | NamedNode> = {
+  const objects: Record<string, Exclude<Quad_Object, Quad | Variable>> = {
     blankNode: DataFactory.blankNode(),
     booleanLiteral: DataFactory.literal(1, xsd.boolean),
     intLiteral: DataFactory.literal(1),
@@ -33,9 +33,10 @@ describe("Resource", () => {
   it("should get an optional value", () => {
     expect(
       resource
-        .optionalValue<
-          BlankNode | Literal | NamedNode
-        >(DataFactory.namedNode("http://example.com/nonexistent"), Resource.ValueMappers.identity)
+        .optionalValue(
+          DataFactory.namedNode("http://example.com/nonexistent"),
+          Resource.ValueMappers.identity,
+        )
         .extract(),
     ).toBeUndefined();
 
@@ -47,7 +48,7 @@ describe("Resource", () => {
 
   it("should get a required value", () => {
     expect(() =>
-      resource.requiredValue<BlankNode | Literal | NamedNode>(
+      resource.requiredValue(
         DataFactory.namedNode("http://example.com/nonexistent"),
         Resource.ValueMappers.identity,
       ),
@@ -60,10 +61,7 @@ describe("Resource", () => {
 
   it("should get all values", () => {
     const values = [
-      ...resource.values<BlankNode | Literal | NamedNode>(
-        predicate,
-        Resource.ValueMappers.identity,
-      ),
+      ...resource.values(predicate, Resource.ValueMappers.identity),
     ];
     expect(values).toHaveLength(Object.keys(objects).length);
     for (const object of Object.values(objects)) {
