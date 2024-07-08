@@ -7,6 +7,9 @@ import {
   DefaultGraph,
   Literal,
   NamedNode,
+  Quad,
+  Quad_Object,
+  Variable,
 } from "@rdfjs/types";
 import { Just, Maybe, Nothing } from "purify-ts";
 import { fromRdf } from "rdf-literal";
@@ -56,10 +59,13 @@ export class Resource {
       null,
       null,
     )) {
-      const mappedObject = mapper(
-        quad.object as BlankNode | NamedNode | Literal,
-        this.dataset,
-      );
+      switch (quad.object.termType) {
+        case "Quad":
+        case "Variable":
+          continue;
+      }
+
+      const mappedObject = mapper(quad.object, this.dataset);
       if (mappedObject.isJust()) yield mappedObject.extract();
     }
   }
@@ -74,7 +80,7 @@ export class Resource {
     )) {
       if (
         mapper(
-          quad.object as BlankNode | Literal | NamedNode,
+          quad.object as Exclude<Quad_Object, Quad | Variable>,
           this.dataset,
         ).isJust()
       ) {
@@ -110,7 +116,10 @@ export namespace Resource {
       this.graph = graph;
     }
 
-    add(predicate: NamedNode, object: BlankNode | Literal | NamedNode): this {
+    add(
+      predicate: NamedNode,
+      object: Exclude<Quad_Object, Quad | Variable>,
+    ): this {
       this.dataset.add(
         this.dataFactory.quad(this.identifier, predicate, object, this.graph),
       );
@@ -119,7 +128,7 @@ export namespace Resource {
 
     delete(
       predicate: NamedNode,
-      object?: BlankNode | Literal | NamedNode,
+      object?: Exclude<Quad_Object, Quad | Variable>,
     ): this {
       for (const quad of [
         ...this.dataset.match(this.identifier, predicate, object),
@@ -136,7 +145,10 @@ export namespace Resource {
       });
     }
 
-    set(predicate: NamedNode, object: BlankNode | Literal | NamedNode): this {
+    set(
+      predicate: NamedNode,
+      object: Exclude<Quad_Object, Quad | Variable>,
+    ): this {
       for (const quad of [...this.dataset.match(this.identifier, predicate)]) {
         this.dataset.delete(quad);
       }
@@ -180,27 +192,29 @@ export namespace Resource {
   }
 
   export type ValueMapper<T> = (
-    object: BlankNode | Literal | NamedNode,
+    object: Exclude<Quad_Object, Quad | Variable>,
     dataset: DatasetCore,
   ) => Maybe<NonNullable<T>>;
 
   export namespace ValueMappers {
     export function boolean(
-      object: BlankNode | Literal | NamedNode,
+      object: Exclude<Quad_Object, Quad | Variable>,
     ): Maybe<boolean> {
       return primitive(object).chain((primitive) =>
         typeof primitive === "boolean" ? Just(primitive) : Nothing,
       );
     }
 
-    export function date(object: BlankNode | Literal | NamedNode): Maybe<Date> {
+    export function date(
+      object: Exclude<Quad_Object, Quad | Variable>,
+    ): Maybe<Date> {
       return primitive(object).chain((primitive) =>
         primitive instanceof Date ? Just(primitive) : Nothing,
       );
     }
 
     export function identifier(
-      object: BlankNode | Literal | NamedNode,
+      object: Exclude<Quad_Object, Quad | Variable>,
     ): Maybe<Identifier> {
       switch (object.termType) {
         case "BlankNode":
@@ -212,25 +226,25 @@ export namespace Resource {
     }
 
     export function identity(
-      object: BlankNode | Literal | NamedNode,
-    ): Maybe<BlankNode | Literal | NamedNode> {
+      object: Exclude<Quad_Object, Quad | Variable>,
+    ): Maybe<Exclude<Quad_Object, Quad | Variable>> {
       return Just(object);
     }
 
     export function iri(
-      object: BlankNode | Literal | NamedNode,
+      object: Exclude<Quad_Object, Quad | Variable>,
     ): Maybe<NamedNode> {
       return object.termType === "NamedNode" ? Just(object) : Nothing;
     }
 
     export function literal(
-      object: BlankNode | Literal | NamedNode,
+      object: Exclude<Quad_Object, Quad | Variable>,
     ): Maybe<Literal> {
       return object.termType === "Literal" ? Just(object) : Nothing;
     }
 
     export function number(
-      object: BlankNode | Literal | NamedNode,
+      object: Exclude<Quad_Object, Quad | Variable>,
     ): Maybe<number> {
       return primitive(object).chain((primitive) =>
         typeof primitive === "number" ? Just(primitive) : Nothing,
@@ -238,7 +252,7 @@ export namespace Resource {
     }
 
     export function primitive(
-      object: BlankNode | Literal | NamedNode,
+      object: Exclude<Quad_Object, Quad | Variable>,
     ): Maybe<boolean | Date | number | string> {
       if (object.termType !== "Literal") {
         return Nothing;
@@ -252,7 +266,7 @@ export namespace Resource {
     }
 
     export function resource(
-      object: BlankNode | Literal | NamedNode,
+      object: Exclude<Quad_Object, Quad | Variable>,
       dataset: DatasetCore,
     ): Maybe<Resource> {
       return identifier(object).map(
@@ -261,7 +275,7 @@ export namespace Resource {
     }
 
     export function string(
-      object: BlankNode | Literal | NamedNode,
+      object: Exclude<Quad_Object, Quad | Variable>,
     ): Maybe<string> {
       return primitive(object).chain((primitive) =>
         typeof primitive === "string" ? Just(primitive as string) : Nothing,
