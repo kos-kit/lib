@@ -1,2 +1,2 @@
+export * from "./MutableResource.js";
 export * from "./Resource.js";
-export * from "./NamedResource.js";

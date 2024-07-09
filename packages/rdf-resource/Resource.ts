@@ -1,5 +1,3 @@
-/* eslint-disable no-inner-declarations */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   BlankNode,
   DataFactory,
@@ -7,64 +5,24 @@ import {
   Literal,
   NamedNode,
   Quad,
-  Quad_Graph,
   Quad_Object,
   Variable,
 } from "@rdfjs/types";
 import { Just, Maybe, Nothing } from "purify-ts";
 import { fromRdf } from "rdf-literal";
 
-export class Resource {
-  protected readonly dataFactory: DataFactory;
+export class Resource<
+  IdentifierT extends Resource.Identifier = Resource.Identifier,
+> {
   readonly dataset: DatasetCore;
-  readonly identifier: Resource.Identifier;
-  protected readonly mutateGraph: Exclude<Quad_Graph, Variable>;
+  readonly identifier: IdentifierT;
 
-  constructor({
-    dataFactory,
-    dataset,
-    identifier,
-    mutateGraph,
-  }: Resource.Parameters) {
-    this.dataFactory = dataFactory;
+  constructor({ dataset, identifier }: Resource.Parameters<IdentifierT>) {
     this.dataset = dataset;
     this.identifier = identifier;
-    this.mutateGraph = mutateGraph ?? dataFactory.defaultGraph();
   }
 
-  add(
-    predicate: NamedNode,
-    object: Exclude<Quad_Object, Quad | Variable>,
-  ): this {
-    this.dataset.add(
-      this.dataFactory.quad(
-        this.identifier,
-        predicate,
-        object,
-        this.mutateGraph,
-      ),
-    );
-    return this;
-  }
-
-  delete(
-    predicate: NamedNode,
-    object?: Exclude<Quad_Object, Quad | Variable>,
-  ): this {
-    for (const quad of [
-      ...this.dataset.match(
-        this.identifier,
-        predicate,
-        object,
-        this.mutateGraph,
-      ),
-    ]) {
-      this.dataset.delete(quad);
-    }
-    return this;
-  }
-
-  optionalValue<T>(
+  value<T>(
     property: NamedNode,
     mapper: Resource.ValueMapper<T>,
   ): Maybe<NonNullable<T>> {
@@ -72,24 +30,6 @@ export class Resource {
       return Just(value);
     }
     return Nothing;
-  }
-
-  requiredValue<T>(
-    property: NamedNode,
-    mapper: Resource.ValueMapper<T>,
-  ): NonNullable<T> {
-    for (const value of this.values(property, mapper)) {
-      return value;
-    }
-    throw new Error(`no appropriate ${property.value} found`);
-  }
-
-  set(
-    predicate: NamedNode,
-    object: Exclude<Quad_Object, Quad | Variable>,
-  ): this {
-    this.delete(predicate);
-    return this.add(predicate, object);
   }
 
   *values<T>(
@@ -108,12 +48,7 @@ export class Resource {
           continue;
       }
 
-      const mappedObject = mapper(
-        quad.object,
-        this.dataFactory,
-        this.dataset,
-        this.mutateGraph,
-      );
+      const mappedObject = mapper(quad.object, this);
       if (mappedObject.isJust()) yield mappedObject.extract();
     }
   }
@@ -126,14 +61,13 @@ export class Resource {
       null,
       null,
     )) {
-      if (
-        mapper(
-          quad.object as Exclude<Quad_Object, Quad | Variable>,
-          this.dataFactory,
-          this.dataset,
-          this.mutateGraph,
-        ).isJust()
-      ) {
+      switch (quad.object.termType) {
+        case "Quad":
+        case "Variable":
+          continue;
+      }
+
+      if (mapper(quad.object, this).isJust()) {
         count++;
       }
     }
@@ -177,12 +111,15 @@ export namespace Resource {
     }
   }
 
-  export type ValueMapper<T> = (
+  export interface Parameters<IdentifierT extends Identifier> {
+    dataset: DatasetCore;
+    identifier: IdentifierT;
+  }
+
+  export type ValueMapper<ValueT> = (
     object: Exclude<Quad_Object, Quad | Variable>,
-    dataFactory: DataFactory,
-    dataset: DatasetCore,
-    mutateGraph: Exclude<Quad_Graph, Variable>,
-  ) => Maybe<NonNullable<T>>;
+    resource: Resource,
+  ) => Maybe<NonNullable<ValueT>>;
 
   export namespace ValueMappers {
     export function boolean(
@@ -231,6 +168,16 @@ export namespace Resource {
       return object.termType === "Literal" ? Just(object) : Nothing;
     }
 
+    export function namedResource(
+      object: Exclude<Quad_Object, Quad | Variable>,
+      resource: Resource,
+    ): Maybe<Resource<NamedNode>> {
+      return iri(object).map(
+        (identifier) =>
+          new Resource<NamedNode>({ dataset: resource.dataset, identifier }),
+      );
+    }
+
     export function number(
       object: Exclude<Quad_Object, Quad | Variable>,
     ): Maybe<number> {
@@ -255,13 +202,10 @@ export namespace Resource {
 
     export function resource(
       object: Exclude<Quad_Object, Quad | Variable>,
-      dataFactory: DataFactory,
-      dataset: DatasetCore,
-      mutateGraph: Exclude<Quad_Graph, Variable>,
+      resource: Resource,
     ): Maybe<Resource> {
       return identifier(object).map(
-        (identifier) =>
-          new Resource({ dataFactory, dataset, mutateGraph, identifier }),
+        (identifier) => new Resource({ dataset: resource.dataset, identifier }),
       );
     }
 
@@ -272,12 +216,5 @@ export namespace Resource {
         typeof primitive === "string" ? Just(primitive as string) : Nothing,
       );
     }
-  }
-
-  export interface Parameters {
-    dataFactory: DataFactory;
-    dataset: DatasetCore;
-    mutateGraph?: Exclude<Quad_Graph, Variable>;
-    identifier: Resource.Identifier;
   }
 }
