@@ -4,10 +4,10 @@ import {
   BlankNode,
   DataFactory,
   DatasetCore,
-  DefaultGraph,
   Literal,
   NamedNode,
   Quad,
+  Quad_Graph,
   Quad_Object,
   Variable,
 } from "@rdfjs/types";
@@ -15,18 +15,53 @@ import { Just, Maybe, Nothing } from "purify-ts";
 import { fromRdf } from "rdf-literal";
 
 export class Resource {
+  protected readonly dataFactory: DataFactory;
   readonly dataset: DatasetCore;
   readonly identifier: Resource.Identifier;
+  protected readonly mutateGraph: Exclude<Quad_Graph, Variable>;
 
   constructor({
+    dataFactory,
     dataset,
     identifier,
-  }: {
-    dataset: DatasetCore;
-    identifier: Resource.Identifier;
-  }) {
+    mutateGraph,
+  }: Resource.Parameters) {
+    this.dataFactory = dataFactory;
     this.dataset = dataset;
     this.identifier = identifier;
+    this.mutateGraph = mutateGraph ?? dataFactory.defaultGraph();
+  }
+
+  add(
+    predicate: NamedNode,
+    object: Exclude<Quad_Object, Quad | Variable>,
+  ): this {
+    this.dataset.add(
+      this.dataFactory.quad(
+        this.identifier,
+        predicate,
+        object,
+        this.mutateGraph,
+      ),
+    );
+    return this;
+  }
+
+  delete(
+    predicate: NamedNode,
+    object?: Exclude<Quad_Object, Quad | Variable>,
+  ): this {
+    for (const quad of [
+      ...this.dataset.match(
+        this.identifier,
+        predicate,
+        object,
+        this.mutateGraph,
+      ),
+    ]) {
+      this.dataset.delete(quad);
+    }
+    return this;
   }
 
   optionalValue<T>(
@@ -49,6 +84,14 @@ export class Resource {
     throw new Error(`no appropriate ${property.value} found`);
   }
 
+  set(
+    predicate: NamedNode,
+    object: Exclude<Quad_Object, Quad | Variable>,
+  ): this {
+    this.delete(predicate);
+    return this.add(predicate, object);
+  }
+
   *values<T>(
     property: NamedNode,
     mapper: Resource.ValueMapper<T>,
@@ -65,7 +108,12 @@ export class Resource {
           continue;
       }
 
-      const mappedObject = mapper(quad.object, this.dataset);
+      const mappedObject = mapper(
+        quad.object,
+        this.dataFactory,
+        this.dataset,
+        this.mutateGraph,
+      );
       if (mappedObject.isJust()) yield mappedObject.extract();
     }
   }
@@ -81,7 +129,9 @@ export class Resource {
       if (
         mapper(
           quad.object as Exclude<Quad_Object, Quad | Variable>,
+          this.dataFactory,
           this.dataset,
+          this.mutateGraph,
         ).isJust()
       ) {
         count++;
@@ -92,70 +142,6 @@ export class Resource {
 }
 
 export namespace Resource {
-  export class Builder {
-    private readonly dataFactory: DataFactory;
-
-    readonly dataset: DatasetCore;
-    readonly graph: DefaultGraph | NamedNode | BlankNode | undefined;
-    readonly identifier: Identifier;
-
-    constructor({
-      dataFactory,
-      dataset,
-      identifier,
-      graph,
-    }: {
-      dataFactory: DataFactory;
-      dataset: DatasetCore;
-      identifier: Resource.Identifier;
-      graph?: DefaultGraph | NamedNode | BlankNode;
-    }) {
-      this.dataFactory = dataFactory;
-      this.dataset = dataset;
-      this.identifier = identifier;
-      this.graph = graph;
-    }
-
-    add(
-      predicate: NamedNode,
-      object: Exclude<Quad_Object, Quad | Variable>,
-    ): this {
-      this.dataset.add(
-        this.dataFactory.quad(this.identifier, predicate, object, this.graph),
-      );
-      return this;
-    }
-
-    delete(
-      predicate: NamedNode,
-      object?: Exclude<Quad_Object, Quad | Variable>,
-    ): this {
-      for (const quad of [
-        ...this.dataset.match(this.identifier, predicate, object),
-      ]) {
-        this.dataset.delete(quad);
-      }
-      return this;
-    }
-
-    build(): Resource {
-      return new Resource({
-        dataset: this.dataset,
-        identifier: this.identifier,
-      });
-    }
-
-    set(
-      predicate: NamedNode,
-      object: Exclude<Quad_Object, Quad | Variable>,
-    ): this {
-      for (const quad of [...this.dataset.match(this.identifier, predicate)]) {
-        this.dataset.delete(quad);
-      }
-      return this.add(predicate, object);
-    }
-  }
-
   export type Identifier = BlankNode | NamedNode;
 
   export namespace Identifier {
@@ -193,7 +179,9 @@ export namespace Resource {
 
   export type ValueMapper<T> = (
     object: Exclude<Quad_Object, Quad | Variable>,
+    dataFactory: DataFactory,
     dataset: DatasetCore,
+    mutateGraph: Exclude<Quad_Graph, Variable>,
   ) => Maybe<NonNullable<T>>;
 
   export namespace ValueMappers {
@@ -267,10 +255,13 @@ export namespace Resource {
 
     export function resource(
       object: Exclude<Quad_Object, Quad | Variable>,
+      dataFactory: DataFactory,
       dataset: DatasetCore,
+      mutateGraph: Exclude<Quad_Graph, Variable>,
     ): Maybe<Resource> {
       return identifier(object).map(
-        (identifier) => new Resource({ dataset, identifier }),
+        (identifier) =>
+          new Resource({ dataFactory, dataset, mutateGraph, identifier }),
       );
     }
 
@@ -281,5 +272,12 @@ export namespace Resource {
         typeof primitive === "string" ? Just(primitive as string) : Nothing,
       );
     }
+  }
+
+  export interface Parameters {
+    dataFactory: DataFactory;
+    dataset: DatasetCore;
+    mutateGraph?: Exclude<Quad_Graph, Variable>;
+    identifier: Resource.Identifier;
   }
 }

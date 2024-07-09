@@ -19,15 +19,14 @@ describe("Resource", () => {
 
   beforeAll(() => {
     const dataset: DatasetCore = new Store();
-    const resourceBuilder = new Resource.Builder({
+    resource = new Resource({
       dataFactory: DataFactory,
       dataset,
       identifier: DataFactory.namedNode("http://example.com/subject"),
     });
     for (const object of Object.values(objects)) {
-      resourceBuilder.add(predicate, object);
+      resource.add(predicate, object);
     }
-    resource = resourceBuilder.build();
   });
 
   it("should get an optional value", () => {
@@ -95,18 +94,17 @@ describe("Resource", () => {
     ).toBeDefined();
   });
 
-  it("should set with the builder", () => {
+  it("should set a value", () => {
     const dataset = new Store();
-    const resourceBuilder = new Resource.Builder({
+    const resource = new Resource({
       dataFactory: DataFactory,
       dataset,
       identifier: DataFactory.blankNode(),
     });
-    resourceBuilder.add(predicate, objects["stringLiteral"]);
+    resource.add(predicate, objects["stringLiteral"]);
     expect(dataset.size).toStrictEqual(1);
-    resourceBuilder.set(predicate, objects["intLiteral"]);
+    resource.set(predicate, objects["intLiteral"]);
     expect(dataset.size).toStrictEqual(1);
-    const resource = resourceBuilder.build();
     const values = [
       ...resource.values(predicate, Resource.ValueMappers.identity),
     ];
