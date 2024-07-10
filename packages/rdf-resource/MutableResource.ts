@@ -23,7 +23,7 @@ export class MutableResource<
   }: MutableResource.Parameters<IdentifierT>) {
     super(resourceParameters);
     this.dataFactory = dataFactory;
-    this.mutateGraph = mutateGraph ?? dataFactory.defaultGraph();
+    this.mutateGraph = mutateGraph;
   }
 
   add(
@@ -71,6 +71,6 @@ export namespace MutableResource {
   export interface Parameters<IdentifierT extends Resource.Identifier>
     extends Resource.Parameters<IdentifierT> {
     dataFactory: DataFactory;
-    mutateGraph?: Exclude<Quad_Graph, Variable>;
+    mutateGraph: Exclude<Quad_Graph, Variable>;
   }
 }

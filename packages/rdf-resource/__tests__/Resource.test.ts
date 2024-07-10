@@ -23,6 +23,7 @@ describe("Resource", () => {
       dataFactory: DataFactory,
       dataset,
       identifier: DataFactory.namedNode("http://example.com/subject"),
+      mutateGraph: DataFactory.defaultGraph(),
     });
     for (const object of Object.values(objects)) {
       resource.add(predicate, object);
@@ -86,6 +87,7 @@ describe("Resource", () => {
       dataFactory: DataFactory,
       dataset,
       identifier: DataFactory.blankNode(),
+      mutateGraph: DataFactory.defaultGraph(),
     });
     resource.add(predicate, objects["stringLiteral"]);
     expect(dataset.size).toStrictEqual(1);
