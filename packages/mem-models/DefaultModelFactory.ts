@@ -5,7 +5,7 @@ import {
   LanguageTagSet,
 } from "@kos-kit/models";
 import { Resource } from "@kos-kit/rdf-resource";
-import { Literal } from "@rdfjs/types";
+import { Literal, NamedNode } from "@rdfjs/types";
 import { Label } from "./Label.js";
 import { LabeledModel } from "./LabeledModel.js";
 import { ModelFactory } from "./ModelFactory.js";
@@ -48,7 +48,7 @@ export class DefaultModelFactory<
     this.labelConstructor = labelConstructor;
   }
 
-  createConcept(resource: Resource): ConceptT {
+  createConcept(resource: Resource<NamedNode>): ConceptT {
     return new this.conceptConstructor({
       includeLanguageTags: this.includeLanguageTags,
       modelFactory: this,
@@ -56,7 +56,7 @@ export class DefaultModelFactory<
     });
   }
 
-  createConceptScheme(resource: Resource): ConceptSchemeT {
+  createConceptScheme(resource: Resource<NamedNode>): ConceptSchemeT {
     return new this.conceptSchemeConstructor({
       includeLanguageTags: this.includeLanguageTags,
       modelFactory: this,

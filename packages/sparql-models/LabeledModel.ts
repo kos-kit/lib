@@ -7,13 +7,14 @@ import {
 import { Model } from "./Model.js";
 import { ModelFetcher } from "./ModelFetcher.js";
 import { SparqlClient } from "./SparqlClient.js";
+import { NamedNode } from "@rdfjs/types";
 
 export abstract class LabeledModel<
     MemLabeledModelT extends ILabeledModel,
     SparqlConceptT extends IConcept,
     SparqlConceptSchemeT extends IConceptScheme,
   >
-  extends Model<MemLabeledModelT>
+  extends Model<MemLabeledModelT, NamedNode>
   implements ILabeledModel
 {
   protected readonly modelFetcher: ModelFetcher<

@@ -1,6 +1,6 @@
 import { Label } from "./Label.js";
 import { Model } from "./Model.js";
-import { BlankNode, NamedNode } from "@rdfjs/types";
+import { NamedNode } from "@rdfjs/types";
 
 /**
  * Common interface between Concept and ConceptScheme.
@@ -15,7 +15,7 @@ export interface LabeledModel extends Model {
    * Hidden labels, equivalent to skos:hiddenLabel.
    */
   readonly hiddenLabels: readonly Label[];
-  readonly identifier: BlankNode | NamedNode;
+  readonly identifier: NamedNode;
   /**
    * Preferred labels, equivalent to skos:prefLabel.
    */

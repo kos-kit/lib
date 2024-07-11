@@ -9,16 +9,21 @@ const rightsPredicates = [dcterms.rights, dc11.rights];
 /**
  * Abstract base class for RDF/JS Dataset-backed models.
  */
-export abstract class Model implements IModel {
+export abstract class Model<IdentifierT extends Resource.Identifier>
+  implements IModel
+{
   protected readonly includeLanguageTags: LanguageTagSet;
-  protected readonly resource: Resource;
+  protected readonly resource: Resource<IdentifierT>;
 
-  constructor({ includeLanguageTags, resource }: Model.Parameters) {
+  constructor({
+    includeLanguageTags,
+    resource,
+  }: Model.Parameters<IdentifierT>) {
     this.resource = resource;
     this.includeLanguageTags = includeLanguageTags;
   }
 
-  get identifier(): Resource.Identifier {
+  get identifier(): IdentifierT {
     return this.resource.identifier;
   }
 
@@ -100,8 +105,8 @@ export abstract class Model implements IModel {
 }
 
 export namespace Model {
-  export interface Parameters {
+  export interface Parameters<IdentifierT extends Resource.Identifier> {
     includeLanguageTags: LanguageTagSet;
-    resource: Resource;
+    resource: Resource<IdentifierT>;
   }
 }
