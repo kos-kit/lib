@@ -1,4 +1,3 @@
-import { NamedNode } from "@rdfjs/types";
 import { Concept } from "./Concept.js";
 import { LabeledModel } from "./LabeledModel.js";
 import { Maybe } from "purify-ts";
@@ -20,5 +19,10 @@ export interface ConceptScheme extends LabeledModel {
 }
 
 export namespace ConceptScheme {
-  export type Identifier = NamedNode;
+  export type Identifier = LabeledModel.Identifier;
+
+  export namespace Identifier {
+    export const fromString = LabeledModel.fromString;
+    export const toString = LabeledModel.toString;
+  }
 }

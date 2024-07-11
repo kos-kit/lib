@@ -1,4 +1,4 @@
-import { Literal, NamedNode } from "@rdfjs/types";
+import { Literal } from "@rdfjs/types";
 import { ConceptScheme } from "./ConceptScheme.js";
 import { LabeledModel } from "./LabeledModel.js";
 import { NoteProperty } from "./NoteProperty.js";
@@ -17,5 +17,10 @@ export interface Concept extends LabeledModel {
 }
 
 export namespace Concept {
-  export type Identifier = NamedNode;
+  export type Identifier = LabeledModel.Identifier;
+
+  export namespace Identifier {
+    export const fromString = LabeledModel.fromString;
+    export const toString = LabeledModel.toString;
+  }
 }
