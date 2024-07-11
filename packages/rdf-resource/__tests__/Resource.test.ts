@@ -1,11 +1,11 @@
 import { beforeAll, describe, expect, it } from "vitest";
 import { DataFactory, Store } from "n3";
 import { DatasetCore, Quad, Quad_Object, Variable } from "@rdfjs/types";
-import { Resource } from "..";
+import { MutableResource, Resource } from "..";
 import { xsd } from "@tpluscode/rdf-ns-builders";
 
 describe("Resource", () => {
-  let resource: Resource;
+  let resource: MutableResource;
 
   const objects: Record<string, Exclude<Quad_Object, Quad | Variable>> = {
     blankNode: DataFactory.blankNode(),
@@ -19,21 +19,21 @@ describe("Resource", () => {
 
   beforeAll(() => {
     const dataset: DatasetCore = new Store();
-    const resourceBuilder = new Resource.Builder({
+    resource = new MutableResource({
       dataFactory: DataFactory,
       dataset,
       identifier: DataFactory.namedNode("http://example.com/subject"),
+      mutateGraph: DataFactory.defaultGraph(),
     });
     for (const object of Object.values(objects)) {
-      resourceBuilder.add(predicate, object);
+      resource.add(predicate, object);
     }
-    resource = resourceBuilder.build();
   });
 
-  it("should get an optional value", () => {
+  it("should get a value", () => {
     expect(
       resource
-        .optionalValue(
+        .value(
           DataFactory.namedNode("http://example.com/nonexistent"),
           Resource.ValueMappers.identity,
         )
@@ -41,22 +41,8 @@ describe("Resource", () => {
     ).toBeUndefined();
 
     expect(
-      resource.optionalValue(predicate, Resource.ValueMappers.iri).extract()
-        ?.value,
+      resource.value(predicate, Resource.ValueMappers.iri).extract()?.value,
     ).toStrictEqual(objects["namedNode"].value);
-  });
-
-  it("should get a required value", () => {
-    expect(() =>
-      resource.requiredValue(
-        DataFactory.namedNode("http://example.com/nonexistent"),
-        Resource.ValueMappers.identity,
-      ),
-    ).toThrowError();
-
-    expect(
-      resource.requiredValue(predicate, Resource.ValueMappers.iri).value,
-    ).toBe(objects["namedNode"].value);
   });
 
   it("should get all values", () => {
@@ -95,18 +81,18 @@ describe("Resource", () => {
     ).toBeDefined();
   });
 
-  it("should set with the builder", () => {
+  it("should set a value", () => {
     const dataset = new Store();
-    const resourceBuilder = new Resource.Builder({
+    const resource = new MutableResource({
       dataFactory: DataFactory,
       dataset,
       identifier: DataFactory.blankNode(),
+      mutateGraph: DataFactory.defaultGraph(),
     });
-    resourceBuilder.add(predicate, objects["stringLiteral"]);
+    resource.add(predicate, objects["stringLiteral"]);
     expect(dataset.size).toStrictEqual(1);
-    resourceBuilder.set(predicate, objects["intLiteral"]);
+    resource.set(predicate, objects["intLiteral"]);
     expect(dataset.size).toStrictEqual(1);
-    const resource = resourceBuilder.build();
     const values = [
       ...resource.values(predicate, Resource.ValueMappers.identity),
     ];

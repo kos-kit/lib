@@ -42,22 +42,14 @@ export function parseRdfFile({
     const streamParser = new N3.StreamParser({ factory: dataFactory });
     const defaultGraph = dataFactory.defaultGraph();
     streamParser.on("data", (quad: Quad) => {
-      if (!graph || quad.graph.equals(graph)) {
-        // Add the quad as-is.
-        dataset.add(quad);
-      } else if (quad.graph.equals(defaultGraph)) {
+      if (graph && quad.graph.equals(defaultGraph)) {
         // The quad is probably a triple, add it to the specified graph.
         dataset.add(
           dataFactory.quad(quad.subject, quad.predicate, quad.object, graph),
         );
       } else {
-        console.warn(
-          "quad has different graph",
-          quad.graph.value,
-          "from the specified graph",
-          graph.value,
-          ", skipping",
-        );
+        // Add the quad as-is.
+        dataset.add(quad);
       }
     });
     streamParser.on("error", reject);

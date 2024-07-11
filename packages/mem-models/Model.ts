@@ -57,10 +57,7 @@ export abstract class Model implements IModel {
   }
 
   get modified(): Maybe<Literal> {
-    return this.resource.optionalValue(
-      dcterms.modified,
-      Resource.ValueMappers.literal,
-    );
+    return this.resource.value(dcterms.modified, Resource.ValueMappers.literal);
   }
 
   get rights(): Maybe<Literal> {
