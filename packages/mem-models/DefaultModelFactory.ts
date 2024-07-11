@@ -5,7 +5,7 @@ import {
   LanguageTagSet,
 } from "@kos-kit/models";
 import { Resource } from "@kos-kit/rdf-resource";
-import { Literal, NamedNode } from "@rdfjs/types";
+import { Literal } from "@rdfjs/types";
 import { Label } from "./Label.js";
 import { LabeledModel } from "./LabeledModel.js";
 import { ModelFactory } from "./ModelFactory.js";

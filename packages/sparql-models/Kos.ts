@@ -3,7 +3,6 @@ import {
   ConceptScheme as IConceptScheme,
   Kos as IKos,
 } from "@kos-kit/models";
-import { Resource } from "@kos-kit/rdf-resource";
 import { rdf, rdfs, skos } from "@tpluscode/rdf-ns-builders";
 import { ModelFetcher } from "./ModelFetcher.js";
 import { SparqlClient } from "./SparqlClient.js";
