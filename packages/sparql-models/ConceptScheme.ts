@@ -55,7 +55,7 @@ WHERE {
   }
 
   async conceptByIdentifier(
-    identifier: Resource.Identifier,
+    identifier: IConcept.Identifier,
   ): Promise<Maybe<Concept>> {
     return (
       await this.modelFetcher.fetchConceptsByIdentifiers([identifier])
@@ -106,7 +106,7 @@ WHERE {
     limit: number;
     offset: number;
     topOnly: boolean;
-  }): Promise<readonly Resource.Identifier[]> {
+  }): Promise<readonly IConcept.Identifier[]> {
     return mapResultRowsToIdentifiers(
       await this.sparqlClient.query.select(`\
 SELECT DISTINCT ?concept

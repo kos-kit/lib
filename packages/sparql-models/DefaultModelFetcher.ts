@@ -87,7 +87,7 @@ export class DefaultModelFetcher<
   }
 
   async fetchConceptSchemesByIdentifiers(
-    identifiers: readonly Resource.Identifier[],
+    identifiers: readonly IConceptScheme.Identifier[],
   ): Promise<readonly Maybe<SparqlConceptSchemeT>[]> {
     const conceptSchemeVariable: GraphPatternVariable = {
       termType: "Variable",
@@ -133,7 +133,7 @@ export class DefaultModelFetcher<
   }
 
   async fetchConceptsByIdentifiers(
-    identifiers: readonly Resource.Identifier[],
+    identifiers: readonly IConcept.Identifier[],
   ): Promise<readonly Maybe<SparqlConceptT>[]> {
     const conceptVariable: GraphPatternVariable = {
       termType: "Variable",

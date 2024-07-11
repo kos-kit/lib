@@ -1,4 +1,4 @@
-import { Literal } from "@rdfjs/types";
+import { Literal, NamedNode } from "@rdfjs/types";
 import { ConceptScheme } from "./ConceptScheme.js";
 import { LabeledModel } from "./LabeledModel.js";
 import { NoteProperty } from "./NoteProperty.js";
@@ -14,4 +14,8 @@ export interface Concept extends LabeledModel {
   ): Promise<readonly Concept[]>;
   semanticRelationsCount(property: SemanticRelationProperty): Promise<number>;
   topConceptOf(): Promise<readonly ConceptScheme[]>;
+}
+
+export namespace Concept {
+  export type Identifier = NamedNode;
 }

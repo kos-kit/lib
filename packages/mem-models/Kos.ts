@@ -5,7 +5,7 @@ import {
   Label as ILabel,
 } from "@kos-kit/models";
 import { Resource } from "@kos-kit/rdf-resource";
-import { instances, isInstanceOf } from "@kos-kit/rdf-utils";
+import { instances, isInstanceOf, namedInstances } from "@kos-kit/rdf-utils";
 import { DatasetCore } from "@rdfjs/types";
 import { skos } from "@tpluscode/rdf-ns-builders";
 import { ModelFactory } from "./ModelFactory.js";
@@ -34,7 +34,7 @@ export class Kos<
     this.modelFactory = modelFactory;
   }
 
-  _conceptByIdentifier(identifier: Resource.Identifier): Maybe<ConceptT> {
+  _conceptByIdentifier(identifier: IConcept.Identifier): Maybe<ConceptT> {
     if (
       isInstanceOf({
         class_: skos.Concept,
@@ -53,7 +53,7 @@ export class Kos<
   }
 
   conceptByIdentifier(
-    identifier: Resource.Identifier,
+    identifier: IConcept.Identifier,
   ): Promise<Maybe<ConceptT>> {
     return new Promise((resolve) => {
       resolve(this._conceptByIdentifier(identifier));
@@ -61,7 +61,7 @@ export class Kos<
   }
 
   async conceptSchemeByIdentifier(
-    identifier: Resource.Identifier,
+    identifier: IConceptScheme.Identifier,
   ): Promise<Maybe<ConceptSchemeT>> {
     for (const conceptScheme of await this.conceptSchemes()) {
       if (conceptScheme.identifier.equals(identifier)) {
@@ -86,7 +86,7 @@ export class Kos<
   }
 
   conceptsByIdentifiers(
-    identifiers: readonly Resource.Identifier[],
+    identifiers: readonly IConcept.Identifier[],
   ): Promise<readonly Maybe<ConceptT>[]> {
     return new Promise((resolve) => {
       resolve(
@@ -136,8 +136,8 @@ export class Kos<
     }
   }
 
-  private *conceptIdentifiers(): Iterable<Resource.Identifier> {
-    yield* instances({
+  private *conceptIdentifiers(): Iterable<IConcept.Identifier> {
+    yield* namedInstances({
       class_: skos.Concept,
       dataset: this.dataset,
       includeSubclasses: true,

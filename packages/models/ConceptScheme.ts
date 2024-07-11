@@ -1,12 +1,10 @@
-import { BlankNode, NamedNode } from "@rdfjs/types";
+import { NamedNode } from "@rdfjs/types";
 import { Concept } from "./Concept.js";
 import { LabeledModel } from "./LabeledModel.js";
 import { Maybe } from "purify-ts";
 
 export interface ConceptScheme extends LabeledModel {
-  conceptByIdentifier(
-    identifier: BlankNode | NamedNode,
-  ): Promise<Maybe<Concept>>;
+  conceptByIdentifier(identifier: Concept.Identifier): Promise<Maybe<Concept>>;
   concepts(): AsyncIterable<Concept>;
   conceptsCount(): Promise<number>;
   conceptsPage(kwds: {
@@ -19,4 +17,8 @@ export interface ConceptScheme extends LabeledModel {
     limit: number;
     offset: number;
   }): Promise<readonly Concept[]>;
+}
+
+export namespace ConceptScheme {
+  export type Identifier = NamedNode;
 }
