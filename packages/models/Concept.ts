@@ -15,3 +15,12 @@ export interface Concept extends LabeledModel {
   semanticRelationsCount(property: SemanticRelationProperty): Promise<number>;
   topConceptOf(): Promise<readonly ConceptScheme[]>;
 }
+
+export namespace Concept {
+  export type Identifier = LabeledModel.Identifier;
+
+  export namespace Identifier {
+    export const fromString = LabeledModel.fromString;
+    export const toString = LabeledModel.toString;
+  }
+}

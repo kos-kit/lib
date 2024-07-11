@@ -85,24 +85,21 @@ export class Concept<
   }: {
     topOnly: boolean;
   }): readonly ConceptSchemeT[] {
-    const conceptSchemeIdentifiers = new TermSet<Resource.Identifier>();
+    const conceptSchemeIdentifiers = new TermSet<IConceptScheme.Identifier>();
 
     for (const quad of this.resource.dataset.match(
       null,
       skos.hasTopConcept,
       this.identifier,
     )) {
-      switch (quad.subject.termType) {
-        case "BlankNode":
-        case "NamedNode":
-          conceptSchemeIdentifiers.add(quad.subject);
-          break;
+      if (quad.subject.termType === "NamedNode") {
+        conceptSchemeIdentifiers.add(quad.subject);
       }
     }
 
     for (const conceptSchemeIdentifier of this.resource.values(
       skos.topConceptOf,
-      Resource.ValueMappers.identifier,
+      Resource.ValueMappers.iri,
     )) {
       conceptSchemeIdentifiers.add(conceptSchemeIdentifier);
     }
@@ -110,7 +107,7 @@ export class Concept<
     if (!topOnly) {
       for (const conceptSchemeIdentifier of this.resource.values(
         skos.inScheme,
-        Resource.ValueMappers.identifier,
+        Resource.ValueMappers.iri,
       )) {
         conceptSchemeIdentifiers.add(conceptSchemeIdentifier);
       }

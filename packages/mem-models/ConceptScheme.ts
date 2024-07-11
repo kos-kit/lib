@@ -63,7 +63,7 @@ export class ConceptScheme<
   }
 
   conceptByIdentifier(
-    identifier: Resource.Identifier,
+    identifier: IConcept.Identifier,
   ): Promise<Maybe<ConceptT>> {
     return new Promise((resolve) => {
       // conceptScheme skos:hasTopConcept resource entails resource is a skos:Concept because of
@@ -149,13 +149,13 @@ export class ConceptScheme<
     topOnly,
   }: {
     topOnly: boolean;
-  }): Iterable<Resource.Identifier> {
-    const conceptIdentifierSet = new TermSet<Resource.Identifier>();
+  }): Iterable<IConcept.Identifier> {
+    const conceptIdentifierSet = new TermSet<IConcept.Identifier>();
 
     // ConceptScheme -> Concept statement
     for (const conceptIdentifier of this.resource.values(
       skos.hasTopConcept,
-      Resource.ValueMappers.identifier,
+      Resource.ValueMappers.iri,
     )) {
       if (!conceptIdentifierSet.has(conceptIdentifier)) {
         yield conceptIdentifier;
@@ -172,12 +172,10 @@ export class ConceptScheme<
         predicate,
         this.identifier,
       )) {
-        const conceptIdentifier = Resource.ValueMappers.identifier(
-          quad.subject as Resource.Identifier,
-        ).extractNullable();
-        if (conceptIdentifier === null) {
+        if (quad.subject.termType !== "NamedNode") {
           continue;
         }
+        const conceptIdentifier = quad.subject;
 
         // See note in conceptByIdentifier about skos:inScheme
         if (

@@ -17,7 +17,8 @@ import { Maybe } from "purify-ts";
  * - Related RDF resources such as skosxl:Label instances can be retrieved as "properties".
  */
 export abstract class Model<
-  MemModelT extends IModel & { identifier: Resource.Identifier },
+  MemModelT extends IModel & { identifier: IdentifierT },
+  IdentifierT extends Resource.Identifier,
 > implements IModel
 {
   protected readonly memModel: MemModelT;
@@ -26,7 +27,7 @@ export abstract class Model<
     this.memModel = memModel;
   }
 
-  get identifier(): Resource.Identifier {
+  get identifier(): IdentifierT {
     return this.memModel.identifier;
   }
 

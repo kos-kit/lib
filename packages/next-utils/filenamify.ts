@@ -1,4 +1,4 @@
-import { base58 } from "./base58.js";
+import { base62 } from "./base62.js";
 
 export const filenamify = (value: string): string =>
-  base58.encode(Buffer.from(value, "utf-8"));
+  base62.encode(Buffer.from(value, "utf-8"));

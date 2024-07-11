@@ -1,4 +1,4 @@
-import { base58 } from "./base58.js";
+import { base62 } from "./base62.js";
 
 export const defilenamify = (value: string): string =>
-  base58.decode(value).toString("utf-8");
+  base62.decode(value).toString("utf-8");

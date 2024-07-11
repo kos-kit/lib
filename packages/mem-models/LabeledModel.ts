@@ -18,7 +18,7 @@ export abstract class LabeledModel<
     ConceptSchemeT extends IConceptScheme,
     LabelT extends ILabel,
   >
-  extends Model
+  extends Model<NamedNode>
   implements ILabeledModel
 {
   protected readonly modelFactory: ModelFactory<
@@ -129,7 +129,7 @@ export namespace LabeledModel {
     ConceptT extends IConcept,
     ConceptSchemeT extends IConceptScheme,
     LabelT extends ILabel,
-  > extends Model.Parameters {
+  > extends Model.Parameters<NamedNode> {
     modelFactory: ModelFactory<ConceptT, ConceptSchemeT, LabelT>;
   }
 }

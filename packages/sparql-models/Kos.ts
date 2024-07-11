@@ -3,7 +3,6 @@ import {
   ConceptScheme as IConceptScheme,
   Kos as IKos,
 } from "@kos-kit/models";
-import { Resource } from "@kos-kit/rdf-resource";
 import { rdf, rdfs, skos } from "@tpluscode/rdf-ns-builders";
 import { ModelFetcher } from "./ModelFetcher.js";
 import { SparqlClient } from "./SparqlClient.js";
@@ -38,7 +37,7 @@ export class Kos<
   }
 
   async conceptByIdentifier(
-    identifier: Resource.Identifier,
+    identifier: IConcept.Identifier,
   ): Promise<Maybe<SparqlConceptT>> {
     return (
       await this.modelFetcher.fetchConceptsByIdentifiers([identifier])
@@ -51,7 +50,7 @@ export class Kos<
   }: {
     limit: number;
     offset: number;
-  }): Promise<readonly Resource.Identifier[]> {
+  }): Promise<readonly IConcept.Identifier[]> {
     return mapResultRowsToIdentifiers(
       await this.sparqlClient.query.select(`\
 SELECT ?concept
@@ -72,7 +71,7 @@ OFFSET ${offset}`),
   }
 
   conceptsByIdentifiers(
-    identifiers: readonly Resource.Identifier[],
+    identifiers: readonly IConcept.Identifier[],
   ): Promise<readonly Maybe<SparqlConceptT>[]> {
     return this.modelFetcher.fetchConceptsByIdentifiers(identifiers);
   }
@@ -107,7 +106,7 @@ WHERE {
   }
 
   async conceptSchemeByIdentifier(
-    identifier: Resource.Identifier,
+    identifier: IConceptScheme.Identifier,
   ): Promise<Maybe<SparqlConceptSchemeT>> {
     return (
       await this.modelFetcher.fetchConceptSchemesByIdentifiers([identifier])
@@ -115,7 +114,7 @@ WHERE {
   }
 
   private async conceptSchemeIdentifiers(): Promise<
-    readonly Resource.Identifier[]
+    readonly IConceptScheme.Identifier[]
   > {
     return mapResultRowsToIdentifiers(
       await this.sparqlClient.query.select(`\

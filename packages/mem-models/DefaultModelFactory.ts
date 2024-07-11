@@ -48,7 +48,7 @@ export class DefaultModelFactory<
     this.labelConstructor = labelConstructor;
   }
 
-  createConcept(resource: Resource): ConceptT {
+  createConcept(resource: Resource<IConcept.Identifier>): ConceptT {
     return new this.conceptConstructor({
       includeLanguageTags: this.includeLanguageTags,
       modelFactory: this,
@@ -56,7 +56,9 @@ export class DefaultModelFactory<
     });
   }
 
-  createConceptScheme(resource: Resource): ConceptSchemeT {
+  createConceptScheme(
+    resource: Resource<IConceptScheme.Identifier>,
+  ): ConceptSchemeT {
     return new this.conceptSchemeConstructor({
       includeLanguageTags: this.includeLanguageTags,
       modelFactory: this,
