@@ -1,15 +1,17 @@
-import { describe, expect, it } from "vitest";
+import { describe, it } from "vitest";
 import { isSafeFileStem } from "../isSafeFileStem.js";
+import { safeFileStems } from "./safeFileStems.js";
+import { unsafeFileStems } from "./unsafeFileStems.js";
 
 describe("isSafeFileStem", () => {
-  for (const fileStem of ["test", "0test", "testA"]) {
-    it(`should consider '${fileStem}' safe`, () => {
+  for (const fileStem of safeFileStems) {
+    it(`should consider '${fileStem}' safe`, ({ expect }) => {
       expect(isSafeFileStem(fileStem)).toStrictEqual(true);
     });
   }
 
-  for (const fileStem of ["test.", "test-", "test+"]) {
-    it(`should consider '${fileStem}' unsafe`, () => {
+  for (const fileStem of unsafeFileStems) {
+    it(`should consider '${fileStem}' unsafe`, ({ expect }) => {
       expect(isSafeFileStem(fileStem)).toStrictEqual(false);
     });
   }
