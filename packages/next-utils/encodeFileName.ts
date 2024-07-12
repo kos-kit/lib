@@ -7,12 +7,10 @@ import { splitFileName } from "./splitFileName.js";
  */
 export const encodeFileName = (fileName: string): string => {
   const [fileStem, fileExtension] = splitFileName(fileName);
-  if (fileExtension.length > 1) {
-    if (!isSafeFileName(fileExtension.substring(1))) {
-      throw new RangeError(
-        "file extension must be file name safe: " + fileExtension,
-      );
-    }
+  if (fileExtension.length <= 1 || isSafeFileName(fileExtension.substring(1))) {
+    return fileNameCodec.encode(Buffer.from(fileStem, "utf-8")) + fileExtension;
+  } else {
+    // Unsafe file extension, encode the entire file name
+    return fileNameCodec.encode(Buffer.from(fileName, "utf-8"));
   }
-  return fileNameCodec.encode(Buffer.from(fileStem, "utf-8")) + fileExtension;
 };

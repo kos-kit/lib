@@ -5,9 +5,11 @@ import { unsafeFileNames } from "./unsafeFileNames.js";
 import { decodeFileName } from "../decodeFileName.js";
 
 describe("decodeFileName", () => {
-  for (const fileName of safeFileNames.concat(unsafeFileNames)) {
+  for (const fileName of unsafeFileNames.concat(safeFileNames)) {
     it(`should encode and decode '${fileName}'`, ({ expect }) => {
-      expect(decodeFileName(encodeFileName(fileName))).toStrictEqual(fileName);
+      const encodedFileName = encodeFileName(fileName);
+      const decodedFileName = decodeFileName(encodedFileName);
+      expect(decodedFileName).toStrictEqual(fileName);
     });
   }
 });
