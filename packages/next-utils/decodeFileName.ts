@@ -1,4 +1,12 @@
-import { fileStemCodec } from "./fileStemCodec.js";
+import { fileNameCodec } from "./fileNameCodec.js";
+import { splitFileName } from "./splitFileName.js";
 
-export const decodeFileName = (value: string): string =>
-  fileStemCodec.decode(value).toString("utf-8");
+/**
+ * Decode a file name from file name-safe characters, preserving its extension.
+ */
+export const decodeFileName = (value: string): string => {
+  const [encodedFileStem, fileExtension] = splitFileName(value);
+  return (
+    fileNameCodec.decode(encodedFileStem).toString("utf-8") + fileExtension
+  );
+};

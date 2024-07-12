@@ -1,13 +1,13 @@
 import { describe, it } from "vitest";
 import { encodeFileName } from "../encodeFileName.js";
-import { safeFileStems } from "./safeFileStems.js";
-import { unsafeFileStems } from "./unsafeFileStems.js";
+import { safeFileNames } from "./safeFileNames.js";
+import { unsafeFileNames } from "./unsafeFileNames.js";
 import { decodeFileName } from "../decodeFileName.js";
 
-describe("encodeFileName", () => {
-  for (const fileStem of safeFileStems.concat(unsafeFileStems)) {
-    it(`should encode and decode '${fileStem}'`, ({ expect }) => {
-      expect(decodeFileName(encodeFileName(fileStem))).toStrictEqual(fileStem);
+describe("decodeFileName", () => {
+  for (const fileName of safeFileNames.concat(unsafeFileNames)) {
+    it(`should encode and decode '${fileName}'`, ({ expect }) => {
+      expect(decodeFileName(encodeFileName(fileName))).toStrictEqual(fileName);
     });
   }
 });
