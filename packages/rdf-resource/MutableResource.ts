@@ -13,8 +13,8 @@ import { Resource } from "./Resource.js";
 export class MutableResource<
   IdentifierT extends Resource.Identifier = Resource.Identifier,
 > extends Resource<IdentifierT> {
-  protected readonly dataFactory: DataFactory;
-  protected readonly mutateGraph: Exclude<Quad_Graph, Variable>;
+  readonly dataFactory: DataFactory;
+  readonly mutateGraph: Exclude<Quad_Graph, Variable>;
 
   constructor({
     dataFactory,
