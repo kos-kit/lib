@@ -52,12 +52,10 @@ export class Kos<
     }
   }
 
-  conceptByIdentifier(
+  async conceptByIdentifier(
     identifier: IConcept.Identifier,
   ): Promise<Maybe<ConceptT>> {
-    return new Promise((resolve) => {
-      resolve(this._conceptByIdentifier(identifier));
-    });
+    return this._conceptByIdentifier(identifier);
   }
 
   async conceptSchemeByIdentifier(
@@ -71,10 +69,8 @@ export class Kos<
     return Nothing;
   }
 
-  conceptSchemes(): Promise<readonly ConceptSchemeT[]> {
-    return new Promise((resolve) => {
-      resolve([...this._conceptSchemes()]);
-    });
+  async conceptSchemes(): Promise<readonly ConceptSchemeT[]> {
+    return [...this._conceptSchemes()];
   }
 
   async *concepts(): AsyncIterable<ConceptT> {
@@ -85,43 +81,37 @@ export class Kos<
     }
   }
 
-  conceptsByIdentifiers(
+  async conceptsByIdentifiers(
     identifiers: readonly IConcept.Identifier[],
   ): Promise<readonly Maybe<ConceptT>[]> {
-    return new Promise((resolve) => {
-      resolve(
-        identifiers.map((identifier) => this._conceptByIdentifier(identifier)),
-      );
-    });
+    return identifiers.map((identifier) =>
+      this._conceptByIdentifier(identifier),
+    );
   }
 
-  conceptsCount(): Promise<number> {
-    return new Promise((resolve) => {
-      resolve(countIterable(this.conceptIdentifiers()));
-    });
+  async conceptsCount(): Promise<number> {
+    return countIterable(this.conceptIdentifiers());
   }
 
-  conceptsPage({
+  async conceptsPage({
     limit,
     offset,
   }: {
     limit: number;
     offset: number;
   }): Promise<readonly ConceptT[]> {
-    return new Promise((resolve) => {
-      const result: ConceptT[] = [];
-      for (const identifier of paginateIterable(this.conceptIdentifiers(), {
-        limit,
-        offset,
-      })) {
-        result.push(
-          this.modelFactory.createConcept(
-            new Resource({ dataset: this.dataset, identifier }),
-          ),
-        );
-      }
-      resolve(result);
-    });
+    const result: ConceptT[] = [];
+    for (const identifier of paginateIterable(this.conceptIdentifiers(), {
+      limit,
+      offset,
+    })) {
+      result.push(
+        this.modelFactory.createConcept(
+          new Resource({ dataset: this.dataset, identifier }),
+        ),
+      );
+    }
+    return result;
   }
 
   private *_conceptSchemes(): Iterable<ConceptSchemeT> {
