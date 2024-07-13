@@ -153,10 +153,9 @@ export class ConceptScheme<
     const conceptIdentifierSet = new TermSet<IConcept.Identifier>();
 
     // ConceptScheme -> Concept statement
-    for (const conceptIdentifier of this.resource.values(
-      skos.hasTopConcept,
-      Resource.ValueMappers.iri,
-    )) {
+    for (const conceptIdentifier of [
+      ...this.resource.values(skos.hasTopConcept),
+    ].flatMap((value) => value.iri.toList())) {
       if (!conceptIdentifierSet.has(conceptIdentifier)) {
         yield conceptIdentifier;
         conceptIdentifierSet.add(conceptIdentifier);

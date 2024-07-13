@@ -21,9 +21,9 @@ export class Concept<
   implements IConcept
 {
   get notations(): readonly Literal[] {
-    return [
-      ...this.resource.values(skos.notation, Resource.ValueMappers.literal),
-    ];
+    return [...this.resource.values(skos.notation)].flatMap((value) =>
+      value.literal.toList(),
+    );
   }
 
   inSchemes(): Promise<readonly ConceptSchemeT[]> {
@@ -33,15 +33,15 @@ export class Concept<
   }
 
   notes(property: NoteProperty): readonly Literal[] {
-    return [
-      ...this.resource.values(property.identifier, (term) =>
-        Resource.ValueMappers.literal(term).filter((literal) =>
+    return [...this.resource.values(property.identifier)].flatMap((value) =>
+      value.literal
+        .filter((literal) =>
           matchLiteral(literal, {
             includeLanguageTags: this.includeLanguageTags,
           }),
-        ),
-      ),
-    ];
+        )
+        .toList(),
+    );
   }
 
   semanticRelations(
@@ -49,15 +49,14 @@ export class Concept<
   ): Promise<readonly ConceptT[]> {
     return new Promise((resolve) => {
       resolve(
-        [
-          ...this.resource.values(
-            property.identifier,
-            Resource.ValueMappers.identifier,
-          ),
-        ].map((identifier) =>
-          this.modelFactory.createConcept(
-            new Resource({ dataset: this.dataset, identifier }),
-          ),
+        [...this.resource.values(property.identifier)].flatMap((value) =>
+          value.identifier
+            .map((identifier) =>
+              this.modelFactory.createConcept(
+                new Resource({ dataset: this.dataset, identifier }),
+              ),
+            )
+            .toList(),
         ),
       );
     });
@@ -66,9 +65,9 @@ export class Concept<
   semanticRelationsCount(property: SemanticRelationProperty): Promise<number> {
     return new Promise((resolve) => {
       resolve(
-        this.resource.valuesCount(
-          property.identifier,
-          Resource.ValueMappers.identifier,
+        [...this.resource.values(property.identifier)].reduce(
+          (count, value) => (value.isIdentifier ? count + 1 : count),
+          0,
         ),
       );
     });
@@ -99,17 +98,19 @@ export class Concept<
 
     for (const conceptSchemeIdentifier of this.resource.values(
       skos.topConceptOf,
-      Resource.ValueMappers.iri,
     )) {
-      conceptSchemeIdentifiers.add(conceptSchemeIdentifier);
+      conceptSchemeIdentifier.iri.ifJust((iri) =>
+        conceptSchemeIdentifiers.add(iri),
+      );
     }
 
     if (!topOnly) {
       for (const conceptSchemeIdentifier of this.resource.values(
         skos.inScheme,
-        Resource.ValueMappers.iri,
       )) {
-        conceptSchemeIdentifiers.add(conceptSchemeIdentifier);
+        conceptSchemeIdentifier.iri.ifJust((iri) =>
+          conceptSchemeIdentifiers.add(iri),
+        );
       }
     }
 
