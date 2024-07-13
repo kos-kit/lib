@@ -1,7 +1,7 @@
 import { beforeAll, describe, expect, it } from "vitest";
 import { DataFactory, Store } from "n3";
 import { DatasetCore, Quad, Quad_Object, Variable } from "@rdfjs/types";
-import { MutableResource, Resource } from "..";
+import { MutableResource } from "..";
 import { xsd } from "@tpluscode/rdf-ns-builders";
 
 describe("Resource", () => {
@@ -30,35 +30,37 @@ describe("Resource", () => {
     }
   });
 
-  it("should get a value", () => {
+  it("should get a value (missing)", () => {
     expect(
       resource
-        .value(
-          DataFactory.namedNode("http://example.com/nonexistent"),
-          Resource.ValueMappers.identity,
-        )
-        .extract(),
+        .value(DataFactory.namedNode("http://example.com/nonexistent"))
+        .term.extract(),
     ).toBeUndefined();
+  });
 
+  it("should get a value (present)", () => {
     expect(
-      resource.value(predicate, Resource.ValueMappers.iri).extract()?.value,
+      [...resource.values(predicate)]
+        .filter((value) => value.isIri)
+        .at(0)
+        ?.iri.extract()?.value,
     ).toStrictEqual(objects["namedNode"].value);
   });
 
   it("should get all values", () => {
-    const values = [
-      ...resource.values(predicate, Resource.ValueMappers.identity),
-    ];
+    const values = [...resource.values(predicate)];
     expect(values).toHaveLength(Object.keys(objects).length);
     for (const object of Object.values(objects)) {
-      expect(values.find((value) => value.equals(object))).toBeDefined();
+      expect(
+        values.find((value) => value.term.extract()?.equals(object)),
+      ).toBeDefined();
     }
   });
 
   it("should get identifier values", () => {
-    const values = [
-      ...resource.values(predicate, Resource.ValueMappers.identifier),
-    ];
+    const values = [...resource.values(predicate)].flatMap((value) =>
+      value.identifier.toList(),
+    );
     expect(values).toHaveLength(2);
     expect(
       values.find((value) => value.equals(objects["blankNode"])),
@@ -69,9 +71,9 @@ describe("Resource", () => {
   });
 
   it("should get resource values", () => {
-    const values = [
-      ...resource.values(predicate, Resource.ValueMappers.resource),
-    ];
+    const values = [...resource.values(predicate)].flatMap((value) =>
+      value.resource.toList(),
+    );
     expect(values).toHaveLength(2);
     expect(
       values.find((value) => value.identifier.equals(objects["blankNode"])),
@@ -93,9 +95,9 @@ describe("Resource", () => {
     expect(dataset.size).toStrictEqual(1);
     resource.set(predicate, objects["intLiteral"]);
     expect(dataset.size).toStrictEqual(1);
-    const values = [
-      ...resource.values(predicate, Resource.ValueMappers.identity),
-    ];
+    const values = [...resource.values(predicate)].flatMap((value) =>
+      value.term.toList(),
+    );
     expect(values).toHaveLength(1);
     expect(values[0].equals(objects["intLiteral"])).toBeTruthy();
   });

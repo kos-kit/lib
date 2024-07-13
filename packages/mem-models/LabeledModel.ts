@@ -3,7 +3,6 @@ import {
   ConceptScheme as IConceptScheme,
   Label as ILabel,
   LabeledModel as ILabeledModel,
-  LanguageTag,
   LiteralLabel,
 } from "@kos-kit/models";
 import { Resource } from "@kos-kit/rdf-resource";
@@ -12,6 +11,7 @@ import { skos, skosxl } from "@tpluscode/rdf-ns-builders";
 import { Model } from "./Model.js";
 import { ModelFactory } from "./ModelFactory.js";
 import { matchLiteral } from "./matchLiteral.js";
+import { Just, Nothing } from "purify-ts";
 
 export abstract class LabeledModel<
     ConceptT extends IConcept,
@@ -75,52 +75,47 @@ export abstract class LabeledModel<
     skosPredicate,
     skosXlPredicate,
   }: {
-    includeLanguageTags?: Set<LanguageTag>;
     skosPredicate: NamedNode;
     skosXlPredicate: NamedNode;
   }): readonly ILabel[] {
-    const labels: ILabel[] = [];
-
-    for (const literal of this.resource.values(
-      skosPredicate,
-      Resource.ValueMappers.literal,
-    )) {
-      if (
-        matchLiteral(literal, {
-          includeLanguageTags: this.includeLanguageTags,
-        })
-      ) {
-        labels.push(new LiteralLabel(literal));
-      }
-    }
-
-    // Any resource in the range of a skosxl: label predicate is considered a skosxl:Label
-    for (const labelResource of this.resource.values(
-      skosXlPredicate,
-      Resource.ValueMappers.resource,
-    )) {
-      for (const literalForm of labelResource.values(
-        skosxl.literalForm,
-        Resource.ValueMappers.literal,
-      )) {
-        if (
-          !matchLiteral(literalForm, {
-            includeLanguageTags: this.includeLanguageTags,
+    return [
+      // All literals that are the objects of the skosPredicate
+      ...[...this.resource.values(skosPredicate)].flatMap((value) =>
+        value.literal
+          .filter((literal) =>
+            matchLiteral(literal, {
+              includeLanguageTags: this.includeLanguageTags,
+            }),
+          )
+          .map((literal) => new LiteralLabel(literal))
+          .toList(),
+      ),
+      // Any resource in the range of a skosxl: label predicate is considered a skosxl:Label
+      ...[...this.resource.values(skosXlPredicate)].flatMap((labelValue) =>
+        labelValue.resource
+          .chain((labelResource) => {
+            for (const literalForm of [
+              ...labelResource.values(skosxl.literalForm),
+            ].flatMap((value) => value.literal.toList())) {
+              if (
+                !matchLiteral(literalForm, {
+                  includeLanguageTags: this.includeLanguageTags,
+                })
+              ) {
+                continue;
+              }
+              return Just(
+                this.modelFactory.createLabel({
+                  literalForm,
+                  resource: labelResource,
+                }),
+              );
+            }
+            return Nothing;
           })
-        ) {
-          continue;
-        }
-
-        labels.push(
-          this.modelFactory.createLabel({
-            literalForm,
-            resource: labelResource,
-          }),
-        );
-      }
-    }
-
-    return labels;
+          .toList(),
+      ),
+    ];
   }
 }
 

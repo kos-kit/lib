@@ -11,6 +11,152 @@ import {
 import { Just, Maybe, Nothing } from "purify-ts";
 import { fromRdf } from "rdf-literal";
 
+class NothingResourceValue implements Resource.Value {
+  readonly boolean: Maybe<boolean> = Nothing;
+  readonly date: Maybe<Date> = Nothing;
+  readonly identifier: Maybe<Resource.Identifier> = Nothing;
+  readonly iri: Maybe<NamedNode<string>> = Nothing;
+  readonly isBoolean: boolean = false;
+  readonly isDate: boolean = false;
+  readonly isIdentifier: boolean = false;
+  readonly isIri: boolean = false;
+  readonly isLiteral: boolean = false;
+  readonly isNumber: boolean = false;
+  readonly isPrimitive: boolean = false;
+  readonly isString: boolean = false;
+  readonly isTerm: boolean = false;
+  readonly literal: Maybe<Literal> = Nothing;
+  readonly namedResource: Maybe<Resource<NamedNode<string>>> = Nothing;
+  readonly primitive: Maybe<string | number | boolean | Date> = Nothing;
+  readonly number: Maybe<number> = Nothing;
+  readonly resource: Maybe<Resource<Resource.Identifier>> = Nothing;
+  readonly string: Maybe<string> = Nothing;
+  readonly term: Maybe<NamedNode<string> | Literal | BlankNode> = Nothing;
+}
+
+const nothingResourceValue = new NothingResourceValue();
+
+class SomeResourceValue implements Resource.Value {
+  constructor(
+    private readonly object: Exclude<Quad_Object, Quad | Variable>,
+    private readonly subjectResource: Resource,
+  ) {}
+  get boolean(): Maybe<boolean> {
+    return this.primitive.chain((primitive) =>
+      typeof primitive === "boolean" ? Just(primitive) : Nothing,
+    );
+  }
+
+  get date(): Maybe<Date> {
+    return this.primitive.chain((primitive) =>
+      primitive instanceof Date ? Just(primitive) : Nothing,
+    );
+  }
+
+  get identifier(): Maybe<Resource.Identifier> {
+    switch (this.object.termType) {
+      case "BlankNode":
+      case "NamedNode":
+        return Just(this.object);
+      default:
+        return Nothing;
+    }
+  }
+
+  get iri(): Maybe<NamedNode> {
+    return this.object.termType === "NamedNode" ? Just(this.object) : Nothing;
+  }
+
+  get isBoolean(): boolean {
+    return this.boolean.isJust();
+  }
+
+  get isDate(): boolean {
+    return this.date.isJust();
+  }
+
+  get isIdentifier(): boolean {
+    switch (this.object.termType) {
+      case "BlankNode":
+      case "NamedNode":
+        return true;
+      default:
+        return false;
+    }
+  }
+
+  get isIri(): boolean {
+    return this.object.termType === "NamedNode";
+  }
+
+  get isLiteral(): boolean {
+    return this.object.termType === "Literal";
+  }
+
+  get isNumber(): boolean {
+    return this.number.isJust();
+  }
+
+  get isPrimitive(): boolean {
+    return this.primitive.isJust();
+  }
+
+  get isString(): boolean {
+    return this.string.isJust();
+  }
+
+  readonly isTerm = true;
+
+  get literal(): Maybe<Literal> {
+    return this.object.termType === "Literal" ? Just(this.object) : Nothing;
+  }
+
+  get namedResource(): Maybe<Resource<NamedNode>> {
+    return this.iri.map(
+      (identifier) =>
+        new Resource<NamedNode>({
+          dataset: this.subjectResource.dataset,
+          identifier,
+        }),
+    );
+  }
+
+  get number(): Maybe<number> {
+    return this.primitive.chain((primitive) =>
+      typeof primitive === "number" ? Just(primitive) : Nothing,
+    );
+  }
+
+  get primitive(): Maybe<boolean | Date | number | string> {
+    if (this.object.termType !== "Literal") {
+      return Nothing;
+    }
+
+    try {
+      return Just(fromRdf(this.object, true));
+    } catch {
+      return Nothing;
+    }
+  }
+
+  get resource(): Maybe<Resource> {
+    return this.identifier.map(
+      (identifier) =>
+        new Resource({ dataset: this.subjectResource.dataset, identifier }),
+    );
+  }
+
+  get string(): Maybe<string> {
+    return this.primitive.chain((primitive) =>
+      typeof primitive === "string" ? Just(primitive as string) : Nothing,
+    );
+  }
+
+  get term(): Maybe<Exclude<Quad_Object, Quad | Variable>> {
+    return Just(this.object);
+  }
+}
+
 export class Resource<
   IdentifierT extends Resource.Identifier = Resource.Identifier,
 > {
@@ -22,20 +168,14 @@ export class Resource<
     this.identifier = identifier;
   }
 
-  value<T>(
-    property: NamedNode,
-    mapper: Resource.ValueMapper<T>,
-  ): Maybe<NonNullable<T>> {
-    for (const value of this.values(property, mapper)) {
-      return Just(value);
+  value(property: NamedNode): Resource.Value {
+    for (const value of this.values(property)) {
+      return value;
     }
-    return Nothing;
+    return nothingResourceValue;
   }
 
-  *values<T>(
-    property: NamedNode,
-    mapper: Resource.ValueMapper<T>,
-  ): Iterable<NonNullable<T>> {
+  *values(property: NamedNode): Iterable<Resource.Value> {
     for (const quad of this.dataset.match(
       this.identifier,
       property,
@@ -48,30 +188,8 @@ export class Resource<
           continue;
       }
 
-      const mappedObject = mapper(quad.object, this);
-      if (mappedObject.isJust()) yield mappedObject.extract();
+      yield new SomeResourceValue(quad.object, this);
     }
-  }
-
-  valuesCount<T>(property: NamedNode, mapper: Resource.ValueMapper<T>) {
-    let count = 0;
-    for (const quad of this.dataset.match(
-      this.identifier,
-      property,
-      null,
-      null,
-    )) {
-      switch (quad.object.termType) {
-        case "Quad":
-        case "Variable":
-          continue;
-      }
-
-      if (mapper(quad.object, this).isJust()) {
-        count++;
-      }
-    }
-    return count;
   }
 }
 
@@ -116,105 +234,26 @@ export namespace Resource {
     identifier: IdentifierT;
   }
 
-  export type ValueMapper<ValueT> = (
-    object: Exclude<Quad_Object, Quad | Variable>,
-    resource: Resource,
-  ) => Maybe<NonNullable<ValueT>>;
-
-  export namespace ValueMappers {
-    export function boolean(
-      object: Exclude<Quad_Object, Quad | Variable>,
-    ): Maybe<boolean> {
-      return primitive(object).chain((primitive) =>
-        typeof primitive === "boolean" ? Just(primitive) : Nothing,
-      );
-    }
-
-    export function date(
-      object: Exclude<Quad_Object, Quad | Variable>,
-    ): Maybe<Date> {
-      return primitive(object).chain((primitive) =>
-        primitive instanceof Date ? Just(primitive) : Nothing,
-      );
-    }
-
-    export function identifier(
-      object: Exclude<Quad_Object, Quad | Variable>,
-    ): Maybe<Identifier> {
-      switch (object.termType) {
-        case "BlankNode":
-        case "NamedNode":
-          return Just(object);
-        default:
-          return Nothing;
-      }
-    }
-
-    export function identity(
-      object: Exclude<Quad_Object, Quad | Variable>,
-    ): Maybe<Exclude<Quad_Object, Quad | Variable>> {
-      return Just(object);
-    }
-
-    export function iri(
-      object: Exclude<Quad_Object, Quad | Variable>,
-    ): Maybe<NamedNode> {
-      return object.termType === "NamedNode" ? Just(object) : Nothing;
-    }
-
-    export function literal(
-      object: Exclude<Quad_Object, Quad | Variable>,
-    ): Maybe<Literal> {
-      return object.termType === "Literal" ? Just(object) : Nothing;
-    }
-
-    export function namedResource(
-      object: Exclude<Quad_Object, Quad | Variable>,
-      resource: Resource,
-    ): Maybe<Resource<NamedNode>> {
-      return iri(object).map(
-        (identifier) =>
-          new Resource<NamedNode>({ dataset: resource.dataset, identifier }),
-      );
-    }
-
-    export function number(
-      object: Exclude<Quad_Object, Quad | Variable>,
-    ): Maybe<number> {
-      return primitive(object).chain((primitive) =>
-        typeof primitive === "number" ? Just(primitive) : Nothing,
-      );
-    }
-
-    export function primitive(
-      object: Exclude<Quad_Object, Quad | Variable>,
-    ): Maybe<boolean | Date | number | string> {
-      if (object.termType !== "Literal") {
-        return Nothing;
-      }
-
-      try {
-        return Just(fromRdf(object, true));
-      } catch {
-        return Nothing;
-      }
-    }
-
-    export function resource(
-      object: Exclude<Quad_Object, Quad | Variable>,
-      resource: Resource,
-    ): Maybe<Resource> {
-      return identifier(object).map(
-        (identifier) => new Resource({ dataset: resource.dataset, identifier }),
-      );
-    }
-
-    export function string(
-      object: Exclude<Quad_Object, Quad | Variable>,
-    ): Maybe<string> {
-      return primitive(object).chain((primitive) =>
-        typeof primitive === "string" ? Just(primitive as string) : Nothing,
-      );
-    }
+  export interface Value {
+    readonly boolean: Maybe<boolean>;
+    readonly date: Maybe<Date>;
+    readonly identifier: Maybe<Identifier>;
+    readonly iri: Maybe<NamedNode>;
+    readonly isBoolean: boolean;
+    readonly isDate: boolean;
+    readonly isIdentifier: boolean;
+    readonly isIri: boolean;
+    readonly isLiteral: boolean;
+    readonly isNumber: boolean;
+    readonly isPrimitive: boolean;
+    readonly isString: boolean;
+    readonly isTerm: boolean;
+    readonly literal: Maybe<Literal>;
+    readonly namedResource: Maybe<Resource<NamedNode>>;
+    readonly number: Maybe<number>;
+    readonly primitive: Maybe<boolean | Date | number | string>;
+    readonly resource: Maybe<Resource>;
+    readonly string: Maybe<string>;
+    readonly term: Maybe<Exclude<Quad_Object, Quad | Variable>>;
   }
 }

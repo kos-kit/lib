@@ -30,20 +30,12 @@ export abstract class Model<IdentifierT extends Resource.Identifier>
   get license(): Maybe<Literal | NamedNode> {
     const literals: Literal[] = [];
 
-    for (const object of this.resource.values(dcterms.license, (term) =>
-      term.termType === "Literal" || term.termType == "NamedNode"
-        ? Just(term)
-        : Nothing,
-    )) {
-      switch (object.termType) {
-        case "NamedNode":
-          return Just(object);
-        case "Literal":
-          literals.push(object);
-          break;
-        default:
-          break;
+    for (const value of this.resource.values(dcterms.license)) {
+      const iri = value.iri;
+      if (iri.isJust()) {
+        return iri;
       }
+      literals.push(...value.literal.toList());
     }
 
     if (literals.length === 0) {
@@ -62,7 +54,7 @@ export abstract class Model<IdentifierT extends Resource.Identifier>
   }
 
   get modified(): Maybe<Literal> {
-    return this.resource.value(dcterms.modified, Resource.ValueMappers.literal);
+    return this.resource.value(dcterms.modified).literal;
   }
 
   get rights(): Maybe<Literal> {
@@ -85,8 +77,8 @@ export abstract class Model<IdentifierT extends Resource.Identifier>
 
   private literalObject(predicate: NamedNode): Maybe<Literal> {
     const literals: readonly Literal[] = [
-      ...this.resource.values(predicate, Resource.ValueMappers.literal),
-    ];
+      ...this.resource.values(predicate),
+    ].flatMap((value) => value.literal.toList());
 
     if (literals.length === 0) {
       return Nothing;
