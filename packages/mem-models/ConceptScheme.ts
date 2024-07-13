@@ -10,7 +10,7 @@ import { skos } from "@tpluscode/rdf-ns-builders";
 import { LabeledModel } from "./LabeledModel.js";
 import { countIterable } from "./countIterable.js";
 import { paginateIterable } from "./paginateIterable.js";
-import { Just, Maybe } from "purify-ts";
+import { Just, Maybe, Nothing } from "purify-ts";
 
 export class ConceptScheme<
     ConceptT extends IConcept,
@@ -28,13 +28,11 @@ export class ConceptScheme<
     }
   }
 
-  _conceptsCount({ topOnly }: { topOnly: boolean }): Promise<number> {
-    return new Promise((resolve) => {
-      resolve(countIterable(this._conceptIdentifiers({ topOnly })));
-    });
+  async _conceptsCount({ topOnly }: { topOnly: boolean }): Promise<number> {
+    return countIterable(this._conceptIdentifiers({ topOnly }));
   }
 
-  _conceptsPage({
+  async _conceptsPage({
     limit,
     offset,
     topOnly,
@@ -43,76 +41,68 @@ export class ConceptScheme<
     offset: number;
     topOnly: boolean;
   }): Promise<readonly ConceptT[]> {
-    return new Promise((resolve) => {
-      const result: ConceptT[] = [];
-      for (const identifier of paginateIterable(
-        this._conceptIdentifiers({ topOnly }),
-        {
-          limit,
-          offset,
-        },
-      )) {
-        result.push(
-          this.modelFactory.createConcept(
-            new Resource({ dataset: this.dataset, identifier }),
-          ),
-        );
-      }
-      resolve(result);
-    });
+    const result: ConceptT[] = [];
+    for (const identifier of paginateIterable(
+      this._conceptIdentifiers({ topOnly }),
+      {
+        limit,
+        offset,
+      },
+    )) {
+      result.push(
+        this.modelFactory.createConcept(
+          new Resource({ dataset: this.dataset, identifier }),
+        ),
+      );
+    }
+    return result;
   }
 
-  conceptByIdentifier(
+  async conceptByIdentifier(
     identifier: IConcept.Identifier,
   ): Promise<Maybe<ConceptT>> {
-    return new Promise((resolve) => {
-      // conceptScheme skos:hasTopConcept resource entails resource is a skos:Concept because of
-      // the range of skos:hasTopConcept
+    // conceptScheme skos:hasTopConcept resource entails resource is a skos:Concept because of
+    // the range of skos:hasTopConcept
+    for (const _ of this.resource.dataset.match(
+      this.identifier,
+      skos.hasTopConcept,
+      identifier,
+    )) {
+      return Just(
+        this.modelFactory.createConcept(
+          new Resource({ dataset: this.dataset, identifier }),
+        ),
+      );
+    }
+
+    // resource skos:topConceptOf conceptScheme entails resource is a skos:Concept because of the
+    // domain of skos:topConceptOf
+    // resource skos:inScheme conceptScheme does not entail resource is a skos:Concept, since
+    // skos:inScheme has an open domain
+    for (const predicate of [skos.inScheme, skos.topConceptOf]) {
       for (const _ of this.resource.dataset.match(
-        this.identifier,
-        skos.hasTopConcept,
         identifier,
+        predicate,
+        this.identifier,
       )) {
-        resolve(
-          Just(
+        if (
+          predicate.equals(skos.topConceptOf) ||
+          isInstanceOf({
+            class_: skos.Concept,
+            dataset: this.dataset,
+            instance: identifier,
+          })
+        ) {
+          return Just(
             this.modelFactory.createConcept(
               new Resource({ dataset: this.dataset, identifier }),
             ),
-          ),
-        );
-        return;
-      }
-
-      // resource skos:topConceptOf conceptScheme entails resource is a skos:Concept because of the
-      // domain of skos:topConceptOf
-      // resource skos:inScheme conceptScheme does not entail resource is a skos:Concept, since
-      // skos:inScheme has an open domain
-      for (const predicate of [skos.inScheme, skos.topConceptOf]) {
-        for (const _ of this.resource.dataset.match(
-          identifier,
-          predicate,
-          this.identifier,
-        )) {
-          if (
-            predicate.equals(skos.topConceptOf) ||
-            isInstanceOf({
-              class_: skos.Concept,
-              dataset: this.dataset,
-              instance: identifier,
-            })
-          ) {
-            resolve(
-              Just(
-                this.modelFactory.createConcept(
-                  new Resource({ dataset: this.dataset, identifier }),
-                ),
-              ),
-            );
-            return;
-          }
+          );
         }
       }
-    });
+    }
+
+    return Nothing;
   }
 
   async *concepts(): AsyncIterable<ConceptT> {

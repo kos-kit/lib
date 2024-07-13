@@ -26,10 +26,8 @@ export class Concept<
     );
   }
 
-  inSchemes(): Promise<readonly ConceptSchemeT[]> {
-    return new Promise((resolve) => {
-      resolve(this._inSchemes({ topOnly: false }));
-    });
+  async inSchemes(): Promise<readonly ConceptSchemeT[]> {
+    return this._inSchemes({ topOnly: false });
   }
 
   notes(property: NoteProperty): readonly Literal[] {
@@ -44,39 +42,31 @@ export class Concept<
     );
   }
 
-  semanticRelations(
+  async semanticRelations(
     property: SemanticRelationProperty,
   ): Promise<readonly ConceptT[]> {
-    return new Promise((resolve) => {
-      resolve(
-        [...this.resource.values(property.identifier)].flatMap((value) =>
-          value.identifier
-            .map((identifier) =>
-              this.modelFactory.createConcept(
-                new Resource({ dataset: this.dataset, identifier }),
-              ),
-            )
-            .toList(),
-        ),
-      );
-    });
+    return [...this.resource.values(property.identifier)].flatMap((value) =>
+      value.identifier
+        .map((identifier) =>
+          this.modelFactory.createConcept(
+            new Resource({ dataset: this.dataset, identifier }),
+          ),
+        )
+        .toList(),
+    );
   }
 
-  semanticRelationsCount(property: SemanticRelationProperty): Promise<number> {
-    return new Promise((resolve) => {
-      resolve(
-        [...this.resource.values(property.identifier)].reduce(
-          (count, value) => (value.isIdentifier ? count + 1 : count),
-          0,
-        ),
-      );
-    });
+  async semanticRelationsCount(
+    property: SemanticRelationProperty,
+  ): Promise<number> {
+    return [...this.resource.values(property.identifier)].reduce(
+      (count, value) => (value.isIdentifier ? count + 1 : count),
+      0,
+    );
   }
 
-  topConceptOf(): Promise<readonly ConceptSchemeT[]> {
-    return new Promise((resolve) => {
-      resolve(this._inSchemes({ topOnly: true }));
-    });
+  async topConceptOf(): Promise<readonly ConceptSchemeT[]> {
+    return this._inSchemes({ topOnly: true });
   }
 
   private _inSchemes({

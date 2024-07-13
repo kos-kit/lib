@@ -117,7 +117,7 @@ export class LunrSearchEngine implements SearchEngine {
     );
   }
 
-  search({
+  async search({
     languageTag,
     limit,
     offset,
@@ -128,39 +128,35 @@ export class LunrSearchEngine implements SearchEngine {
     offset: number;
     query: string;
   }): Promise<SearchResults> {
-    return new Promise((resolve) => {
-      if (languageTag !== this.languageTag) {
-        throw new RangeError(
-          `expected language tag '${this.languageTag}', actual '${this.languageTag}`,
-        );
-      }
+    if (languageTag !== this.languageTag) {
+      throw new RangeError(
+        `expected language tag '${this.languageTag}', actual '${this.languageTag}`,
+      );
+    }
 
-      const indexResults = this.index.search(query);
+    const indexResults = this.index.search(query);
 
-      const page: SearchResult[] = [];
-      for (const indexResult of indexResults.slice(offset)) {
-        for (const documentType of Object.keys(this.documents)) {
-          const documentPrefLabel =
-            this.documents[documentType][indexResult.ref];
+    const page: SearchResult[] = [];
+    for (const indexResult of indexResults.slice(offset)) {
+      for (const documentType of Object.keys(this.documents)) {
+        const documentPrefLabel = this.documents[documentType][indexResult.ref];
 
-          if (!documentPrefLabel) {
-            continue;
-          }
-
-          page.push({
-            identifier: indexResult.ref,
-            prefLabel: documentPrefLabel,
-            type: documentType as SearchResult["type"],
-          });
-          if (page.length === limit) {
-            resolve({ page, total: indexResults.length });
-            return;
-          }
-          break;
+        if (!documentPrefLabel) {
+          continue;
         }
+
+        page.push({
+          identifier: indexResult.ref,
+          prefLabel: documentPrefLabel,
+          type: documentType as SearchResult["type"],
+        });
+        if (page.length === limit) {
+          return { page, total: indexResults.length };
+        }
+        break;
       }
-      resolve({ page, total: indexResults.length });
-    });
+    }
+    return { page, total: indexResults.length };
   }
 
   toJson(): SearchEngineJson {

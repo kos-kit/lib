@@ -11,7 +11,7 @@ import { skos, skosxl } from "@tpluscode/rdf-ns-builders";
 import { Model } from "./Model.js";
 import { ModelFactory } from "./ModelFactory.js";
 import { matchLiteral } from "./matchLiteral.js";
-import { Just, Nothing } from "purify-ts";
+import { Maybe } from "purify-ts";
 
 export abstract class LabeledModel<
     ConceptT extends IConcept,
@@ -93,26 +93,26 @@ export abstract class LabeledModel<
       // Any resource in the range of a skosxl: label predicate is considered a skosxl:Label
       ...[...this.resource.values(skosXlPredicate)].flatMap((labelValue) =>
         labelValue.resource
-          .chain((labelResource) => {
-            for (const literalForm of [
-              ...labelResource.values(skosxl.literalForm),
-            ].flatMap((value) => value.literal.toList())) {
-              if (
-                !matchLiteral(literalForm, {
-                  includeLanguageTags: this.includeLanguageTags,
-                })
-              ) {
-                continue;
-              }
-              return Just(
-                this.modelFactory.createLabel({
-                  literalForm,
-                  resource: labelResource,
-                }),
-              );
-            }
-            return Nothing;
-          })
+          .chain((labelResource) =>
+            Maybe.fromNullable(
+              [...labelResource.values(skosxl.literalForm)]
+                .flatMap((value) =>
+                  value.literal
+                    .filter((literal) =>
+                      matchLiteral(literal, {
+                        includeLanguageTags: this.includeLanguageTags,
+                      }),
+                    )
+                    .toList(),
+                )
+                .at(0),
+            ).map((literalForm) =>
+              this.modelFactory.createLabel({
+                literalForm,
+                resource: labelResource,
+              }),
+            ),
+          )
           .toList(),
       ),
     ];
