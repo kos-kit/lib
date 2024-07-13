@@ -1,6 +1,23 @@
-import ParsingSparqlClient from "sparql-http-client/ParsingClient";
+import Delegate, { Options } from "sparql-http-client/ParsingClient";
 import { SparqlClient } from "./SparqlClient";
+import { QueryOptions } from "sparql-http-client";
 
-export class HttpSparqlClient
-  extends ParsingSparqlClient
-  implements SparqlClient {}
+export class HttpSparqlClient implements SparqlClient {
+  private readonly delegate: Delegate;
+  private readonly queryOptions?: QueryOptions;
+
+  constructor(options: Options & QueryOptions) {
+    this.delegate = new Delegate(options);
+    this.queryOptions = options;
+  }
+
+  readonly query: SparqlClient.Query = {
+    ask: (query: string) => this.delegate.query.ask(query, this.queryOptions),
+    construct: (query: string) =>
+      this.delegate.query.construct(query, this.queryOptions),
+    select: (query: string) =>
+      this.delegate.query.select(query, this.queryOptions),
+    update: (query: string) =>
+      this.delegate.query.update(query, this.queryOptions),
+  };
+}
