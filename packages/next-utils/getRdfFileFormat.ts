@@ -1,22 +1,19 @@
 import * as path from "node:path";
-import { CompressionMethod, compressionMethods } from "./CompressionMethod.js";
-import { RdfFormat, rdfFormats } from "./RdfFormat.js";
-import { Either, Just, Left, Maybe, Nothing, Right } from "purify-ts";
+import { compressionMethods } from "./CompressionMethod.js";
+import { rdfFormats } from "./RdfFormat.js";
+import { Either, Just, Left, Nothing, Right } from "purify-ts";
 import standardMimeTypes from "mime/types/standard.js";
 import otherMimeTypes from "mime/types/other.js";
 import { Mime } from "mime";
+import { RdfFileFormat } from "./RdfFileFormat.js";
 
 const mime = new Mime(standardMimeTypes, otherMimeTypes, {
   "application/x-brotli": ["br"],
 });
 
-export function getRdfFileFormat(filePath: string): Either<
-  Error,
-  {
-    compressionMethod: Maybe<CompressionMethod>;
-    rdfFormat: RdfFormat;
-  }
-> {
+export function getRdfFileFormat(
+  filePath: string,
+): Either<Error, RdfFileFormat> {
   const mimeType = mime.getType(filePath);
   if (mimeType === null) {
     return Left(new Error("unable to infer MIME type of " + filePath));
