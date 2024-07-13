@@ -10,7 +10,7 @@ import { skos } from "@tpluscode/rdf-ns-builders";
 import { LabeledModel } from "./LabeledModel.js";
 import { countIterable } from "./countIterable.js";
 import { paginateIterable } from "./paginateIterable.js";
-import { Just, Maybe } from "purify-ts";
+import { Just, Maybe, Nothing } from "purify-ts";
 
 export class ConceptScheme<
     ConceptT extends IConcept,
@@ -101,6 +101,8 @@ export class ConceptScheme<
         }
       }
     }
+
+    return Nothing;
   }
 
   async *concepts(): AsyncIterable<ConceptT> {
