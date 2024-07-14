@@ -11,8 +11,8 @@
     "sparql-http-client": "^3.0.0"
   },
   "devDependencies": {
-    "n3": "^1.17.3",
-    "@types/n3": "^1.16.4"
+    "@types/n3": "^1.16.4",
+    "n3": "^1.17.3"
   },
   "engines": {
     "node": ">=20"

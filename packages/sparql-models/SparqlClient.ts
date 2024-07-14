@@ -10,6 +10,9 @@ export namespace SparqlClient {
     ask(query: string): Promise<boolean>;
     construct(query: string): Promise<DatasetCore>;
     select(query: string): Promise<readonly ResultRow[]>;
+  }
+
+  export interface Update {
     update(query: string): Promise<void>;
   }
 }

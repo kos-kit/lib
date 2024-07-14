@@ -1,5 +1,5 @@
 import Delegate, { Options } from "sparql-http-client/ParsingClient";
-import { SparqlClient } from "./SparqlClient";
+import { SparqlClient } from "./SparqlClient.js";
 import { QueryOptions } from "sparql-http-client";
 
 export class HttpSparqlClient implements SparqlClient {
@@ -17,6 +17,9 @@ export class HttpSparqlClient implements SparqlClient {
       this.delegate.query.construct(query, this.queryOptions),
     select: (query: string) =>
       this.delegate.query.select(query, this.queryOptions),
+  };
+
+  readonly update: SparqlClient.Update = {
     update: (query: string) =>
       this.delegate.query.update(query, this.queryOptions),
   };
