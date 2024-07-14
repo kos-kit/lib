@@ -39,8 +39,5 @@
     "packages/mem-models",
     "packages/search",
     "packages/sparql-models"
-  ],
-  "dependencies": {
-    "rdf-literal": "^1.3.2"
-  }
+  ]
 }
