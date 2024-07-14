@@ -1,14 +1,36 @@
 import * as mem from "@kos-kit/mem-models";
 import { LanguageTag, LanguageTagSet } from "@kos-kit/models";
-import { Concept, ConceptScheme, Kos, HttpSparqlClient } from "..";
+import { Concept, ConceptScheme, Kos } from "..";
 import { DefaultModelFetcher } from "../DefaultModelFetcher.js";
+import { OxigraphSparqlClient } from "../OxigraphSparqlClient";
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import { Store } from "oxigraph";
 
 export const testKosFactory = (includeLanguageTag: LanguageTag) => {
   const includeLanguageTags = new LanguageTagSet(includeLanguageTag, "");
-  const sparqlClient = new HttpSparqlClient({
-    endpointUrl: "http://localhost:7878/sparql",
-    operation: "postDirect",
-  });
+  // const sparqlClient = new HttpSparqlClient({
+  //   endpointUrl: "http://localhost:7878/sparql",
+  //   operation: "postDirect",
+  // });
+  const store = new Store();
+  store.load(
+    fs
+      .readFileSync(
+        path.join(
+          path.dirname(fileURLToPath(import.meta.url)),
+          "..",
+          "..",
+          "..",
+          "test-data",
+          "unesco-thesaurus.nt",
+        ),
+      )
+      .toString(),
+    { format: "nt" },
+  );
+  const sparqlClient = new OxigraphSparqlClient(store);
   return new Kos({
     modelFetcher: new DefaultModelFetcher({
       conceptConstructor: Concept,
