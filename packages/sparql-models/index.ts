@@ -3,6 +3,7 @@ export * from "./ConceptScheme.js";
 export * from "./ConstructQueryBuilder.js";
 export * from "./DefaultModelFetcher";
 export * from "./GraphPattern.js";
+export * from "./HttpSparqlClient.js";
 export * from "./Kos.js";
 export * from "./LabeledModel.js";
 export * from "./Model.js";

@@ -106,7 +106,6 @@ export class DefaultModelFetcher<
         )
         .addValues(conceptSchemeVariable, ...identifiers)
         .build(),
-      { operation: "postDirect" },
     );
     return identifiers.map((identifier) => {
       if (
@@ -152,7 +151,6 @@ export class DefaultModelFetcher<
         )
         .addValues(conceptVariable, ...identifiers)
         .build(),
-      { operation: "postDirect" },
     );
     return identifiers.map((identifier) => {
       if (
