@@ -22,7 +22,7 @@ export class Concept<
 {
   get notations(): readonly Literal[] {
     return [...this.resource.values(skos.notation)].flatMap((value) =>
-      value.literal.toList(),
+      value.toLiteral().toList(),
     );
   }
 
@@ -32,7 +32,8 @@ export class Concept<
 
   notes(property: NoteProperty): readonly Literal[] {
     return [...this.resource.values(property.identifier)].flatMap((value) =>
-      value.literal
+      value
+        .toLiteral()
         .filter((literal) =>
           matchLiteral(literal, {
             includeLanguageTags: this.includeLanguageTags,
@@ -46,7 +47,8 @@ export class Concept<
     property: SemanticRelationProperty,
   ): Promise<readonly ConceptT[]> {
     return [...this.resource.values(property.identifier)].flatMap((value) =>
-      value.identifier
+      value
+        .toIdentifier()
         .map((identifier) =>
           this.modelFactory.createConcept(
             new Resource({ dataset: this.dataset, identifier }),
@@ -60,7 +62,7 @@ export class Concept<
     property: SemanticRelationProperty,
   ): Promise<number> {
     return [...this.resource.values(property.identifier)].reduce(
-      (count, value) => (value.isIdentifier ? count + 1 : count),
+      (count, value) => (value.isIdentifier() ? count + 1 : count),
       0,
     );
   }
@@ -89,18 +91,18 @@ export class Concept<
     for (const conceptSchemeIdentifier of this.resource.values(
       skos.topConceptOf,
     )) {
-      conceptSchemeIdentifier.iri.ifJust((iri) =>
-        conceptSchemeIdentifiers.add(iri),
-      );
+      conceptSchemeIdentifier
+        .toIri()
+        .ifJust((iri) => conceptSchemeIdentifiers.add(iri));
     }
 
     if (!topOnly) {
       for (const conceptSchemeIdentifier of this.resource.values(
         skos.inScheme,
       )) {
-        conceptSchemeIdentifier.iri.ifJust((iri) =>
-          conceptSchemeIdentifiers.add(iri),
-        );
+        conceptSchemeIdentifier
+          .toIri()
+          .ifJust((iri) => conceptSchemeIdentifiers.add(iri));
       }
     }
 

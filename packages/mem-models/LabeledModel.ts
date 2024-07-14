@@ -81,7 +81,8 @@ export abstract class LabeledModel<
     return [
       // All literals that are the objects of the skosPredicate
       ...[...this.resource.values(skosPredicate)].flatMap((value) =>
-        value.literal
+        value
+          .toLiteral()
           .filter((literal) =>
             matchLiteral(literal, {
               includeLanguageTags: this.includeLanguageTags,
@@ -92,12 +93,14 @@ export abstract class LabeledModel<
       ),
       // Any resource in the range of a skosxl: label predicate is considered a skosxl:Label
       ...[...this.resource.values(skosXlPredicate)].flatMap((labelValue) =>
-        labelValue.resource
+        labelValue
+          .toResource()
           .chain((labelResource) =>
             Maybe.fromNullable(
               [...labelResource.values(skosxl.literalForm)]
                 .flatMap((value) =>
-                  value.literal
+                  value
+                    .toLiteral()
                     .filter((literal) =>
                       matchLiteral(literal, {
                         includeLanguageTags: this.includeLanguageTags,

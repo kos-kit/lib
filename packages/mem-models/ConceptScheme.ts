@@ -145,7 +145,7 @@ export class ConceptScheme<
     // ConceptScheme -> Concept statement
     for (const conceptIdentifier of [
       ...this.resource.values(skos.hasTopConcept),
-    ].flatMap((value) => value.iri.toList())) {
+    ].flatMap((value) => value.toIri().toList())) {
       if (!conceptIdentifierSet.has(conceptIdentifier)) {
         yield conceptIdentifier;
         conceptIdentifierSet.add(conceptIdentifier);
