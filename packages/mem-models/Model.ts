@@ -31,11 +31,11 @@ export abstract class Model<IdentifierT extends Resource.Identifier>
     const literals: Literal[] = [];
 
     for (const value of this.resource.values(dcterms.license)) {
-      const iri = value.iri;
+      const iri = value.toIri();
       if (iri.isJust()) {
         return iri;
       }
-      literals.push(...value.literal.toList());
+      literals.push(...value.toLiteral().toList());
     }
 
     if (literals.length === 0) {
@@ -54,7 +54,7 @@ export abstract class Model<IdentifierT extends Resource.Identifier>
   }
 
   get modified(): Maybe<Literal> {
-    return this.resource.value(dcterms.modified).literal;
+    return this.resource.value(dcterms.modified).toLiteral();
   }
 
   get rights(): Maybe<Literal> {
@@ -78,7 +78,7 @@ export abstract class Model<IdentifierT extends Resource.Identifier>
   private literalObject(predicate: NamedNode): Maybe<Literal> {
     const literals: readonly Literal[] = [
       ...this.resource.values(predicate),
-    ].flatMap((value) => value.literal.toList());
+    ].flatMap((value) => value.toLiteral().toList());
 
     if (literals.length === 0) {
       return Nothing;

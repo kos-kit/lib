@@ -12,26 +12,66 @@ import { Just, Maybe, Nothing } from "purify-ts";
 import { fromRdf } from "rdf-literal";
 
 class NothingResourceValue implements Resource.Value {
-  readonly boolean: Maybe<boolean> = Nothing;
-  readonly date: Maybe<Date> = Nothing;
-  readonly identifier: Maybe<Resource.Identifier> = Nothing;
-  readonly iri: Maybe<NamedNode<string>> = Nothing;
-  readonly isBoolean: boolean = false;
-  readonly isDate: boolean = false;
-  readonly isIdentifier: boolean = false;
-  readonly isIri: boolean = false;
-  readonly isLiteral: boolean = false;
-  readonly isNumber: boolean = false;
-  readonly isPrimitive: boolean = false;
-  readonly isString: boolean = false;
-  readonly isTerm: boolean = false;
-  readonly literal: Maybe<Literal> = Nothing;
-  readonly namedResource: Maybe<Resource<NamedNode<string>>> = Nothing;
-  readonly primitive: Maybe<string | number | boolean | Date> = Nothing;
-  readonly number: Maybe<number> = Nothing;
-  readonly resource: Maybe<Resource<Resource.Identifier>> = Nothing;
-  readonly string: Maybe<string> = Nothing;
-  readonly term: Maybe<NamedNode<string> | Literal | BlankNode> = Nothing;
+  isBoolean(): boolean {
+    return false;
+  }
+  isDate(): boolean {
+    return false;
+  }
+  isIdentifier(): boolean {
+    return false;
+  }
+  isIri(): boolean {
+    return false;
+  }
+  isLiteral(): boolean {
+    return false;
+  }
+  isNumber(): boolean {
+    return false;
+  }
+  isPrimitive(): boolean {
+    return false;
+  }
+  isString(): boolean {
+    return false;
+  }
+  isTerm(): boolean {
+    return false;
+  }
+  toBoolean(): Maybe<boolean> {
+    return Nothing;
+  }
+  toDate(): Maybe<Date> {
+    return Nothing;
+  }
+  toIdentifier(): Maybe<Resource.Identifier> {
+    return Nothing;
+  }
+  toIri(): Maybe<NamedNode> {
+    return Nothing;
+  }
+  toLiteral(): Maybe<Literal> {
+    return Nothing;
+  }
+  toNamedResource(): Maybe<Resource<NamedNode>> {
+    return Nothing;
+  }
+  toNumber(): Maybe<number> {
+    return Nothing;
+  }
+  toPrimitive(): Maybe<boolean | Date | number | string> {
+    return Nothing;
+  }
+  toResource(): Maybe<Resource> {
+    return Nothing;
+  }
+  toString(): Maybe<string> {
+    return Nothing;
+  }
+  toTerm(): Maybe<Exclude<Quad_Object, Quad | Variable>> {
+    return Nothing;
+  }
 }
 
 const nothingResourceValue = new NothingResourceValue();
@@ -41,41 +81,15 @@ class SomeResourceValue implements Resource.Value {
     private readonly object: Exclude<Quad_Object, Quad | Variable>,
     private readonly subjectResource: Resource,
   ) {}
-  get boolean(): Maybe<boolean> {
-    return this.primitive.chain((primitive) =>
-      typeof primitive === "boolean" ? Just(primitive) : Nothing,
-    );
+  isBoolean(): boolean {
+    return this.toBoolean().isJust();
   }
 
-  get date(): Maybe<Date> {
-    return this.primitive.chain((primitive) =>
-      primitive instanceof Date ? Just(primitive) : Nothing,
-    );
+  isDate(): boolean {
+    return this.toDate().isJust();
   }
 
-  get identifier(): Maybe<Resource.Identifier> {
-    switch (this.object.termType) {
-      case "BlankNode":
-      case "NamedNode":
-        return Just(this.object);
-      default:
-        return Nothing;
-    }
-  }
-
-  get iri(): Maybe<NamedNode> {
-    return this.object.termType === "NamedNode" ? Just(this.object) : Nothing;
-  }
-
-  get isBoolean(): boolean {
-    return this.boolean.isJust();
-  }
-
-  get isDate(): boolean {
-    return this.date.isJust();
-  }
-
-  get isIdentifier(): boolean {
+  isIdentifier(): boolean {
     switch (this.object.termType) {
       case "BlankNode":
       case "NamedNode":
@@ -85,34 +99,62 @@ class SomeResourceValue implements Resource.Value {
     }
   }
 
-  get isIri(): boolean {
+  isIri(): boolean {
     return this.object.termType === "NamedNode";
   }
 
-  get isLiteral(): boolean {
+  isLiteral(): boolean {
     return this.object.termType === "Literal";
   }
 
-  get isNumber(): boolean {
-    return this.number.isJust();
+  isNumber(): boolean {
+    return this.toNumber().isJust();
   }
 
-  get isPrimitive(): boolean {
-    return this.primitive.isJust();
+  isPrimitive(): boolean {
+    return this.toPrimitive().isJust();
   }
 
-  get isString(): boolean {
-    return this.string.isJust();
+  isString(): boolean {
+    return this.toString().isJust();
   }
 
-  readonly isTerm = true;
+  isTerm(): boolean {
+    return true;
+  }
 
-  get literal(): Maybe<Literal> {
+  toBoolean(): Maybe<boolean> {
+    return this.toPrimitive().chain((primitive) =>
+      typeof primitive === "boolean" ? Just(primitive) : Nothing,
+    );
+  }
+
+  toDate(): Maybe<Date> {
+    return this.toPrimitive().chain((primitive) =>
+      primitive instanceof Date ? Just(primitive) : Nothing,
+    );
+  }
+
+  toIdentifier(): Maybe<Resource.Identifier> {
+    switch (this.object.termType) {
+      case "BlankNode":
+      case "NamedNode":
+        return Just(this.object);
+      default:
+        return Nothing;
+    }
+  }
+
+  toIri(): Maybe<NamedNode> {
+    return this.object.termType === "NamedNode" ? Just(this.object) : Nothing;
+  }
+
+  toLiteral(): Maybe<Literal> {
     return this.object.termType === "Literal" ? Just(this.object) : Nothing;
   }
 
-  get namedResource(): Maybe<Resource<NamedNode>> {
-    return this.iri.map(
+  toNamedResource(): Maybe<Resource<NamedNode>> {
+    return this.toIri().map(
       (identifier) =>
         new Resource<NamedNode>({
           dataset: this.subjectResource.dataset,
@@ -121,13 +163,13 @@ class SomeResourceValue implements Resource.Value {
     );
   }
 
-  get number(): Maybe<number> {
-    return this.primitive.chain((primitive) =>
+  toNumber(): Maybe<number> {
+    return this.toPrimitive().chain((primitive) =>
       typeof primitive === "number" ? Just(primitive) : Nothing,
     );
   }
 
-  get primitive(): Maybe<boolean | Date | number | string> {
+  toPrimitive(): Maybe<boolean | Date | number | string> {
     if (this.object.termType !== "Literal") {
       return Nothing;
     }
@@ -139,20 +181,20 @@ class SomeResourceValue implements Resource.Value {
     }
   }
 
-  get resource(): Maybe<Resource> {
-    return this.identifier.map(
+  toResource(): Maybe<Resource> {
+    return this.toIdentifier().map(
       (identifier) =>
         new Resource({ dataset: this.subjectResource.dataset, identifier }),
     );
   }
 
-  get string(): Maybe<string> {
-    return this.primitive.chain((primitive) =>
+  toString(): Maybe<string> {
+    return this.toPrimitive().chain((primitive) =>
       typeof primitive === "string" ? Just(primitive as string) : Nothing,
     );
   }
 
-  get term(): Maybe<Exclude<Quad_Object, Quad | Variable>> {
+  toTerm(): Maybe<Exclude<Quad_Object, Quad | Variable>> {
     return Just(this.object);
   }
 }
@@ -235,25 +277,25 @@ export namespace Resource {
   }
 
   export interface Value {
-    readonly boolean: Maybe<boolean>;
-    readonly date: Maybe<Date>;
-    readonly identifier: Maybe<Identifier>;
-    readonly iri: Maybe<NamedNode>;
-    readonly isBoolean: boolean;
-    readonly isDate: boolean;
-    readonly isIdentifier: boolean;
-    readonly isIri: boolean;
-    readonly isLiteral: boolean;
-    readonly isNumber: boolean;
-    readonly isPrimitive: boolean;
-    readonly isString: boolean;
-    readonly isTerm: boolean;
-    readonly literal: Maybe<Literal>;
-    readonly namedResource: Maybe<Resource<NamedNode>>;
-    readonly number: Maybe<number>;
-    readonly primitive: Maybe<boolean | Date | number | string>;
-    readonly resource: Maybe<Resource>;
-    readonly string: Maybe<string>;
-    readonly term: Maybe<Exclude<Quad_Object, Quad | Variable>>;
+    isBoolean(): boolean;
+    isDate(): boolean;
+    isIdentifier(): boolean;
+    isIri(): boolean;
+    isLiteral(): boolean;
+    isNumber(): boolean;
+    isPrimitive(): boolean;
+    isString(): boolean;
+    isTerm(): boolean;
+    toBoolean(): Maybe<boolean>;
+    toDate(): Maybe<Date>;
+    toIdentifier(): Maybe<Identifier>;
+    toIri(): Maybe<NamedNode>;
+    toLiteral(): Maybe<Literal>;
+    toNamedResource(): Maybe<Resource<NamedNode>>;
+    toNumber(): Maybe<number>;
+    toPrimitive(): Maybe<boolean | Date | number | string>;
+    toResource(): Maybe<Resource>;
+    toString(): Maybe<string>;
+    toTerm(): Maybe<Exclude<Quad_Object, Quad | Variable>>;
   }
 }
