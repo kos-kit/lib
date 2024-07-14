@@ -34,16 +34,18 @@ describe("Resource", () => {
     expect(
       resource
         .value(DataFactory.namedNode("http://example.com/nonexistent"))
-        .term.extract(),
+        .toTerm()
+        .extract(),
     ).toBeUndefined();
   });
 
   it("should get a value (present)", () => {
     expect(
       [...resource.values(predicate)]
-        .filter((value) => value.isIri)
+        .filter((value) => value.isIri())
         .at(0)
-        ?.iri.extract()?.value,
+        ?.toIri()
+        .extract()?.value,
     ).toStrictEqual(objects["namedNode"].value);
   });
 
@@ -52,14 +54,14 @@ describe("Resource", () => {
     expect(values).toHaveLength(Object.keys(objects).length);
     for (const object of Object.values(objects)) {
       expect(
-        values.find((value) => value.term.extract()?.equals(object)),
+        values.find((value) => value.toTerm().extract()?.equals(object)),
       ).toBeDefined();
     }
   });
 
   it("should get identifier values", () => {
     const values = [...resource.values(predicate)].flatMap((value) =>
-      value.identifier.toList(),
+      value.toIdentifier().toList(),
     );
     expect(values).toHaveLength(2);
     expect(
@@ -72,7 +74,7 @@ describe("Resource", () => {
 
   it("should get resource values", () => {
     const values = [...resource.values(predicate)].flatMap((value) =>
-      value.resource.toList(),
+      value.toResource().toList(),
     );
     expect(values).toHaveLength(2);
     expect(
@@ -96,7 +98,7 @@ describe("Resource", () => {
     resource.set(predicate, objects["intLiteral"]);
     expect(dataset.size).toStrictEqual(1);
     const values = [...resource.values(predicate)].flatMap((value) =>
-      value.term.toList(),
+      value.toTerm().toList(),
     );
     expect(values).toHaveLength(1);
     expect(values[0].equals(objects["intLiteral"])).toBeTruthy();
