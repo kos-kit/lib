@@ -1,5 +1,5 @@
 import { BlankNode, DatasetCore, DefaultGraph, NamedNode } from "@rdfjs/types";
-import { getRdfList } from "./getRdfList";
+import { getRdfList } from "./getRdfList.js";
 
 export function isRdfList({
   dataset,
