@@ -4,7 +4,7 @@ import {
   Label as ILabel,
 } from "@kos-kit/models";
 import { Resource } from "@kos-kit/rdf-resource";
-import { isInstanceOf } from "@kos-kit/rdf-utils";
+import { isRdfInstanceOf } from "@kos-kit/rdf-utils";
 import TermSet from "@rdfjs/term-set";
 import { skos } from "@tpluscode/rdf-ns-builders";
 import { LabeledModel } from "./LabeledModel.js";
@@ -87,7 +87,7 @@ export class ConceptScheme<
       )) {
         if (
           predicate.equals(skos.topConceptOf) ||
-          isInstanceOf({
+          isRdfInstanceOf({
             class_: skos.Concept,
             dataset: this.dataset,
             instance: identifier,
@@ -169,7 +169,7 @@ export class ConceptScheme<
         // See note in conceptByIdentifier about skos:inScheme
         if (
           predicate.equals(skos.inScheme) &&
-          !isInstanceOf({
+          !isRdfInstanceOf({
             class_: skos.Concept,
             dataset: this.dataset,
             instance: conceptIdentifier,

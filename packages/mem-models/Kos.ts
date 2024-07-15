@@ -5,7 +5,7 @@ import {
   Label as ILabel,
 } from "@kos-kit/models";
 import { Resource } from "@kos-kit/rdf-resource";
-import { instances, isInstanceOf, namedInstances } from "@kos-kit/rdf-utils";
+import { getRdfNamedInstances, isRdfInstanceOf } from "@kos-kit/rdf-utils";
 import { DatasetCore } from "@rdfjs/types";
 import { skos } from "@tpluscode/rdf-ns-builders";
 import { ModelFactory } from "./ModelFactory.js";
@@ -36,7 +36,7 @@ export class Kos<
 
   _conceptByIdentifier(identifier: IConcept.Identifier): Maybe<ConceptT> {
     if (
-      isInstanceOf({
+      isRdfInstanceOf({
         class_: skos.Concept,
         dataset: this.dataset,
         instance: identifier,
@@ -44,7 +44,10 @@ export class Kos<
     ) {
       return Just(
         this.modelFactory.createConcept(
-          new Resource({ dataset: this.dataset, identifier }),
+          new Resource({
+            dataset: this.dataset,
+            identifier,
+          }),
         ),
       );
     } else {
@@ -115,19 +118,22 @@ export class Kos<
   }
 
   private *_conceptSchemes(): Iterable<ConceptSchemeT> {
-    for (const identifier of instances({
+    for (const identifier of getRdfNamedInstances({
       class_: skos.ConceptScheme,
       dataset: this.dataset,
       includeSubclasses: true,
     })) {
       yield this.modelFactory.createConceptScheme(
-        new Resource({ dataset: this.dataset, identifier }),
+        new Resource({
+          dataset: this.dataset,
+          identifier,
+        }),
       );
     }
   }
 
   private *conceptIdentifiers(): Iterable<IConcept.Identifier> {
-    yield* namedInstances({
+    yield* getRdfNamedInstances({
       class_: skos.Concept,
       dataset: this.dataset,
       includeSubclasses: true,

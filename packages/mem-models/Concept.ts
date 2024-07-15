@@ -48,7 +48,7 @@ export class Concept<
   ): Promise<readonly ConceptT[]> {
     return [...this.resource.values(property.identifier)].flatMap((value) =>
       value
-        .toIdentifier()
+        .toIri()
         .map((identifier) =>
           this.modelFactory.createConcept(
             new Resource({ dataset: this.dataset, identifier }),
