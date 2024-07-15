@@ -22,12 +22,12 @@ describe("getRdfList", () => {
     ];
   };
 
-  it("should read an empty list", async ({ expect }) => {
+  it("should read an empty list", ({ expect }) => {
     expect(parseAndGetRdfList(`<${subject.value}> <${predicate.value}> ( ) .`))
       .to.be.empty;
   });
 
-  it("should read a list with one literal", async ({ expect }) => {
+  it("should read a list with one literal", ({ expect }) => {
     const list = parseAndGetRdfList(
       `<${subject.value}> <${predicate.value}> ( "test" ) .`,
     );
@@ -35,7 +35,7 @@ describe("getRdfList", () => {
     expect(list[0].value).to.eq("test");
   });
 
-  it("should read a list with two literals", async ({ expect }) => {
+  it("should read a list with two literals", ({ expect }) => {
     const list = parseAndGetRdfList(
       `<${subject.value}> <${predicate.value}> ( "test" "test2" ) .`,
     );
@@ -44,7 +44,7 @@ describe("getRdfList", () => {
     expect(list[1].value).to.eq("test2");
   });
 
-  it("should read a list with blank nodes", async ({ expect }) => {
+  it("should read a list with blank nodes", ({ expect }) => {
     expect(
       parseAndGetRdfList(
         `<${subject.value}> <${predicate.value}> ( [ ] [ ] ) .`,
