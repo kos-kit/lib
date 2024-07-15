@@ -7,7 +7,7 @@ import {
   noteProperties,
 } from "@kos-kit/models";
 import { Resource } from "@kos-kit/rdf-resource";
-import { isInstanceOf } from "@kos-kit/rdf-utils";
+import { isRdfInstanceOf } from "@kos-kit/rdf-utils";
 import { dc11, dcterms, rdf, skos, skosxl } from "@tpluscode/rdf-ns-builders";
 import { ConstructQueryBuilder } from "./ConstructQueryBuilder.js";
 import {
@@ -109,7 +109,7 @@ export class DefaultModelFetcher<
     );
     return identifiers.map((identifier) => {
       if (
-        isInstanceOf({
+        isRdfInstanceOf({
           class_: skos.ConceptScheme,
           dataset,
           instance: identifier,
@@ -154,7 +154,7 @@ export class DefaultModelFetcher<
     );
     return identifiers.map((identifier) => {
       if (
-        isInstanceOf({
+        isRdfInstanceOf({
           class_: skos.Concept,
           dataset,
           instance: identifier,

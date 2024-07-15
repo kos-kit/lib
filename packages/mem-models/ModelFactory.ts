@@ -11,7 +11,9 @@ export interface ModelFactory<
   ConceptSchemeT extends IConceptScheme,
   LabelT extends ILabel,
 > {
-  createConcept(resource: Resource): ConceptT;
-  createConceptScheme(resource: Resource): ConceptSchemeT;
+  createConcept(resource: Resource<IConcept.Identifier>): ConceptT;
+  createConceptScheme(
+    resource: Resource<IConceptScheme.Identifier>,
+  ): ConceptSchemeT;
   createLabel(kwds: { literalForm: Literal; resource: Resource }): LabelT;
 }

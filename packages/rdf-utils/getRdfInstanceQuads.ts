@@ -1,10 +1,14 @@
+import { DatasetCore, NamedNode, Quad } from "@rdfjs/types";
 import TermSet from "@rdfjs/term-set";
-import { BlankNode, DatasetCore, NamedNode } from "@rdfjs/types";
 import { rdf, rdfs } from "@tpluscode/rdf-ns-builders";
 
-export function isInstanceOf({
+/**
+ * Get all unique RDF instanceQuads of a given class in the given dataset.
+ *
+ * Returns the quads declaring an instance to be of the given class or one of its subclasses.
+ */
+export function* getRdfInstanceQuads({
   class_,
-  instance,
   dataset,
   includeSubclasses,
   instanceOfPredicate,
@@ -12,47 +16,57 @@ export function isInstanceOf({
 }: {
   class_: NamedNode;
   dataset: DatasetCore;
-  includeSubclasses?: boolean;
-  instance: BlankNode | NamedNode;
+  includeSubclasses: boolean;
   instanceOfPredicate?: NamedNode;
   subClassOfPredicate?: NamedNode;
-}): boolean {
-  return isInstanceOfRecursive({
+}): Iterable<Quad> {
+  yield* getRdfInstanceQuadsRecursive({
     class_,
     dataset,
-    includeSubclasses: includeSubclasses ?? true,
-    instance,
+    includeSubclasses,
     instanceOfPredicate: instanceOfPredicate ?? rdf.type,
+    instanceQuads: new TermSet<Quad>(),
     subClassOfPredicate: subClassOfPredicate ?? rdfs.subClassOf,
     visitedClasses: new TermSet<NamedNode>(),
   });
 }
 
-function isInstanceOfRecursive({
+function* getRdfInstanceQuadsRecursive({
   class_,
   dataset,
   includeSubclasses,
-  instance,
   instanceOfPredicate,
+  instanceQuads,
   subClassOfPredicate,
   visitedClasses,
 }: {
   class_: NamedNode;
   dataset: DatasetCore;
   includeSubclasses: boolean;
-  instance: BlankNode | NamedNode;
   instanceOfPredicate: NamedNode;
+  instanceQuads: TermSet<Quad>;
   subClassOfPredicate: NamedNode;
   visitedClasses: TermSet<NamedNode>;
-}): boolean {
-  for (const _ of dataset.match(instance, instanceOfPredicate, class_)) {
-    return true;
+}): Iterable<Quad> {
+  // Get instanceQuads of the class
+  for (const quad of dataset.match(null, instanceOfPredicate, class_)) {
+    switch (quad.subject.termType) {
+      case "BlankNode":
+      case "NamedNode":
+        if (!instanceQuads.has(quad)) {
+          yield quad;
+          instanceQuads.add(quad);
+        }
+        break;
+      default:
+        break;
+    }
   }
 
   visitedClasses.add(class_);
 
   if (!includeSubclasses) {
-    return false;
+    return;
   }
 
   // Recurse into class's sub-classes that haven't been visited yet.
@@ -62,20 +76,14 @@ function isInstanceOfRecursive({
     } else if (visitedClasses.has(quad.subject)) {
       continue;
     }
-    if (
-      isInstanceOfRecursive({
-        class_: quad.subject,
-        dataset,
-        includeSubclasses,
-        instance,
-        instanceOfPredicate,
-        subClassOfPredicate,
-        visitedClasses,
-      })
-    ) {
-      return true;
-    }
+    yield* getRdfInstanceQuadsRecursive({
+      class_: quad.subject,
+      dataset,
+      includeSubclasses,
+      instanceOfPredicate,
+      instanceQuads,
+      subClassOfPredicate,
+      visitedClasses,
+    });
   }
-
-  return false;
 }

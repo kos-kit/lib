@@ -1,9 +1,9 @@
-import { isInstanceOf } from "..";
+import { isRdfInstanceOf } from "..";
 import { describe, expect, it } from "vitest";
 import { DataFactory, Store } from "n3";
 import { rdf, rdfs, skos } from "@tpluscode/rdf-ns-builders";
 
-describe("isInstanceOf", () => {
+describe("isRdfInstanceOf", () => {
   const dataset = new Store();
   const class_ = skos.Concept;
   const classInstance = DataFactory.blankNode();
@@ -15,7 +15,7 @@ describe("isInstanceOf", () => {
 
   it("should find a class instance", () => {
     expect(
-      isInstanceOf({
+      isRdfInstanceOf({
         class_,
         dataset,
         instance: classInstance,
@@ -25,7 +25,7 @@ describe("isInstanceOf", () => {
 
   it("should find a subclass instance if includeSubclasses is true", () => {
     expect(
-      isInstanceOf({
+      isRdfInstanceOf({
         class_,
         dataset,
         instance: subClassInstance,
@@ -35,7 +35,7 @@ describe("isInstanceOf", () => {
 
   it("should not find a subclass instance if includeSubclasses is false", () => {
     expect(
-      isInstanceOf({
+      isRdfInstanceOf({
         class_,
         dataset,
         includeSubclasses: false,
@@ -46,7 +46,7 @@ describe("isInstanceOf", () => {
 
   it("should handle the negative case", () => {
     expect(
-      isInstanceOf({
+      isRdfInstanceOf({
         class_: subClass,
         dataset,
         instance: DataFactory.blankNode(),
