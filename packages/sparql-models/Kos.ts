@@ -75,12 +75,6 @@ OFFSET ${offset}`),
     });
   }
 
-  conceptsByIdentifiers(
-    identifiers: readonly IConcept.Identifier[],
-  ): Promise<readonly Maybe<SparqlConceptT>[]> {
-    return this.modelFetcher.fetchConceptsByIdentifiers(identifiers);
-  }
-
   async conceptsCount(): Promise<number> {
     return mapResultRowsToCount(
       await this.sparqlClient.query.select(`\
