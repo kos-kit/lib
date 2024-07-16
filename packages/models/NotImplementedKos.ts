@@ -3,15 +3,18 @@ import { ConceptScheme } from "./ConceptScheme.js";
 import { Kos } from "./Kos.js";
 import { StubConceptScheme } from "./StubConceptScheme.js";
 import { StubConcept } from "./StubConcept.js";
+import { Maybe } from "purify-ts";
 
 export class NotImplementedKos implements Kos {
-  conceptByIdentifier(_identifier: Concept.Identifier): StubConcept {
+  conceptByIdentifier(
+    _identifier: Concept.Identifier,
+  ): Promise<Maybe<Concept>> {
     throw new Error("Method not implemented.");
   }
 
   conceptSchemeByIdentifier(
     _identifier: ConceptScheme.Identifier,
-  ): StubConceptScheme {
+  ): Promise<Maybe<ConceptScheme>> {
     throw new Error("Method not implemented.");
   }
 

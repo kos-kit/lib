@@ -13,6 +13,7 @@ import { countIterable } from "./countIterable.js";
 import { paginateIterable } from "./paginateIterable.js";
 import { StubConcept } from "./StubConcept.js";
 import { StubConceptScheme } from "./StubConceptScheme.js";
+import { Maybe } from "purify-ts";
 
 export class Kos<
   ConceptT extends IConcept,
@@ -37,20 +38,20 @@ export class Kos<
 
   conceptByIdentifier(
     identifier: IConcept.Identifier,
-  ): StubConcept<ConceptT, ConceptSchemeT, LabelT> {
+  ): Promise<Maybe<ConceptT>> {
     return new StubConcept({
       modelFactory: this.modelFactory,
       resource: new Resource({ dataset: this.dataset, identifier }),
-    });
+    }).resolve();
   }
 
   conceptSchemeByIdentifier(
     identifier: IConceptScheme.Identifier,
-  ): StubConceptScheme<ConceptT, ConceptSchemeT, LabelT> {
+  ): Promise<Maybe<ConceptSchemeT>> {
     return new StubConceptScheme({
       modelFactory: this.modelFactory,
       resource: new Resource({ dataset: this.dataset, identifier }),
-    });
+    }).resolve();
   }
 
   async conceptSchemes(): Promise<
