@@ -9,5 +9,8 @@ export * from "./LabeledModel.js";
 export * from "./Model.js";
 export * from "./ModelFetcher";
 export * from "./SparqlClient.js";
+export * from "./StubConcept.js";
+export * from "./StubConceptScheme.js";
+export * from "./StubLabeledModel.js";
 export * from "./mapResultRowsToCount.js";
 export * from "./mapResultRowsToIdentifiers.js";
