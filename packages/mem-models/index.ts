@@ -8,3 +8,7 @@ export * from "./Model.js";
 export * from "./ModelFactory.js";
 export * from "./countIterable.js";
 export * from "./matchLiteral.js";
+export * from "./StubConcept.js";
+export * from "./StubConceptScheme.js";
+export * from "./StubLabeledModel.js";
+export * from "./StubModel.js";
