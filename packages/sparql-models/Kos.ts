@@ -10,6 +10,8 @@ import { mapResultRowsToCount } from "./mapResultRowsToCount.js";
 import { mapResultRowsToIdentifiers } from "./mapResultRowsToIdentifiers.js";
 import { paginationToAsyncIterable } from "./paginationToAsyncIterable.js";
 import { Maybe } from "purify-ts";
+import { StubConcept } from "./StubConcept.js";
+import { StubConceptScheme } from "./StubConceptScheme.js";
 
 export class Kos<
   SparqlConceptT extends IConcept,
@@ -36,12 +38,13 @@ export class Kos<
     this.sparqlClient = sparqlClient;
   }
 
-  async conceptByIdentifier(
+  conceptByIdentifier(
     identifier: IConcept.Identifier,
   ): Promise<Maybe<SparqlConceptT>> {
-    return (
-      await this.modelFetcher.fetchConceptsByIdentifiers([identifier])
-    )[0];
+    return new StubConcept({
+      identifier,
+      modelFetcher: this.modelFetcher,
+    }).resolve();
   }
 
   private async conceptIdentifiersPage({
@@ -63,7 +66,9 @@ OFFSET ${offset}`),
     );
   }
 
-  async *concepts(): AsyncIterable<SparqlConceptT> {
+  async *concepts(): AsyncIterable<
+    StubConcept<SparqlConceptT, SparqlConceptSchemeT>
+  > {
     yield* paginationToAsyncIterable({
       getPage: ({ offset }) => this.conceptsPage({ limit: 100, offset }),
       totalCount: await this.conceptsCount(),
@@ -94,23 +99,28 @@ WHERE {
   }: {
     limit: number;
     offset: number;
-  }): Promise<readonly SparqlConceptT[]> {
+  }): Promise<readonly StubConcept<SparqlConceptT, SparqlConceptSchemeT>[]> {
     return (
-      await this.modelFetcher.fetchConceptsByIdentifiers(
-        await this.conceptIdentifiersPage({
-          limit,
-          offset,
+      await this.conceptIdentifiersPage({
+        limit,
+        offset,
+      })
+    ).map(
+      (identifier) =>
+        new StubConcept({
+          identifier,
+          modelFetcher: this.modelFetcher,
         }),
-      )
-    ).flatMap((concept) => concept.toList());
+    );
   }
 
-  async conceptSchemeByIdentifier(
+  conceptSchemeByIdentifier(
     identifier: IConceptScheme.Identifier,
   ): Promise<Maybe<SparqlConceptSchemeT>> {
-    return (
-      await this.modelFetcher.fetchConceptSchemesByIdentifiers([identifier])
-    )[0];
+    return new StubConceptScheme({
+      identifier,
+      modelFetcher: this.modelFetcher,
+    }).resolve();
   }
 
   private async conceptSchemeIdentifiers(): Promise<
@@ -126,11 +136,12 @@ WHERE {
     );
   }
 
-  async conceptSchemes(): Promise<readonly SparqlConceptSchemeT[]> {
-    return (
-      await this.modelFetcher.fetchConceptSchemesByIdentifiers(
-        await this.conceptSchemeIdentifiers(),
-      )
-    ).flatMap((conceptScheme) => conceptScheme.toList());
+  async conceptSchemes(): Promise<
+    readonly StubConceptScheme<SparqlConceptT, SparqlConceptSchemeT>[]
+  > {
+    return (await this.conceptSchemeIdentifiers()).map(
+      (identifier) =>
+        new StubConceptScheme({ identifier, modelFetcher: this.modelFetcher }),
+    );
   }
 }

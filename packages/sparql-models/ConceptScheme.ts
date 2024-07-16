@@ -1,5 +1,4 @@
 import {
-  Concept,
   Concept as IConcept,
   ConceptScheme as IConceptScheme,
 } from "@kos-kit/models";
@@ -9,6 +8,7 @@ import { LabeledModel } from "./LabeledModel.js";
 import { mapResultRowsToCount } from "./mapResultRowsToCount.js";
 import { mapResultRowsToIdentifiers } from "./mapResultRowsToIdentifiers.js";
 import { paginationToAsyncIterable } from "./paginationToAsyncIterable.js";
+import { StubConcept } from "./StubConcept.js";
 import { Maybe } from "purify-ts";
 
 export class ConceptScheme<
@@ -19,7 +19,11 @@ export class ConceptScheme<
   extends LabeledModel<MemConceptSchemeT, SparqlConceptT, SparqlConceptSchemeT>
   implements IConceptScheme
 {
-  async *_concepts({ topOnly }: { topOnly: boolean }): AsyncIterable<Concept> {
+  async *_concepts({
+    topOnly,
+  }: {
+    topOnly: boolean;
+  }): AsyncIterable<StubConcept<SparqlConceptT, SparqlConceptSchemeT>> {
     yield* paginationToAsyncIterable({
       getPage: ({ offset }) =>
         this._conceptsPage({ limit: 100, offset, topOnly }),
@@ -46,23 +50,27 @@ WHERE {
     limit: number;
     offset: number;
     topOnly: boolean;
-  }): Promise<readonly Concept[]> {
-    return (
-      await this.modelFetcher.fetchConceptsByIdentifiers(
-        await this._conceptIdentifiersPage({ limit, offset, topOnly }),
-      )
-    ).flatMap((concept) => concept.toList());
+  }): Promise<readonly StubConcept<SparqlConceptT, SparqlConceptSchemeT>[]> {
+    return (await this._conceptIdentifiersPage({ limit, offset, topOnly })).map(
+      (identifier) =>
+        new StubConcept({
+          identifier,
+          modelFetcher: this.modelFetcher,
+        }),
+    );
   }
 
   async conceptByIdentifier(
     identifier: IConcept.Identifier,
-  ): Promise<Maybe<Concept>> {
-    return (
-      await this.modelFetcher.fetchConceptsByIdentifiers([identifier])
-    )[0];
+  ): Promise<Maybe<SparqlConceptT>> {
+    // TODO: verify it's part of the scheme
+    return new StubConcept({
+      identifier,
+      modelFetcher: this.modelFetcher,
+    }).resolve();
   }
 
-  concepts(): AsyncIterable<Concept> {
+  concepts(): AsyncIterable<StubConcept<SparqlConceptT, SparqlConceptSchemeT>> {
     return this._concepts({ topOnly: false });
   }
 
@@ -76,11 +84,13 @@ WHERE {
   }: {
     limit: number;
     offset: number;
-  }): Promise<readonly Concept[]> {
+  }): Promise<readonly StubConcept<SparqlConceptT, SparqlConceptSchemeT>[]> {
     return this._conceptsPage({ limit, offset, topOnly: false });
   }
 
-  topConcepts(): AsyncIterable<Concept> {
+  topConcepts(): AsyncIterable<
+    StubConcept<SparqlConceptT, SparqlConceptSchemeT>
+  > {
     return this._concepts({ topOnly: true });
   }
 
@@ -94,7 +104,7 @@ WHERE {
   }: {
     limit: number;
     offset: number;
-  }): Promise<readonly Concept[]> {
+  }): Promise<readonly StubConcept<SparqlConceptT, SparqlConceptSchemeT>[]> {
     return this._conceptsPage({ limit, offset, topOnly: true });
   }
 

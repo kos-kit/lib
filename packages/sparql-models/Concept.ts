@@ -10,6 +10,8 @@ import { skos } from "@tpluscode/rdf-ns-builders";
 import { LabeledModel } from "./LabeledModel.js";
 import { mapResultRowsToCount } from "./mapResultRowsToCount.js";
 import { mapResultRowsToIdentifiers } from "./mapResultRowsToIdentifiers.js";
+import { StubConceptScheme } from "./StubConceptScheme.js";
+import { StubConcept } from "./StubConcept.js";
 
 export class Concept<
     MemConceptT extends IConcept,
@@ -23,13 +25,13 @@ export class Concept<
     return this.memModel.notations;
   }
 
-  async inSchemes(): Promise<readonly SparqlConceptSchemeT[]> {
+  async inSchemes(): Promise<
+    readonly StubConceptScheme<SparqlConceptT, SparqlConceptSchemeT>[]
+  > {
     // Could do this in a single CONSTRUCT as an optimization. This code is simpler.
     const identifierString = Resource.Identifier.toString(this.identifier);
-    return (
-      await this.modelFetcher.fetchConceptSchemesByIdentifiers(
-        mapResultRowsToIdentifiers(
-          await this.sparqlClient.query.select(`
+    return mapResultRowsToIdentifiers(
+      await this.sparqlClient.query.select(`
 SELECT DISTINCT ?conceptScheme
 WHERE {
   { ${identifierString} <${skos.inScheme.value}> ?conceptScheme . }
@@ -38,10 +40,14 @@ WHERE {
   UNION
   { ?conceptScheme <${skos.hasTopConcept.value}> ${identifierString} . }
 }`),
-          "conceptScheme",
-        ),
-      )
-    ).flatMap((concept) => concept.toList());
+      "conceptScheme",
+    ).map(
+      (identifier) =>
+        new StubConceptScheme({
+          identifier,
+          modelFetcher: this.modelFetcher,
+        }),
+    );
   }
 
   notes(property: NoteProperty): readonly Literal[] {
@@ -50,20 +56,19 @@ WHERE {
 
   async semanticRelations(
     property: SemanticRelationProperty,
-  ): Promise<readonly SparqlConceptT[]> {
+  ): Promise<readonly StubConcept<SparqlConceptT, SparqlConceptSchemeT>[]> {
     // Could do this in a single CONSTRUCT as an optimization. This code is simpler.
-    return (
-      await this.modelFetcher.fetchConceptsByIdentifiers(
-        mapResultRowsToIdentifiers(
-          await this.sparqlClient.query.select(`
+    return mapResultRowsToIdentifiers(
+      await this.sparqlClient.query.select(`
 SELECT DISTINCT ?concept
 WHERE {
   ${Resource.Identifier.toString(this.identifier)} <${property.identifier.value}> ?concept .
 }`),
-          "concept",
-        ),
-      )
-    ).flatMap((concept) => concept.toList());
+      "concept",
+    ).map(
+      (identifier) =>
+        new StubConcept({ identifier, modelFetcher: this.modelFetcher }),
+    );
   }
 
   async semanticRelationsCount(
@@ -79,21 +84,22 @@ ${Resource.Identifier.toString(this.identifier)} <${property.identifier.value}> 
     );
   }
 
-  async topConceptOf(): Promise<readonly SparqlConceptSchemeT[]> {
+  async topConceptOf(): Promise<
+    readonly StubConceptScheme<SparqlConceptT, SparqlConceptSchemeT>[]
+  > {
     const identifierString = Resource.Identifier.toString(this.identifier);
-    return (
-      await this.modelFetcher.fetchConceptSchemesByIdentifiers(
-        mapResultRowsToIdentifiers(
-          await this.sparqlClient.query.select(`
+    return mapResultRowsToIdentifiers(
+      await this.sparqlClient.query.select(`
 SELECT DISTINCT ?conceptScheme
 WHERE {
   { ?conceptScheme <${skos.hasTopConcept.value}> ${identifierString} . }
   UNION
   { ${identifierString} <${skos.topConceptOf.value}> ?conceptScheme . }
 }`),
-          "conceptScheme",
-        ),
-      )
-    ).flatMap((concept) => concept.toList());
+      "conceptScheme",
+    ).map(
+      (identifier) =>
+        new StubConceptScheme({ identifier, modelFetcher: this.modelFetcher }),
+    );
   }
 }
