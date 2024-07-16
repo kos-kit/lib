@@ -21,6 +21,8 @@ export abstract class LabeledModel<
   extends Model<NamedNode>
   implements ILabeledModel
 {
+  readonly stub = false;
+
   protected readonly modelFactory: ModelFactory<
     ConceptT,
     ConceptSchemeT,

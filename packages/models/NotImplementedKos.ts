@@ -2,6 +2,8 @@ import { Concept } from "./Concept.js";
 import { ConceptScheme } from "./ConceptScheme.js";
 import { Kos } from "./Kos.js";
 import { Maybe } from "purify-ts";
+import { StubConceptScheme } from "./StubConceptScheme.js";
+import { StubConcept } from "./StubConcept.js";
 
 export class NotImplementedKos implements Kos {
   conceptByIdentifier(
@@ -16,11 +18,11 @@ export class NotImplementedKos implements Kos {
     throw new Error("Method not implemented.");
   }
 
-  conceptSchemes(): Promise<readonly ConceptScheme[]> {
+  conceptSchemes(): Promise<readonly StubConceptScheme[]> {
     throw new Error("Method not implemented.");
   }
 
-  concepts(): AsyncIterable<Concept> {
+  concepts(): AsyncIterable<StubConcept> {
     throw new Error("Method not implemented.");
   }
 
@@ -37,7 +39,7 @@ export class NotImplementedKos implements Kos {
   conceptsPage(_kwds: {
     limit: number;
     offset: number;
-  }): Promise<readonly Concept[]> {
+  }): Promise<readonly StubConcept[]> {
     throw new Error("Method not implemented.");
   }
 }

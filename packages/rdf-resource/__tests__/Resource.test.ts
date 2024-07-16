@@ -101,6 +101,6 @@ describe("Resource", () => {
       value.toTerm().toList(),
     );
     expect(values).toHaveLength(1);
-    expect(values[0].equals(objects["intLiteral"])).toBeTruthy();
+    expect(values[0].equals(objects["intLiteral"])).toBe(true);
   });
 });

@@ -9,19 +9,19 @@ export const behavesLikeKos = (kos: Kos) => {
     const firstConcepts = await kos.conceptsPage({ limit: 10, offset: 0 });
     expect(firstConcepts).toHaveLength(10);
     for (const firstConcept of firstConcepts) {
-      expectConcept(firstConcept);
+      expectConcept((await firstConcept.resolve()).extractNullable());
     }
 
     const nextConcepts = await kos.conceptsPage({ limit: 10, offset: 10 });
     expect(nextConcepts).toHaveLength(10);
     for (const nextConcept of nextConcepts) {
-      expectConcept(nextConcept);
+      expectConcept((await nextConcept.resolve()).extractNullable());
       expect(
         firstConcepts.every(
           (firstConcept) =>
             !firstConcept.identifier.equals(nextConcept.identifier),
         ),
-      ).toBeTruthy();
+      ).toBe(true);
     }
   });
 
@@ -30,12 +30,11 @@ export const behavesLikeKos = (kos: Kos) => {
       limit: 1,
       offset: 0,
     })) {
-      expectConcept(concept);
+      expectConcept((await concept.resolve()).extractNullable());
       const conceptByIdentifier = (
         await kos.conceptByIdentifier(concept.identifier)
       ).extractNullable();
-      expect(conceptByIdentifier).not.toBeNull();
-      expectConcept(conceptByIdentifier!);
+      expectConcept(conceptByIdentifier);
       expect(
         concept.identifier.equals(conceptByIdentifier!.identifier),
       ).toStrictEqual(true);
@@ -56,7 +55,7 @@ export const behavesLikeKos = (kos: Kos) => {
     expect(conceptsByIdentifiers).toHaveLength(5);
     conceptsPage.forEach((leftConcept, conceptI) => {
       const rightConcept = conceptsByIdentifiers[conceptI].extractNullable();
-      expect(rightConcept).not.toBeNull();
+      expect(rightConcept).toBeTruthy();
       expect(
         leftConcept.identifier.equals(rightConcept!.identifier),
       ).toStrictEqual(true);
@@ -70,17 +69,16 @@ export const behavesLikeKos = (kos: Kos) => {
   it("should get concept schemes", async () => {
     const conceptSchemes = await kos.conceptSchemes();
     expect(conceptSchemes).toHaveLength(1);
-    expectConceptScheme(conceptSchemes[0]);
+    expectConceptScheme((await conceptSchemes[0].resolve()).extractNullable());
   });
 
   it("should get a concept scheme by an identifier", async () => {
     for (const conceptScheme of await kos.conceptSchemes()) {
-      expectConceptScheme(conceptScheme);
+      expectConceptScheme((await conceptScheme.resolve()).extractNullable());
       const conceptSchemeByIdentifier = (
         await kos.conceptSchemeByIdentifier(conceptScheme.identifier)
       ).extractNullable();
-      expect(conceptSchemeByIdentifier).not.toBeNull();
-      expectConceptScheme(conceptSchemeByIdentifier!);
+      expectConceptScheme(conceptSchemeByIdentifier);
       expect(
         conceptScheme.identifier.equals(conceptSchemeByIdentifier!.identifier),
       ).toBeTruthy();

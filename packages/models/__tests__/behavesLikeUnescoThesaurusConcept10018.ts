@@ -116,13 +116,15 @@ export const behavesLikeUnescoThesaurusConcept10018 = (
     const conceptEn = await lazyConcept("en");
     const conceptFr = await lazyConcept("fr");
 
-    expect(conceptEn.notes(NoteProperty.SCOPE_NOTE)).toHaveLength(1);
-    expect(conceptEn.notes(NoteProperty.SCOPE_NOTE)[0].value).toStrictEqual(
+    const notesEn = await conceptEn.notes(NoteProperty.SCOPE_NOTE);
+    expect(notesEn).toHaveLength(1);
+    expect(notesEn[0].value).toStrictEqual(
       "An activity designed to identify, predict, interpret and communicate information concerning the environmental consequences of policies, projects etc.",
     );
 
-    expect(conceptFr.notes(NoteProperty.SCOPE_NOTE)).toHaveLength(1);
-    expect(conceptFr.notes(NoteProperty.SCOPE_NOTE)[0].value).toStrictEqual(
+    const notesFr = await conceptFr.notes(NoteProperty.SCOPE_NOTE);
+    expect(notesFr).toHaveLength(1);
+    expect(notesFr[0].value).toStrictEqual(
       "Activité destinée à identifier, prévoir, interpréter et communiquer l'information ayant trait aux conséquences de politiques, de projets, etc., sur l'environnement.",
     );
   });
