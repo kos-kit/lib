@@ -9,6 +9,7 @@ describe("mem.ConceptScheme", () => {
       .conceptSchemeByIdentifier(
         DataFactory.namedNode("http://vocabularies.unesco.org/thesaurus"),
       )
+      .resolve()
       .then((conceptScheme) =>
         conceptScheme.orDefaultLazy(() => {
           throw new Error("missing concept scheme");

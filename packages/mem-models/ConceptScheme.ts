@@ -11,6 +11,7 @@ import { LabeledModel } from "./LabeledModel.js";
 import { countIterable } from "./countIterable.js";
 import { paginateIterable } from "./paginateIterable.js";
 import { Just, Maybe, Nothing } from "purify-ts";
+import { StubConcept } from "./StubConcept.js";
 
 export class ConceptScheme<
     ConceptT extends IConcept,
@@ -20,11 +21,16 @@ export class ConceptScheme<
   extends LabeledModel<ConceptT, ConceptSchemeT, LabelT>
   implements IConceptScheme
 {
-  async *_concepts({ topOnly }: { topOnly: boolean }): AsyncIterable<ConceptT> {
+  async *_concepts({
+    topOnly,
+  }: {
+    topOnly: boolean;
+  }): AsyncIterable<StubConcept<ConceptT, ConceptSchemeT, LabelT>> {
     for await (const identifier of this._conceptIdentifiers({ topOnly })) {
-      yield this.modelFactory.createConcept(
-        new Resource({ dataset: this.dataset, identifier }),
-      );
+      yield new StubConcept({
+        modelFactory: this.modelFactory,
+        resource: new Resource({ dataset: this.dataset, identifier }),
+      });
     }
   }
 
@@ -32,35 +38,9 @@ export class ConceptScheme<
     return countIterable(this._conceptIdentifiers({ topOnly }));
   }
 
-  async _conceptsPage({
-    limit,
-    offset,
-    topOnly,
-  }: {
-    limit: number;
-    offset: number;
-    topOnly: boolean;
-  }): Promise<readonly ConceptT[]> {
-    const result: ConceptT[] = [];
-    for (const identifier of paginateIterable(
-      this._conceptIdentifiers({ topOnly }),
-      {
-        limit,
-        offset,
-      },
-    )) {
-      result.push(
-        this.modelFactory.createConcept(
-          new Resource({ dataset: this.dataset, identifier }),
-        ),
-      );
-    }
-    return result;
-  }
-
   async conceptByIdentifier(
     identifier: IConcept.Identifier,
-  ): Promise<Maybe<ConceptT>> {
+  ): Promise<Maybe<StubConcept<ConceptT, ConceptSchemeT, LabelT>>> {
     // conceptScheme skos:hasTopConcept resource entails resource is a skos:Concept because of
     // the range of skos:hasTopConcept
     for (const _ of this.resource.dataset.match(
@@ -69,9 +49,10 @@ export class ConceptScheme<
       identifier,
     )) {
       return Just(
-        this.modelFactory.createConcept(
-          new Resource({ dataset: this.dataset, identifier }),
-        ),
+        new StubConcept({
+          modelFactory: this.modelFactory,
+          resource: new Resource({ dataset: this.dataset, identifier }),
+        }),
       );
     }
 
@@ -94,9 +75,10 @@ export class ConceptScheme<
           })
         ) {
           return Just(
-            this.modelFactory.createConcept(
-              new Resource({ dataset: this.dataset, identifier }),
-            ),
+            new StubConcept({
+              modelFactory: this.modelFactory,
+              resource: new Resource({ dataset: this.dataset, identifier }),
+            }),
           );
         }
       }
@@ -105,7 +87,9 @@ export class ConceptScheme<
     return Nothing;
   }
 
-  async *concepts(): AsyncIterable<ConceptT> {
+  async *concepts(): AsyncIterable<
+    StubConcept<ConceptT, ConceptSchemeT, LabelT>
+  > {
     yield* this._concepts({ topOnly: false });
   }
 
@@ -116,11 +100,13 @@ export class ConceptScheme<
   conceptsPage(kwds: {
     limit: number;
     offset: number;
-  }): Promise<readonly ConceptT[]> {
+  }): Promise<readonly StubConcept<ConceptT, ConceptSchemeT, LabelT>[]> {
     return this._conceptsPage({ ...kwds, topOnly: false });
   }
 
-  async *topConcepts(): AsyncIterable<ConceptT> {
+  async *topConcepts(): AsyncIterable<
+    StubConcept<ConceptT, ConceptSchemeT, LabelT>
+  > {
     yield* this._concepts({ topOnly: true });
   }
 
@@ -131,7 +117,7 @@ export class ConceptScheme<
   topConceptsPage(kwds: {
     limit: number;
     offset: number;
-  }): Promise<readonly ConceptT[]> {
+  }): Promise<readonly StubConcept<ConceptT, ConceptSchemeT, LabelT>[]> {
     return this._conceptsPage({ ...kwds, topOnly: true });
   }
 
@@ -185,5 +171,32 @@ export class ConceptScheme<
         yield conceptIdentifier;
         conceptIdentifierSet.add(conceptIdentifier);
       }
+  }
+
+  private async _conceptsPage({
+    limit,
+    offset,
+    topOnly,
+  }: {
+    limit: number;
+    offset: number;
+    topOnly: boolean;
+  }): Promise<readonly StubConcept<ConceptT, ConceptSchemeT, LabelT>[]> {
+    const result: StubConcept<ConceptT, ConceptSchemeT, LabelT>[] = [];
+    for (const identifier of paginateIterable(
+      this._conceptIdentifiers({ topOnly }),
+      {
+        limit,
+        offset,
+      },
+    )) {
+      result.push(
+        new StubConcept({
+          modelFactory: this.modelFactory,
+          resource: new Resource({ dataset: this.dataset, identifier }),
+        }),
+      );
+    }
+    return result;
   }
 }

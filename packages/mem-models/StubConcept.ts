@@ -19,6 +19,7 @@ export class StubConcept<
 {
   async resolve(): Promise<Maybe<ConceptT>> {
     // If there's an rdf:type statement then consider that we have the concept.
+    // TODO: fetch all required fields here
     if (
       isRdfInstanceOf({
         class_: skos.Concept,

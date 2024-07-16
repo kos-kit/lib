@@ -5,13 +5,14 @@ import {
   Label as ILabel,
 } from "@kos-kit/models";
 import { Resource } from "@kos-kit/rdf-resource";
-import { getRdfNamedInstances, isRdfInstanceOf } from "@kos-kit/rdf-utils";
+import { getRdfNamedInstances } from "@kos-kit/rdf-utils";
 import { DatasetCore } from "@rdfjs/types";
 import { skos } from "@tpluscode/rdf-ns-builders";
 import { ModelFactory } from "./ModelFactory.js";
 import { countIterable } from "./countIterable.js";
 import { paginateIterable } from "./paginateIterable.js";
-import { Just, Maybe, Nothing } from "purify-ts";
+import { StubConcept } from "./StubConcept.js";
+import { StubConceptScheme } from "./StubConceptScheme.js";
 
 export class Kos<
   ConceptT extends IConcept,
@@ -34,62 +35,52 @@ export class Kos<
     this.modelFactory = modelFactory;
   }
 
-  _conceptByIdentifier(identifier: IConcept.Identifier): Maybe<ConceptT> {
-    if (
-      isRdfInstanceOf({
-        class_: skos.Concept,
-        dataset: this.dataset,
-        instance: identifier,
-      })
-    ) {
-      return Just(
-        this.modelFactory.createConcept(
-          new Resource({
-            dataset: this.dataset,
-            identifier,
-          }),
-        ),
-      );
-    } else {
-      return Nothing;
-    }
-  }
-
-  async conceptByIdentifier(
+  conceptByIdentifier(
     identifier: IConcept.Identifier,
-  ): Promise<Maybe<ConceptT>> {
-    return this._conceptByIdentifier(identifier);
+  ): StubConcept<ConceptT, ConceptSchemeT, LabelT> {
+    return new StubConcept({
+      modelFactory: this.modelFactory,
+      resource: new Resource({ dataset: this.dataset, identifier }),
+    });
   }
 
-  async conceptSchemeByIdentifier(
+  conceptSchemeByIdentifier(
     identifier: IConceptScheme.Identifier,
-  ): Promise<Maybe<ConceptSchemeT>> {
-    for (const conceptScheme of await this.conceptSchemes()) {
-      if (conceptScheme.identifier.equals(identifier)) {
-        return Just(conceptScheme);
-      }
-    }
-    return Nothing;
+  ): StubConceptScheme<ConceptT, ConceptSchemeT, LabelT> {
+    return new StubConceptScheme({
+      modelFactory: this.modelFactory,
+      resource: new Resource({ dataset: this.dataset, identifier }),
+    });
   }
 
-  async conceptSchemes(): Promise<readonly ConceptSchemeT[]> {
-    return [...this._conceptSchemes()];
-  }
-
-  async *concepts(): AsyncIterable<ConceptT> {
-    for await (const identifier of this.conceptIdentifiers()) {
-      yield this.modelFactory.createConcept(
-        new Resource({ dataset: this.dataset, identifier }),
+  async conceptSchemes(): Promise<
+    readonly StubConceptScheme<ConceptT, ConceptSchemeT, LabelT>[]
+  > {
+    const result: StubConceptScheme<ConceptT, ConceptSchemeT, LabelT>[] = [];
+    for (const identifier of getRdfNamedInstances({
+      class_: skos.ConceptScheme,
+      dataset: this.dataset,
+      includeSubclasses: true,
+    })) {
+      result.push(
+        new StubConceptScheme({
+          modelFactory: this.modelFactory,
+          resource: new Resource({ dataset: this.dataset, identifier }),
+        }),
       );
     }
+    return result;
   }
 
-  async conceptsByIdentifiers(
-    identifiers: readonly IConcept.Identifier[],
-  ): Promise<readonly Maybe<ConceptT>[]> {
-    return identifiers.map((identifier) =>
-      this._conceptByIdentifier(identifier),
-    );
+  async *concepts(): AsyncIterable<
+    StubConcept<ConceptT, ConceptSchemeT, LabelT>
+  > {
+    for await (const identifier of this.conceptIdentifiers()) {
+      yield new StubConcept({
+        modelFactory: this.modelFactory,
+        resource: new Resource({ dataset: this.dataset, identifier }),
+      });
+    }
   }
 
   async conceptsCount(): Promise<number> {
@@ -102,34 +93,20 @@ export class Kos<
   }: {
     limit: number;
     offset: number;
-  }): Promise<readonly ConceptT[]> {
-    const result: ConceptT[] = [];
+  }): Promise<readonly StubConcept<ConceptT, ConceptSchemeT, LabelT>[]> {
+    const result: StubConcept<ConceptT, ConceptSchemeT, LabelT>[] = [];
     for (const identifier of paginateIterable(this.conceptIdentifiers(), {
       limit,
       offset,
     })) {
       result.push(
-        this.modelFactory.createConcept(
-          new Resource({ dataset: this.dataset, identifier }),
-        ),
-      );
-    }
-    return result;
-  }
-
-  private *_conceptSchemes(): Iterable<ConceptSchemeT> {
-    for (const identifier of getRdfNamedInstances({
-      class_: skos.ConceptScheme,
-      dataset: this.dataset,
-      includeSubclasses: true,
-    })) {
-      yield this.modelFactory.createConceptScheme(
-        new Resource({
-          dataset: this.dataset,
-          identifier,
+        new StubConcept({
+          modelFactory: this.modelFactory,
+          resource: new Resource({ dataset: this.dataset, identifier }),
         }),
       );
     }
+    return result;
   }
 
   private *conceptIdentifiers(): Iterable<IConcept.Identifier> {

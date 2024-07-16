@@ -7,7 +7,6 @@ import {
 } from "@kos-kit/models";
 import { StubModel } from "./StubModel.js";
 import { ModelFactory } from "./ModelFactory.js";
-import { LabeledModel } from "./LabeledModel.js";
 
 export abstract class StubLabeledModel<
     ConceptT extends IConcept,
@@ -27,7 +26,9 @@ export abstract class StubLabeledModel<
   constructor({
     modelFactory,
     ...modelParameters
-  }: LabeledModel.Parameters<ConceptT, ConceptSchemeT, LabelT>) {
+  }: {
+    modelFactory: ModelFactory<ConceptT, ConceptSchemeT, LabelT>;
+  } & StubModel.Parameters<ILabeledModel.Identifier>) {
     super(modelParameters);
     this.modelFactory = modelFactory;
   }

@@ -9,7 +9,7 @@ export interface Concept extends LabeledModel {
   readonly notations: readonly Literal[];
 
   inSchemes(): Promise<readonly StubConceptScheme[]>;
-  notes(property: NoteProperty): Promise<readonly Literal[]>;
+  notes(property: NoteProperty): readonly Literal[];
   semanticRelations(
     property: SemanticRelationProperty,
   ): Promise<readonly StubConcept[]>;

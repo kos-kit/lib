@@ -1,20 +1,17 @@
 import { Concept } from "./Concept.js";
 import { ConceptScheme } from "./ConceptScheme.js";
 import { Kos } from "./Kos.js";
-import { Maybe } from "purify-ts";
 import { StubConceptScheme } from "./StubConceptScheme.js";
 import { StubConcept } from "./StubConcept.js";
 
 export class NotImplementedKos implements Kos {
-  conceptByIdentifier(
-    _identifier: Concept.Identifier,
-  ): Promise<Maybe<Concept>> {
+  conceptByIdentifier(_identifier: Concept.Identifier): StubConcept {
     throw new Error("Method not implemented.");
   }
 
   conceptSchemeByIdentifier(
     _identifier: ConceptScheme.Identifier,
-  ): Promise<Maybe<ConceptScheme>> {
+  ): StubConceptScheme {
     throw new Error("Method not implemented.");
   }
 
@@ -23,12 +20,6 @@ export class NotImplementedKos implements Kos {
   }
 
   concepts(): AsyncIterable<StubConcept> {
-    throw new Error("Method not implemented.");
-  }
-
-  conceptsByIdentifiers(
-    _identifiers: readonly Concept.Identifier[],
-  ): Promise<readonly Maybe<Concept>[]> {
     throw new Error("Method not implemented.");
   }
 

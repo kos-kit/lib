@@ -11,6 +11,8 @@ import { Literal } from "@rdfjs/types";
 import { skos } from "@tpluscode/rdf-ns-builders";
 import { LabeledModel } from "./LabeledModel.js";
 import { matchLiteral } from "./matchLiteral.js";
+import { StubConceptScheme } from "./StubConceptScheme.js";
+import { StubConcept } from "./StubConcept.js";
 
 export class Concept<
     ConceptT extends IConcept,
@@ -26,7 +28,9 @@ export class Concept<
     );
   }
 
-  async inSchemes(): Promise<readonly ConceptSchemeT[]> {
+  async inSchemes(): Promise<
+    readonly StubConceptScheme<ConceptT, ConceptSchemeT, LabelT>[]
+  > {
     return this._inSchemes({ topOnly: false });
   }
 
@@ -45,14 +49,16 @@ export class Concept<
 
   async semanticRelations(
     property: SemanticRelationProperty,
-  ): Promise<readonly ConceptT[]> {
+  ): Promise<readonly StubConcept<ConceptT, ConceptSchemeT, LabelT>[]> {
     return [...this.resource.values(property.identifier)].flatMap((value) =>
       value
         .toIri()
-        .map((identifier) =>
-          this.modelFactory.createConcept(
-            new Resource({ dataset: this.dataset, identifier }),
-          ),
+        .map(
+          (identifier) =>
+            new StubConcept({
+              modelFactory: this.modelFactory,
+              resource: new Resource({ dataset: this.dataset, identifier }),
+            }),
         )
         .toList(),
     );
@@ -67,7 +73,9 @@ export class Concept<
     );
   }
 
-  async topConceptOf(): Promise<readonly ConceptSchemeT[]> {
+  async topConceptOf(): Promise<
+    readonly StubConceptScheme<ConceptT, ConceptSchemeT, LabelT>[]
+  > {
     return this._inSchemes({ topOnly: true });
   }
 
@@ -75,7 +83,7 @@ export class Concept<
     topOnly,
   }: {
     topOnly: boolean;
-  }): readonly ConceptSchemeT[] {
+  }): readonly StubConceptScheme<ConceptT, ConceptSchemeT, LabelT>[] {
     const conceptSchemeIdentifiers = new TermSet<IConceptScheme.Identifier>();
 
     for (const quad of this.resource.dataset.match(
@@ -106,10 +114,12 @@ export class Concept<
       }
     }
 
-    return [...conceptSchemeIdentifiers].map((identifier) =>
-      this.modelFactory.createConceptScheme(
-        new Resource({ dataset: this.dataset, identifier }),
-      ),
+    return [...conceptSchemeIdentifiers].map(
+      (identifier) =>
+        new StubConceptScheme({
+          modelFactory: this.modelFactory,
+          resource: new Resource({ dataset: this.dataset, identifier }),
+        }),
     );
   }
 }
