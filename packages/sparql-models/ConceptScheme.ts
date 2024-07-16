@@ -9,7 +9,7 @@ import { mapResultRowsToCount } from "./mapResultRowsToCount.js";
 import { mapResultRowsToIdentifiers } from "./mapResultRowsToIdentifiers.js";
 import { paginationToAsyncIterable } from "./paginationToAsyncIterable.js";
 import { StubConcept } from "./StubConcept.js";
-import { Maybe } from "purify-ts";
+import { Just, Maybe } from "purify-ts";
 
 export class ConceptScheme<
     MemConceptSchemeT extends IConceptScheme,
@@ -62,12 +62,14 @@ WHERE {
 
   async conceptByIdentifier(
     identifier: IConcept.Identifier,
-  ): Promise<Maybe<SparqlConceptT>> {
+  ): Promise<Maybe<StubConcept<SparqlConceptT, SparqlConceptSchemeT>>> {
     // TODO: verify it's part of the scheme
-    return new StubConcept({
-      identifier,
-      modelFetcher: this.modelFetcher,
-    }).resolve();
+    return Just(
+      new StubConcept({
+        identifier,
+        modelFetcher: this.modelFetcher,
+      }),
+    );
   }
 
   concepts(): AsyncIterable<StubConcept<SparqlConceptT, SparqlConceptSchemeT>> {

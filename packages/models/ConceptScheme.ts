@@ -4,7 +4,9 @@ import { LabeledModel } from "./LabeledModel.js";
 import { StubConcept } from "./StubConcept.js";
 
 export interface ConceptScheme extends LabeledModel {
-  conceptByIdentifier(identifier: Concept.Identifier): Promise<Maybe<Concept>>;
+  conceptByIdentifier(
+    identifier: Concept.Identifier,
+  ): Promise<Maybe<StubConcept>>;
   concepts(): AsyncIterable<StubConcept>;
   conceptsCount(): Promise<number>;
   conceptsPage(kwds: {

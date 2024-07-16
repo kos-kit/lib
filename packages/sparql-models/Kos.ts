@@ -9,7 +9,6 @@ import { SparqlClient } from "./SparqlClient.js";
 import { mapResultRowsToCount } from "./mapResultRowsToCount.js";
 import { mapResultRowsToIdentifiers } from "./mapResultRowsToIdentifiers.js";
 import { paginationToAsyncIterable } from "./paginationToAsyncIterable.js";
-import { Maybe } from "purify-ts";
 import { StubConcept } from "./StubConcept.js";
 import { StubConceptScheme } from "./StubConceptScheme.js";
 
@@ -40,11 +39,11 @@ export class Kos<
 
   conceptByIdentifier(
     identifier: IConcept.Identifier,
-  ): Promise<Maybe<SparqlConceptT>> {
+  ): StubConcept<SparqlConceptT, SparqlConceptSchemeT> {
     return new StubConcept({
       identifier,
       modelFetcher: this.modelFetcher,
-    }).resolve();
+    });
   }
 
   private async conceptIdentifiersPage({
@@ -110,11 +109,11 @@ WHERE {
 
   conceptSchemeByIdentifier(
     identifier: IConceptScheme.Identifier,
-  ): Promise<Maybe<SparqlConceptSchemeT>> {
+  ): StubConceptScheme<SparqlConceptT, SparqlConceptSchemeT> {
     return new StubConceptScheme({
       identifier,
       modelFetcher: this.modelFetcher,
-    }).resolve();
+    });
   }
 
   private async conceptSchemeIdentifiers(): Promise<

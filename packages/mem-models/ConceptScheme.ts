@@ -10,7 +10,7 @@ import { skos } from "@tpluscode/rdf-ns-builders";
 import { LabeledModel } from "./LabeledModel.js";
 import { countIterable } from "./countIterable.js";
 import { paginateIterable } from "./paginateIterable.js";
-import { Maybe, Nothing } from "purify-ts";
+import { Just, Maybe, Nothing } from "purify-ts";
 import { StubConcept } from "./StubConcept.js";
 
 export class ConceptScheme<
@@ -40,7 +40,7 @@ export class ConceptScheme<
 
   async conceptByIdentifier(
     identifier: IConcept.Identifier,
-  ): Promise<Maybe<ConceptT>> {
+  ): Promise<Maybe<StubConcept<ConceptT, ConceptSchemeT, LabelT>>> {
     // conceptScheme skos:hasTopConcept resource entails resource is a skos:Concept because of
     // the range of skos:hasTopConcept
     for (const _ of this.resource.dataset.match(
@@ -48,10 +48,12 @@ export class ConceptScheme<
       skos.hasTopConcept,
       identifier,
     )) {
-      return new StubConcept({
-        modelFactory: this.modelFactory,
-        resource: new Resource({ dataset: this.dataset, identifier }),
-      }).resolve();
+      return Just(
+        new StubConcept({
+          modelFactory: this.modelFactory,
+          resource: new Resource({ dataset: this.dataset, identifier }),
+        }),
+      );
     }
 
     // resource skos:topConceptOf conceptScheme entails resource is a skos:Concept because of the
@@ -72,10 +74,12 @@ export class ConceptScheme<
             instance: identifier,
           })
         ) {
-          return new StubConcept({
-            modelFactory: this.modelFactory,
-            resource: new Resource({ dataset: this.dataset, identifier }),
-          }).resolve();
+          return Just(
+            new StubConcept({
+              modelFactory: this.modelFactory,
+              resource: new Resource({ dataset: this.dataset, identifier }),
+            }),
+          );
         }
       }
     }
