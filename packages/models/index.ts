@@ -13,7 +13,4 @@ export * from "./NoteProperty.js";
 export * from "./NotImplementedKos.js";
 export * from "./semanticRelationProperties.js";
 export * from "./SemanticRelationProperty.js";
-export * from "./StubConcept.js";
-export * from "./StubConceptScheme.js";
-export * from "./StubLabeledModel.js";
-export * from "./StubModel.js";
+export * from "./Stub.js";

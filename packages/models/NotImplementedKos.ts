@@ -1,25 +1,24 @@
 import { Concept } from "./Concept.js";
 import { ConceptScheme } from "./ConceptScheme.js";
 import { Kos } from "./Kos.js";
-import { StubConceptScheme } from "./StubConceptScheme.js";
-import { StubConcept } from "./StubConcept.js";
+import { Stub } from "./Stub.js";
 
 export class NotImplementedKos implements Kos {
-  conceptByIdentifier(_identifier: Concept.Identifier): StubConcept {
+  conceptByIdentifier(_identifier: Concept.Identifier): Stub<Concept> {
     throw new Error("Method not implemented.");
   }
 
   conceptSchemeByIdentifier(
     _identifier: ConceptScheme.Identifier,
-  ): StubConceptScheme {
+  ): Stub<ConceptScheme> {
     throw new Error("Method not implemented.");
   }
 
-  conceptSchemes(): Promise<readonly StubConceptScheme[]> {
+  conceptSchemes(): Promise<readonly Stub<ConceptScheme>[]> {
     throw new Error("Method not implemented.");
   }
 
-  concepts(): AsyncIterable<StubConcept> {
+  concepts(): AsyncIterable<Stub<Concept>> {
     throw new Error("Method not implemented.");
   }
 
@@ -30,7 +29,7 @@ export class NotImplementedKos implements Kos {
   conceptsPage(_kwds: {
     limit: number;
     offset: number;
-  }): Promise<readonly StubConcept[]> {
+  }): Promise<readonly Stub<Concept>[]> {
     throw new Error("Method not implemented.");
   }
 }

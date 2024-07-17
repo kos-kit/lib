@@ -1,24 +1,24 @@
 import { Maybe } from "purify-ts";
 import { Concept } from "./Concept.js";
 import { LabeledModel } from "./LabeledModel.js";
-import { StubConcept } from "./StubConcept.js";
+import { Stub } from "./Stub.js";
 
 export interface ConceptScheme extends LabeledModel {
   conceptByIdentifier(
     identifier: Concept.Identifier,
-  ): Promise<Maybe<StubConcept>>;
-  concepts(): AsyncIterable<StubConcept>;
+  ): Promise<Maybe<Stub<Concept>>>;
+  concepts(): AsyncIterable<Stub<Concept>>;
   conceptsCount(): Promise<number>;
   conceptsPage(kwds: {
     limit: number;
     offset: number;
-  }): Promise<readonly StubConcept[]>;
-  topConcepts(): AsyncIterable<StubConcept>;
+  }): Promise<readonly Stub<Concept>[]>;
+  topConcepts(): AsyncIterable<Stub<Concept>>;
   topConceptsCount(): Promise<number>;
   topConceptsPage(kwds: {
     limit: number;
     offset: number;
-  }): Promise<readonly StubConcept[]>;
+  }): Promise<readonly Stub<Concept>[]>;
 }
 
 export namespace ConceptScheme {

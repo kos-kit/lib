@@ -2,19 +2,19 @@ import { Literal } from "@rdfjs/types";
 import { LabeledModel } from "./LabeledModel.js";
 import { NoteProperty } from "./NoteProperty.js";
 import { SemanticRelationProperty } from "./SemanticRelationProperty.js";
-import { StubConcept } from "./StubConcept.js";
-import { StubConceptScheme } from "./StubConceptScheme.js";
+import { ConceptScheme } from "./ConceptScheme.js";
+import { Stub } from "./Stub.js";
 
 export interface Concept extends LabeledModel {
   readonly notations: readonly Literal[];
 
-  inSchemes(): Promise<readonly StubConceptScheme[]>;
+  inSchemes(): Promise<readonly Stub<ConceptScheme>[]>;
   notes(property: NoteProperty): readonly Literal[];
   semanticRelations(
     property: SemanticRelationProperty,
-  ): Promise<readonly StubConcept[]>;
+  ): Promise<readonly Stub<Concept>[]>;
   semanticRelationsCount(property: SemanticRelationProperty): Promise<number>;
-  topConceptOf(): Promise<readonly StubConceptScheme[]>;
+  topConceptOf(): Promise<readonly Stub<ConceptScheme>[]>;
 }
 
 export namespace Concept {

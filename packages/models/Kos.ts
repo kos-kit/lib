@@ -1,18 +1,17 @@
 import { Concept } from "./Concept.js";
 import { ConceptScheme } from "./ConceptScheme.js";
-import { StubConceptScheme } from "./StubConceptScheme.js";
-import { StubConcept } from "./StubConcept.js";
+import { Stub } from "./Stub.js";
 
 export interface Kos {
-  conceptByIdentifier(identifier: Concept.Identifier): StubConcept;
+  conceptByIdentifier(identifier: Concept.Identifier): Stub<Concept>;
   conceptSchemeByIdentifier(
     identifier: ConceptScheme.Identifier,
-  ): StubConceptScheme;
-  conceptSchemes(): Promise<readonly StubConceptScheme[]>;
-  concepts(): AsyncIterable<StubConcept>;
+  ): Stub<ConceptScheme>;
+  conceptSchemes(): Promise<readonly Stub<ConceptScheme>[]>;
+  concepts(): AsyncIterable<Stub<Concept>>;
   conceptsCount(): Promise<number>;
   conceptsPage(kwds: {
     limit: number;
     offset: number;
-  }): Promise<readonly StubConcept[]>;
+  }): Promise<readonly Stub<Concept>[]>;
 }
