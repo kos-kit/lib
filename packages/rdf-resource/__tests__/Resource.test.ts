@@ -103,4 +103,31 @@ describe("Resource", () => {
     expect(values).toHaveLength(1);
     expect(values[0].equals(objects["intLiteral"])).toBe(true);
   });
+
+  it("should get a valueOf", () => {
+    const resourceValues = [...resource.values(predicate)].flatMap((value) =>
+      value.toResource().toList(),
+    );
+    expect(resourceValues).toHaveLength(2);
+    for (const resourceValue of resourceValues) {
+      expect(
+        resourceValue
+          .valueOf(predicate)
+          .unsafeCoerce()
+          .identifier.equals(resource.identifier),
+      ).toBe(true);
+    }
+  });
+
+  it("should get a valuesOf", () => {
+    const resourceValues = [...resource.values(predicate)].flatMap((value) =>
+      value.toResource().toList(),
+    );
+    expect(resourceValues).toHaveLength(2);
+    for (const resourceValue of resourceValues) {
+      const valuesOf = [...resourceValue.valuesOf(predicate)];
+      expect(valuesOf).toHaveLength(1);
+      expect(valuesOf[0].identifier.equals(resource.identifier)).toBe(true);
+    }
+  });
 });

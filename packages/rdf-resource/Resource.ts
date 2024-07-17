@@ -210,6 +210,9 @@ export class Resource<
     this.identifier = identifier;
   }
 
+  /**
+   * Get the first value/object of dataset statements (this.identifier, property, value).
+   */
   value(property: NamedNode): Resource.Value {
     for (const value of this.values(property)) {
       return value;
@@ -217,6 +220,19 @@ export class Resource<
     return nothingResourceValue;
   }
 
+  /**
+   * Get the first subject of dataset statements (subject, property, this.identifier).
+   */
+  valueOf(property: NamedNode): Maybe<Resource> {
+    for (const resource of this.valuesOf(property)) {
+      return Just(resource);
+    }
+    return Nothing;
+  }
+
+  /**
+   * Get all values/objects of dataset statements (this.identifier, property, value).
+   */
   *values(property: NamedNode): Iterable<Resource.Value> {
     for (const quad of this.dataset.match(
       this.identifier,
@@ -225,12 +241,34 @@ export class Resource<
       null,
     )) {
       switch (quad.object.termType) {
-        case "Quad":
-        case "Variable":
-          continue;
+        case "BlankNode":
+        case "Literal":
+        case "NamedNode":
+          yield new SomeResourceValue(quad.object, this);
+          break;
       }
+    }
+  }
 
-      yield new SomeResourceValue(quad.object, this);
+  /**
+   * Get the first subject of dataset statements (subject, property, this.identifier).
+   */
+  *valuesOf(property: NamedNode): Iterable<Resource> {
+    for (const quad of this.dataset.match(
+      null,
+      property,
+      this.identifier,
+      null,
+    )) {
+      switch (quad.subject.termType) {
+        case "BlankNode":
+        case "NamedNode":
+          yield new Resource({
+            dataset: this.dataset,
+            identifier: quad.subject,
+          });
+          break;
+      }
     }
   }
 }
