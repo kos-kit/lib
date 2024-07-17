@@ -199,6 +199,14 @@ class SomeResourceValue implements Resource.Value {
   }
 }
 
+function defaultValueOfFilter(_subject: Resource): boolean {
+  return true;
+}
+
+function defaultValueFilter(_value: Resource.Value): boolean {
+  return true;
+}
+
 export class Resource<
   IdentifierT extends Resource.Identifier = Resource.Identifier,
 > {
@@ -211,19 +219,33 @@ export class Resource<
   }
 
   /**
-   * Get the first value/object of dataset statements (this.identifier, property, value).
+   * Get the first matching value of dataset statements (this.identifier, property, value).
    */
-  value(property: NamedNode): Resource.Value {
+  value(
+    property: NamedNode,
+    filter?: (value: Resource.Value) => boolean,
+  ): Resource.Value {
+    if (!filter) {
+      filter = defaultValueFilter;
+    }
     for (const value of this.values(property)) {
-      return value;
+      if (filter(value)) {
+        return value;
+      }
     }
     return nothingResourceValue;
   }
 
   /**
-   * Get the first subject of dataset statements (subject, property, this.identifier).
+   * Get the first matching subject of dataset statements (subject, property, this.identifier).
    */
-  valueOf(property: NamedNode): Maybe<Resource> {
+  valueOf(
+    property: NamedNode,
+    filter?: (subject: Resource) => boolean,
+  ): Maybe<Resource> {
+    if (!filter) {
+      filter = defaultValueOfFilter;
+    }
     for (const resource of this.valuesOf(property)) {
       return Just(resource);
     }
@@ -231,7 +253,7 @@ export class Resource<
   }
 
   /**
-   * Get all values/objects of dataset statements (this.identifier, property, value).
+   * Get all values of dataset statements (this.identifier, property, value).
    */
   *values(property: NamedNode): Generator<Resource.Value> {
     for (const quad of this.dataset.match(
