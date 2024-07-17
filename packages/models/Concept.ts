@@ -21,7 +21,7 @@ export namespace Concept {
   export type Identifier = LabeledModel.Identifier;
 
   export namespace Identifier {
-    export const fromString = LabeledModel.fromString;
-    export const toString = LabeledModel.toString;
+    export const fromString = LabeledModel.Identifier.fromString;
+    export const toString = LabeledModel.Identifier.toString;
   }
 }

@@ -25,26 +25,28 @@ export interface LabeledModel extends Model {
 export namespace LabeledModel {
   export type Identifier = NamedNode;
 
-  export function fromString({
-    dataFactory,
-    identifier,
-  }: {
-    dataFactory: DataFactory;
-    identifier: string;
-  }): Identifier {
-    if (
-      identifier.startsWith("<") &&
-      identifier.endsWith(">") &&
-      identifier.length > 2
-    ) {
-      return dataFactory.namedNode(
-        identifier.substring(1, identifier.length - 1),
-      );
+  export namespace Identifier {
+    export function fromString({
+      dataFactory,
+      identifier,
+    }: {
+      dataFactory: DataFactory;
+      identifier: string;
+    }): Identifier {
+      if (
+        identifier.startsWith("<") &&
+        identifier.endsWith(">") &&
+        identifier.length > 2
+      ) {
+        return dataFactory.namedNode(
+          identifier.substring(1, identifier.length - 1),
+        );
+      }
+      throw new RangeError(identifier);
     }
-    throw new RangeError(identifier);
-  }
 
-  export function toString(identifier: Identifier): string {
-    return `<${identifier.value}>`;
+    export function toString(identifier: Identifier): string {
+      return `<${identifier.value}>`;
+    }
   }
 }
