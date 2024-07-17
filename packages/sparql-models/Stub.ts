@@ -2,16 +2,16 @@ import {
   Concept as IConcept,
   ConceptScheme as IConceptScheme,
   LabeledModel as ILabeledModel,
-  StubLabeledModel as IStubLabeledModel,
+  Stub as IStub,
 } from "@kos-kit/models";
 import { ModelFetcher } from "./ModelFetcher.js";
 import { Maybe } from "purify-ts";
 
-export abstract class StubLabeledModel<
+export abstract class Stub<
   SparqlConceptT extends IConcept,
   SparqlConceptSchemeT extends IConceptScheme,
   LabeledModelT extends ILabeledModel,
-> implements IStubLabeledModel<LabeledModelT>
+> implements IStub<LabeledModelT>
 {
   readonly identifier: ILabeledModel.Identifier;
   protected readonly modelFetcher: ModelFetcher<

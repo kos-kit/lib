@@ -10,8 +10,8 @@ import { skos } from "@tpluscode/rdf-ns-builders";
 import { LabeledModel } from "./LabeledModel.js";
 import { mapResultRowsToCount } from "./mapResultRowsToCount.js";
 import { mapResultRowsToIdentifiers } from "./mapResultRowsToIdentifiers.js";
-import { StubConceptScheme } from "./StubConceptScheme.js";
-import { StubConcept } from "./StubConcept.js";
+import { ConceptSchemeStub } from "./ConceptSchemeStub.js";
+import { ConceptStub } from "./ConceptStub.js";
 
 export class Concept<
     MemConceptT extends IConcept,
@@ -26,7 +26,7 @@ export class Concept<
   }
 
   async inSchemes(): Promise<
-    readonly StubConceptScheme<SparqlConceptT, SparqlConceptSchemeT>[]
+    readonly ConceptSchemeStub<SparqlConceptT, SparqlConceptSchemeT>[]
   > {
     // Could do this in a single CONSTRUCT as an optimization. This code is simpler.
     const identifierString = Resource.Identifier.toString(this.identifier);
@@ -43,7 +43,7 @@ WHERE {
       "conceptScheme",
     ).map(
       (identifier) =>
-        new StubConceptScheme({
+        new ConceptSchemeStub({
           identifier,
           modelFetcher: this.modelFetcher,
         }),
@@ -56,7 +56,7 @@ WHERE {
 
   async semanticRelations(
     property: SemanticRelationProperty,
-  ): Promise<readonly StubConcept<SparqlConceptT, SparqlConceptSchemeT>[]> {
+  ): Promise<readonly ConceptStub<SparqlConceptT, SparqlConceptSchemeT>[]> {
     // Could do this in a single CONSTRUCT as an optimization. This code is simpler.
     return mapResultRowsToIdentifiers(
       await this.sparqlClient.query.select(`
@@ -67,7 +67,7 @@ WHERE {
       "concept",
     ).map(
       (identifier) =>
-        new StubConcept({ identifier, modelFetcher: this.modelFetcher }),
+        new ConceptStub({ identifier, modelFetcher: this.modelFetcher }),
     );
   }
 
@@ -85,7 +85,7 @@ ${Resource.Identifier.toString(this.identifier)} <${property.identifier.value}> 
   }
 
   async topConceptOf(): Promise<
-    readonly StubConceptScheme<SparqlConceptT, SparqlConceptSchemeT>[]
+    readonly ConceptSchemeStub<SparqlConceptT, SparqlConceptSchemeT>[]
   > {
     const identifierString = Resource.Identifier.toString(this.identifier);
     return mapResultRowsToIdentifiers(
@@ -99,7 +99,7 @@ WHERE {
       "conceptScheme",
     ).map(
       (identifier) =>
-        new StubConceptScheme({ identifier, modelFetcher: this.modelFetcher }),
+        new ConceptSchemeStub({ identifier, modelFetcher: this.modelFetcher }),
     );
   }
 }

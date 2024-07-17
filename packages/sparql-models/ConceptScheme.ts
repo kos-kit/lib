@@ -8,7 +8,7 @@ import { LabeledModel } from "./LabeledModel.js";
 import { mapResultRowsToCount } from "./mapResultRowsToCount.js";
 import { mapResultRowsToIdentifiers } from "./mapResultRowsToIdentifiers.js";
 import { paginationToAsyncIterable } from "./paginationToAsyncIterable.js";
-import { StubConcept } from "./StubConcept.js";
+import { ConceptStub } from "./ConceptStub.js";
 import { Just, Maybe } from "purify-ts";
 
 export class ConceptScheme<
@@ -23,7 +23,7 @@ export class ConceptScheme<
     topOnly,
   }: {
     topOnly: boolean;
-  }): AsyncIterable<StubConcept<SparqlConceptT, SparqlConceptSchemeT>> {
+  }): AsyncIterable<ConceptStub<SparqlConceptT, SparqlConceptSchemeT>> {
     yield* paginationToAsyncIterable({
       getPage: ({ offset }) =>
         this._conceptsPage({ limit: 100, offset, topOnly }),
@@ -50,10 +50,10 @@ WHERE {
     limit: number;
     offset: number;
     topOnly: boolean;
-  }): Promise<readonly StubConcept<SparqlConceptT, SparqlConceptSchemeT>[]> {
+  }): Promise<readonly ConceptStub<SparqlConceptT, SparqlConceptSchemeT>[]> {
     return (await this._conceptIdentifiersPage({ limit, offset, topOnly })).map(
       (identifier) =>
-        new StubConcept({
+        new ConceptStub({
           identifier,
           modelFetcher: this.modelFetcher,
         }),
@@ -62,17 +62,17 @@ WHERE {
 
   async conceptByIdentifier(
     identifier: IConcept.Identifier,
-  ): Promise<Maybe<StubConcept<SparqlConceptT, SparqlConceptSchemeT>>> {
+  ): Promise<Maybe<ConceptStub<SparqlConceptT, SparqlConceptSchemeT>>> {
     // TODO: verify it's part of the scheme
     return Just(
-      new StubConcept({
+      new ConceptStub({
         identifier,
         modelFetcher: this.modelFetcher,
       }),
     );
   }
 
-  concepts(): AsyncIterable<StubConcept<SparqlConceptT, SparqlConceptSchemeT>> {
+  concepts(): AsyncIterable<ConceptStub<SparqlConceptT, SparqlConceptSchemeT>> {
     return this._concepts({ topOnly: false });
   }
 
@@ -86,12 +86,12 @@ WHERE {
   }: {
     limit: number;
     offset: number;
-  }): Promise<readonly StubConcept<SparqlConceptT, SparqlConceptSchemeT>[]> {
+  }): Promise<readonly ConceptStub<SparqlConceptT, SparqlConceptSchemeT>[]> {
     return this._conceptsPage({ limit, offset, topOnly: false });
   }
 
   topConcepts(): AsyncIterable<
-    StubConcept<SparqlConceptT, SparqlConceptSchemeT>
+    ConceptStub<SparqlConceptT, SparqlConceptSchemeT>
   > {
     return this._concepts({ topOnly: true });
   }
@@ -106,7 +106,7 @@ WHERE {
   }: {
     limit: number;
     offset: number;
-  }): Promise<readonly StubConcept<SparqlConceptT, SparqlConceptSchemeT>[]> {
+  }): Promise<readonly ConceptStub<SparqlConceptT, SparqlConceptSchemeT>[]> {
     return this._conceptsPage({ limit, offset, topOnly: true });
   }
 
