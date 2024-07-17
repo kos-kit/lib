@@ -233,7 +233,7 @@ export class Resource<
   /**
    * Get all values/objects of dataset statements (this.identifier, property, value).
    */
-  *values(property: NamedNode): Iterable<Resource.Value> {
+  *values(property: NamedNode): Generator<Resource.Value> {
     for (const quad of this.dataset.match(
       this.identifier,
       property,
@@ -253,7 +253,7 @@ export class Resource<
   /**
    * Get the first subject of dataset statements (subject, property, this.identifier).
    */
-  *valuesOf(property: NamedNode): Iterable<Resource> {
+  *valuesOf(property: NamedNode): Generator<Resource> {
     for (const quad of this.dataset.match(
       null,
       property,

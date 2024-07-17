@@ -12,6 +12,7 @@ import { Model } from "./Model.js";
 import { ModelFactory } from "./ModelFactory.js";
 import { matchLiteral } from "./matchLiteral.js";
 import { Maybe } from "purify-ts";
+import "iterator-helpers-polyfill";
 
 export abstract class LabeledModel<
     ConceptT extends IConcept,
@@ -80,7 +81,7 @@ export abstract class LabeledModel<
   }): readonly ILabel[] {
     return [
       // All literals that are the objects of the skosPredicate
-      ...[...this.resource.values(skosPredicate)].flatMap((value) =>
+      ...this.resource.values(skosPredicate).flatMap((value) =>
         value
           .toLiteral()
           .filter((literal) =>
@@ -92,13 +93,13 @@ export abstract class LabeledModel<
           .toList(),
       ),
       // Any resource in the range of a skosxl: label predicate is considered a skosxl:Label
-      ...[...this.resource.values(skosXlPredicate)].flatMap((labelValue) =>
+      ...this.resource.values(skosXlPredicate).flatMap((labelValue) =>
         labelValue
           .toResource()
           .chain((labelResource) =>
             Maybe.fromNullable(
-              [...labelResource.values(skosxl.literalForm)]
-                .flatMap((value) =>
+              [
+                ...labelResource.values(skosxl.literalForm).flatMap((value) =>
                   value
                     .toLiteral()
                     .filter((literal) =>
@@ -107,8 +108,8 @@ export abstract class LabeledModel<
                       }),
                     )
                     .toList(),
-                )
-                .at(0),
+                ),
+              ].at(0),
             ).map((literalForm) =>
               this.modelFactory.createLabel({
                 literalForm,

@@ -13,6 +13,7 @@ import { LabeledModel } from "./LabeledModel.js";
 import { matchLiteral } from "./matchLiteral.js";
 import { ConceptSchemeStub } from "./ConceptSchemeStub.js";
 import { ConceptStub } from "./ConceptStub.js";
+import "iterator-helpers-polyfill";
 
 export class Concept<
     ConceptT extends IConcept,
@@ -23,9 +24,11 @@ export class Concept<
   implements IConcept
 {
   get notations(): readonly Literal[] {
-    return [...this.resource.values(skos.notation)].flatMap((value) =>
-      value.toLiteral().toList(),
-    );
+    return [
+      ...this.resource
+        .values(skos.notation)
+        .flatMap((value) => value.toLiteral().toList()),
+    ];
   }
 
   async inSchemes(): Promise<
@@ -35,42 +38,45 @@ export class Concept<
   }
 
   notes(property: NoteProperty): readonly Literal[] {
-    return [...this.resource.values(property.identifier)].flatMap((value) =>
-      value
-        .toLiteral()
-        .filter((literal) =>
-          matchLiteral(literal, {
-            includeLanguageTags: this.includeLanguageTags,
-          }),
-        )
-        .toList(),
-    );
+    return [
+      ...this.resource.values(property.identifier).flatMap((value) =>
+        value
+          .toLiteral()
+          .filter((literal) =>
+            matchLiteral(literal, {
+              includeLanguageTags: this.includeLanguageTags,
+            }),
+          )
+          .toList(),
+      ),
+    ];
   }
 
   async semanticRelations(
     property: SemanticRelationProperty,
   ): Promise<readonly ConceptStub<ConceptT, ConceptSchemeT, LabelT>[]> {
-    return [...this.resource.values(property.identifier)].flatMap((value) =>
-      value
-        .toIri()
-        .map(
-          (identifier) =>
-            new ConceptStub({
-              modelFactory: this.modelFactory,
-              resource: new Resource({ dataset: this.dataset, identifier }),
-            }),
-        )
-        .toList(),
-    );
+    return [
+      ...this.resource.values(property.identifier).flatMap((value) =>
+        value
+          .toIri()
+          .map(
+            (identifier) =>
+              new ConceptStub({
+                modelFactory: this.modelFactory,
+                resource: new Resource({ dataset: this.dataset, identifier }),
+              }),
+          )
+          .toList(),
+      ),
+    ];
   }
 
   async semanticRelationsCount(
     property: SemanticRelationProperty,
   ): Promise<number> {
-    return [...this.resource.values(property.identifier)].reduce(
-      (count, value) => (value.isIdentifier() ? count + 1 : count),
-      0,
-    );
+    return this.resource
+      .values(property.identifier)
+      .reduce((count, value) => (value.isIdentifier() ? count + 1 : count), 0);
   }
 
   async topConceptOf(): Promise<
