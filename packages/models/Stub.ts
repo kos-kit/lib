@@ -9,6 +9,7 @@ import { LabeledModel } from "./LabeledModel.js";
  * let the caller resolve() the actual model as necessary.
  */
 export interface Stub<LabeledModelT extends LabeledModel> {
+  readonly displayLabel: string;
   readonly identifier: LabeledModel.Identifier;
   resolve(): Promise<Maybe<LabeledModelT>>;
 }

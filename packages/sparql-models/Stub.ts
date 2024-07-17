@@ -30,5 +30,9 @@ export abstract class Stub<
     this.modelFetcher = modelFetcher;
   }
 
+  get displayLabel() {
+    return ILabeledModel.Identifier.toString(this.identifier);
+  }
+
   abstract resolve(): Promise<Maybe<LabeledModelT>>;
 }

@@ -34,6 +34,10 @@ export abstract class Stub<
     this.resource = resource;
   }
 
+  get displayLabel() {
+    return ILabeledModel.Identifier.toString(this.identifier);
+  }
+
   get identifier() {
     return this.resource.identifier;
   }
