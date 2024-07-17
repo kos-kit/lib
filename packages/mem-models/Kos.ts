@@ -109,7 +109,7 @@ export class Kos<
     return result;
   }
 
-  private *conceptIdentifiers(): Iterable<IConcept.Identifier> {
+  private *conceptIdentifiers(): Generator<IConcept.Identifier> {
     yield* getRdfNamedInstances({
       class_: skos.Concept,
       dataset: this.dataset,

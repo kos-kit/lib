@@ -10,7 +10,7 @@ export function* getRdfNamedInstances(kwds: {
   includeSubclasses: boolean;
   instanceOfPredicate?: NamedNode;
   subClassOfPredicate?: NamedNode;
-}): Iterable<NamedNode> {
+}): Generator<NamedNode> {
   for (const instanceQuad of getRdfNamedInstanceQuads(kwds)) {
     yield instanceQuad.subject as NamedNode;
   }

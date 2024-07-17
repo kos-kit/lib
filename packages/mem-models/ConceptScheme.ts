@@ -125,7 +125,7 @@ export class ConceptScheme<
     topOnly,
   }: {
     topOnly: boolean;
-  }): Iterable<IConcept.Identifier> {
+  }): Generator<IConcept.Identifier> {
     const conceptIdentifierSet = new TermSet<IConcept.Identifier>();
 
     // ConceptScheme -> Concept statement

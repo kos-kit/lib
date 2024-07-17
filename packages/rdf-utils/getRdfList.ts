@@ -15,7 +15,7 @@ export function* getRdfList({
   dataset: DatasetCore;
   graph?: BlankNode | DefaultGraph | NamedNode;
   node: BlankNode | NamedNode;
-}): Iterable<BlankNode | NamedNode | Literal> {
+}): Generator<BlankNode | NamedNode | Literal> {
   if (node.equals(rdf.nil)) {
     return;
   }
