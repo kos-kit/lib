@@ -11,8 +11,8 @@ import { skos } from "@tpluscode/rdf-ns-builders";
 import { ModelFactory } from "./ModelFactory.js";
 import { countIterable } from "./countIterable.js";
 import { paginateIterable } from "./paginateIterable.js";
-import { StubConcept } from "./StubConcept.js";
-import { StubConceptScheme } from "./StubConceptScheme.js";
+import { ConceptStub } from "./ConceptStub.js";
+import { ConceptSchemeStub } from "./ConceptSchemeStub.js";
 
 export class Kos<
   ConceptT extends IConcept,
@@ -37,8 +37,8 @@ export class Kos<
 
   conceptByIdentifier(
     identifier: IConcept.Identifier,
-  ): StubConcept<ConceptT, ConceptSchemeT, LabelT> {
-    return new StubConcept({
+  ): ConceptStub<ConceptT, ConceptSchemeT, LabelT> {
+    return new ConceptStub({
       modelFactory: this.modelFactory,
       resource: new Resource({ dataset: this.dataset, identifier }),
     });
@@ -46,24 +46,24 @@ export class Kos<
 
   conceptSchemeByIdentifier(
     identifier: IConceptScheme.Identifier,
-  ): StubConceptScheme<ConceptT, ConceptSchemeT, LabelT> {
-    return new StubConceptScheme({
+  ): ConceptSchemeStub<ConceptT, ConceptSchemeT, LabelT> {
+    return new ConceptSchemeStub({
       modelFactory: this.modelFactory,
       resource: new Resource({ dataset: this.dataset, identifier }),
     });
   }
 
   async conceptSchemes(): Promise<
-    readonly StubConceptScheme<ConceptT, ConceptSchemeT, LabelT>[]
+    readonly ConceptSchemeStub<ConceptT, ConceptSchemeT, LabelT>[]
   > {
-    const result: StubConceptScheme<ConceptT, ConceptSchemeT, LabelT>[] = [];
+    const result: ConceptSchemeStub<ConceptT, ConceptSchemeT, LabelT>[] = [];
     for (const identifier of getRdfNamedInstances({
       class_: skos.ConceptScheme,
       dataset: this.dataset,
       includeSubclasses: true,
     })) {
       result.push(
-        new StubConceptScheme({
+        new ConceptSchemeStub({
           modelFactory: this.modelFactory,
           resource: new Resource({ dataset: this.dataset, identifier }),
         }),
@@ -73,10 +73,10 @@ export class Kos<
   }
 
   async *concepts(): AsyncIterable<
-    StubConcept<ConceptT, ConceptSchemeT, LabelT>
+    ConceptStub<ConceptT, ConceptSchemeT, LabelT>
   > {
     for await (const identifier of this.conceptIdentifiers()) {
-      yield new StubConcept({
+      yield new ConceptStub({
         modelFactory: this.modelFactory,
         resource: new Resource({ dataset: this.dataset, identifier }),
       });
@@ -93,14 +93,14 @@ export class Kos<
   }: {
     limit: number;
     offset: number;
-  }): Promise<readonly StubConcept<ConceptT, ConceptSchemeT, LabelT>[]> {
-    const result: StubConcept<ConceptT, ConceptSchemeT, LabelT>[] = [];
+  }): Promise<readonly ConceptStub<ConceptT, ConceptSchemeT, LabelT>[]> {
+    const result: ConceptStub<ConceptT, ConceptSchemeT, LabelT>[] = [];
     for (const identifier of paginateIterable(this.conceptIdentifiers(), {
       limit,
       offset,
     })) {
       result.push(
-        new StubConcept({
+        new ConceptStub({
           modelFactory: this.modelFactory,
           resource: new Resource({ dataset: this.dataset, identifier }),
         }),
