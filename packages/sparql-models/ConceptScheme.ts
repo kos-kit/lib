@@ -7,7 +7,6 @@ import { rdf, rdfs, skos } from "@tpluscode/rdf-ns-builders";
 import { LabeledModel } from "./LabeledModel.js";
 import { mapResultRowsToCount } from "./mapResultRowsToCount.js";
 import { mapResultRowsToIdentifiers } from "./mapResultRowsToIdentifiers.js";
-import { paginationToAsyncIterable } from "./paginationToAsyncIterable.js";
 import { ConceptStub } from "./ConceptStub.js";
 import { Just, Maybe } from "purify-ts";
 
@@ -23,12 +22,19 @@ export class ConceptScheme<
     topOnly,
   }: {
     topOnly: boolean;
-  }): AsyncIterable<ConceptStub<SparqlConceptT, SparqlConceptSchemeT>> {
-    yield* paginationToAsyncIterable({
-      getPage: ({ offset }) =>
-        this._conceptsPage({ limit: 100, offset, topOnly }),
-      totalCount: await this._conceptsCount({ topOnly }),
-    });
+  }): AsyncGenerator<ConceptStub<SparqlConceptT, SparqlConceptSchemeT>> {
+    const count = await this._conceptsCount({ topOnly });
+    let offset = 0;
+    while (offset < count) {
+      for (const value of await this._conceptsPage({
+        limit: 100,
+        offset,
+        topOnly,
+      })) {
+        yield value;
+        offset++;
+      }
+    }
   }
 
   async _conceptsCount({ topOnly }: { topOnly: boolean }): Promise<number> {
@@ -72,7 +78,9 @@ WHERE {
     );
   }
 
-  concepts(): AsyncIterable<ConceptStub<SparqlConceptT, SparqlConceptSchemeT>> {
+  concepts(): AsyncGenerator<
+    ConceptStub<SparqlConceptT, SparqlConceptSchemeT>
+  > {
     return this._concepts({ topOnly: false });
   }
 
@@ -90,7 +98,7 @@ WHERE {
     return this._conceptsPage({ limit, offset, topOnly: false });
   }
 
-  topConcepts(): AsyncIterable<
+  topConcepts(): AsyncGenerator<
     ConceptStub<SparqlConceptT, SparqlConceptSchemeT>
   > {
     return this._concepts({ topOnly: true });

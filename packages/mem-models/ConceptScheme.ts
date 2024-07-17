@@ -25,7 +25,7 @@ export class ConceptScheme<
     topOnly,
   }: {
     topOnly: boolean;
-  }): AsyncIterable<ConceptStub<ConceptT, ConceptSchemeT, LabelT>> {
+  }): AsyncGenerator<ConceptStub<ConceptT, ConceptSchemeT, LabelT>> {
     for await (const identifier of this._conceptIdentifiers({ topOnly })) {
       yield new ConceptStub({
         modelFactory: this.modelFactory,
@@ -87,7 +87,7 @@ export class ConceptScheme<
     return Nothing;
   }
 
-  async *concepts(): AsyncIterable<
+  async *concepts(): AsyncGenerator<
     ConceptStub<ConceptT, ConceptSchemeT, LabelT>
   > {
     yield* this._concepts({ topOnly: false });
@@ -104,7 +104,7 @@ export class ConceptScheme<
     return this._conceptsPage({ ...kwds, topOnly: false });
   }
 
-  async *topConcepts(): AsyncIterable<
+  async *topConcepts(): AsyncGenerator<
     ConceptStub<ConceptT, ConceptSchemeT, LabelT>
   > {
     yield* this._concepts({ topOnly: true });

@@ -72,7 +72,7 @@ export class Kos<
     return result;
   }
 
-  async *concepts(): AsyncIterable<
+  async *concepts(): AsyncGenerator<
     ConceptStub<ConceptT, ConceptSchemeT, LabelT>
   > {
     for await (const identifier of this.conceptIdentifiers()) {

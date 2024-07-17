@@ -7,13 +7,13 @@ export interface ConceptScheme extends LabeledModel {
   conceptByIdentifier(
     identifier: Concept.Identifier,
   ): Promise<Maybe<Stub<Concept>>>;
-  concepts(): AsyncIterable<Stub<Concept>>;
+  concepts(): AsyncGenerator<Stub<Concept>>;
   conceptsCount(): Promise<number>;
   conceptsPage(kwds: {
     limit: number;
     offset: number;
   }): Promise<readonly Stub<Concept>[]>;
-  topConcepts(): AsyncIterable<Stub<Concept>>;
+  topConcepts(): AsyncGenerator<Stub<Concept>>;
   topConceptsCount(): Promise<number>;
   topConceptsPage(kwds: {
     limit: number;

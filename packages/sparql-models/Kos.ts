@@ -8,7 +8,6 @@ import { ModelFetcher } from "./ModelFetcher.js";
 import { SparqlClient } from "./SparqlClient.js";
 import { mapResultRowsToCount } from "./mapResultRowsToCount.js";
 import { mapResultRowsToIdentifiers } from "./mapResultRowsToIdentifiers.js";
-import { paginationToAsyncIterable } from "./paginationToAsyncIterable.js";
 import { ConceptStub } from "./ConceptStub.js";
 import { ConceptSchemeStub } from "./ConceptSchemeStub.js";
 
@@ -65,13 +64,17 @@ OFFSET ${offset}`),
     );
   }
 
-  async *concepts(): AsyncIterable<
+  async *concepts(): AsyncGenerator<
     ConceptStub<SparqlConceptT, SparqlConceptSchemeT>
   > {
-    yield* paginationToAsyncIterable({
-      getPage: ({ offset }) => this.conceptsPage({ limit: 100, offset }),
-      totalCount: await this.conceptsCount(),
-    });
+    const count = await this.conceptsCount();
+    let offset = 0;
+    while (offset < count) {
+      for (const value of await this.conceptsPage({ limit: 100, offset })) {
+        yield value;
+        offset++;
+      }
+    }
   }
 
   async conceptsCount(): Promise<number> {

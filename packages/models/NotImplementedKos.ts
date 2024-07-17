@@ -18,7 +18,7 @@ export class NotImplementedKos implements Kos {
     throw new Error("Method not implemented.");
   }
 
-  concepts(): AsyncIterable<Stub<Concept>> {
+  concepts(): AsyncGenerator<Stub<Concept>> {
     throw new Error("Method not implemented.");
   }
 
