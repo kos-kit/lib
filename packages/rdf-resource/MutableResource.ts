@@ -14,7 +14,7 @@ export class MutableResource<
   IdentifierT extends Resource.Identifier = Resource.Identifier,
 > extends Resource<IdentifierT> {
   readonly dataFactory: DataFactory;
-  readonly mutateGraph: Exclude<Quad_Graph, Variable>;
+  readonly mutateGraph: MutableResource.MutateGraph;
 
   constructor({
     dataFactory,
@@ -68,6 +68,8 @@ export class MutableResource<
 }
 
 export namespace MutableResource {
+  export type MutateGraph = Exclude<Quad_Graph, Variable>;
+
   export interface Parameters<IdentifierT extends Resource.Identifier>
     extends Resource.Parameters<IdentifierT> {
     dataFactory: DataFactory;
