@@ -60,7 +60,6 @@ export class Kos<
     for (const identifier of getRdfInstances({
       class_: skos.ConceptScheme,
       dataset: this.dataset,
-      includeSubclasses: true,
     })) {
       if (identifier.termType !== "NamedNode") {
         continue;
@@ -116,7 +115,6 @@ export class Kos<
     for (const identifier of getRdfInstances({
       class_: skos.Concept,
       dataset: this.dataset,
-      includeSubclasses: true,
     })) {
       if (identifier.termType === "NamedNode") {
         yield identifier;

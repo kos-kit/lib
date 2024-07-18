@@ -4,7 +4,6 @@ import {
   Label as ILabel,
 } from "@kos-kit/models";
 import { Stub } from "./Stub.js";
-import { isRdfInstanceOf } from "@kos-kit/rdf-utils";
 import { Just, Maybe, Nothing } from "purify-ts";
 import { skos } from "@tpluscode/rdf-ns-builders";
 
@@ -16,13 +15,7 @@ export class ConceptSchemeStub<
   async resolve(): Promise<Maybe<ConceptSchemeT>> {
     // If there's an rdf:type statement then consider that we have the concept.
     // TODO: fetch all required fields here
-    if (
-      isRdfInstanceOf({
-        class_: skos.ConceptScheme,
-        dataset: this.resource.dataset,
-        instance: this.identifier,
-      })
-    ) {
+    if (this.resource.isInstanceOf(skos.ConceptScheme)) {
       return Just(this.modelFactory.createConceptScheme(this.resource));
     }
     return Nothing;
