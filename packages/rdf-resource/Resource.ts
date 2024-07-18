@@ -1,3 +1,4 @@
+import { getRdfList, isRdfInstanceOf } from "@kos-kit/rdf-utils";
 import {
   BlankNode,
   DataFactory,
@@ -103,6 +104,10 @@ class SomeResourceValue implements Resource.Value {
     return this.object.termType === "NamedNode";
   }
 
+  isList(): boolean {
+    return this.toList().isJust();
+  }
+
   isLiteral(): boolean {
     return this.object.termType === "Literal";
   }
@@ -151,6 +156,32 @@ class SomeResourceValue implements Resource.Value {
 
   toLiteral(): Maybe<Literal> {
     return this.object.termType === "Literal" ? Just(this.object) : Nothing;
+  }
+
+  toList(): Maybe<readonly Resource.Value[]> {
+    switch (this.object.termType) {
+      case "BlankNode":
+      case "NamedNode": {
+        let objectsList: Exclude<Quad_Object, Quad | Variable>[];
+        try {
+          objectsList = [
+            ...getRdfList({
+              dataset: this.subjectResource.dataset,
+              node: this.object,
+            }),
+          ];
+        } catch {
+          return Nothing;
+        }
+        return Just(
+          objectsList.map(
+            (value) => new SomeResourceValue(value, this.subjectResource),
+          ),
+        );
+      }
+      default:
+        return Nothing;
+    }
   }
 
   toNamedResource(): Maybe<Resource<NamedNode>> {
@@ -219,6 +250,22 @@ export class Resource<
   constructor({ dataset, identifier }: Resource.Parameters<IdentifierT>) {
     this.dataset = dataset;
     this.identifier = identifier;
+  }
+
+  isInstanceOf(
+    class_: NamedNode,
+    options?: {
+      includeSubclasses?: boolean;
+      instanceOfPredicate?: NamedNode;
+      subClassOfPredicate?: NamedNode;
+    },
+  ): boolean {
+    return isRdfInstanceOf({
+      class_,
+      dataset: this.dataset,
+      instance: this.identifier,
+      ...options,
+    });
   }
 
   /**

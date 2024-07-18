@@ -1,6 +1,7 @@
 /* eslint-disable no-inner-declarations */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import {
+  BlankNode,
   DataFactory,
   NamedNode,
   Quad,
@@ -9,6 +10,9 @@ import {
   Variable,
 } from "@rdfjs/types";
 import { Resource } from "./Resource.js";
+import { createRdfList } from "@kos-kit/rdf-utils";
+
+type Value = Exclude<Quad_Object, Quad | Variable>;
 
 /**
  * Resource subclass with operations to mutate the underlying dataset.
@@ -29,30 +33,45 @@ export class MutableResource<
     this.mutateGraph = mutateGraph;
   }
 
-  add(
-    predicate: NamedNode,
-    object: Exclude<Quad_Object, Quad | Variable>,
-  ): this {
+  add(predicate: NamedNode, value: Value): this {
     this.dataset.add(
       this.dataFactory.quad(
         this.identifier,
         predicate,
-        object,
+        value,
         this.mutateGraph,
       ),
     );
     return this;
   }
 
-  delete(
+  addList(
     predicate: NamedNode,
-    object?: Exclude<Quad_Object, Quad | Variable>,
+    valuesList: Iterable<Value>,
+    options?: {
+      generateIdentifier?: (
+        item: Value,
+        itemIndex: number,
+      ) => BlankNode | NamedNode;
+    },
   ): this {
+    return this.add(
+      predicate,
+      createRdfList({
+        dataFactory: this.dataFactory,
+        dataset: this.dataset,
+        generateIdentifier: options?.generateIdentifier,
+        items: valuesList,
+      }),
+    );
+  }
+
+  delete(predicate: NamedNode, value?: Value): this {
     for (const quad of [
       ...this.dataset.match(
         this.identifier,
         predicate,
-        object,
+        value,
         this.mutateGraph,
       ),
     ]) {
@@ -61,12 +80,9 @@ export class MutableResource<
     return this;
   }
 
-  set(
-    predicate: NamedNode,
-    object: Exclude<Quad_Object, Quad | Variable>,
-  ): this {
+  set(predicate: NamedNode, value: Value): this {
     this.delete(predicate);
-    return this.add(predicate, object);
+    return this.add(predicate, value);
   }
 }
 
