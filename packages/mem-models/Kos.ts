@@ -5,7 +5,6 @@ import {
   Label as ILabel,
 } from "@kos-kit/models";
 import { Resource } from "@kos-kit/rdf-resource";
-import { getRdfNamedInstances } from "@kos-kit/rdf-utils";
 import { DatasetCore } from "@rdfjs/types";
 import { skos } from "@tpluscode/rdf-ns-builders";
 import { ModelFactory } from "./ModelFactory.js";
@@ -13,6 +12,7 @@ import { countIterable } from "./countIterable.js";
 import { paginateIterable } from "./paginateIterable.js";
 import { ConceptStub } from "./ConceptStub.js";
 import { ConceptSchemeStub } from "./ConceptSchemeStub.js";
+import { getRdfInstances } from "@kos-kit/rdf-utils";
 
 export class Kos<
   ConceptT extends IConcept,
@@ -57,11 +57,14 @@ export class Kos<
     readonly ConceptSchemeStub<ConceptT, ConceptSchemeT, LabelT>[]
   > {
     const result: ConceptSchemeStub<ConceptT, ConceptSchemeT, LabelT>[] = [];
-    for (const identifier of getRdfNamedInstances({
+    for (const identifier of getRdfInstances({
       class_: skos.ConceptScheme,
       dataset: this.dataset,
       includeSubclasses: true,
     })) {
+      if (identifier.termType !== "NamedNode") {
+        continue;
+      }
       result.push(
         new ConceptSchemeStub({
           modelFactory: this.modelFactory,
@@ -110,10 +113,14 @@ export class Kos<
   }
 
   private *conceptIdentifiers(): Generator<IConcept.Identifier> {
-    yield* getRdfNamedInstances({
+    for (const identifier of getRdfInstances({
       class_: skos.Concept,
       dataset: this.dataset,
       includeSubclasses: true,
-    });
+    })) {
+      if (identifier.termType === "NamedNode") {
+        yield identifier;
+      }
+    }
   }
 }

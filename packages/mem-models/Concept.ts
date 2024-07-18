@@ -13,7 +13,6 @@ import { LabeledModel } from "./LabeledModel.js";
 import { matchLiteral } from "./matchLiteral.js";
 import { ConceptSchemeStub } from "./ConceptSchemeStub.js";
 import { ConceptStub } from "./ConceptStub.js";
-import "iterator-helpers-polyfill";
 
 export class Concept<
     ConceptT extends IConcept,
