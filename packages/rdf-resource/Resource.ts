@@ -207,6 +207,9 @@ function defaultValueFilter(_value: Resource.Value): boolean {
   return true;
 }
 
+/**
+ * A Resource abstraction over subjects or objects in an RDF/JS dataset.
+ */
 export class Resource<
   IdentifierT extends Resource.Identifier = Resource.Identifier,
 > {

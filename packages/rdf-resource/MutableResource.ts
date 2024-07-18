@@ -10,6 +10,9 @@ import {
 } from "@rdfjs/types";
 import { Resource } from "./Resource.js";
 
+/**
+ * Resource subclass with operations to mutate the underlying dataset.
+ */
 export class MutableResource<
   IdentifierT extends Resource.Identifier = Resource.Identifier,
 > extends Resource<IdentifierT> {
