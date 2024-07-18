@@ -17,7 +17,7 @@ export function isRdfInstanceOf({
   instanceOfPredicate?: NamedNode;
   subClassOfPredicate?: NamedNode;
 }): boolean {
-  return isInstanceOfRecursive({
+  return isRdfInstanceOfRecursive({
     class_,
     dataset,
     includeSubclasses: includeSubclasses ?? true,
@@ -28,7 +28,7 @@ export function isRdfInstanceOf({
   });
 }
 
-function isInstanceOfRecursive({
+function isRdfInstanceOfRecursive({
   class_,
   dataset,
   includeSubclasses,
@@ -63,7 +63,7 @@ function isInstanceOfRecursive({
       continue;
     }
     if (
-      isInstanceOfRecursive({
+      isRdfInstanceOfRecursive({
         class_: quad.subject,
         dataset,
         includeSubclasses,

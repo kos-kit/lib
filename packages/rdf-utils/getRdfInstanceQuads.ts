@@ -16,14 +16,14 @@ export function* getRdfInstanceQuads({
 }: {
   class_: NamedNode;
   dataset: DatasetCore;
-  includeSubclasses: boolean;
+  includeSubclasses?: boolean;
   instanceOfPredicate?: NamedNode;
   subClassOfPredicate?: NamedNode;
 }): Generator<Quad> {
   yield* getRdfInstanceQuadsRecursive({
     class_,
     dataset,
-    includeSubclasses,
+    includeSubclasses: includeSubclasses ?? false,
     instanceOfPredicate: instanceOfPredicate ?? rdf.type,
     instanceQuads: new TermSet<Quad>(),
     subClassOfPredicate: subClassOfPredicate ?? rdfs.subClassOf,

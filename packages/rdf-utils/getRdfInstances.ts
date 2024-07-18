@@ -7,7 +7,7 @@ import { getRdfInstanceQuads } from "./getRdfInstanceQuads.js";
 export function* getRdfInstances(kwds: {
   class_: NamedNode;
   dataset: DatasetCore;
-  includeSubclasses: boolean;
+  includeSubclasses?: boolean;
   instanceOfPredicate?: NamedNode;
   subClassOfPredicate?: NamedNode;
 }): Generator<BlankNode | NamedNode> {
