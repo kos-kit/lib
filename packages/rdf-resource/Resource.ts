@@ -55,6 +55,9 @@ class NothingResourceValue implements Resource.Value {
   toLiteral(): Maybe<Literal> {
     return Nothing;
   }
+  toList(): Maybe<readonly Resource.Value[]> {
+    return Nothing;
+  }
   toNamedResource(): Maybe<Resource<NamedNode>> {
     return Nothing;
   }
@@ -255,7 +258,7 @@ export class Resource<
   isInstanceOf(
     class_: NamedNode,
     options?: {
-      includeSubclasses?: boolean;
+      excludeSubclasses?: boolean;
       instanceOfPredicate?: NamedNode;
       subClassOfPredicate?: NamedNode;
     },
@@ -400,6 +403,7 @@ export namespace Resource {
     toDate(): Maybe<Date>;
     toIdentifier(): Maybe<Identifier>;
     toIri(): Maybe<NamedNode>;
+    toList(): Maybe<readonly Value[]>;
     toLiteral(): Maybe<Literal>;
     toNamedResource(): Maybe<Resource<NamedNode>>;
     toNumber(): Maybe<number>;
