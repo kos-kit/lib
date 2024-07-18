@@ -2,6 +2,14 @@ import { DatasetCore, NamedNode, Quad } from "@rdfjs/types";
 import TermSet from "@rdfjs/term-set";
 import { rdf, rdfs } from "@tpluscode/rdf-ns-builders";
 
+export interface GetRdfInstanceQuadsParameters {
+  class_: NamedNode;
+  dataset: DatasetCore;
+  excludeSubclasses?: boolean;
+  instanceOfPredicate?: NamedNode;
+  subClassOfPredicate?: NamedNode;
+}
+
 /**
  * Get all unique RDF instanceQuads of a given class in the given dataset.
  *
@@ -10,20 +18,14 @@ import { rdf, rdfs } from "@tpluscode/rdf-ns-builders";
 export function* getRdfInstanceQuads({
   class_,
   dataset,
-  includeSubclasses,
+  excludeSubclasses,
   instanceOfPredicate,
   subClassOfPredicate,
-}: {
-  class_: NamedNode;
-  dataset: DatasetCore;
-  includeSubclasses?: boolean;
-  instanceOfPredicate?: NamedNode;
-  subClassOfPredicate?: NamedNode;
-}): Generator<Quad> {
+}: GetRdfInstanceQuadsParameters): Generator<Quad> {
   yield* getRdfInstanceQuadsRecursive({
     class_,
     dataset,
-    includeSubclasses: includeSubclasses ?? false,
+    excludeSubclasses: excludeSubclasses ?? false,
     instanceOfPredicate: instanceOfPredicate ?? rdf.type,
     instanceQuads: new TermSet<Quad>(),
     subClassOfPredicate: subClassOfPredicate ?? rdfs.subClassOf,
@@ -34,7 +36,7 @@ export function* getRdfInstanceQuads({
 function* getRdfInstanceQuadsRecursive({
   class_,
   dataset,
-  includeSubclasses,
+  excludeSubclasses,
   instanceOfPredicate,
   instanceQuads,
   subClassOfPredicate,
@@ -42,7 +44,7 @@ function* getRdfInstanceQuadsRecursive({
 }: {
   class_: NamedNode;
   dataset: DatasetCore;
-  includeSubclasses: boolean;
+  excludeSubclasses: boolean;
   instanceOfPredicate: NamedNode;
   instanceQuads: TermSet<Quad>;
   subClassOfPredicate: NamedNode;
@@ -65,7 +67,7 @@ function* getRdfInstanceQuadsRecursive({
 
   visitedClasses.add(class_);
 
-  if (!includeSubclasses) {
+  if (excludeSubclasses) {
     return;
   }
 
@@ -79,7 +81,7 @@ function* getRdfInstanceQuadsRecursive({
     yield* getRdfInstanceQuadsRecursive({
       class_: quad.subject,
       dataset,
-      includeSubclasses,
+      excludeSubclasses,
       instanceOfPredicate,
       instanceQuads,
       subClassOfPredicate,

@@ -1,26 +1,22 @@
 import TermSet from "@rdfjs/term-set";
 import { BlankNode, DatasetCore, NamedNode } from "@rdfjs/types";
 import { rdf, rdfs } from "@tpluscode/rdf-ns-builders";
+import { GetRdfInstanceQuadsParameters } from "./getRdfInstanceQuads.js";
 
 export function isRdfInstanceOf({
   class_,
   instance,
   dataset,
-  includeSubclasses,
+  excludeSubclasses,
   instanceOfPredicate,
   subClassOfPredicate,
-}: {
-  class_: NamedNode;
-  dataset: DatasetCore;
-  includeSubclasses?: boolean;
+}: GetRdfInstanceQuadsParameters & {
   instance: BlankNode | NamedNode;
-  instanceOfPredicate?: NamedNode;
-  subClassOfPredicate?: NamedNode;
 }): boolean {
   return isRdfInstanceOfRecursive({
     class_,
     dataset,
-    includeSubclasses: includeSubclasses ?? true,
+    excludeSubclasses: excludeSubclasses ?? false,
     instance,
     instanceOfPredicate: instanceOfPredicate ?? rdf.type,
     subClassOfPredicate: subClassOfPredicate ?? rdfs.subClassOf,
@@ -31,7 +27,7 @@ export function isRdfInstanceOf({
 function isRdfInstanceOfRecursive({
   class_,
   dataset,
-  includeSubclasses,
+  excludeSubclasses,
   instance,
   instanceOfPredicate,
   subClassOfPredicate,
@@ -39,7 +35,7 @@ function isRdfInstanceOfRecursive({
 }: {
   class_: NamedNode;
   dataset: DatasetCore;
-  includeSubclasses: boolean;
+  excludeSubclasses: boolean;
   instance: BlankNode | NamedNode;
   instanceOfPredicate: NamedNode;
   subClassOfPredicate: NamedNode;
@@ -51,7 +47,7 @@ function isRdfInstanceOfRecursive({
 
   visitedClasses.add(class_);
 
-  if (!includeSubclasses) {
+  if (excludeSubclasses) {
     return false;
   }
 
@@ -66,7 +62,7 @@ function isRdfInstanceOfRecursive({
       isRdfInstanceOfRecursive({
         class_: quad.subject,
         dataset,
-        includeSubclasses,
+        excludeSubclasses,
         instance,
         instanceOfPredicate,
         subClassOfPredicate,
