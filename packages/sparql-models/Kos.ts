@@ -2,6 +2,8 @@ import {
   Concept as IConcept,
   ConceptScheme as IConceptScheme,
   Kos as IKos,
+  Stub,
+  StubArray,
 } from "@kos-kit/models";
 import { rdf, rdfs, skos } from "@tpluscode/rdf-ns-builders";
 import { ModelFetcher } from "./ModelFetcher.js";
@@ -64,9 +66,7 @@ OFFSET ${offset}`),
     );
   }
 
-  async *concepts(): AsyncGenerator<
-    ConceptStub<SparqlConceptT, SparqlConceptSchemeT>
-  > {
+  async *concepts(): AsyncGenerator<Stub<SparqlConceptT>> {
     const count = await this.conceptsCount();
     let offset = 0;
     while (offset < count) {
@@ -95,18 +95,20 @@ WHERE {
   }: {
     limit: number;
     offset: number;
-  }): Promise<readonly ConceptStub<SparqlConceptT, SparqlConceptSchemeT>[]> {
-    return (
-      await this.conceptIdentifiersPage({
-        limit,
-        offset,
-      })
-    ).map(
-      (identifier) =>
-        new ConceptStub({
-          identifier,
-          modelFetcher: this.modelFetcher,
-        }),
+  }): Promise<StubArray<SparqlConceptT>> {
+    return new StubArray(
+      (
+        await this.conceptIdentifiersPage({
+          limit,
+          offset,
+        })
+      ).map(
+        (identifier) =>
+          new ConceptStub({
+            identifier,
+            modelFetcher: this.modelFetcher,
+          }),
+      ),
     );
   }
 
@@ -132,12 +134,15 @@ WHERE {
     );
   }
 
-  async conceptSchemes(): Promise<
-    readonly ConceptSchemeStub<SparqlConceptT, SparqlConceptSchemeT>[]
-  > {
-    return (await this.conceptSchemeIdentifiers()).map(
-      (identifier) =>
-        new ConceptSchemeStub({ identifier, modelFetcher: this.modelFetcher }),
+  async conceptSchemes(): Promise<StubArray<SparqlConceptSchemeT>> {
+    return new StubArray(
+      (await this.conceptSchemeIdentifiers()).map(
+        (identifier) =>
+          new ConceptSchemeStub({
+            identifier,
+            modelFetcher: this.modelFetcher,
+          }),
+      ),
     );
   }
 }

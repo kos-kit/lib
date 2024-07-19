@@ -2,6 +2,7 @@ import {
   Concept as IConcept,
   ConceptScheme as IConceptScheme,
   Label as ILabel,
+  StubArray,
 } from "@kos-kit/models";
 import { Resource } from "@kos-kit/rdf-resource";
 import { isRdfInstanceOf } from "@kos-kit/rdf-utils";
@@ -100,7 +101,7 @@ export class ConceptScheme<
   conceptsPage(kwds: {
     limit: number;
     offset: number;
-  }): Promise<readonly ConceptStub<ConceptT, ConceptSchemeT, LabelT>[]> {
+  }): Promise<StubArray<ConceptT>> {
     return this._conceptsPage({ ...kwds, topOnly: false });
   }
 
@@ -117,7 +118,7 @@ export class ConceptScheme<
   topConceptsPage(kwds: {
     limit: number;
     offset: number;
-  }): Promise<readonly ConceptStub<ConceptT, ConceptSchemeT, LabelT>[]> {
+  }): Promise<StubArray<ConceptT>> {
     return this._conceptsPage({ ...kwds, topOnly: true });
   }
 
@@ -181,7 +182,7 @@ export class ConceptScheme<
     limit: number;
     offset: number;
     topOnly: boolean;
-  }): Promise<readonly ConceptStub<ConceptT, ConceptSchemeT, LabelT>[]> {
+  }): Promise<StubArray<ConceptT>> {
     const result: ConceptStub<ConceptT, ConceptSchemeT, LabelT>[] = [];
     for (const identifier of paginateIterable(
       this._conceptIdentifiers({ topOnly }),
@@ -197,6 +198,6 @@ export class ConceptScheme<
         }),
       );
     }
-    return result;
+    return new StubArray(result);
   }
 }

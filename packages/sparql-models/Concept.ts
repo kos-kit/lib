@@ -3,6 +3,7 @@ import {
   ConceptScheme as IConceptScheme,
   NoteProperty,
   SemanticRelationProperty,
+  StubArray,
 } from "@kos-kit/models";
 import { Resource } from "@kos-kit/rdf-resource";
 import { Literal } from "@rdfjs/types";
@@ -25,13 +26,12 @@ export class Concept<
     return this.memModel.notations;
   }
 
-  async inSchemes(): Promise<
-    readonly ConceptSchemeStub<SparqlConceptT, SparqlConceptSchemeT>[]
-  > {
+  async inSchemes(): Promise<StubArray<SparqlConceptSchemeT>> {
     // Could do this in a single CONSTRUCT as an optimization. This code is simpler.
     const identifierString = Resource.Identifier.toString(this.identifier);
-    return mapResultRowsToIdentifiers(
-      await this.sparqlClient.query.select(`
+    return new StubArray(
+      mapResultRowsToIdentifiers(
+        await this.sparqlClient.query.select(`
 SELECT DISTINCT ?conceptScheme
 WHERE {
   { ${identifierString} <${skos.inScheme.value}> ?conceptScheme . }
@@ -40,13 +40,14 @@ WHERE {
   UNION
   { ?conceptScheme <${skos.hasTopConcept.value}> ${identifierString} . }
 }`),
-      "conceptScheme",
-    ).map(
-      (identifier) =>
-        new ConceptSchemeStub({
-          identifier,
-          modelFetcher: this.modelFetcher,
-        }),
+        "conceptScheme",
+      ).map(
+        (identifier) =>
+          new ConceptSchemeStub({
+            identifier,
+            modelFetcher: this.modelFetcher,
+          }),
+      ),
     );
   }
 
@@ -56,18 +57,20 @@ WHERE {
 
   async semanticRelations(
     property: SemanticRelationProperty,
-  ): Promise<readonly ConceptStub<SparqlConceptT, SparqlConceptSchemeT>[]> {
+  ): Promise<StubArray<SparqlConceptT>> {
     // Could do this in a single CONSTRUCT as an optimization. This code is simpler.
-    return mapResultRowsToIdentifiers(
-      await this.sparqlClient.query.select(`
+    return new StubArray(
+      mapResultRowsToIdentifiers(
+        await this.sparqlClient.query.select(`
 SELECT DISTINCT ?concept
 WHERE {
   ${Resource.Identifier.toString(this.identifier)} <${property.identifier.value}> ?concept .
 }`),
-      "concept",
-    ).map(
-      (identifier) =>
-        new ConceptStub({ identifier, modelFetcher: this.modelFetcher }),
+        "concept",
+      ).map(
+        (identifier) =>
+          new ConceptStub({ identifier, modelFetcher: this.modelFetcher }),
+      ),
     );
   }
 
@@ -84,22 +87,25 @@ ${Resource.Identifier.toString(this.identifier)} <${property.identifier.value}> 
     );
   }
 
-  async topConceptOf(): Promise<
-    readonly ConceptSchemeStub<SparqlConceptT, SparqlConceptSchemeT>[]
-  > {
+  async topConceptOf(): Promise<StubArray<SparqlConceptSchemeT>> {
     const identifierString = Resource.Identifier.toString(this.identifier);
-    return mapResultRowsToIdentifiers(
-      await this.sparqlClient.query.select(`
+    return new StubArray(
+      mapResultRowsToIdentifiers(
+        await this.sparqlClient.query.select(`
 SELECT DISTINCT ?conceptScheme
 WHERE {
   { ?conceptScheme <${skos.hasTopConcept.value}> ${identifierString} . }
   UNION
   { ${identifierString} <${skos.topConceptOf.value}> ?conceptScheme . }
 }`),
-      "conceptScheme",
-    ).map(
-      (identifier) =>
-        new ConceptSchemeStub({ identifier, modelFetcher: this.modelFetcher }),
+        "conceptScheme",
+      ).map(
+        (identifier) =>
+          new ConceptSchemeStub({
+            identifier,
+            modelFetcher: this.modelFetcher,
+          }),
+      ),
     );
   }
 }

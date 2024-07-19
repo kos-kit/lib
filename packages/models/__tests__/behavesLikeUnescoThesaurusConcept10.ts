@@ -15,8 +15,8 @@ export const behavesLikeUnescoThesaurusConcept10 = (
   it("should be in the single concept scheme", async () => {
     const concept = await lazyConcept("en");
     for (const inSchemes of [
-      await concept.topConceptOf(),
-      await concept.inSchemes(),
+      (await concept.topConceptOf()).toArray(),
+      (await concept.inSchemes()).toArray(),
     ]) {
       expect(inSchemes).toHaveLength(1);
       expect(
@@ -53,7 +53,7 @@ export const behavesLikeUnescoThesaurusConcept10 = (
 
   it("should be a top concept of the single concept scheme", async () => {
     const concept = await lazyConcept("en");
-    const topConceptOf = await concept.topConceptOf();
+    const topConceptOf = (await concept.topConceptOf()).toArray();
     expect(topConceptOf).toHaveLength(1);
     expect(
       topConceptOf[0].identifier.equals(
@@ -77,9 +77,9 @@ export const behavesLikeUnescoThesaurusConcept10 = (
       expect(
         await concept.semanticRelationsCount(semanticRelationProperty),
       ).toStrictEqual(conceptNumbers.length);
-      const semanticRelations = await concept.semanticRelations(
-        semanticRelationProperty,
-      );
+      const semanticRelations = (
+        await concept.semanticRelations(semanticRelationProperty)
+      ).toArray();
       expect(semanticRelations).toHaveLength(conceptNumbers.length);
       for (const conceptNumber of conceptNumbers) {
         const conceptIdentifier = DataFactory.namedNode(

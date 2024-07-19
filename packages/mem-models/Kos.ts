@@ -3,6 +3,7 @@ import {
   ConceptScheme as IConceptScheme,
   Kos as IKos,
   Label as ILabel,
+  StubArray,
 } from "@kos-kit/models";
 import { Resource } from "@kos-kit/rdf-resource";
 import { DatasetCore } from "@rdfjs/types";
@@ -53,9 +54,7 @@ export class Kos<
     });
   }
 
-  async conceptSchemes(): Promise<
-    readonly ConceptSchemeStub<ConceptT, ConceptSchemeT, LabelT>[]
-  > {
+  async conceptSchemes(): Promise<StubArray<ConceptSchemeT>> {
     const result: ConceptSchemeStub<ConceptT, ConceptSchemeT, LabelT>[] = [];
     for (const identifier of getRdfInstances({
       class_: skos.ConceptScheme,
@@ -71,7 +70,7 @@ export class Kos<
         }),
       );
     }
-    return result;
+    return new StubArray(result);
   }
 
   async *concepts(): AsyncGenerator<
@@ -95,7 +94,7 @@ export class Kos<
   }: {
     limit: number;
     offset: number;
-  }): Promise<readonly ConceptStub<ConceptT, ConceptSchemeT, LabelT>[]> {
+  }): Promise<StubArray<ConceptT>> {
     const result: ConceptStub<ConceptT, ConceptSchemeT, LabelT>[] = [];
     for (const identifier of paginateIterable(this.conceptIdentifiers(), {
       limit,
@@ -108,7 +107,7 @@ export class Kos<
         }),
       );
     }
-    return result;
+    return new StubArray(result);
   }
 
   private *conceptIdentifiers(): Generator<IConcept.Identifier> {

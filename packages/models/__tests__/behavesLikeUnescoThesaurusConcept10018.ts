@@ -19,7 +19,7 @@ export const behavesLikeUnescoThesaurusConcept10018 = (
 
   it("should be in the single concept scheme", async () => {
     const concept = await lazyConcept("en");
-    const inSchemes = await concept.inSchemes();
+    const inSchemes = (await concept.inSchemes()).toArray();
     expect(inSchemes).toHaveLength(1);
     expect(
       inSchemes[0].identifier.equals(
@@ -54,7 +54,7 @@ export const behavesLikeUnescoThesaurusConcept10018 = (
 
   it("should be in the single concept scheme", async () => {
     const concept = await lazyConcept("en");
-    const inSchemes = await concept.inSchemes();
+    const inSchemes = (await concept.inSchemes()).toArray();
     expect(inSchemes).toHaveLength(1);
     expect(
       inSchemes[0].identifier.equals(
@@ -95,9 +95,9 @@ export const behavesLikeUnescoThesaurusConcept10018 = (
       expect(
         await concept.semanticRelationsCount(semanticRelationProperty),
       ).toStrictEqual(conceptNumbers.length);
-      const semanticRelations = await concept.semanticRelations(
-        semanticRelationProperty,
-      );
+      const semanticRelations = (
+        await concept.semanticRelations(semanticRelationProperty)
+      ).toArray();
       expect(semanticRelations).toHaveLength(conceptNumbers.length);
       for (const conceptNumber of conceptNumbers) {
         const conceptIdentifier = DataFactory.namedNode(
@@ -116,13 +116,13 @@ export const behavesLikeUnescoThesaurusConcept10018 = (
     const conceptEn = await lazyConcept("en");
     const conceptFr = await lazyConcept("fr");
 
-    const notesEn = await conceptEn.notes(NoteProperty.SCOPE_NOTE);
+    const notesEn = conceptEn.notes(NoteProperty.SCOPE_NOTE);
     expect(notesEn).toHaveLength(1);
     expect(notesEn[0].value).toStrictEqual(
       "An activity designed to identify, predict, interpret and communicate information concerning the environmental consequences of policies, projects etc.",
     );
 
-    const notesFr = await conceptFr.notes(NoteProperty.SCOPE_NOTE);
+    const notesFr = conceptFr.notes(NoteProperty.SCOPE_NOTE);
     expect(notesFr).toHaveLength(1);
     expect(notesFr[0].value).toStrictEqual(
       "Activité destinée à identifier, prévoir, interpréter et communiquer l'information ayant trait aux conséquences de politiques, de projets, etc., sur l'environnement.",

@@ -3,18 +3,18 @@ import { LabeledModel } from "./LabeledModel.js";
 import { NoteProperty } from "./NoteProperty.js";
 import { SemanticRelationProperty } from "./SemanticRelationProperty.js";
 import { ConceptScheme } from "./ConceptScheme.js";
-import { Stub } from "./Stub.js";
+import { StubArray } from "./StubArray.js";
 
 export interface Concept extends LabeledModel {
   readonly notations: readonly Literal[];
 
-  inSchemes(): Promise<readonly Stub<ConceptScheme>[]>;
+  inSchemes(): Promise<StubArray<ConceptScheme>>;
   notes(property: NoteProperty): readonly Literal[];
   semanticRelations(
     property: SemanticRelationProperty,
-  ): Promise<readonly Stub<Concept>[]>;
+  ): Promise<StubArray<Concept>>;
   semanticRelationsCount(property: SemanticRelationProperty): Promise<number>;
-  topConceptOf(): Promise<readonly Stub<ConceptScheme>[]>;
+  topConceptOf(): Promise<StubArray<ConceptScheme>>;
 }
 
 export namespace Concept {

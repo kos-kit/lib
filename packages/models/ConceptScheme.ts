@@ -2,6 +2,7 @@ import { Maybe } from "purify-ts";
 import { Concept } from "./Concept.js";
 import { LabeledModel } from "./LabeledModel.js";
 import { Stub } from "./Stub.js";
+import { StubArray } from "./StubArray.js";
 
 export interface ConceptScheme extends LabeledModel {
   conceptByIdentifier(
@@ -12,13 +13,13 @@ export interface ConceptScheme extends LabeledModel {
   conceptsPage(kwds: {
     limit: number;
     offset: number;
-  }): Promise<readonly Stub<Concept>[]>;
+  }): Promise<StubArray<Concept>>;
   topConcepts(): AsyncGenerator<Stub<Concept>>;
   topConceptsCount(): Promise<number>;
   topConceptsPage(kwds: {
     limit: number;
     offset: number;
-  }): Promise<readonly Stub<Concept>[]>;
+  }): Promise<StubArray<Concept>>;
 }
 
 export namespace ConceptScheme {

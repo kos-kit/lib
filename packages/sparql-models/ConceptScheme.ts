@@ -1,6 +1,7 @@
 import {
   Concept as IConcept,
   ConceptScheme as IConceptScheme,
+  StubArray,
 } from "@kos-kit/models";
 import { Resource } from "@kos-kit/rdf-resource";
 import { rdf, rdfs, skos } from "@tpluscode/rdf-ns-builders";
@@ -88,14 +89,16 @@ WHERE {
     return this._conceptsCount({ topOnly: false });
   }
 
-  conceptsPage({
+  async conceptsPage({
     limit,
     offset,
   }: {
     limit: number;
     offset: number;
-  }): Promise<readonly ConceptStub<SparqlConceptT, SparqlConceptSchemeT>[]> {
-    return this._conceptsPage({ limit, offset, topOnly: false });
+  }): Promise<StubArray<SparqlConceptT>> {
+    return new StubArray(
+      await this._conceptsPage({ limit, offset, topOnly: false }),
+    );
   }
 
   topConcepts(): AsyncGenerator<
@@ -114,8 +117,10 @@ WHERE {
   }: {
     limit: number;
     offset: number;
-  }): Promise<readonly ConceptStub<SparqlConceptT, SparqlConceptSchemeT>[]> {
-    return this._conceptsPage({ limit, offset, topOnly: true });
+  }): Promise<StubArray<SparqlConceptT>> {
+    return new StubArray(
+      await this._conceptsPage({ limit, offset, topOnly: true }),
+    );
   }
 
   private async _conceptIdentifiersPage({
