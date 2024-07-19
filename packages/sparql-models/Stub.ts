@@ -35,4 +35,13 @@ export abstract class Stub<
   }
 
   abstract resolve(): Promise<Maybe<LabeledModelT>>;
+
+  async resolveOrStub() {
+    const model = (await this.resolve()).extractNullable();
+    if (model !== null) {
+      return model;
+    } else {
+      return this;
+    }
+  }
 }

@@ -11,5 +11,14 @@ import { LabeledModel } from "./LabeledModel.js";
 export interface Stub<LabeledModelT extends LabeledModel> {
   readonly displayLabel: string;
   readonly identifier: LabeledModel.Identifier;
+
   resolve(): Promise<Maybe<LabeledModelT>>;
+
+  /**
+   * Resolve a stub, returning the model if successfully resolved, else the stub.
+   */
+  resolveOrStub(): Promise<{
+    readonly displayLabel: string;
+    readonly identifier: LabeledModel.Identifier;
+  }>;
 }
