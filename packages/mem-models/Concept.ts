@@ -4,7 +4,6 @@ import {
   Label as ILabel,
   NoteProperty,
   SemanticRelationProperty,
-  StubArray,
 } from "@kos-kit/models";
 import { Resource } from "@kos-kit/rdf-resource";
 import TermSet from "@rdfjs/term-set";
@@ -31,7 +30,9 @@ export class Concept<
     ];
   }
 
-  async inSchemes(): Promise<StubArray<ConceptSchemeT>> {
+  async inSchemes(): Promise<
+    readonly ConceptSchemeStub<ConceptT, ConceptSchemeT, LabelT>[]
+  > {
     return this._inSchemes({ topOnly: false });
   }
 
@@ -52,8 +53,8 @@ export class Concept<
 
   async semanticRelations(
     property: SemanticRelationProperty,
-  ): Promise<StubArray<ConceptT>> {
-    return new StubArray([
+  ): Promise<readonly ConceptStub<ConceptT, ConceptSchemeT, LabelT>[]> {
+    return [
       ...this.resource.values(property.identifier).flatMap((value) =>
         value
           .toIri()
@@ -66,7 +67,7 @@ export class Concept<
           )
           .toList(),
       ),
-    ]);
+    ];
   }
 
   async semanticRelationsCount(
@@ -77,7 +78,9 @@ export class Concept<
       .reduce((count, value) => (value.isIdentifier() ? count + 1 : count), 0);
   }
 
-  async topConceptOf(): Promise<StubArray<ConceptSchemeT>> {
+  async topConceptOf(): Promise<
+    readonly ConceptSchemeStub<ConceptT, ConceptSchemeT, LabelT>[]
+  > {
     return this._inSchemes({ topOnly: true });
   }
 
@@ -85,7 +88,7 @@ export class Concept<
     topOnly,
   }: {
     topOnly: boolean;
-  }): StubArray<ConceptSchemeT> {
+  }): readonly ConceptSchemeStub<ConceptT, ConceptSchemeT, LabelT>[] {
     const conceptSchemeIdentifiers = new TermSet<IConceptScheme.Identifier>();
 
     for (const quad of this.resource.dataset.match(
@@ -116,14 +119,12 @@ export class Concept<
       }
     }
 
-    return new StubArray<ConceptSchemeT>(
-      [...conceptSchemeIdentifiers].map(
-        (identifier) =>
-          new ConceptSchemeStub({
-            modelFactory: this.modelFactory,
-            resource: new Resource({ dataset: this.dataset, identifier }),
-          }),
-      ),
+    return [...conceptSchemeIdentifiers].map(
+      (identifier) =>
+        new ConceptSchemeStub({
+          modelFactory: this.modelFactory,
+          resource: new Resource({ dataset: this.dataset, identifier }),
+        }),
     );
   }
 }

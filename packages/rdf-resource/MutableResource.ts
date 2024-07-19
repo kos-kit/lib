@@ -11,7 +11,6 @@ import {
 } from "@rdfjs/types";
 import { Resource } from "./Resource.js";
 import { createRdfList } from "@kos-kit/rdf-utils";
-import { rdf } from "@tpluscode/rdf-ns-builders";
 
 type Value = Exclude<Quad_Object, Quad | Variable>;
 
@@ -49,25 +48,22 @@ export class MutableResource<
   addList(
     predicate: NamedNode,
     valuesList: Iterable<Value>,
-    options?: MutableResource.AddListOptions,
+    options?: {
+      generateIdentifier?: (
+        item: Value,
+        itemIndex: number,
+      ) => BlankNode | NamedNode;
+    },
   ): this {
-    const listIdentifier = createRdfList({
-      dataFactory: this.dataFactory,
-      dataset: this.dataset,
-      generateIdentifier: options?.generateIdentifier,
-      items: valuesList,
-    });
-    if (options?.rdfType) {
-      this.dataset.add(
-        this.dataFactory.quad(
-          listIdentifier,
-          rdf.type,
-          options.rdfType,
-          this.mutateGraph,
-        ),
-      );
-    }
-    return this.add(predicate, listIdentifier);
+    return this.add(
+      predicate,
+      createRdfList({
+        dataFactory: this.dataFactory,
+        dataset: this.dataset,
+        generateIdentifier: options?.generateIdentifier,
+        items: valuesList,
+      }),
+    );
   }
 
   delete(predicate: NamedNode, value?: Value): this {
@@ -92,14 +88,6 @@ export class MutableResource<
 
 export namespace MutableResource {
   export type MutateGraph = Exclude<Quad_Graph, Variable>;
-
-  export interface AddListOptions {
-    generateIdentifier?: (
-      item: Value,
-      itemIndex: number,
-    ) => BlankNode | NamedNode;
-    rdfType?: NamedNode;
-  }
 
   export interface Parameters<IdentifierT extends Resource.Identifier>
     extends Resource.Parameters<IdentifierT> {

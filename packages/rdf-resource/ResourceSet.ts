@@ -1,9 +1,6 @@
 import { DatasetCore, NamedNode } from "@rdfjs/types";
 import { Resource } from "./Resource.js";
-import {
-  GetRdfInstanceQuadsParameters,
-  getRdfInstances,
-} from "@kos-kit/rdf-utils";
+import { getRdfInstances } from "@kos-kit/rdf-utils";
 
 /**
  * A ResourceSet wraps an RDF/JS dataset with convenient resource factory methods.
@@ -17,7 +14,11 @@ export class ResourceSet {
 
   *instancesOf(
     class_: NamedNode,
-    options?: ResourceSet.InstancesOfOptions,
+    options?: {
+      excludeSubclasses?: boolean;
+      instanceOfPredicate?: NamedNode;
+      subClassOfPredicate?: NamedNode;
+    },
   ): Generator<Resource> {
     for (const identifier of getRdfInstances({
       class_,
@@ -28,38 +29,10 @@ export class ResourceSet {
     }
   }
 
-  *namedInstancesOf(
-    class_: NamedNode,
-    options?: ResourceSet.InstancesOfOptions,
-  ): Generator<Resource<NamedNode>> {
-    for (const identifier of getRdfInstances({
-      class_,
-      dataset: this.dataset,
-      ...options,
-    })) {
-      if (identifier.termType === "NamedNode")
-        yield this.namedResource(identifier);
-    }
-  }
-
-  namedResource(identifier: NamedNode): Resource<NamedNode> {
-    return new Resource({
-      dataset: this.dataset,
-      identifier,
-    });
-  }
-
   resource(identifier: Resource.Identifier): Resource {
     return new Resource({
       dataset: this.dataset,
       identifier,
     });
   }
-}
-
-export namespace ResourceSet {
-  export type InstancesOfOptions = Omit<
-    GetRdfInstanceQuadsParameters,
-    "class_" | "dataset"
-  >;
 }

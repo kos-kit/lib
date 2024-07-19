@@ -6,17 +6,13 @@ import { expectConceptScheme } from "./expectConceptScheme.js";
 
 export const behavesLikeKos = (kos: Kos) => {
   it("should get concepts", async () => {
-    const firstConcepts = (
-      await kos.conceptsPage({ limit: 10, offset: 0 })
-    ).toArray();
+    const firstConcepts = await kos.conceptsPage({ limit: 10, offset: 0 });
     expect(firstConcepts).toHaveLength(10);
     for (const firstConcept of firstConcepts) {
       expectConcept((await firstConcept.resolve()).extractNullable());
     }
 
-    const nextConcepts = (
-      await kos.conceptsPage({ limit: 10, offset: 10 })
-    ).toArray();
+    const nextConcepts = await kos.conceptsPage({ limit: 10, offset: 10 });
     expect(nextConcepts).toHaveLength(10);
     for (const nextConcept of nextConcepts) {
       expectConcept((await nextConcept.resolve()).extractNullable());
@@ -52,7 +48,7 @@ export const behavesLikeKos = (kos: Kos) => {
   });
 
   it("should get concept schemes", async () => {
-    const conceptSchemes = (await kos.conceptSchemes()).toArray();
+    const conceptSchemes = await kos.conceptSchemes();
     expect(conceptSchemes).toHaveLength(1);
     expectConceptScheme((await conceptSchemes[0].resolve()).extractNullable());
   });

@@ -10,12 +10,10 @@ export const behavesLikeConceptScheme = (
   it("should get a concept by its identifier", async () => {
     const conceptScheme = await lazyConceptScheme("en");
 
-    const firstConcepts = (
-      await conceptScheme.conceptsPage({
-        limit: 1,
-        offset: 0,
-      })
-    ).toArray();
+    const firstConcepts = await conceptScheme.conceptsPage({
+      limit: 1,
+      offset: 0,
+    });
     expect(firstConcepts).toHaveLength(1);
     const firstConcept = firstConcepts[0];
 
@@ -31,20 +29,16 @@ export const behavesLikeConceptScheme = (
   it("should get concept pages", async () => {
     const conceptScheme = await lazyConceptScheme("en");
 
-    const firstConcepts = (
-      await conceptScheme.conceptsPage({
-        limit: 10,
-        offset: 0,
-      })
-    ).toArray();
+    const firstConcepts = await conceptScheme.conceptsPage({
+      limit: 10,
+      offset: 0,
+    });
     expect(firstConcepts).toHaveLength(10);
 
-    const nextConcepts = (
-      await conceptScheme.conceptsPage({
-        limit: 10,
-        offset: 10,
-      })
-    ).toArray();
+    const nextConcepts = await conceptScheme.conceptsPage({
+      limit: 10,
+      offset: 10,
+    });
     expect(nextConcepts).toHaveLength(10);
     for (const nextConcept of nextConcepts) {
       expect(
@@ -74,20 +68,16 @@ export const behavesLikeConceptScheme = (
   it("should get top concept pages", async () => {
     const conceptScheme = await lazyConceptScheme("en");
 
-    const firstConcepts = (
-      await conceptScheme.topConceptsPage({
-        limit: 10,
-        offset: 0,
-      })
-    ).toArray();
+    const firstConcepts = await conceptScheme.topConceptsPage({
+      limit: 10,
+      offset: 0,
+    });
     expect(firstConcepts).toHaveLength(10);
 
-    const nextConcepts = (
-      await conceptScheme.topConceptsPage({
-        limit: 10,
-        offset: 10,
-      })
-    ).toArray();
+    const nextConcepts = await conceptScheme.topConceptsPage({
+      limit: 10,
+      offset: 10,
+    });
     expect(nextConcepts).toHaveLength(10);
     for (const nextConcept of nextConcepts) {
       expect(
