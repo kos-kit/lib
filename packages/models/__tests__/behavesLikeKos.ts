@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { assert, expect, it } from "vitest";
-import { Kos } from "..";
+import { ConceptScheme, Kos, Stub } from "..";
 import { expectConcept } from "./expectConcept.js";
 import { expectConceptScheme } from "./expectConceptScheme.js";
 
@@ -48,13 +48,16 @@ export const behavesLikeKos = (kos: Kos) => {
   });
 
   it("should get concept schemes", async () => {
-    const conceptSchemes = await kos.conceptSchemes();
+    const conceptSchemes: Stub<ConceptScheme>[] = [];
+    for await (const conceptScheme of kos.conceptSchemes()) {
+      conceptSchemes.push(conceptScheme);
+    }
     expect(conceptSchemes).toHaveLength(1);
     expectConceptScheme((await conceptSchemes[0].resolve()).extractNullable());
   });
 
   it("should get a concept scheme by an identifier", async () => {
-    for (const conceptScheme of await kos.conceptSchemes()) {
+    for await (const conceptScheme of kos.conceptSchemes()) {
       expectConceptScheme((await conceptScheme.resolve()).extractNullable());
       const conceptSchemeByIdentifier = (
         await kos.conceptSchemeByIdentifier(conceptScheme.identifier).resolve()

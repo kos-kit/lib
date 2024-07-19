@@ -132,12 +132,14 @@ WHERE {
     );
   }
 
-  async conceptSchemes(): Promise<
-    readonly ConceptSchemeStub<SparqlConceptT, SparqlConceptSchemeT>[]
+  async *conceptSchemes(): AsyncGenerator<
+    ConceptSchemeStub<SparqlConceptT, SparqlConceptSchemeT>
   > {
-    return (await this.conceptSchemeIdentifiers()).map(
-      (identifier) =>
-        new ConceptSchemeStub({ identifier, modelFetcher: this.modelFetcher }),
-    );
+    for (const identifier of await this.conceptSchemeIdentifiers()) {
+      yield new ConceptSchemeStub({
+        identifier,
+        modelFetcher: this.modelFetcher,
+      });
+    }
   }
 }

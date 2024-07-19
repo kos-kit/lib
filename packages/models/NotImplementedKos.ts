@@ -14,7 +14,7 @@ export class NotImplementedKos implements Kos {
     throw new Error("Method not implemented.");
   }
 
-  conceptSchemes(): Promise<readonly Stub<ConceptScheme>[]> {
+  conceptSchemes(): AsyncGenerator<Stub<ConceptScheme>> {
     throw new Error("Method not implemented.");
   }
 

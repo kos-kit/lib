@@ -69,7 +69,7 @@ export class ServerSearchEngine implements SearchEngine {
       });
     }
 
-    for (const conceptScheme of await kos.conceptSchemes()) {
+    for await (const conceptScheme of kos.conceptSchemes()) {
       (await conceptScheme.resolve()).ifJust((conceptScheme) => {
         const prefLabels = conceptScheme.prefLabels;
         if (prefLabels.length === 0) {

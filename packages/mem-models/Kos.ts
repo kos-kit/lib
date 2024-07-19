@@ -53,10 +53,9 @@ export class Kos<
     });
   }
 
-  async conceptSchemes(): Promise<
-    readonly ConceptSchemeStub<ConceptT, ConceptSchemeT, LabelT>[]
+  async *conceptSchemes(): AsyncGenerator<
+    ConceptSchemeStub<ConceptT, ConceptSchemeT, LabelT>
   > {
-    const result: ConceptSchemeStub<ConceptT, ConceptSchemeT, LabelT>[] = [];
     for (const identifier of getRdfInstances({
       class_: skos.ConceptScheme,
       dataset: this.dataset,
@@ -64,14 +63,11 @@ export class Kos<
       if (identifier.termType !== "NamedNode") {
         continue;
       }
-      result.push(
-        new ConceptSchemeStub({
-          modelFactory: this.modelFactory,
-          resource: new Resource({ dataset: this.dataset, identifier }),
-        }),
-      );
+      yield new ConceptSchemeStub({
+        modelFactory: this.modelFactory,
+        resource: new Resource({ dataset: this.dataset, identifier }),
+      });
     }
-    return result;
   }
 
   async *concepts(): AsyncGenerator<

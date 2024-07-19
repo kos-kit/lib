@@ -7,7 +7,7 @@ export interface Kos {
   conceptSchemeByIdentifier(
     identifier: ConceptScheme.Identifier,
   ): Stub<ConceptScheme>;
-  conceptSchemes(): Promise<readonly Stub<ConceptScheme>[]>;
+  conceptSchemes(): AsyncGenerator<Stub<ConceptScheme>>;
   concepts(): AsyncGenerator<Stub<Concept>>;
   conceptsCount(): Promise<number>;
   conceptsPage(kwds: {

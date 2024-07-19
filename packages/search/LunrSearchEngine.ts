@@ -78,7 +78,7 @@ export class LunrSearchEngine implements SearchEngine {
     }
 
     // Index concept schemes
-    for (const conceptScheme of await kos.conceptSchemes()) {
+    for await (const conceptScheme of kos.conceptSchemes()) {
       (await conceptScheme.resolve()).ifJust((conceptScheme) =>
         indexDocuments.push(toIndexDocument(conceptScheme, "ConceptScheme")),
       );
