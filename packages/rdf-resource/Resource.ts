@@ -272,6 +272,24 @@ export class Resource<
   }
 
   /**
+   * Consider the resource itself as an RDF list.
+   */
+  toList(): Maybe<readonly Resource.Value[]> {
+    let objectsList: Exclude<Quad_Object, Quad | Variable>[];
+    try {
+      objectsList = [
+        ...getRdfList({
+          dataset: this.dataset,
+          node: this.identifier,
+        }),
+      ];
+    } catch {
+      return Nothing;
+    }
+    return Just(objectsList.map((value) => new SomeResourceValue(value, this)));
+  }
+
+  /**
    * Get the first matching value of dataset statements (this.identifier, property, value).
    */
   value(
