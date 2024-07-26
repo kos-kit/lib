@@ -1,6 +1,7 @@
 import {
   Concept as IConcept,
   ConceptScheme as IConceptScheme,
+  Identifier,
 } from "@kos-kit/models";
 import { Maybe } from "purify-ts";
 
@@ -9,10 +10,10 @@ export interface ModelFetcher<
   SparqlConceptSchemeT extends IConceptScheme,
 > {
   fetchConceptSchemesByIdentifiers(
-    identifiers: readonly IConceptScheme.Identifier[],
+    identifiers: readonly Identifier[],
   ): Promise<readonly Maybe<SparqlConceptSchemeT>[]>;
 
   fetchConceptsByIdentifiers(
-    identifiers: readonly IConcept.Identifier[],
+    identifiers: readonly Identifier[],
   ): Promise<readonly Maybe<SparqlConceptT>[]>;
 }

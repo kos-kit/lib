@@ -67,7 +67,7 @@ WHERE {
   }
 
   async conceptByIdentifier(
-    identifier: IConcept.Identifier,
+    identifier: Identifier,
   ): Promise<Maybe<ConceptStub<SparqlConceptT, SparqlConceptSchemeT>>> {
     // TODO: verify it's part of the scheme
     return Just(
@@ -98,6 +98,10 @@ WHERE {
     return this._conceptsPage({ limit, offset, topOnly: false });
   }
 
+  equals(other: IConceptScheme): boolean {
+    return IConceptScheme.equals(this, other);
+  }
+
   topConcepts(): AsyncGenerator<
     ConceptStub<SparqlConceptT, SparqlConceptSchemeT>
   > {
@@ -126,7 +130,7 @@ WHERE {
     limit: number;
     offset: number;
     topOnly: boolean;
-  }): Promise<readonly IConcept.Identifier[]> {
+  }): Promise<readonly Identifier[]> {
     return mapResultRowsToIdentifiers(
       await this.sparqlClient.query.select(`\
 SELECT DISTINCT ?concept

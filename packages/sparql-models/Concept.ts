@@ -21,6 +21,10 @@ export class Concept<
   extends LabeledModel<MemConceptT, SparqlConceptT, SparqlConceptSchemeT>
   implements IConcept
 {
+  equals(other: IConcept): boolean {
+    return IConcept.equals(this, other);
+  }
+
   get notations(): readonly Literal[] {
     return this.memModel.notations;
   }

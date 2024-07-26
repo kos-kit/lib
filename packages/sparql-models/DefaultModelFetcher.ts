@@ -2,6 +2,7 @@ import * as mem from "@kos-kit/mem-models";
 import {
   Concept as IConcept,
   ConceptScheme as IConceptScheme,
+  Identifier,
   Label as ILabel,
   LanguageTagSet,
   noteProperties,
@@ -87,7 +88,7 @@ export class DefaultModelFetcher<
   }
 
   async fetchConceptSchemesByIdentifiers(
-    identifiers: readonly IConceptScheme.Identifier[],
+    identifiers: readonly Identifier[],
   ): Promise<readonly Maybe<SparqlConceptSchemeT>[]> {
     const conceptSchemeVariable: GraphPatternVariable = {
       termType: "Variable",
@@ -132,7 +133,7 @@ export class DefaultModelFetcher<
   }
 
   async fetchConceptsByIdentifiers(
-    identifiers: readonly IConcept.Identifier[],
+    identifiers: readonly Identifier[],
   ): Promise<readonly Maybe<SparqlConceptT>[]> {
     const conceptVariable: GraphPatternVariable = {
       termType: "Variable",

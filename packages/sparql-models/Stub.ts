@@ -1,7 +1,8 @@
 import {
   Concept as IConcept,
   ConceptScheme as IConceptScheme,
-  LabeledModel as ILabeledModel,
+  Identifier,
+  NamedModel as INamedModel,
   Stub as IStub,
 } from "@kos-kit/models";
 import { ModelFetcher } from "./ModelFetcher.js";
@@ -10,10 +11,10 @@ import { Maybe } from "purify-ts";
 export abstract class Stub<
   SparqlConceptT extends IConcept,
   SparqlConceptSchemeT extends IConceptScheme,
-  LabeledModelT extends ILabeledModel,
-> implements IStub<LabeledModelT>
+  ModelT extends INamedModel,
+> implements IStub<ModelT>
 {
-  readonly identifier: ILabeledModel.Identifier;
+  readonly identifier: Identifier;
   protected readonly modelFetcher: ModelFetcher<
     SparqlConceptT,
     SparqlConceptSchemeT
@@ -23,7 +24,7 @@ export abstract class Stub<
     identifier,
     modelFetcher,
   }: {
-    identifier: ILabeledModel.Identifier;
+    identifier: Identifier;
     modelFetcher: ModelFetcher<SparqlConceptT, SparqlConceptSchemeT>;
   }) {
     this.identifier = identifier;
@@ -31,10 +32,10 @@ export abstract class Stub<
   }
 
   get displayLabel() {
-    return ILabeledModel.Identifier.toString(this.identifier);
+    return Identifier.toString(this.identifier);
   }
 
-  abstract resolve(): Promise<Maybe<LabeledModelT>>;
+  abstract resolve(): Promise<Maybe<ModelT>>;
 
   async resolveOrStub() {
     const model = (await this.resolve()).extractNullable();

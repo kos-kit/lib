@@ -37,7 +37,7 @@ export class Kos<
   }
 
   conceptByIdentifier(
-    identifier: IConcept.Identifier,
+    identifier: Identifier,
   ): ConceptStub<SparqlConceptT, SparqlConceptSchemeT> {
     return new ConceptStub({
       identifier,
@@ -51,7 +51,7 @@ export class Kos<
   }: {
     limit: number;
     offset: number;
-  }): Promise<readonly IConcept.Identifier[]> {
+  }): Promise<readonly Identifier[]> {
     return mapResultRowsToIdentifiers(
       await this.sparqlClient.query.select(`\
 SELECT ?concept
@@ -111,7 +111,7 @@ WHERE {
   }
 
   conceptSchemeByIdentifier(
-    identifier: IConceptScheme.Identifier,
+    identifier: Identifier,
   ): ConceptSchemeStub<SparqlConceptT, SparqlConceptSchemeT> {
     return new ConceptSchemeStub({
       identifier,
@@ -119,9 +119,7 @@ WHERE {
     });
   }
 
-  private async conceptSchemeIdentifiers(): Promise<
-    readonly IConceptScheme.Identifier[]
-  > {
+  private async conceptSchemeIdentifiers(): Promise<readonly Identifier[]> {
     return mapResultRowsToIdentifiers(
       await this.sparqlClient.query.select(`\
 SELECT ?conceptScheme
