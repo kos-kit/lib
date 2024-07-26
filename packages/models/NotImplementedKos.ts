@@ -1,16 +1,15 @@
 import { Concept } from "./Concept.js";
 import { ConceptScheme } from "./ConceptScheme.js";
+import { Identifier } from "./Identifier.js";
 import { Kos } from "./Kos.js";
 import { Stub } from "./Stub.js";
 
 export class NotImplementedKos implements Kos {
-  conceptByIdentifier(_identifier: Concept.Identifier): Stub<Concept> {
+  conceptByIdentifier(_identifier: Identifier): Stub<Concept> {
     throw new Error("Method not implemented.");
   }
 
-  conceptSchemeByIdentifier(
-    _identifier: ConceptScheme.Identifier,
-  ): Stub<ConceptScheme> {
+  conceptSchemeByIdentifier(_identifier: Identifier): Stub<ConceptScheme> {
     throw new Error("Method not implemented.");
   }
 

@@ -1,8 +1,8 @@
-import { behavesLikeLabeledModel } from "./behavesLikeLabeledModel.js";
+import { behavesLikeLabelsMixin } from "./behavesLikeLabelsMixin.js";
 import { Concept, LanguageTag } from "..";
 
 export const behavesLikeConcept = (
   lazyConcept: (includeLanguageTag: LanguageTag) => Promise<Concept>,
 ) => {
-  behavesLikeLabeledModel(lazyConcept);
+  behavesLikeLabelsMixin(lazyConcept);
 };

@@ -1,6 +1,6 @@
 import { expect, it } from "vitest";
 import { ConceptScheme, LanguageTag } from "..";
-import { behavesLikeLabeledModel } from "./behavesLikeLabeledModel.js";
+import { behavesLikeLabelsMixin } from "./behavesLikeLabelsMixin.js";
 
 export const behavesLikeConceptScheme = (
   lazyConceptScheme: (
@@ -104,5 +104,5 @@ export const behavesLikeConceptScheme = (
     expect(await conceptScheme.topConceptsCount()).toStrictEqual(585);
   });
 
-  behavesLikeLabeledModel(lazyConceptScheme);
+  behavesLikeLabelsMixin(lazyConceptScheme);
 };

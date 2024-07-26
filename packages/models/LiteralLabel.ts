@@ -12,4 +12,12 @@ export class LiteralLabel implements Label {
   readonly rightsHolder: Maybe<Literal> = Nothing;
 
   constructor(readonly literalForm: Literal) {}
+
+  get displayLabel(): string {
+    return this.literalForm.value;
+  }
+
+  equals(other: Label): boolean {
+    return Label.equals(this, other);
+  }
 }

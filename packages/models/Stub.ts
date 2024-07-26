@@ -1,5 +1,6 @@
 import { Maybe } from "purify-ts";
-import { LabeledModel } from "./LabeledModel.js";
+import { Identifier } from "./Identifier.js";
+import { NamedModel } from "./NamedModel.js";
 
 /**
  * A stub is a placeholder for a model in situations where it's unclear whether the other model is fully resolvable.
@@ -8,17 +9,14 @@ import { LabeledModel } from "./LabeledModel.js";
  * but we may know nothing else about it. In those situations we return a stub model (i.e., ConceptStub) with the identifier and
  * let the caller resolve() the actual model as necessary.
  */
-export interface Stub<LabeledModelT extends LabeledModel> {
+export interface Stub<ModelT extends NamedModel> extends NamedModel {
   readonly displayLabel: string;
-  readonly identifier: LabeledModel.Identifier;
+  readonly identifier: Identifier;
 
-  resolve(): Promise<Maybe<LabeledModelT>>;
+  resolve(): Promise<Maybe<ModelT>>;
 
   /**
    * Resolve a stub, returning the model if successfully resolved, else the stub.
    */
-  resolveOrStub(): Promise<{
-    readonly displayLabel: string;
-    readonly identifier: LabeledModel.Identifier;
-  }>;
+  resolveOrStub(): Promise<NamedModel>;
 }
