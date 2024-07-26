@@ -43,6 +43,10 @@ export abstract class Stub<
     return this.resource.identifier;
   }
 
+  equals(other: IStub<ModelT>): boolean {
+    return IStub.equals(this, other);
+  }
+
   abstract resolve(): Promise<Maybe<ModelT>>;
 
   async resolveOrStub() {

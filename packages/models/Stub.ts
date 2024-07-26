@@ -1,5 +1,4 @@
 import { Maybe } from "purify-ts";
-import { Identifier } from "./Identifier.js";
 import { NamedModel } from "./NamedModel.js";
 
 /**
@@ -10,8 +9,7 @@ import { NamedModel } from "./NamedModel.js";
  * let the caller resolve() the actual model as necessary.
  */
 export interface Stub<ModelT extends NamedModel> extends NamedModel {
-  readonly displayLabel: string;
-  readonly identifier: Identifier;
+  equals(other: Stub<ModelT>): boolean;
 
   resolve(): Promise<Maybe<ModelT>>;
 
@@ -19,4 +17,13 @@ export interface Stub<ModelT extends NamedModel> extends NamedModel {
    * Resolve a stub, returning the model if successfully resolved, else the stub.
    */
   resolveOrStub(): Promise<NamedModel>;
+}
+
+export namespace Stub {
+  export function equals<ModelT extends NamedModel>(
+    left: Stub<ModelT>,
+    right: Stub<ModelT>,
+  ): boolean {
+    return left.identifier.equals(right.identifier);
+  }
 }
