@@ -1,26 +1,51 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   Concept as IConcept,
   ConceptScheme as IConceptScheme,
+  Identifier,
   Label as ILabel,
 } from "@kos-kit/models";
 import { Resource } from "@kos-kit/rdf-resource";
 import { isRdfInstanceOf } from "@kos-kit/rdf-utils";
 import TermSet from "@rdfjs/term-set";
 import { skos } from "@tpluscode/rdf-ns-builders";
-import { LabeledModel } from "./LabeledModel.js";
 import { countIterable } from "./countIterable.js";
 import { paginateIterable } from "./paginateIterable.js";
 import { Just, Maybe, Nothing } from "purify-ts";
 import { ConceptStub } from "./ConceptStub.js";
+import { ModelFactory } from "./ModelFactory.js";
+import { NamedModel } from "./NamedModel.js";
+import { mix } from "ts-mixer";
+import { LabelsMixin } from "./LabelsMixin.js";
+import { ProvenanceMixin } from "./ProvenanceMixin.js";
 
-export class ConceptScheme<
-    ConceptT extends IConcept,
-    ConceptSchemeT extends IConceptScheme,
-    LabelT extends ILabel,
-  >
-  extends LabeledModel<ConceptT, ConceptSchemeT, LabelT>
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface ConceptScheme<
+  ConceptT extends IConcept,
+  ConceptSchemeT extends IConceptScheme,
+  LabelT extends ILabel,
+> extends IConceptScheme {}
+
+@mix(LabelsMixin, ProvenanceMixin)
+// eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
+export class ConceptScheme<ConceptT, ConceptSchemeT, LabelT>
+  extends NamedModel
   implements IConceptScheme
 {
+  protected readonly modelFactory: ModelFactory<
+    ConceptT,
+    ConceptSchemeT,
+    LabelT
+  >;
+
+  constructor({
+    modelFactory,
+    ...namedModelParameters
+  }: ConceptScheme.Parameters<ConceptT, ConceptSchemeT, LabelT>) {
+    super(namedModelParameters);
+    this.modelFactory = modelFactory;
+  }
+
   async *_concepts({
     topOnly,
   }: {
@@ -39,7 +64,7 @@ export class ConceptScheme<
   }
 
   async conceptByIdentifier(
-    identifier: IConcept.Identifier,
+    identifier: Identifier,
   ): Promise<Maybe<ConceptStub<ConceptT, ConceptSchemeT, LabelT>>> {
     // conceptScheme skos:hasTopConcept resource entails resource is a skos:Concept because of
     // the range of skos:hasTopConcept
@@ -125,8 +150,8 @@ export class ConceptScheme<
     topOnly,
   }: {
     topOnly: boolean;
-  }): Generator<IConcept.Identifier> {
-    const conceptIdentifierSet = new TermSet<IConcept.Identifier>();
+  }): Generator<Identifier> {
+    const conceptIdentifierSet = new TermSet<Identifier>();
 
     // ConceptScheme -> Concept statement
     for (const conceptIdentifier of [
@@ -198,5 +223,15 @@ export class ConceptScheme<
       );
     }
     return result;
+  }
+}
+
+export namespace ConceptScheme {
+  export interface Parameters<
+    ConceptT extends IConcept,
+    ConceptSchemeT extends IConceptScheme,
+    LabelT extends ILabel,
+  > extends NamedModel.Parameters {
+    modelFactory: ModelFactory<ConceptT, ConceptSchemeT, LabelT>;
   }
 }

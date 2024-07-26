@@ -1,6 +1,7 @@
 import {
   Concept as IConcept,
   ConceptScheme as IConceptScheme,
+  Identifier,
   Kos as IKos,
   Label as ILabel,
 } from "@kos-kit/models";
@@ -36,7 +37,7 @@ export class Kos<
   }
 
   conceptByIdentifier(
-    identifier: IConcept.Identifier,
+    identifier: Identifier,
   ): ConceptStub<ConceptT, ConceptSchemeT, LabelT> {
     return new ConceptStub({
       modelFactory: this.modelFactory,
@@ -45,7 +46,7 @@ export class Kos<
   }
 
   conceptSchemeByIdentifier(
-    identifier: IConceptScheme.Identifier,
+    identifier: Identifier,
   ): ConceptSchemeStub<ConceptT, ConceptSchemeT, LabelT> {
     return new ConceptSchemeStub({
       modelFactory: this.modelFactory,
@@ -107,7 +108,7 @@ export class Kos<
     return result;
   }
 
-  private *conceptIdentifiers(): Generator<IConcept.Identifier> {
+  private *conceptIdentifiers(): Generator<Identifier> {
     for (const identifier of getRdfInstances({
       class_: skos.Concept,
       dataset: this.dataset,

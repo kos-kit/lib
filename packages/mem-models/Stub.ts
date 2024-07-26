@@ -1,8 +1,9 @@
 import {
   Concept as IConcept,
   ConceptScheme as IConceptScheme,
+  Identifier,
   Label as ILabel,
-  LabeledModel as ILabeledModel,
+  NamedModel as INamedModel,
   Stub as IStub,
 } from "@kos-kit/models";
 import { ModelFactory } from "./ModelFactory.js";
@@ -13,36 +14,36 @@ export abstract class Stub<
   ConceptT extends IConcept,
   ConceptSchemeT extends IConceptScheme,
   LabelT extends ILabel,
-  LabeledModelT extends ILabeledModel,
-> implements IStub<LabeledModelT>
+  ModelT extends INamedModel,
+> implements IStub<ModelT>
 {
   protected readonly modelFactory: ModelFactory<
     ConceptT,
     ConceptSchemeT,
     LabelT
   >;
-  protected readonly resource: Resource<ILabeledModel.Identifier>;
+  protected readonly resource: Resource<Identifier>;
 
   constructor({
     modelFactory,
     resource,
   }: {
     modelFactory: ModelFactory<ConceptT, ConceptSchemeT, LabelT>;
-    resource: Resource<ILabeledModel.Identifier>;
+    resource: Resource<Identifier>;
   }) {
     this.modelFactory = modelFactory;
     this.resource = resource;
   }
 
   get displayLabel() {
-    return ILabeledModel.Identifier.toString(this.identifier);
+    return Identifier.toString(this.identifier);
   }
 
   get identifier() {
     return this.resource.identifier;
   }
 
-  abstract resolve(): Promise<Maybe<LabeledModelT>>;
+  abstract resolve(): Promise<Maybe<ModelT>>;
 
   async resolveOrStub() {
     const model = (await this.resolve()).extractNullable();

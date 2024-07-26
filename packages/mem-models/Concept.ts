@@ -1,6 +1,8 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   Concept as IConcept,
   ConceptScheme as IConceptScheme,
+  Identifier,
   Label as ILabel,
   NoteProperty,
   SemanticRelationProperty,
@@ -9,25 +11,49 @@ import { Resource } from "@kos-kit/rdf-resource";
 import TermSet from "@rdfjs/term-set";
 import { Literal } from "@rdfjs/types";
 import { skos } from "@tpluscode/rdf-ns-builders";
-import { LabeledModel } from "./LabeledModel.js";
 import { matchLiteral } from "./matchLiteral.js";
 import { ConceptSchemeStub } from "./ConceptSchemeStub.js";
 import { ConceptStub } from "./ConceptStub.js";
+import { NamedModel } from "./NamedModel.js";
+import { mix } from "ts-mixer";
+import { ProvenanceMixin } from "./ProvenanceMixin.js";
+import { LabelsMixin } from "./LabelsMixin.js";
+import { ModelFactory } from "./ModelFactory.js";
 
-export class Concept<
-    ConceptT extends IConcept,
-    ConceptSchemeT extends IConceptScheme,
-    LabelT extends ILabel,
-  >
-  extends LabeledModel<ConceptT, ConceptSchemeT, LabelT>
-  implements IConcept
-{
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface Concept<
+  ConceptT extends IConcept,
+  ConceptSchemeT extends IConceptScheme,
+  LabelT extends ILabel,
+> extends IConcept {}
+
+@mix(LabelsMixin, ProvenanceMixin)
+// eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
+export class Concept<ConceptT, ConceptSchemeT, LabelT> extends NamedModel {
+  protected readonly modelFactory: ModelFactory<
+    ConceptT,
+    ConceptSchemeT,
+    LabelT
+  >;
+
+  constructor({
+    modelFactory,
+    ...namedModelParameters
+  }: Concept.Parameters<ConceptT, ConceptSchemeT, LabelT>) {
+    super(namedModelParameters);
+    this.modelFactory = modelFactory;
+  }
+
   get notations(): readonly Literal[] {
     return [
       ...this.resource
         .values(skos.notation)
         .flatMap((value) => value.toLiteral().toList()),
     ];
+  }
+
+  equals(other: IConcept): boolean {
+    return IConcept.equals(this, other);
   }
 
   async inSchemes(): Promise<
@@ -89,7 +115,7 @@ export class Concept<
   }: {
     topOnly: boolean;
   }): readonly ConceptSchemeStub<ConceptT, ConceptSchemeT, LabelT>[] {
-    const conceptSchemeIdentifiers = new TermSet<IConceptScheme.Identifier>();
+    const conceptSchemeIdentifiers = new TermSet<Identifier>();
 
     for (const quad of this.resource.dataset.match(
       null,
@@ -126,5 +152,15 @@ export class Concept<
           resource: new Resource({ dataset: this.dataset, identifier }),
         }),
     );
+  }
+}
+
+export namespace Concept {
+  export interface Parameters<
+    ConceptT extends IConcept,
+    ConceptSchemeT extends IConceptScheme,
+    LabelT extends ILabel,
+  > extends NamedModel.Parameters {
+    modelFactory: ModelFactory<ConceptT, ConceptSchemeT, LabelT>;
   }
 }

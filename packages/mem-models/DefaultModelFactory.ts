@@ -1,14 +1,16 @@
 import {
   Concept as IConcept,
   ConceptScheme as IConceptScheme,
+  Identifier,
   Label as ILabel,
   LanguageTagSet,
 } from "@kos-kit/models";
 import { Resource } from "@kos-kit/rdf-resource";
 import { Literal } from "@rdfjs/types";
 import { Label } from "./Label.js";
-import { LabeledModel } from "./LabeledModel.js";
 import { ModelFactory } from "./ModelFactory.js";
+import { Concept } from "./Concept.js";
+import { ConceptScheme } from "./ConceptScheme.js";
 
 export class DefaultModelFactory<
   ConceptT extends IConcept,
@@ -17,10 +19,10 @@ export class DefaultModelFactory<
 > implements ModelFactory<ConceptT, ConceptSchemeT, LabelT>
 {
   private readonly conceptConstructor: new (
-    parameters: LabeledModel.Parameters<ConceptT, ConceptSchemeT, LabelT>,
+    parameters: Concept.Parameters<ConceptT, ConceptSchemeT, LabelT>,
   ) => ConceptT;
   private readonly conceptSchemeConstructor: new (
-    parameters: LabeledModel.Parameters<ConceptT, ConceptSchemeT, LabelT>,
+    parameters: ConceptScheme.Parameters<ConceptT, ConceptSchemeT, LabelT>,
   ) => ConceptSchemeT;
   private readonly includeLanguageTags: LanguageTagSet;
   private readonly labelConstructor: new (
@@ -34,10 +36,10 @@ export class DefaultModelFactory<
     labelConstructor,
   }: {
     conceptConstructor: new (
-      parameters: LabeledModel.Parameters<ConceptT, ConceptSchemeT, LabelT>,
+      parameters: Concept.Parameters<ConceptT, ConceptSchemeT, LabelT>,
     ) => ConceptT;
     conceptSchemeConstructor: new (
-      parameters: LabeledModel.Parameters<ConceptT, ConceptSchemeT, LabelT>,
+      parameters: ConceptScheme.Parameters<ConceptT, ConceptSchemeT, LabelT>,
     ) => ConceptSchemeT;
     includeLanguageTags: LanguageTagSet;
     labelConstructor: new (parameters: Label.Parameters) => LabelT;
@@ -48,7 +50,7 @@ export class DefaultModelFactory<
     this.labelConstructor = labelConstructor;
   }
 
-  createConcept(resource: Resource<IConcept.Identifier>): ConceptT {
+  createConcept(resource: Resource<Identifier>): ConceptT {
     return new this.conceptConstructor({
       includeLanguageTags: this.includeLanguageTags,
       modelFactory: this,
@@ -56,9 +58,7 @@ export class DefaultModelFactory<
     });
   }
 
-  createConceptScheme(
-    resource: Resource<IConceptScheme.Identifier>,
-  ): ConceptSchemeT {
+  createConceptScheme(resource: Resource<Identifier>): ConceptSchemeT {
     return new this.conceptSchemeConstructor({
       includeLanguageTags: this.includeLanguageTags,
       modelFactory: this,
@@ -71,7 +71,7 @@ export class DefaultModelFactory<
     resource,
   }: {
     literalForm: Literal;
-    resource: Resource;
+    resource: Resource<Identifier>;
   }): LabelT {
     return new this.labelConstructor({
       includeLanguageTags: this.includeLanguageTags,
