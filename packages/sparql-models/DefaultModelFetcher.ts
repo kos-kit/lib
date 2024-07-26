@@ -16,10 +16,11 @@ import {
   GraphPatternSubject,
   GraphPatternVariable,
 } from "./GraphPattern.js";
-import { LabeledModel } from "./LabeledModel.js";
 import { ModelFetcher } from "./ModelFetcher.js";
 import { SparqlClient } from "./SparqlClient.js";
 import { Just, Maybe, Nothing } from "purify-ts";
+import { Concept } from "./Concept.js";
+import { ConceptScheme } from "./ConceptScheme.js";
 
 export class DefaultModelFetcher<
   MemConceptT extends IConcept,
@@ -30,14 +31,14 @@ export class DefaultModelFetcher<
 > implements ModelFetcher<SparqlConceptT, SparqlConceptSchemeT>
 {
   private readonly conceptConstructor: new (
-    parameters: LabeledModel.Parameters<
+    parameters: Concept.Parameters<
       MemConceptT,
       SparqlConceptT,
       SparqlConceptSchemeT
     >,
   ) => SparqlConceptT;
   private readonly conceptSchemeConstructor: new (
-    parameters: LabeledModel.Parameters<
+    parameters: ConceptScheme.Parameters<
       MemConceptSchemeT,
       SparqlConceptT,
       SparqlConceptSchemeT
@@ -59,14 +60,14 @@ export class DefaultModelFetcher<
     sparqlClient,
   }: {
     conceptConstructor: new (
-      parameters: LabeledModel.Parameters<
+      parameters: Concept.Parameters<
         MemConceptT,
         SparqlConceptT,
         SparqlConceptSchemeT
       >,
     ) => SparqlConceptT;
     conceptSchemeConstructor: new (
-      parameters: LabeledModel.Parameters<
+      parameters: ConceptScheme.Parameters<
         MemConceptSchemeT,
         SparqlConceptT,
         SparqlConceptSchemeT

@@ -7,8 +7,6 @@ export * from "./DefaultModelFetcher";
 export * from "./GraphPattern.js";
 export * from "./HttpSparqlClient.js";
 export * from "./Kos.js";
-export * from "./LabeledModel.js";
-export * from "./Model.js";
 export * from "./ModelFetcher";
 export * from "./SparqlClient.js";
 export * from "./Stub.js";
