@@ -15,35 +15,41 @@ import { Just, Maybe, Nothing } from "purify-ts";
 import { ConceptStub } from "./ConceptStub.js";
 import { ModelFactory } from "./ModelFactory.js";
 import { NamedModel } from "./NamedModel.js";
-import { mix } from "ts-mixer";
-import { LabelsMixin } from "./LabelsMixin.js";
-import { ProvenanceMixin } from "./ProvenanceMixin.js";
+import { Labels } from "./Labels.js";
+import { Provenance } from "./Provenance.js";
+import { Literal, NamedNode } from "@rdfjs/types";
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface ConceptScheme<
-  ConceptT extends IConcept,
-  ConceptSchemeT extends IConceptScheme,
-  LabelT extends ILabel,
-> extends IConceptScheme {}
-
-@mix(LabelsMixin, ProvenanceMixin)
-// eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
-export class ConceptScheme<ConceptT, ConceptSchemeT, LabelT>
+export class ConceptScheme<
+    ConceptT extends IConcept,
+    ConceptSchemeT extends IConceptScheme,
+    LabelT extends ILabel,
+  >
   extends NamedModel
   implements IConceptScheme
 {
+  private readonly labels: Labels<LabelT>;
   protected readonly modelFactory: ModelFactory<
     ConceptT,
     ConceptSchemeT,
     LabelT
   >;
+  private readonly provenance: Provenance;
 
   constructor({
     modelFactory,
     ...namedModelParameters
   }: ConceptScheme.Parameters<ConceptT, ConceptSchemeT, LabelT>) {
     super(namedModelParameters);
+    this.labels = new Labels({
+      labelFactory: modelFactory,
+      ...namedModelParameters,
+    });
     this.modelFactory = modelFactory;
+    this.provenance = new Provenance(namedModelParameters);
+  }
+
+  get altLabels(): readonly ILabel[] {
+    return this.labels.altLabels;
   }
 
   async *_concepts({
@@ -127,6 +133,38 @@ export class ConceptScheme<ConceptT, ConceptSchemeT, LabelT>
     offset: number;
   }): Promise<readonly ConceptStub<ConceptT, ConceptSchemeT, LabelT>[]> {
     return this._conceptsPage({ ...kwds, topOnly: false });
+  }
+
+  get displayLabel(): string {
+    return this.labels.displayLabel;
+  }
+
+  equals(other: IConceptScheme): boolean {
+    return IConceptScheme.equals(this, other);
+  }
+
+  get hiddenLabels(): readonly ILabel[] {
+    return this.labels.hiddenLabels;
+  }
+
+  get license(): Maybe<Literal | NamedNode> {
+    return this.provenance.license;
+  }
+
+  get modified(): Maybe<Literal> {
+    return this.provenance.modified;
+  }
+
+  get prefLabels(): readonly ILabel[] {
+    return this.labels.prefLabels;
+  }
+
+  get rights(): Maybe<Literal> {
+    return this.provenance.rights;
+  }
+
+  get rightsHolder(): Maybe<Literal> {
+    return this.provenance.rightsHolder;
   }
 
   async *topConcepts(): AsyncGenerator<

@@ -1,16 +1,26 @@
-import { ProvenanceMixin as IProvenanceMixin } from "@kos-kit/models";
+import {
+  Identifier,
+  ProvenanceMixin as IProvenanceMixin,
+  LanguageTagSet,
+} from "@kos-kit/models";
 import { Literal, NamedNode } from "@rdfjs/types";
 import { dc11, dcterms } from "@tpluscode/rdf-ns-builders";
 import { matchLiteral } from "./matchLiteral.js";
 import { Just, Maybe, Nothing } from "purify-ts";
-import { NamedModelMixin } from "./NamedModelMixin.js";
+import { Resource } from "@kos-kit/rdf-resource";
+import { NamedModel } from "./NamedModel.js";
 
 const rightsPredicates = [dcterms.rights, dc11.rights];
 
-export abstract class ProvenanceMixin
-  extends NamedModelMixin
-  implements IProvenanceMixin
-{
+export class Provenance implements IProvenanceMixin {
+  private readonly includeLanguageTags: LanguageTagSet;
+  private readonly resource: Resource<Identifier>;
+
+  constructor({ includeLanguageTags, resource }: NamedModel.Parameters) {
+    this.includeLanguageTags = includeLanguageTags;
+    this.resource = resource;
+  }
+
   get license(): Maybe<Literal | NamedNode> {
     const literals: Literal[] = [];
 

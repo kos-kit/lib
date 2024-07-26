@@ -1,6 +1,8 @@
 import {
+  Identifier,
   Label as ILabel,
   LabelsMixin as ILabelsMixin,
+  LanguageTagSet,
   LiteralLabel,
 } from "@kos-kit/models";
 import { Resource } from "@kos-kit/rdf-resource";
@@ -9,14 +11,23 @@ import { skos, skosxl } from "@tpluscode/rdf-ns-builders";
 import { matchLiteral } from "./matchLiteral.js";
 import { Maybe } from "purify-ts";
 import "iterator-helpers-polyfill";
-import { NamedModelMixin } from "./NamedModelMixin.js";
 import { LabelFactory } from "./LabelFactory.js";
+import { NamedModel } from "./NamedModel.js";
 
-export abstract class LabelsMixin<LabelT extends ILabel>
-  extends NamedModelMixin
-  implements ILabelsMixin
-{
-  protected abstract readonly labelFactory: LabelFactory<LabelT>;
+export class Labels<LabelT extends ILabel> implements ILabelsMixin {
+  private readonly includeLanguageTags: LanguageTagSet;
+  private readonly labelFactory: LabelFactory<LabelT>;
+  private readonly resource: Resource<Identifier>;
+
+  constructor({
+    includeLanguageTags,
+    labelFactory,
+    resource,
+  }: { labelFactory: LabelFactory<LabelT> } & NamedModel.Parameters) {
+    this.includeLanguageTags = includeLanguageTags;
+    this.labelFactory = labelFactory;
+    this.resource = resource;
+  }
 
   get altLabels(): readonly ILabel[] {
     return this.labels({
@@ -37,7 +48,7 @@ export abstract class LabelsMixin<LabelT extends ILabel>
       }
     }
 
-    return Resource.Identifier.toString(this.identifier);
+    return Resource.Identifier.toString(this.resource.identifier);
   }
 
   get hiddenLabels(): readonly ILabel[] {
