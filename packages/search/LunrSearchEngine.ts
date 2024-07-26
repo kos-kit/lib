@@ -1,4 +1,4 @@
-import { Kos, LabeledModel, LanguageTag } from "@kos-kit/models";
+import { Kos, LabelsMixin, LanguageTag, NamedModel } from "@kos-kit/models";
 import { Resource } from "@kos-kit/rdf-resource";
 import lunr, { Index } from "lunr";
 import { LunrIndexCompactor } from "./LunrIndexCompactor.js";
@@ -34,7 +34,7 @@ export class LunrSearchEngine implements SearchEngine {
     }
 
     const toIndexDocument = (
-      model: LabeledModel,
+      model: NamedModel & LabelsMixin,
       type: SearchResult["type"],
     ): IndexDocument | null => {
       const prefLabels = model.prefLabels;
