@@ -9,10 +9,14 @@ import {
   Quad_Object,
   Variable,
 } from "@rdfjs/types";
-import { Just, Maybe, Nothing } from "purify-ts";
+import { Either, Just, Left, Maybe, Nothing } from "purify-ts";
 import { fromRdf } from "rdf-literal";
 
 class NothingResourceValue implements Resource.Value {
+  readonly #toList: Either<Error, readonly Resource.Value[]> = Left(
+    new Error("object is a not a list"),
+  );
+
   isBoolean(): boolean {
     return false;
   }
@@ -55,8 +59,8 @@ class NothingResourceValue implements Resource.Value {
   toLiteral(): Maybe<Literal> {
     return Nothing;
   }
-  toList(): Maybe<readonly Resource.Value[]> {
-    return Nothing;
+  toList(): Either<Error, readonly Resource.Value[]> {
+    return this.#toList;
   }
   toNamedResource(): Maybe<Resource<NamedNode>> {
     return Nothing;
@@ -108,7 +112,7 @@ class SomeResourceValue implements Resource.Value {
   }
 
   isList(): boolean {
-    return this.toList().isJust();
+    return this.toList().isRight();
   }
 
   isLiteral(): boolean {
@@ -161,29 +165,22 @@ class SomeResourceValue implements Resource.Value {
     return this.object.termType === "Literal" ? Just(this.object) : Nothing;
   }
 
-  toList(): Maybe<readonly Resource.Value[]> {
-    switch (this.object.termType) {
+  toList(): Either<Error, readonly Resource.Value[]> {
+    const object = this.object;
+    switch (object.termType) {
       case "BlankNode":
       case "NamedNode": {
-        let objectsList: Exclude<Quad_Object, Quad | Variable>[];
-        try {
-          objectsList = [
+        return Either.encase(() => {
+          return [
             ...getRdfList({
               dataset: this.subjectResource.dataset,
-              node: this.object,
+              node: object,
             }),
-          ];
-        } catch {
-          return Nothing;
-        }
-        return Just(
-          objectsList.map(
-            (value) => new SomeResourceValue(value, this.subjectResource),
-          ),
-        );
+          ].map((value) => new SomeResourceValue(value, this.subjectResource));
+        });
       }
       default:
-        return Nothing;
+        return Left(new Error("object is not an identifier"));
     }
   }
 
@@ -274,19 +271,15 @@ export class Resource<
   /**
    * Consider the resource itself as an RDF list.
    */
-  toList(): Maybe<readonly Resource.Value[]> {
-    let objectsList: Exclude<Quad_Object, Quad | Variable>[];
-    try {
-      objectsList = [
+  toList(): Either<Error, readonly Resource.Value[]> {
+    return Either.encase(() =>
+      [
         ...getRdfList({
           dataset: this.dataset,
           node: this.identifier,
         }),
-      ];
-    } catch {
-      return Nothing;
-    }
-    return Just(objectsList.map((value) => new SomeResourceValue(value, this)));
+      ].map((value) => new SomeResourceValue(value, this)),
+    );
   }
 
   /**
@@ -421,7 +414,7 @@ export namespace Resource {
     toDate(): Maybe<Date>;
     toIdentifier(): Maybe<Identifier>;
     toIri(): Maybe<NamedNode>;
-    toList(): Maybe<readonly Value[]>;
+    toList(): Either<Error, readonly Value[]>;
     toLiteral(): Maybe<Literal>;
     toNamedResource(): Maybe<Resource<NamedNode>>;
     toNumber(): Maybe<number>;
