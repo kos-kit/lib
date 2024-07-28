@@ -1,6 +1,7 @@
 /* eslint-disable no-inner-declarations */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import {
+  BlankNode,
   DataFactory,
   NamedNode,
   Quad,
@@ -9,12 +10,19 @@ import {
   Variable,
 } from "@rdfjs/types";
 import { Resource } from "./Resource.js";
+import { createRdfList } from "@kos-kit/rdf-utils";
+import { rdf } from "@tpluscode/rdf-ns-builders";
 
+type Value = Exclude<Quad_Object, Quad | Variable>;
+
+/**
+ * Resource subclass with operations to mutate the underlying dataset.
+ */
 export class MutableResource<
   IdentifierT extends Resource.Identifier = Resource.Identifier,
 > extends Resource<IdentifierT> {
   readonly dataFactory: DataFactory;
-  readonly mutateGraph: Exclude<Quad_Graph, Variable>;
+  readonly mutateGraph: MutableResource.MutateGraph;
 
   constructor({
     dataFactory,
@@ -26,30 +34,48 @@ export class MutableResource<
     this.mutateGraph = mutateGraph;
   }
 
-  add(
-    predicate: NamedNode,
-    object: Exclude<Quad_Object, Quad | Variable>,
-  ): this {
+  add(predicate: NamedNode, value: Value): this {
     this.dataset.add(
       this.dataFactory.quad(
         this.identifier,
         predicate,
-        object,
+        value,
         this.mutateGraph,
       ),
     );
     return this;
   }
 
-  delete(
+  addList(
     predicate: NamedNode,
-    object?: Exclude<Quad_Object, Quad | Variable>,
+    valuesList: Iterable<Value>,
+    options?: MutableResource.AddListOptions,
   ): this {
+    const listIdentifier = createRdfList({
+      dataFactory: this.dataFactory,
+      dataset: this.dataset,
+      generateIdentifier: options?.generateIdentifier,
+      items: valuesList,
+    });
+    if (options?.rdfType) {
+      this.dataset.add(
+        this.dataFactory.quad(
+          listIdentifier,
+          rdf.type,
+          options.rdfType,
+          this.mutateGraph,
+        ),
+      );
+    }
+    return this.add(predicate, listIdentifier);
+  }
+
+  delete(predicate: NamedNode, value?: Value): this {
     for (const quad of [
       ...this.dataset.match(
         this.identifier,
         predicate,
-        object,
+        value,
         this.mutateGraph,
       ),
     ]) {
@@ -58,16 +84,23 @@ export class MutableResource<
     return this;
   }
 
-  set(
-    predicate: NamedNode,
-    object: Exclude<Quad_Object, Quad | Variable>,
-  ): this {
+  set(predicate: NamedNode, value: Value): this {
     this.delete(predicate);
-    return this.add(predicate, object);
+    return this.add(predicate, value);
   }
 }
 
 export namespace MutableResource {
+  export type MutateGraph = Exclude<Quad_Graph, Variable>;
+
+  export interface AddListOptions {
+    generateIdentifier?: (
+      item: Value,
+      itemIndex: number,
+    ) => BlankNode | NamedNode;
+    rdfType?: NamedNode;
+  }
+
   export interface Parameters<IdentifierT extends Resource.Identifier>
     extends Resource.Parameters<IdentifierT> {
     dataFactory: DataFactory;

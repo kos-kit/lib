@@ -1,30 +1,24 @@
-import { Model as IModel, LanguageTagSet } from "@kos-kit/models";
-import { Resource } from "@kos-kit/rdf-resource";
-import { DatasetCore, Literal, NamedNode } from "@rdfjs/types";
+import {
+  Identifier,
+  ProvenanceMixin as IProvenanceMixin,
+  LanguageTagSet,
+} from "@kos-kit/models";
+import { Literal, NamedNode } from "@rdfjs/types";
 import { dc11, dcterms } from "@tpluscode/rdf-ns-builders";
 import { matchLiteral } from "./matchLiteral.js";
 import { Just, Maybe, Nothing } from "purify-ts";
+import { Resource } from "@kos-kit/rdf-resource";
+import { NamedModel } from "./NamedModel.js";
 
 const rightsPredicates = [dcterms.rights, dc11.rights];
-/**
- * Abstract base class for RDF/JS Dataset-backed models.
- */
-export abstract class Model<IdentifierT extends Resource.Identifier>
-  implements IModel
-{
-  protected readonly includeLanguageTags: LanguageTagSet;
-  protected readonly resource: Resource<IdentifierT>;
 
-  constructor({
-    includeLanguageTags,
-    resource,
-  }: Model.Parameters<IdentifierT>) {
-    this.resource = resource;
+export class Provenance implements IProvenanceMixin {
+  private readonly includeLanguageTags: LanguageTagSet;
+  private readonly resource: Resource<Identifier>;
+
+  constructor({ includeLanguageTags, resource }: NamedModel.Parameters) {
     this.includeLanguageTags = includeLanguageTags;
-  }
-
-  get identifier(): IdentifierT {
-    return this.resource.identifier;
+    this.resource = resource;
   }
 
   get license(): Maybe<Literal | NamedNode> {
@@ -71,10 +65,6 @@ export abstract class Model<IdentifierT extends Resource.Identifier>
     return this.literalObject(dcterms.rightsHolder);
   }
 
-  protected get dataset(): DatasetCore {
-    return this.resource.dataset;
-  }
-
   private literalObject(predicate: NamedNode): Maybe<Literal> {
     const literals: readonly Literal[] = [
       ...this.resource.values(predicate),
@@ -93,12 +83,5 @@ export abstract class Model<IdentifierT extends Resource.Identifier>
     }
 
     return Nothing;
-  }
-}
-
-export namespace Model {
-  export interface Parameters<IdentifierT extends Resource.Identifier> {
-    includeLanguageTags: LanguageTagSet;
-    resource: Resource<IdentifierT>;
   }
 }

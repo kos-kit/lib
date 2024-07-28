@@ -1,3 +1,4 @@
+import { getRdfList, isRdfInstanceOf } from "@kos-kit/rdf-utils";
 import {
   BlankNode,
   DataFactory,
@@ -8,10 +9,14 @@ import {
   Quad_Object,
   Variable,
 } from "@rdfjs/types";
-import { Just, Maybe, Nothing } from "purify-ts";
+import { Either, Just, Left, Maybe, Nothing } from "purify-ts";
 import { fromRdf } from "rdf-literal";
 
 class NothingResourceValue implements Resource.Value {
+  readonly #toList: Either<Error, readonly Resource.Value[]> = Left(
+    new Error("object is a not a list"),
+  );
+
   isBoolean(): boolean {
     return false;
   }
@@ -53,6 +58,9 @@ class NothingResourceValue implements Resource.Value {
   }
   toLiteral(): Maybe<Literal> {
     return Nothing;
+  }
+  toList(): Either<Error, readonly Resource.Value[]> {
+    return this.#toList;
   }
   toNamedResource(): Maybe<Resource<NamedNode>> {
     return Nothing;
@@ -101,6 +109,10 @@ class SomeResourceValue implements Resource.Value {
 
   isIri(): boolean {
     return this.object.termType === "NamedNode";
+  }
+
+  isList(): boolean {
+    return this.toList().isRight();
   }
 
   isLiteral(): boolean {
@@ -153,6 +165,25 @@ class SomeResourceValue implements Resource.Value {
     return this.object.termType === "Literal" ? Just(this.object) : Nothing;
   }
 
+  toList(): Either<Error, readonly Resource.Value[]> {
+    const object = this.object;
+    switch (object.termType) {
+      case "BlankNode":
+      case "NamedNode": {
+        return Either.encase(() => {
+          return [
+            ...getRdfList({
+              dataset: this.subjectResource.dataset,
+              node: object,
+            }),
+          ].map((value) => new SomeResourceValue(value, this.subjectResource));
+        });
+      }
+      default:
+        return Left(new Error("object is not an identifier"));
+    }
+  }
+
   toNamedResource(): Maybe<Resource<NamedNode>> {
     return this.toIri().map(
       (identifier) =>
@@ -199,6 +230,17 @@ class SomeResourceValue implements Resource.Value {
   }
 }
 
+function defaultValueOfFilter(_subject: Resource): boolean {
+  return true;
+}
+
+function defaultValueFilter(_value: Resource.Value): boolean {
+  return true;
+}
+
+/**
+ * A Resource abstraction over subjects or objects in an RDF/JS dataset.
+ */
 export class Resource<
   IdentifierT extends Resource.Identifier = Resource.Identifier,
 > {
@@ -210,14 +252,74 @@ export class Resource<
     this.identifier = identifier;
   }
 
-  value(property: NamedNode): Resource.Value {
+  isInstanceOf(
+    class_: NamedNode,
+    options?: {
+      excludeSubclasses?: boolean;
+      instanceOfPredicate?: NamedNode;
+      subClassOfPredicate?: NamedNode;
+    },
+  ): boolean {
+    return isRdfInstanceOf({
+      class_,
+      dataset: this.dataset,
+      instance: this.identifier,
+      ...options,
+    });
+  }
+
+  /**
+   * Consider the resource itself as an RDF list.
+   */
+  toList(): Either<Error, readonly Resource.Value[]> {
+    return Either.encase(() =>
+      [
+        ...getRdfList({
+          dataset: this.dataset,
+          node: this.identifier,
+        }),
+      ].map((value) => new SomeResourceValue(value, this)),
+    );
+  }
+
+  /**
+   * Get the first matching value of dataset statements (this.identifier, property, value).
+   */
+  value(
+    property: NamedNode,
+    filter?: (value: Resource.Value) => boolean,
+  ): Resource.Value {
+    if (!filter) {
+      filter = defaultValueFilter;
+    }
     for (const value of this.values(property)) {
-      return value;
+      if (filter(value)) {
+        return value;
+      }
     }
     return nothingResourceValue;
   }
 
-  *values(property: NamedNode): Iterable<Resource.Value> {
+  /**
+   * Get the first matching subject of dataset statements (subject, property, this.identifier).
+   */
+  valueOf(
+    property: NamedNode,
+    filter?: (subject: Resource) => boolean,
+  ): Maybe<Resource> {
+    if (!filter) {
+      filter = defaultValueOfFilter;
+    }
+    for (const resource of this.valuesOf(property)) {
+      return Just(resource);
+    }
+    return Nothing;
+  }
+
+  /**
+   * Get all values of dataset statements (this.identifier, property, value).
+   */
+  *values(property: NamedNode): Generator<Resource.Value> {
     for (const quad of this.dataset.match(
       this.identifier,
       property,
@@ -225,12 +327,34 @@ export class Resource<
       null,
     )) {
       switch (quad.object.termType) {
-        case "Quad":
-        case "Variable":
-          continue;
+        case "BlankNode":
+        case "Literal":
+        case "NamedNode":
+          yield new SomeResourceValue(quad.object, this);
+          break;
       }
+    }
+  }
 
-      yield new SomeResourceValue(quad.object, this);
+  /**
+   * Get the first subject of dataset statements (subject, property, this.identifier).
+   */
+  *valuesOf(property: NamedNode): Generator<Resource> {
+    for (const quad of this.dataset.match(
+      null,
+      property,
+      this.identifier,
+      null,
+    )) {
+      switch (quad.subject.termType) {
+        case "BlankNode":
+        case "NamedNode":
+          yield new Resource({
+            dataset: this.dataset,
+            identifier: quad.subject,
+          });
+          break;
+      }
     }
   }
 }
@@ -290,6 +414,7 @@ export namespace Resource {
     toDate(): Maybe<Date>;
     toIdentifier(): Maybe<Identifier>;
     toIri(): Maybe<NamedNode>;
+    toList(): Either<Error, readonly Value[]>;
     toLiteral(): Maybe<Literal>;
     toNamedResource(): Maybe<Resource<NamedNode>>;
     toNumber(): Maybe<number>;

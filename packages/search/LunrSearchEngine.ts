@@ -1,4 +1,4 @@
-import { Kos, LabeledModel, LanguageTag } from "@kos-kit/models";
+import { Kos, LabelsMixin, LanguageTag, NamedModel } from "@kos-kit/models";
 import { Resource } from "@kos-kit/rdf-resource";
 import lunr, { Index } from "lunr";
 import { LunrIndexCompactor } from "./LunrIndexCompactor.js";
@@ -34,7 +34,7 @@ export class LunrSearchEngine implements SearchEngine {
     }
 
     const toIndexDocument = (
-      model: LabeledModel,
+      model: NamedModel & LabelsMixin,
       type: SearchResult["type"],
     ): IndexDocument | null => {
       const prefLabels = model.prefLabels;
@@ -64,21 +64,25 @@ export class LunrSearchEngine implements SearchEngine {
         limit: conceptsLimit,
         offset: 0,
       })) {
-        indexDocuments.push(toIndexDocument(concept, "Concept"));
+        (await concept.resolve()).ifJust((concept) =>
+          indexDocuments.push(toIndexDocument(concept, "Concept")),
+        );
       }
     } else {
       // Index all concepts in the set
       for await (const concept of kos.concepts()) {
-        indexDocuments.push(toIndexDocument(concept, "Concept"));
+        (await concept.resolve()).ifJust((concept) =>
+          indexDocuments.push(toIndexDocument(concept, "Concept")),
+        );
       }
     }
 
     // Index concept schemes
-    indexDocuments.push(
-      ...(await kos.conceptSchemes()).map((conceptScheme) =>
-        toIndexDocument(conceptScheme, "ConceptScheme"),
-      ),
-    );
+    for await (const conceptScheme of kos.conceptSchemes()) {
+      (await conceptScheme.resolve()).ifJust((conceptScheme) =>
+        indexDocuments.push(toIndexDocument(conceptScheme, "ConceptScheme")),
+      );
+    }
 
     const compactIndexDocuments: Record<string, Record<string, string>> = {};
     const index = lunr(function () {

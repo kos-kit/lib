@@ -1,6 +1,6 @@
 import { expect, it } from "vitest";
 import { ConceptScheme, LanguageTag } from "..";
-import { behavesLikeLabeledModel } from "./behavesLikeLabeledModel.js";
+import { behavesLikeLabelsMixin } from "./behavesLikeLabelsMixin.js";
 
 export const behavesLikeConceptScheme = (
   lazyConceptScheme: (
@@ -21,7 +21,9 @@ export const behavesLikeConceptScheme = (
       await conceptScheme.conceptByIdentifier(firstConcept.identifier)
     ).extractNullable();
     expect(conceptByIdentifier).not.toBeNull();
-    expect(conceptByIdentifier?.identifier.equals(firstConcept.identifier));
+    expect(
+      conceptByIdentifier?.identifier.equals(firstConcept.identifier),
+    ).toBe(true);
   });
 
   it("should get concept pages", async () => {
@@ -44,14 +46,16 @@ export const behavesLikeConceptScheme = (
           (firstConcept) =>
             !firstConcept.identifier.equals(nextConcept.identifier),
         ),
-      ).toBeTruthy();
+      ).toBe(true);
     }
   });
 
   it("should get concepts", async () => {
     const conceptScheme = await lazyConceptScheme("en");
     for await (const concept of conceptScheme.concepts()) {
-      expect(concept.displayLabel);
+      expect(
+        (await concept.resolve()).extractNullable()?.displayLabel,
+      ).toBeDefined();
       return;
     }
   });
@@ -81,14 +85,16 @@ export const behavesLikeConceptScheme = (
           (firstConcept) =>
             !firstConcept.identifier.equals(nextConcept.identifier),
         ),
-      ).toBeTruthy();
+      ).toBe(true);
     }
   });
 
   it("should get top concepts", async () => {
     const conceptScheme = await lazyConceptScheme("en");
     for await (const topConcept of conceptScheme.topConcepts()) {
-      expect(topConcept.displayLabel);
+      expect(
+        (await topConcept.resolve()).extractNullable()?.displayLabel,
+      ).toBeTruthy();
       return;
     }
   });
@@ -98,5 +104,5 @@ export const behavesLikeConceptScheme = (
     expect(await conceptScheme.topConceptsCount()).toStrictEqual(585);
   });
 
-  behavesLikeLabeledModel(lazyConceptScheme);
+  behavesLikeLabelsMixin(lazyConceptScheme);
 };

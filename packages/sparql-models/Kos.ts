@@ -1,6 +1,7 @@
 import {
   Concept as IConcept,
   ConceptScheme as IConceptScheme,
+  Identifier,
   Kos as IKos,
 } from "@kos-kit/models";
 import { rdf, rdfs, skos } from "@tpluscode/rdf-ns-builders";
@@ -8,8 +9,8 @@ import { ModelFetcher } from "./ModelFetcher.js";
 import { SparqlClient } from "./SparqlClient.js";
 import { mapResultRowsToCount } from "./mapResultRowsToCount.js";
 import { mapResultRowsToIdentifiers } from "./mapResultRowsToIdentifiers.js";
-import { paginationToAsyncIterable } from "./paginationToAsyncIterable.js";
-import { Maybe } from "purify-ts";
+import { ConceptStub } from "./ConceptStub.js";
+import { ConceptSchemeStub } from "./ConceptSchemeStub.js";
 
 export class Kos<
   SparqlConceptT extends IConcept,
@@ -36,12 +37,13 @@ export class Kos<
     this.sparqlClient = sparqlClient;
   }
 
-  async conceptByIdentifier(
-    identifier: IConcept.Identifier,
-  ): Promise<Maybe<SparqlConceptT>> {
-    return (
-      await this.modelFetcher.fetchConceptsByIdentifiers([identifier])
-    )[0];
+  conceptByIdentifier(
+    identifier: Identifier,
+  ): ConceptStub<SparqlConceptT, SparqlConceptSchemeT> {
+    return new ConceptStub({
+      identifier,
+      modelFetcher: this.modelFetcher,
+    });
   }
 
   private async conceptIdentifiersPage({
@@ -50,7 +52,7 @@ export class Kos<
   }: {
     limit: number;
     offset: number;
-  }): Promise<readonly IConcept.Identifier[]> {
+  }): Promise<readonly Identifier[]> {
     return mapResultRowsToIdentifiers(
       await this.sparqlClient.query.select(`\
 SELECT ?concept
@@ -63,17 +65,17 @@ OFFSET ${offset}`),
     );
   }
 
-  async *concepts(): AsyncIterable<SparqlConceptT> {
-    yield* paginationToAsyncIterable({
-      getPage: ({ offset }) => this.conceptsPage({ limit: 100, offset }),
-      totalCount: await this.conceptsCount(),
-    });
-  }
-
-  conceptsByIdentifiers(
-    identifiers: readonly IConcept.Identifier[],
-  ): Promise<readonly Maybe<SparqlConceptT>[]> {
-    return this.modelFetcher.fetchConceptsByIdentifiers(identifiers);
+  async *concepts(): AsyncGenerator<
+    ConceptStub<SparqlConceptT, SparqlConceptSchemeT>
+  > {
+    const count = await this.conceptsCount();
+    let offset = 0;
+    while (offset < count) {
+      for (const value of await this.conceptsPage({ limit: 100, offset })) {
+        yield value;
+        offset++;
+      }
+    }
   }
 
   async conceptsCount(): Promise<number> {
@@ -94,28 +96,31 @@ WHERE {
   }: {
     limit: number;
     offset: number;
-  }): Promise<readonly SparqlConceptT[]> {
+  }): Promise<readonly ConceptStub<SparqlConceptT, SparqlConceptSchemeT>[]> {
     return (
-      await this.modelFetcher.fetchConceptsByIdentifiers(
-        await this.conceptIdentifiersPage({
-          limit,
-          offset,
+      await this.conceptIdentifiersPage({
+        limit,
+        offset,
+      })
+    ).map(
+      (identifier) =>
+        new ConceptStub({
+          identifier,
+          modelFetcher: this.modelFetcher,
         }),
-      )
-    ).flatMap((concept) => concept.toList());
+    );
   }
 
-  async conceptSchemeByIdentifier(
-    identifier: IConceptScheme.Identifier,
-  ): Promise<Maybe<SparqlConceptSchemeT>> {
-    return (
-      await this.modelFetcher.fetchConceptSchemesByIdentifiers([identifier])
-    )[0];
+  conceptSchemeByIdentifier(
+    identifier: Identifier,
+  ): ConceptSchemeStub<SparqlConceptT, SparqlConceptSchemeT> {
+    return new ConceptSchemeStub({
+      identifier,
+      modelFetcher: this.modelFetcher,
+    });
   }
 
-  private async conceptSchemeIdentifiers(): Promise<
-    readonly IConceptScheme.Identifier[]
-  > {
+  private async conceptSchemeIdentifiers(): Promise<readonly Identifier[]> {
     return mapResultRowsToIdentifiers(
       await this.sparqlClient.query.select(`\
 SELECT ?conceptScheme
@@ -126,11 +131,14 @@ WHERE {
     );
   }
 
-  async conceptSchemes(): Promise<readonly SparqlConceptSchemeT[]> {
-    return (
-      await this.modelFetcher.fetchConceptSchemesByIdentifiers(
-        await this.conceptSchemeIdentifiers(),
-      )
-    ).flatMap((conceptScheme) => conceptScheme.toList());
+  async *conceptSchemes(): AsyncGenerator<
+    ConceptSchemeStub<SparqlConceptT, SparqlConceptSchemeT>
+  > {
+    for (const identifier of await this.conceptSchemeIdentifiers()) {
+      yield new ConceptSchemeStub({
+        identifier,
+        modelFetcher: this.modelFetcher,
+      });
+    }
   }
 }

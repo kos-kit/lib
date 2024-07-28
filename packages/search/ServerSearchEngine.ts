@@ -56,26 +56,30 @@ export class ServerSearchEngine implements SearchEngine {
     const page: SearchResult[] = [];
 
     for await (const concept of kos.concepts()) {
-      const prefLabels = concept.prefLabels;
-      if (prefLabels.length === 0) {
-        continue;
-      }
-      page.push({
-        identifier: Resource.Identifier.toString(concept.identifier),
-        prefLabel: prefLabels[0].literalForm.value,
-        type: "Concept",
+      (await concept.resolve()).ifJust((concept) => {
+        const prefLabels = concept.prefLabels;
+        if (prefLabels.length === 0) {
+          return;
+        }
+        page.push({
+          identifier: Resource.Identifier.toString(concept.identifier),
+          prefLabel: prefLabels[0].literalForm.value,
+          type: "Concept",
+        });
       });
     }
 
-    for (const conceptScheme of await kos.conceptSchemes()) {
-      const prefLabels = conceptScheme.prefLabels;
-      if (prefLabels.length === 0) {
-        continue;
-      }
-      page.push({
-        identifier: Resource.Identifier.toString(conceptScheme.identifier),
-        prefLabel: prefLabels[0].literalForm.value,
-        type: "ConceptScheme",
+    for await (const conceptScheme of kos.conceptSchemes()) {
+      (await conceptScheme.resolve()).ifJust((conceptScheme) => {
+        const prefLabels = conceptScheme.prefLabels;
+        if (prefLabels.length === 0) {
+          return;
+        }
+        page.push({
+          identifier: Resource.Identifier.toString(conceptScheme.identifier),
+          prefLabel: prefLabels[0].literalForm.value,
+          type: "ConceptScheme",
+        });
       });
     }
 

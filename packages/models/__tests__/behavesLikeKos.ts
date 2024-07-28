@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { assert, expect, it } from "vitest";
-import { Kos } from "..";
+import { ConceptScheme, Kos, Stub } from "..";
 import { expectConcept } from "./expectConcept.js";
 import { expectConceptScheme } from "./expectConceptScheme.js";
 
@@ -9,19 +9,19 @@ export const behavesLikeKos = (kos: Kos) => {
     const firstConcepts = await kos.conceptsPage({ limit: 10, offset: 0 });
     expect(firstConcepts).toHaveLength(10);
     for (const firstConcept of firstConcepts) {
-      expectConcept(firstConcept);
+      expectConcept((await firstConcept.resolve()).extractNullable());
     }
 
     const nextConcepts = await kos.conceptsPage({ limit: 10, offset: 10 });
     expect(nextConcepts).toHaveLength(10);
     for (const nextConcept of nextConcepts) {
-      expectConcept(nextConcept);
+      expectConcept((await nextConcept.resolve()).extractNullable());
       expect(
         firstConcepts.every(
           (firstConcept) =>
             !firstConcept.identifier.equals(nextConcept.identifier),
         ),
-      ).toBeTruthy();
+      ).toBe(true);
     }
   });
 
@@ -30,12 +30,11 @@ export const behavesLikeKos = (kos: Kos) => {
       limit: 1,
       offset: 0,
     })) {
-      expectConcept(concept);
+      expectConcept((await concept.resolve()).extractNullable());
       const conceptByIdentifier = (
-        await kos.conceptByIdentifier(concept.identifier)
+        await kos.conceptByIdentifier(concept.identifier).resolve()
       ).extractNullable();
-      expect(conceptByIdentifier).not.toBeNull();
-      expectConcept(conceptByIdentifier!);
+      expectConcept(conceptByIdentifier);
       expect(
         concept.identifier.equals(conceptByIdentifier!.identifier),
       ).toStrictEqual(true);
@@ -44,42 +43,26 @@ export const behavesLikeKos = (kos: Kos) => {
     assert.fail("no concepts");
   });
 
-  it("should get multiple concepts by their identifiers", async () => {
-    const conceptsPage = await kos.conceptsPage({
-      limit: 5,
-      offset: 0,
-    });
-    expect(conceptsPage).toHaveLength(5);
-    const conceptsByIdentifiers = await kos.conceptsByIdentifiers(
-      conceptsPage.map((concept) => concept.identifier),
-    );
-    expect(conceptsByIdentifiers).toHaveLength(5);
-    conceptsPage.forEach((leftConcept, conceptI) => {
-      const rightConcept = conceptsByIdentifiers[conceptI].extractNullable();
-      expect(rightConcept).not.toBeNull();
-      expect(
-        leftConcept.identifier.equals(rightConcept!.identifier),
-      ).toStrictEqual(true);
-    });
-  });
-
   it("should get a count of concepts", async () => {
     expect(await kos.conceptsCount()).toStrictEqual(4482);
   });
 
   it("should get concept schemes", async () => {
-    const conceptSchemes = await kos.conceptSchemes();
+    const conceptSchemes: Stub<ConceptScheme>[] = [];
+    for await (const conceptScheme of kos.conceptSchemes()) {
+      conceptSchemes.push(conceptScheme);
+    }
     expect(conceptSchemes).toHaveLength(1);
-    expectConceptScheme(conceptSchemes[0]);
+    expectConceptScheme((await conceptSchemes[0].resolve()).extractNullable());
   });
 
   it("should get a concept scheme by an identifier", async () => {
-    for (const conceptScheme of await kos.conceptSchemes()) {
-      expectConceptScheme(conceptScheme);
+    for await (const conceptScheme of kos.conceptSchemes()) {
+      expectConceptScheme((await conceptScheme.resolve()).extractNullable());
       const conceptSchemeByIdentifier = (
-        await kos.conceptSchemeByIdentifier(conceptScheme.identifier)
+        await kos.conceptSchemeByIdentifier(conceptScheme.identifier).resolve()
       ).extractNullable();
-      expect(conceptSchemeByIdentifier).not.toBeNull();
+      expect(conceptSchemeByIdentifier).toBeTruthy();
       expectConceptScheme(conceptSchemeByIdentifier!);
       expect(
         conceptScheme.identifier.equals(conceptSchemeByIdentifier!.identifier),

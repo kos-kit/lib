@@ -1,8 +1,7 @@
 import { DataFactory, Parser, Store } from "n3";
 import { getRdfList } from "../getRdfList.js";
 import { BlankNode, NamedNode } from "@rdfjs/types";
-import { describe, expect, it } from "vitest";
-import { isRdfList } from "../isRdfList.js";
+import { describe, it } from "vitest";
 
 describe("getRdfList", () => {
   const subject = DataFactory.namedNode("urn:example:subject");
@@ -13,7 +12,6 @@ describe("getRdfList", () => {
     dataset.addQuads(new Parser({ format: "Turtle" }).parse(ttl));
     const node = [...dataset.match(subject, predicate, null, null)][0]
       .object as BlankNode | NamedNode;
-    expect(isRdfList({ dataset, node })).toStrictEqual(true);
     return [
       ...getRdfList({
         dataset,

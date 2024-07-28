@@ -1,30 +1,67 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   Concept as IConcept,
   ConceptScheme as IConceptScheme,
+  Identifier,
   Label as ILabel,
 } from "@kos-kit/models";
 import { Resource } from "@kos-kit/rdf-resource";
 import { isRdfInstanceOf } from "@kos-kit/rdf-utils";
 import TermSet from "@rdfjs/term-set";
 import { skos } from "@tpluscode/rdf-ns-builders";
-import { LabeledModel } from "./LabeledModel.js";
 import { countIterable } from "./countIterable.js";
 import { paginateIterable } from "./paginateIterable.js";
 import { Just, Maybe, Nothing } from "purify-ts";
+import { ConceptStub } from "./ConceptStub.js";
+import { ModelFactory } from "./ModelFactory.js";
+import { NamedModel } from "./NamedModel.js";
+import { Labels } from "./Labels.js";
+import { Provenance } from "./Provenance.js";
+import { Literal, NamedNode } from "@rdfjs/types";
 
 export class ConceptScheme<
     ConceptT extends IConcept,
     ConceptSchemeT extends IConceptScheme,
     LabelT extends ILabel,
   >
-  extends LabeledModel<ConceptT, ConceptSchemeT, LabelT>
+  extends NamedModel
   implements IConceptScheme
 {
-  async *_concepts({ topOnly }: { topOnly: boolean }): AsyncIterable<ConceptT> {
+  private readonly labels: Labels<LabelT>;
+  protected readonly modelFactory: ModelFactory<
+    ConceptT,
+    ConceptSchemeT,
+    LabelT
+  >;
+  private readonly provenance: Provenance;
+
+  constructor({
+    modelFactory,
+    ...namedModelParameters
+  }: ConceptScheme.Parameters<ConceptT, ConceptSchemeT, LabelT>) {
+    super(namedModelParameters);
+    this.labels = new Labels({
+      labelFactory: modelFactory,
+      ...namedModelParameters,
+    });
+    this.modelFactory = modelFactory;
+    this.provenance = new Provenance(namedModelParameters);
+  }
+
+  get altLabels(): readonly ILabel[] {
+    return this.labels.altLabels;
+  }
+
+  async *_concepts({
+    topOnly,
+  }: {
+    topOnly: boolean;
+  }): AsyncGenerator<ConceptStub<ConceptT, ConceptSchemeT, LabelT>> {
     for await (const identifier of this._conceptIdentifiers({ topOnly })) {
-      yield this.modelFactory.createConcept(
-        new Resource({ dataset: this.dataset, identifier }),
-      );
+      yield new ConceptStub({
+        modelFactory: this.modelFactory,
+        resource: new Resource({ dataset: this.dataset, identifier }),
+      });
     }
   }
 
@@ -32,35 +69,9 @@ export class ConceptScheme<
     return countIterable(this._conceptIdentifiers({ topOnly }));
   }
 
-  async _conceptsPage({
-    limit,
-    offset,
-    topOnly,
-  }: {
-    limit: number;
-    offset: number;
-    topOnly: boolean;
-  }): Promise<readonly ConceptT[]> {
-    const result: ConceptT[] = [];
-    for (const identifier of paginateIterable(
-      this._conceptIdentifiers({ topOnly }),
-      {
-        limit,
-        offset,
-      },
-    )) {
-      result.push(
-        this.modelFactory.createConcept(
-          new Resource({ dataset: this.dataset, identifier }),
-        ),
-      );
-    }
-    return result;
-  }
-
   async conceptByIdentifier(
-    identifier: IConcept.Identifier,
-  ): Promise<Maybe<ConceptT>> {
+    identifier: Identifier,
+  ): Promise<Maybe<ConceptStub<ConceptT, ConceptSchemeT, LabelT>>> {
     // conceptScheme skos:hasTopConcept resource entails resource is a skos:Concept because of
     // the range of skos:hasTopConcept
     for (const _ of this.resource.dataset.match(
@@ -69,9 +80,10 @@ export class ConceptScheme<
       identifier,
     )) {
       return Just(
-        this.modelFactory.createConcept(
-          new Resource({ dataset: this.dataset, identifier }),
-        ),
+        new ConceptStub({
+          modelFactory: this.modelFactory,
+          resource: new Resource({ dataset: this.dataset, identifier }),
+        }),
       );
     }
 
@@ -94,9 +106,10 @@ export class ConceptScheme<
           })
         ) {
           return Just(
-            this.modelFactory.createConcept(
-              new Resource({ dataset: this.dataset, identifier }),
-            ),
+            new ConceptStub({
+              modelFactory: this.modelFactory,
+              resource: new Resource({ dataset: this.dataset, identifier }),
+            }),
           );
         }
       }
@@ -105,7 +118,9 @@ export class ConceptScheme<
     return Nothing;
   }
 
-  async *concepts(): AsyncIterable<ConceptT> {
+  async *concepts(): AsyncGenerator<
+    ConceptStub<ConceptT, ConceptSchemeT, LabelT>
+  > {
     yield* this._concepts({ topOnly: false });
   }
 
@@ -116,11 +131,45 @@ export class ConceptScheme<
   conceptsPage(kwds: {
     limit: number;
     offset: number;
-  }): Promise<readonly ConceptT[]> {
+  }): Promise<readonly ConceptStub<ConceptT, ConceptSchemeT, LabelT>[]> {
     return this._conceptsPage({ ...kwds, topOnly: false });
   }
 
-  async *topConcepts(): AsyncIterable<ConceptT> {
+  get displayLabel(): string {
+    return this.labels.displayLabel;
+  }
+
+  equals(other: IConceptScheme): boolean {
+    return IConceptScheme.equals(this, other);
+  }
+
+  get hiddenLabels(): readonly ILabel[] {
+    return this.labels.hiddenLabels;
+  }
+
+  get license(): Maybe<Literal | NamedNode> {
+    return this.provenance.license;
+  }
+
+  get modified(): Maybe<Literal> {
+    return this.provenance.modified;
+  }
+
+  get prefLabels(): readonly ILabel[] {
+    return this.labels.prefLabels;
+  }
+
+  get rights(): Maybe<Literal> {
+    return this.provenance.rights;
+  }
+
+  get rightsHolder(): Maybe<Literal> {
+    return this.provenance.rightsHolder;
+  }
+
+  async *topConcepts(): AsyncGenerator<
+    ConceptStub<ConceptT, ConceptSchemeT, LabelT>
+  > {
     yield* this._concepts({ topOnly: true });
   }
 
@@ -131,7 +180,7 @@ export class ConceptScheme<
   topConceptsPage(kwds: {
     limit: number;
     offset: number;
-  }): Promise<readonly ConceptT[]> {
+  }): Promise<readonly ConceptStub<ConceptT, ConceptSchemeT, LabelT>[]> {
     return this._conceptsPage({ ...kwds, topOnly: true });
   }
 
@@ -139,8 +188,8 @@ export class ConceptScheme<
     topOnly,
   }: {
     topOnly: boolean;
-  }): Iterable<IConcept.Identifier> {
-    const conceptIdentifierSet = new TermSet<IConcept.Identifier>();
+  }): Generator<Identifier> {
+    const conceptIdentifierSet = new TermSet<Identifier>();
 
     // ConceptScheme -> Concept statement
     for (const conceptIdentifier of [
@@ -185,5 +234,42 @@ export class ConceptScheme<
         yield conceptIdentifier;
         conceptIdentifierSet.add(conceptIdentifier);
       }
+  }
+
+  private async _conceptsPage({
+    limit,
+    offset,
+    topOnly,
+  }: {
+    limit: number;
+    offset: number;
+    topOnly: boolean;
+  }): Promise<readonly ConceptStub<ConceptT, ConceptSchemeT, LabelT>[]> {
+    const result: ConceptStub<ConceptT, ConceptSchemeT, LabelT>[] = [];
+    for (const identifier of paginateIterable(
+      this._conceptIdentifiers({ topOnly }),
+      {
+        limit,
+        offset,
+      },
+    )) {
+      result.push(
+        new ConceptStub({
+          modelFactory: this.modelFactory,
+          resource: new Resource({ dataset: this.dataset, identifier }),
+        }),
+      );
+    }
+    return result;
+  }
+}
+
+export namespace ConceptScheme {
+  export interface Parameters<
+    ConceptT extends IConcept,
+    ConceptSchemeT extends IConceptScheme,
+    LabelT extends ILabel,
+  > extends NamedModel.Parameters {
+    modelFactory: ModelFactory<ConceptT, ConceptSchemeT, LabelT>;
   }
 }

@@ -1,8 +1,8 @@
-import { Label, LabeledModel, LanguageTag } from "..";
+import { Label, LabelsMixin, LanguageTag } from "..";
 import { expect, it } from "vitest";
 
-export const behavesLikeLabeledModel = (
-  lazyModel: (includeLanguageTag: LanguageTag) => Promise<LabeledModel>,
+export const behavesLikeLabelsMixin = (
+  lazyModel: (includeLanguageTag: LanguageTag) => Promise<LabelsMixin>,
 ) => {
   const expectLabels = (labels: readonly Label[]) => {
     expect(labels).toBeDefined();

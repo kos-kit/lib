@@ -12,6 +12,7 @@ describe("mem.Concept", () => {
           "http://vocabularies.unesco.org/thesaurus/concept10",
         ),
       )
+      .resolve()
       .then((concept) =>
         concept.orDefaultLazy(() => {
           throw new Error("missing concept");
@@ -26,6 +27,7 @@ describe("mem.Concept", () => {
           "http://vocabularies.unesco.org/thesaurus/concept10018",
         ),
       )
+      .resolve()
       .then((concept) =>
         concept.orDefaultLazy(() => {
           throw new Error("missing concept");

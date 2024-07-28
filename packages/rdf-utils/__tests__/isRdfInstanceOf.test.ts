@@ -23,22 +23,23 @@ describe("isRdfInstanceOf", () => {
     ).toStrictEqual(true);
   });
 
-  it("should find a subclass instance if includeSubclasses is true", () => {
+  it("should find a subclass instance if excludeSubclasses is false", () => {
     expect(
       isRdfInstanceOf({
         class_,
         dataset,
         instance: subClassInstance,
+        excludeSubclasses: false,
       }),
     ).toStrictEqual(true);
   });
 
-  it("should not find a subclass instance if includeSubclasses is false", () => {
+  it("should not find a subclass instance if excludeSubclasses is true", () => {
     expect(
       isRdfInstanceOf({
         class_,
         dataset,
-        includeSubclasses: false,
+        excludeSubclasses: true,
         instance: subClassInstance,
       }),
     ).toStrictEqual(false);

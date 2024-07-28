@@ -1,38 +1,32 @@
 import {
-  Concept as IConcept,
-  ConceptScheme as IConceptScheme,
+  Identifier,
   Label as ILabel,
-  LabeledModel as ILabeledModel,
+  LabelsMixin as ILabelsMixin,
+  LanguageTagSet,
   LiteralLabel,
 } from "@kos-kit/models";
 import { Resource } from "@kos-kit/rdf-resource";
 import { NamedNode } from "@rdfjs/types";
 import { skos, skosxl } from "@tpluscode/rdf-ns-builders";
-import { Model } from "./Model.js";
-import { ModelFactory } from "./ModelFactory.js";
 import { matchLiteral } from "./matchLiteral.js";
 import { Maybe } from "purify-ts";
+import "iterator-helpers-polyfill";
+import { LabelFactory } from "./LabelFactory.js";
+import { NamedModel } from "./NamedModel.js";
 
-export abstract class LabeledModel<
-    ConceptT extends IConcept,
-    ConceptSchemeT extends IConceptScheme,
-    LabelT extends ILabel,
-  >
-  extends Model<NamedNode>
-  implements ILabeledModel
-{
-  protected readonly modelFactory: ModelFactory<
-    ConceptT,
-    ConceptSchemeT,
-    LabelT
-  >;
+export class Labels<LabelT extends ILabel> implements ILabelsMixin {
+  private readonly includeLanguageTags: LanguageTagSet;
+  private readonly labelFactory: LabelFactory<LabelT>;
+  private readonly resource: Resource<Identifier>;
 
   constructor({
-    modelFactory,
-    ...modelParameters
-  }: LabeledModel.Parameters<ConceptT, ConceptSchemeT, LabelT>) {
-    super(modelParameters);
-    this.modelFactory = modelFactory;
+    includeLanguageTags,
+    labelFactory,
+    resource,
+  }: { labelFactory: LabelFactory<LabelT> } & NamedModel.Parameters) {
+    this.includeLanguageTags = includeLanguageTags;
+    this.labelFactory = labelFactory;
+    this.resource = resource;
   }
 
   get altLabels(): readonly ILabel[] {
@@ -54,7 +48,7 @@ export abstract class LabeledModel<
       }
     }
 
-    return Resource.Identifier.toString(this.identifier);
+    return Resource.Identifier.toString(this.resource.identifier);
   }
 
   get hiddenLabels(): readonly ILabel[] {
@@ -80,7 +74,7 @@ export abstract class LabeledModel<
   }): readonly ILabel[] {
     return [
       // All literals that are the objects of the skosPredicate
-      ...[...this.resource.values(skosPredicate)].flatMap((value) =>
+      ...this.resource.values(skosPredicate).flatMap((value) =>
         value
           .toLiteral()
           .filter((literal) =>
@@ -92,13 +86,13 @@ export abstract class LabeledModel<
           .toList(),
       ),
       // Any resource in the range of a skosxl: label predicate is considered a skosxl:Label
-      ...[...this.resource.values(skosXlPredicate)].flatMap((labelValue) =>
+      ...this.resource.values(skosXlPredicate).flatMap((labelValue) =>
         labelValue
-          .toResource()
+          .toNamedResource()
           .chain((labelResource) =>
             Maybe.fromNullable(
-              [...labelResource.values(skosxl.literalForm)]
-                .flatMap((value) =>
+              [
+                ...labelResource.values(skosxl.literalForm).flatMap((value) =>
                   value
                     .toLiteral()
                     .filter((literal) =>
@@ -107,10 +101,10 @@ export abstract class LabeledModel<
                       }),
                     )
                     .toList(),
-                )
-                .at(0),
+                ),
+              ].at(0),
             ).map((literalForm) =>
-              this.modelFactory.createLabel({
+              this.labelFactory.createLabel({
                 literalForm,
                 resource: labelResource,
               }),
@@ -119,15 +113,5 @@ export abstract class LabeledModel<
           .toList(),
       ),
     ];
-  }
-}
-
-export namespace LabeledModel {
-  export interface Parameters<
-    ConceptT extends IConcept,
-    ConceptSchemeT extends IConceptScheme,
-    LabelT extends ILabel,
-  > extends Model.Parameters<NamedNode> {
-    modelFactory: ModelFactory<ConceptT, ConceptSchemeT, LabelT>;
   }
 }

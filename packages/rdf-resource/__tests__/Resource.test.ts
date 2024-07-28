@@ -1,11 +1,11 @@
 import { beforeAll, describe, expect, it } from "vitest";
 import { DataFactory, Store } from "n3";
 import { DatasetCore, Quad, Quad_Object, Variable } from "@rdfjs/types";
-import { MutableResource } from "..";
+import { MutableResource, Resource } from "..";
 import { xsd } from "@tpluscode/rdf-ns-builders";
 
 describe("Resource", () => {
-  let resource: MutableResource;
+  let resource: Resource;
 
   const objects: Record<string, Exclude<Quad_Object, Quad | Variable>> = {
     blankNode: DataFactory.blankNode(),
@@ -26,7 +26,7 @@ describe("Resource", () => {
       mutateGraph: DataFactory.defaultGraph(),
     });
     for (const object of Object.values(objects)) {
-      resource.add(predicate, object);
+      (resource as MutableResource).add(predicate, object);
     }
   });
 
@@ -47,6 +47,11 @@ describe("Resource", () => {
         ?.toIri()
         .extract()?.value,
     ).toStrictEqual(objects["namedNode"].value);
+  });
+
+  it("should get a value (filtered)", () => {
+    const value = resource.value(predicate, (value) => value.isIri());
+    expect(value.isIri()).toBe(true);
   });
 
   it("should get all values", () => {
@@ -85,22 +90,30 @@ describe("Resource", () => {
     ).toBeDefined();
   });
 
-  it("should set a value", () => {
-    const dataset = new Store();
-    const resource = new MutableResource({
-      dataFactory: DataFactory,
-      dataset,
-      identifier: DataFactory.blankNode(),
-      mutateGraph: DataFactory.defaultGraph(),
-    });
-    resource.add(predicate, objects["stringLiteral"]);
-    expect(dataset.size).toStrictEqual(1);
-    resource.set(predicate, objects["intLiteral"]);
-    expect(dataset.size).toStrictEqual(1);
-    const values = [...resource.values(predicate)].flatMap((value) =>
-      value.toTerm().toList(),
+  it("should get a valueOf", () => {
+    const resourceValues = [...resource.values(predicate)].flatMap((value) =>
+      value.toResource().toList(),
     );
-    expect(values).toHaveLength(1);
-    expect(values[0].equals(objects["intLiteral"])).toBeTruthy();
+    expect(resourceValues).toHaveLength(2);
+    for (const resourceValue of resourceValues) {
+      expect(
+        resourceValue
+          .valueOf(predicate)
+          .unsafeCoerce()
+          .identifier.equals(resource.identifier),
+      ).toBe(true);
+    }
+  });
+
+  it("should get a valuesOf", () => {
+    const resourceValues = [...resource.values(predicate)].flatMap((value) =>
+      value.toResource().toList(),
+    );
+    expect(resourceValues).toHaveLength(2);
+    for (const resourceValue of resourceValues) {
+      const valuesOf = [...resourceValue.valuesOf(predicate)];
+      expect(valuesOf).toHaveLength(1);
+      expect(valuesOf[0].identifier.equals(resource.identifier)).toBe(true);
+    }
   });
 });
