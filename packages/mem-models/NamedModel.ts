@@ -10,9 +10,10 @@ import { DatasetCore } from "@rdfjs/types";
  * Abstract base class for RDF/JS Dataset-backed models.
  */
 export abstract class NamedModel implements INamedModel {
-  abstract readonly displayLabel: string;
   protected readonly includeLanguageTags: LanguageTagSet;
   protected readonly resource: Resource<Identifier>;
+
+  abstract readonly displayLabel: string;
 
   constructor({ includeLanguageTags, resource }: NamedModel.Parameters) {
     this.resource = resource;

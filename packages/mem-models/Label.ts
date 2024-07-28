@@ -5,8 +5,9 @@ import { Provenance } from "./Provenance.js";
 import { Maybe } from "purify-ts";
 
 export class Label extends NamedModel implements ILabel {
-  readonly literalForm: Literal;
   private readonly provenance: Provenance;
+
+  readonly literalForm: Literal;
 
   constructor({ literalForm, ...namedModelParameters }: Label.Parameters) {
     super(namedModelParameters);
@@ -16,10 +17,6 @@ export class Label extends NamedModel implements ILabel {
 
   get displayLabel(): string {
     return this.literalForm.value;
-  }
-
-  equals(other: ILabel): boolean {
-    return ILabel.equals(this, other);
   }
 
   get license(): Maybe<Literal | NamedNode> {
@@ -36,6 +33,10 @@ export class Label extends NamedModel implements ILabel {
 
   get rightsHolder(): Maybe<Literal> {
     return this.provenance.rightsHolder;
+  }
+
+  equals(other: ILabel): boolean {
+    return ILabel.equals(this, other);
   }
 }
 

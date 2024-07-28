@@ -28,12 +28,13 @@ export class ConceptScheme<
   implements IConceptScheme
 {
   private readonly labels: Labels<LabelT>;
+  private readonly provenance: Provenance;
+
   protected readonly modelFactory: ModelFactory<
     ConceptT,
     ConceptSchemeT,
     LabelT
   >;
-  private readonly provenance: Provenance;
 
   constructor({
     modelFactory,
@@ -50,6 +51,34 @@ export class ConceptScheme<
 
   get altLabels(): readonly ILabel[] {
     return this.labels.altLabels;
+  }
+
+  get displayLabel(): string {
+    return this.labels.displayLabel;
+  }
+
+  get hiddenLabels(): readonly ILabel[] {
+    return this.labels.hiddenLabels;
+  }
+
+  get license(): Maybe<Literal | NamedNode> {
+    return this.provenance.license;
+  }
+
+  get modified(): Maybe<Literal> {
+    return this.provenance.modified;
+  }
+
+  get prefLabels(): readonly ILabel[] {
+    return this.labels.prefLabels;
+  }
+
+  get rights(): Maybe<Literal> {
+    return this.provenance.rights;
+  }
+
+  get rightsHolder(): Maybe<Literal> {
+    return this.provenance.rightsHolder;
   }
 
   async *_concepts({
@@ -135,36 +164,8 @@ export class ConceptScheme<
     return this._conceptsPage({ ...kwds, topOnly: false });
   }
 
-  get displayLabel(): string {
-    return this.labels.displayLabel;
-  }
-
   equals(other: IConceptScheme): boolean {
     return IConceptScheme.equals(this, other);
-  }
-
-  get hiddenLabels(): readonly ILabel[] {
-    return this.labels.hiddenLabels;
-  }
-
-  get license(): Maybe<Literal | NamedNode> {
-    return this.provenance.license;
-  }
-
-  get modified(): Maybe<Literal> {
-    return this.provenance.modified;
-  }
-
-  get prefLabels(): readonly ILabel[] {
-    return this.labels.prefLabels;
-  }
-
-  get rights(): Maybe<Literal> {
-    return this.provenance.rights;
-  }
-
-  get rightsHolder(): Maybe<Literal> {
-    return this.provenance.rightsHolder;
   }
 
   async *topConcepts(): AsyncGenerator<

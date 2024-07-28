@@ -48,6 +48,38 @@ export class ConceptScheme<
     return this.memModel.altLabels;
   }
 
+  get displayLabel(): string {
+    return this.memModel.displayLabel;
+  }
+
+  get hiddenLabels(): readonly Label[] {
+    return this.memModel.hiddenLabels;
+  }
+
+  get identifier(): Identifier {
+    return this.memModel.identifier;
+  }
+
+  get license(): Maybe<Literal | NamedNode> {
+    return this.memModel.license;
+  }
+
+  get modified(): Maybe<Literal> {
+    return this.memModel.modified;
+  }
+
+  get prefLabels(): readonly Label[] {
+    return this.memModel.prefLabels;
+  }
+
+  get rights(): Maybe<Literal> {
+    return this.memModel.rights;
+  }
+
+  get rightsHolder(): Maybe<Literal> {
+    return this.memModel.rightsHolder;
+  }
+
   async *_concepts({
     topOnly,
   }: {
@@ -128,40 +160,8 @@ WHERE {
     return this._conceptsPage({ limit, offset, topOnly: false });
   }
 
-  get displayLabel(): string {
-    return this.memModel.displayLabel;
-  }
-
   equals(other: IConceptScheme): boolean {
     return IConceptScheme.equals(this, other);
-  }
-
-  get hiddenLabels(): readonly Label[] {
-    return this.memModel.hiddenLabels;
-  }
-
-  get identifier(): Identifier {
-    return this.memModel.identifier;
-  }
-
-  get license(): Maybe<Literal | NamedNode> {
-    return this.memModel.license;
-  }
-
-  get modified(): Maybe<Literal> {
-    return this.memModel.modified;
-  }
-
-  get prefLabels(): readonly Label[] {
-    return this.memModel.prefLabels;
-  }
-
-  get rights(): Maybe<Literal> {
-    return this.memModel.rights;
-  }
-
-  get rightsHolder(): Maybe<Literal> {
-    return this.memModel.rightsHolder;
   }
 
   topConcepts(): AsyncGenerator<

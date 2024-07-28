@@ -26,12 +26,13 @@ export class Concept<
   LabelT extends ILabel,
 > extends NamedModel {
   private readonly labels: Labels<LabelT>;
+  private readonly provenance: Provenance;
+
   protected readonly modelFactory: ModelFactory<
     ConceptT,
     ConceptSchemeT,
     LabelT
   >;
-  private readonly provenance: Provenance;
 
   constructor({
     modelFactory,
@@ -54,18 +55,8 @@ export class Concept<
     return this.labels.displayLabel;
   }
 
-  equals(other: IConcept): boolean {
-    return IConcept.equals(this, other);
-  }
-
   get hiddenLabels(): readonly ILabel[] {
     return this.labels.hiddenLabels;
-  }
-
-  async inSchemes(): Promise<
-    readonly ConceptSchemeStub<ConceptT, ConceptSchemeT, LabelT>[]
-  > {
-    return this._inSchemes({ topOnly: false });
   }
 
   get license(): Maybe<Literal | NamedNode> {
@@ -84,6 +75,28 @@ export class Concept<
     ];
   }
 
+  get prefLabels(): readonly ILabel[] {
+    return this.labels.prefLabels;
+  }
+
+  get rights(): Maybe<Literal> {
+    return this.provenance.rights;
+  }
+
+  get rightsHolder(): Maybe<Literal> {
+    return this.provenance.rightsHolder;
+  }
+
+  equals(other: IConcept): boolean {
+    return IConcept.equals(this, other);
+  }
+
+  async inSchemes(): Promise<
+    readonly ConceptSchemeStub<ConceptT, ConceptSchemeT, LabelT>[]
+  > {
+    return this._inSchemes({ topOnly: false });
+  }
+
   notes(property: NoteProperty): readonly Literal[] {
     return [
       ...this.resource.values(property.identifier).flatMap((value) =>
@@ -97,18 +110,6 @@ export class Concept<
           .toList(),
       ),
     ];
-  }
-
-  get prefLabels(): readonly ILabel[] {
-    return this.labels.prefLabels;
-  }
-
-  get rights(): Maybe<Literal> {
-    return this.provenance.rights;
-  }
-
-  get rightsHolder(): Maybe<Literal> {
-    return this.provenance.rightsHolder;
   }
 
   async semanticRelations(

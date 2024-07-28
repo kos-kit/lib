@@ -6,14 +6,11 @@ export interface LabelsMixin {
    * Alternate labels, equivalent to skos:altLabel.
    */
   readonly altLabels: readonly Label[];
-
   readonly displayLabel: string;
-
   /**
    * Hidden labels, equivalent to skos:hiddenLabel.
    */
   readonly hiddenLabels: readonly Label[];
-
   /**
    * Preferred labels, equivalent to skos:prefLabel.
    */
