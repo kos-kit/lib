@@ -140,10 +140,10 @@ WHERE {
     );
   }
 
-  concepts(): AsyncGenerator<
+  async *concepts(): AsyncGenerator<
     ConceptStub<SparqlConceptT, SparqlConceptSchemeT>
   > {
-    return this._concepts({ topOnly: false });
+    yield* this._concepts({ topOnly: false });
   }
 
   conceptsCount(): Promise<number> {
@@ -164,10 +164,10 @@ WHERE {
     return IConceptScheme.equals(this, other);
   }
 
-  topConcepts(): AsyncGenerator<
+  async *topConcepts(): AsyncGenerator<
     ConceptStub<SparqlConceptT, SparqlConceptSchemeT>
   > {
-    return this._concepts({ topOnly: true });
+    yield* this._concepts({ topOnly: true });
   }
 
   async topConceptsCount(): Promise<number> {
