@@ -39,11 +39,13 @@ export class Labels<LabelT extends ILabel> implements ILabelsMixin {
   get displayLabel(): string {
     const prefLabels = this.prefLabels;
     if (prefLabels.length > 0) {
-      for (const languageTag of this.includeLanguageTags) {
-        for (const prefLabel of prefLabels) {
-          if (prefLabel.literalForm.language === languageTag) {
-            return prefLabel.literalForm.value;
-          }
+      for (const prefLabel of prefLabels) {
+        if (
+          matchLiteral(prefLabel.literalForm, {
+            includeLanguageTags: this.includeLanguageTags,
+          })
+        ) {
+          return prefLabel.literalForm.value;
         }
       }
     }
