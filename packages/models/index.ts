@@ -1,5 +1,3 @@
-export * from "./Arrays.js";
-export * from "./AsyncIterables.js";
 export * from "./Concept.js";
 export * from "./ConceptScheme.js";
 export * from "./Identifier.js";
@@ -11,7 +9,6 @@ export * from "./LanguageTag.js";
 export * from "./LanguageTagSet.js";
 export * from "./LiteralLabel.js";
 export * from "./MappingProperty.js";
-export * from "./Maybes.js";
 export * from "./Model.js";
 export * from "./NamedModel.js";
 export * from "./noteProperties.js";

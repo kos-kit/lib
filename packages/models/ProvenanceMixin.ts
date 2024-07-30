@@ -1,6 +1,6 @@
 import { Literal, NamedNode } from "@rdfjs/types";
 import { Maybe } from "purify-ts";
-import { Maybes } from "./Maybes.js";
+import { Maybes } from "purify-ts-helpers";
 
 export interface ProvenanceMixin {
   readonly license: Maybe<Literal | NamedNode>;
