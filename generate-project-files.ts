@@ -107,11 +107,12 @@ const projects: readonly Project[] = [{
     }];
 
 for (const project of projects) {
-    const internalDependencies = {};
+    const internalDependencies: Record<string, string> = {};
     for (const internalDependency of project.internalDependencies) {
         internalDependencies[`@kos-kit/${internalDependency}`] = VERSION;
     }
 
+    // biome-ignore lint/style/useTemplate: <explanation>
     fs.writeFileSync(path.join(__dirname, "packages", project.name, "package.json"), JSON.stringify(
         {
             dependencies: {...internalDependencies, ...project.externalDependencies},
@@ -128,8 +129,9 @@ for (const project of projects) {
             "name": `@kos-kit/${project.name}`,
             "scripts": {
                 "build": "tsc -b",
-                "clean": "tsc -b --clean",
-                "lint": "tsc -b --clean && eslint *.ts",
+                "clean": "rimraf *.d.ts* *.js *.js.map __tests__/*.d.ts* __tests__/*.js __tests__/*.js.map",
+                "format": "biome check --write --unsafe .",
+                "lint": "tsc -b --clean && biome lint",
                 "rebuild": "run-s clean build",
                 "test": "vitest run",
                 "test:watch": "vitest watch",
