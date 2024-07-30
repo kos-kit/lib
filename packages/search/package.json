@@ -1,8 +1,8 @@
 {
   "dependencies": {
-    "@kos-kit/mem-models": "2.0.28",
-    "@kos-kit/models": "2.0.28",
-    "@kos-kit/rdf-resource": "2.0.28",
+    "@kos-kit/mem-models": "2.0.29",
+    "@kos-kit/models": "2.0.29",
+    "@kos-kit/rdf-resource": "2.0.29",
     "@rdfjs/types": "^1.1.0",
     "@types/lunr": "^2.3.7",
     "axios": "^1.7.2",
@@ -34,5 +34,5 @@
   },
   "type": "module",
   "types": "index.d.ts",
-  "version": "2.0.28"
+  "version": "2.0.29"
 }
