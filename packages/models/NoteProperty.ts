@@ -29,6 +29,6 @@ export class NoteProperty {
   }
 
   get pluralLabel(): string {
-    return this.singularLabel + "s";
+    return `${this.singularLabel}s`;
   }
 }

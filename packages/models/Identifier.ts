@@ -22,6 +22,7 @@ export namespace Identifier {
     throw new RangeError(identifier);
   }
 
+  // biome-ignore lint/suspicious/noShadowRestrictedNames: <explanation>
   export function toString(identifier: Identifier): string {
     return `<${identifier.value}>`;
   }

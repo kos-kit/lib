@@ -1,12 +1,12 @@
 import { Literal } from "@rdfjs/types";
-import { NoteProperty } from "./NoteProperty.js";
-import { SemanticRelationProperty } from "./SemanticRelationProperty.js";
-import { ConceptScheme } from "./ConceptScheme.js";
-import { Stub } from "./Stub.js";
-import { LabelsMixin } from "./LabelsMixin.js";
-import { ProvenanceMixin } from "./ProvenanceMixin.js";
-import { NamedModel } from "./NamedModel.js";
 import { Arrays } from "purify-ts-helpers";
+import { ConceptScheme } from "./ConceptScheme.js";
+import { LabelsMixin } from "./LabelsMixin.js";
+import { NamedModel } from "./NamedModel.js";
+import { NoteProperty } from "./NoteProperty.js";
+import { ProvenanceMixin } from "./ProvenanceMixin.js";
+import { SemanticRelationProperty } from "./SemanticRelationProperty.js";
+import { Stub } from "./Stub.js";
 
 export interface Concept extends LabelsMixin, NamedModel, ProvenanceMixin {
   readonly notations: readonly Literal[];

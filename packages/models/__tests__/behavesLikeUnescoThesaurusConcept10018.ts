@@ -1,13 +1,13 @@
-import { behavesLikeConcept } from "./behavesLikeConcept.js";
 import { DataFactory } from "n3";
-import { expectConcept } from "./expectConcept.js";
+import { expect, it } from "vitest";
 import {
   Concept,
   LanguageTag,
   NoteProperty,
   SemanticRelationProperty,
 } from "..";
-import { expect, it } from "vitest";
+import { behavesLikeConcept } from "./behavesLikeConcept.js";
+import { expectConcept } from "./expectConcept.js";
 
 export const behavesLikeUnescoThesaurusConcept10018 = (
   lazyConcept: (includeLanguageTag: LanguageTag) => Promise<Concept>,

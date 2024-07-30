@@ -1,10 +1,10 @@
 import { Maybe } from "purify-ts";
 import { Concept } from "./Concept.js";
-import { Stub } from "./Stub.js";
-import { LabelsMixin } from "./LabelsMixin.js";
-import { ProvenanceMixin } from "./ProvenanceMixin.js";
 import { Identifier } from "./Identifier.js";
+import { LabelsMixin } from "./LabelsMixin.js";
 import { NamedModel } from "./NamedModel.js";
+import { ProvenanceMixin } from "./ProvenanceMixin.js";
+import { Stub } from "./Stub.js";
 
 export interface ConceptScheme
   extends LabelsMixin,
