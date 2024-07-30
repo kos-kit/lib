@@ -1,4 +1,4 @@
-import { Arrays } from "./Arrays.js";
+import { Arrays } from "purify-ts-helpers";
 import { Label } from "./Label.js";
 
 export interface LabelsMixin {

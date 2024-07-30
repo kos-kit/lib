@@ -5,8 +5,8 @@ import { ConceptScheme } from "./ConceptScheme.js";
 import { Stub } from "./Stub.js";
 import { LabelsMixin } from "./LabelsMixin.js";
 import { ProvenanceMixin } from "./ProvenanceMixin.js";
-import { Arrays } from "./Arrays.js";
 import { NamedModel } from "./NamedModel.js";
+import { Arrays } from "purify-ts-helpers";
 
 export interface Concept extends LabelsMixin, NamedModel, ProvenanceMixin {
   readonly notations: readonly Literal[];
