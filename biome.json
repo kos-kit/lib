@@ -1,7 +1,7 @@
 {
   "$schema": "https://biomejs.dev/schemas/1.8.3/schema.json",
   "files": {
-    "ignore": ["*.js", "*.js.map", "*.d.ts", "*.d.ts.map"]
+    "ignore": ["*.js", "*.js.map", "*.d.ts", "*.d.ts.map", "package.json"]
   },
   "formatter": {
     "enabled": true,
@@ -10,6 +10,9 @@
   "linter": {
     "enabled": true,
     "rules": {
+      "complexity": {
+        "noStaticOnlyClass": "off"
+      },
       "recommended": true,
       "style": {
         "noNonNullAssertion": "off",
