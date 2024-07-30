@@ -14,8 +14,8 @@
   "private": true,
   "scripts": {
     "build": "npm run build --workspaces",
+    "check": "npm run check --workspaces",
     "clean": "npm run clean --workspaces",
-    "format": "npm run format --workspaces",
     "generate-project-files": "tsx generate-project-files.ts",
     "link": "npm link --workspaces",
     "lint": "npm run lint --workspaces",
