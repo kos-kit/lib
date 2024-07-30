@@ -125,8 +125,10 @@ for (const project of projects) {
     internalDependencies[`@kos-kit/${internalDependency}`] = VERSION;
   }
 
+  const projectDirectoryPath = path.join(__dirname, "packages", project.name);
+
   fs.writeFileSync(
-    path.join(__dirname, "packages", project.name, "package.json"),
+    path.join(projectDirectoryPath, "package.json"),
     `${JSON.stringify(
       {
         dependencies: {
@@ -165,4 +167,13 @@ for (const project of projects) {
       2,
     )}\n`,
   );
+
+  for (const fileName of ["biome.json", "LICENSE", "tsconfig.json"]) {
+    // const rootFilePath = path.resolve(__dirname, fileName);
+    const projectFilePath = path.resolve(projectDirectoryPath, fileName);
+    if (fs.existsSync(projectFilePath)) {
+      continue;
+    }
+    fs.symlinkSync(`../../${fileName}`, projectFilePath);
+  }
 }
