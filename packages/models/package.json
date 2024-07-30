@@ -3,7 +3,7 @@
     "@rdfjs/types": "^1.1.0",
     "@tpluscode/rdf-ns-builders": "^4.3.0",
     "purify-ts": "~2.1.0",
-    "purify-ts-helpers": "1.0.1"
+    "purify-ts-helpers": "1.0.2"
   },
   "engines": {
     "node": ">=20"
@@ -11,9 +11,7 @@
   "main": "index.js",
   "files": [
     "*.d.ts",
-    "*.d.ts.map",
-    "*.js",
-    "*.js.map"
+    "*.js"
   ],
   "license": "Apache-2.0",
   "name": "@kos-kit/models",
