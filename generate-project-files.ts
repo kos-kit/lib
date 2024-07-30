@@ -147,8 +147,8 @@ for (const project of projects) {
           build: "tsc -b",
           clean:
             "rimraf *.d.ts* *.js *.js.map __tests__/*.d.ts* __tests__/*.js __tests__/*.js.map",
-          format: "biome check --write --unsafe .",
-          lint: "tsc -b --clean && biome lint",
+          format: "biome check --write",
+          lint: "tsc -b --clean && biome check",
           rebuild: "run-s clean build",
           test: "vitest run",
           "test:watch": "vitest watch",
