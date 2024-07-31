@@ -1,5 +1,5 @@
 import { expect, it } from "vitest";
-import { createSearchEngineFromJson, SearchEngine } from "..";
+import { SearchEngine, createSearchEngineFromJson } from "..";
 
 export const behavesLikeSearchEngine = (
   lazySearchEngine: () => Promise<SearchEngine>,
