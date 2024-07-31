@@ -96,7 +96,6 @@ export class LunrSearchEngine implements SearchEngine {
 
         let compactIndexDocumentsByIdentifier =
           compactIndexDocuments[indexDocument.type];
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         if (!compactIndexDocumentsByIdentifier) {
           compactIndexDocumentsByIdentifier = compactIndexDocuments[
             indexDocument.type
@@ -113,10 +112,8 @@ export class LunrSearchEngine implements SearchEngine {
   static fromJson(json: SearchEngineJson) {
     const lunrIndexCompactor = new LunrIndexCompactor();
     return new LunrSearchEngine(
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       json["documents"],
       lunrIndexCompactor.expandLunrIndex(json["index"]),
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       json["languageTag"],
     );
   }
@@ -167,7 +164,6 @@ export class LunrSearchEngine implements SearchEngine {
     const lunrIndexCompactor = new LunrIndexCompactor();
     return {
       documents: this.documents,
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       index: lunrIndexCompactor.compactLunrIndex(this.index),
       languageTag: this.languageTag,
       type: "Lunr",

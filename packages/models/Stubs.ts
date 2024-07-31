@@ -14,7 +14,6 @@ export namespace Stubs {
       for (const model of await Stubs.Array.resolve(stubs)) {
         const modelNullable = model.extractNullable();
         if (modelNullable !== null) {
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           models.push(modelNullable! as ModelT);
         }
       }
@@ -60,7 +59,6 @@ export namespace Stubs {
       for await (const model of Stubs.AsyncIterable.resolve(stubs)) {
         const modelNullable = model.extractNullable();
         if (modelNullable !== null) {
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           yield modelNullable! as ModelT;
         }
       }

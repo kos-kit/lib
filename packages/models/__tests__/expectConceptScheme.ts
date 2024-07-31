@@ -1,5 +1,4 @@
 import { expect } from "vitest";
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { ConceptScheme } from "..";
 
 /**

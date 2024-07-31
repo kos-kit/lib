@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { assert, expect, it } from "vitest";
 import { ConceptScheme, Kos, Stub } from "..";
 import { expectConcept } from "./expectConcept.js";

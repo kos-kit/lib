@@ -50,7 +50,6 @@ export function createRdfList({
   if (!list) {
     return rdf.nil;
   }
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   dataset.add(dataFactory.quad(currentHead!, rdf.rest, rdf.nil, graph));
   return list;
 }

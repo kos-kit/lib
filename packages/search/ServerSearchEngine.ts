@@ -20,7 +20,6 @@ export class ServerSearchEngine implements SearchEngine {
   }
 
   static fromJson(json: SearchEngineJson) {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     return new ServerSearchEngine(json["endpoint"]);
   }
 
@@ -34,14 +33,11 @@ export class ServerSearchEngine implements SearchEngine {
       params,
     });
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const totalHeaderValue = response.headers["x-total-count"];
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     const total = Number.parseInt(totalHeaderValue);
 
     const parser = new Parser({ format: "N-Triples" });
     const store = new Store();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     store.addQuads(parser.parse(response.data));
     const kos = new mem.Kos({
       dataset: store,

@@ -1,4 +1,3 @@
-/* eslint-disable */
 import lunr from "lunr";
 
 // Adapted from https://john-millikin.com/compacting-lunr-search-indices

@@ -91,7 +91,6 @@ WHERE {
     );
   }
 
-  // eslint-disable-next-line no-empty-pattern
   async conceptsPage({
     limit,
     offset,

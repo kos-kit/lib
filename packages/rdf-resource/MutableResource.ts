@@ -1,6 +1,4 @@
 import { createRdfList } from "@kos-kit/rdf-utils";
-/* eslint-disable no-inner-declarations */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   BlankNode,
   DataFactory,
