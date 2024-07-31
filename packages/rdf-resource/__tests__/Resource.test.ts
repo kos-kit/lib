@@ -15,7 +15,7 @@ describe("Resource", () => {
     stringLiteral: DataFactory.literal("stringLiteralObject"),
   };
 
-  const predicate = DataFactory.namedNode(`http://example.com/predicate`);
+  const predicate = DataFactory.namedNode("http://example.com/predicate");
 
   beforeAll(() => {
     const dataset: DatasetCore = new Store();
