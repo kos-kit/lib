@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 
-const VERSION = "2.0.30";
+const VERSION = "2.0.31";
 
 type ProjectName =
   | "mem-models"
@@ -26,7 +26,7 @@ const externalDependencyVersions = {
   "iterator-helpers-polyfill": "^3.0.1",
   n3: "^1.17.3",
   "purify-ts": "~2.1.0",
-  "purify-ts-helpers": "1.0.2",
+  "purify-ts-helpers": "1.0.3",
 };
 
 const projects: readonly Project[] = [
@@ -168,7 +168,7 @@ for (const project of projects) {
         },
         type: "module",
         types: "index.d.ts",
-        version: "2.0.30",
+        version: "2.0.31",
       },
       undefined,
       2,
