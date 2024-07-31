@@ -372,7 +372,8 @@ export namespace Resource {
     }) {
       if (identifier.startsWith("_:")) {
         return dataFactory.blankNode(identifier.substring("_:".length));
-      } else if (
+      }
+      if (
         identifier.startsWith("<") &&
         identifier.endsWith(">") &&
         identifier.length > 2
@@ -380,9 +381,8 @@ export namespace Resource {
         return dataFactory.namedNode(
           identifier.substring(1, identifier.length - 1),
         );
-      } else {
-        throw new RangeError(identifier);
       }
+      throw new RangeError(identifier);
     }
 
     export function toString(identifier: Identifier) {
