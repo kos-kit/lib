@@ -1,7 +1,7 @@
-import { DataFactory, Store } from "n3";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { DataFactory, Store } from "n3";
 import { describe, expect, it } from "vitest";
 import { parseRdfFile } from "../parseRdfFile.js";
 

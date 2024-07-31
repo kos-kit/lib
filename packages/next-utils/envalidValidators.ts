@@ -1,6 +1,6 @@
-import * as envalid from "envalid";
 import fs from "node:fs";
 import path from "node:path";
+import * as envalid from "envalid";
 
 export const existingPathValidator = envalid.makeExactValidator((value) => {
   if (value.length === 0) {
@@ -36,7 +36,7 @@ export const pathValidator = envalid.makeExactValidator((value) => {
   return path.resolve(value);
 });
 
-export const intValidator = envalid.makeExactValidator<number>(parseInt);
+export const intValidator = envalid.makeExactValidator<number>(Number.parseInt);
 
 export const languageTagArrayValidator = envalid.makeExactValidator((value) => {
   if (value.length === 0) {
