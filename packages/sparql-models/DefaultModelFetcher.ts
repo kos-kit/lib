@@ -2,14 +2,17 @@ import * as mem from "@kos-kit/mem-models";
 import {
   Concept as IConcept,
   ConceptScheme as IConceptScheme,
-  Identifier,
   Label as ILabel,
+  Identifier,
   LanguageTagSet,
   noteProperties,
 } from "@kos-kit/models";
 import { Resource } from "@kos-kit/rdf-resource";
 import { isRdfInstanceOf } from "@kos-kit/rdf-utils";
 import { dc11, dcterms, rdf, skos, skosxl } from "@tpluscode/rdf-ns-builders";
+import { Just, Maybe, Nothing } from "purify-ts";
+import { Concept } from "./Concept.js";
+import { ConceptScheme } from "./ConceptScheme.js";
 import { ConstructQueryBuilder } from "./ConstructQueryBuilder.js";
 import {
   GraphPattern,
@@ -18,9 +21,6 @@ import {
 } from "./GraphPattern.js";
 import { ModelFetcher } from "./ModelFetcher.js";
 import { SparqlClient } from "./SparqlClient.js";
-import { Just, Maybe, Nothing } from "purify-ts";
-import { Concept } from "./Concept.js";
-import { ConceptScheme } from "./ConceptScheme.js";
 
 export class DefaultModelFetcher<
   MemConceptT extends IConcept,

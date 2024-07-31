@@ -58,10 +58,10 @@ ${indentedStringsToString(
 )}
 } WHERE {
 ${valuesString.length > 0 ? " ".repeat(TAB_SPACES) + valuesString + "\n" : ""}${indentedStringsToString(
-      sortedGraphPatterns.flatMap((graphPattern) =>
-        this.graphPatternToWhereStrings(graphPattern, TAB_SPACES),
-      ),
-    )}
+  sortedGraphPatterns.flatMap((graphPattern) =>
+    this.graphPatternToWhereStrings(graphPattern, TAB_SPACES),
+  ),
+)}
 }`;
   }
 
