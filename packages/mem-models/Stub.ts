@@ -53,8 +53,7 @@ export abstract class Stub<
     const model = (await this.resolve()).extractNullable();
     if (model !== null) {
       return model;
-    } else {
-      return this;
     }
+    return this;
   }
 }
