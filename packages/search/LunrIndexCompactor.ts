@@ -26,6 +26,7 @@ export class LunrIndexCompactor {
       const expanded = vectors.map((v: any, ii: number) => {
         if (ii % 2 === 0) {
           if (v === null) {
+            // biome-ignore lint/style/noParameterAssign: <explanation>
             v = prev + 1;
           }
           prev = v;
@@ -107,9 +108,11 @@ export class LunrIndexCompactor {
         const token = item[0];
         const props = item[1];
         const newItem = [token];
+        // biome-ignore lint/complexity/noForEach: <explanation>
         fields.forEach((field: any) => {
           const fProps = props[field];
           const matches: any[] = [];
+          // biome-ignore lint/complexity/noForEach: <explanation>
           Object.keys(fProps).forEach((docRef) => {
             const fieldVectorIdx = fieldVectorIdxs.get(`${field}/${docRef}`);
             if (fieldVectorIdx === undefined) {
