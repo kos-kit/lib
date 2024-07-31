@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 
-const VERSION = "2.0.29";
+const VERSION = "2.0.30";
 
 type ProjectName =
   | "mem-models"
@@ -168,7 +168,7 @@ for (const project of projects) {
         },
         type: "module",
         types: "index.d.ts",
-        version: "2.0.29",
+        version: "2.0.30",
       },
       undefined,
       2,
