@@ -18,7 +18,7 @@ export function mapResultRowsToCount(
     throw new Error("'count' variable is not a Literal");
   }
   const parsedCount = Number.parseInt(count.value);
-  if (isNaN(parsedCount)) {
+  if (Number.isNaN(parsedCount)) {
     throw new Error("'count' variable is NaN");
   }
   return parsedCount;
