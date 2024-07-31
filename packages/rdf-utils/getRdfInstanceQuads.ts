@@ -86,7 +86,8 @@ function* getRdfInstanceQuadsRecursive({
   for (const quad of dataset.match(null, subClassOfPredicate, class_, graph)) {
     if (quad.subject.termType !== "NamedNode") {
       continue;
-    } else if (visitedClasses.has(quad.subject)) {
+    }
+    if (visitedClasses.has(quad.subject)) {
       continue;
     }
     yield* getRdfInstanceQuadsRecursive({

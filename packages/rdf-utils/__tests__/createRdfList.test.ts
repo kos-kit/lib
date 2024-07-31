@@ -31,7 +31,7 @@ describe("createRdfList", () => {
         dataset,
         generateIdentifier: (_, itemIndex) =>
           DataFactory.namedNode(
-            "http://example.com/list" + itemIndex.toString(),
+            `http://example.com/list${itemIndex.toString()}`,
           ),
         items: terms,
       });

@@ -55,7 +55,8 @@ function isRdfInstanceOfRecursive({
   for (const quad of dataset.match(null, subClassOfPredicate, class_, null)) {
     if (quad.subject.termType !== "NamedNode") {
       continue;
-    } else if (visitedClasses.has(quad.subject)) {
+    }
+    if (visitedClasses.has(quad.subject)) {
       continue;
     }
     if (
