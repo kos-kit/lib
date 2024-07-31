@@ -9,8 +9,7 @@ export const encodeFileName = (fileName: string): string => {
   const [fileStem, fileExtension] = splitFileName(fileName);
   if (fileExtension.length <= 1 || isSafeFileName(fileExtension.substring(1))) {
     return fileNameCodec.encode(Buffer.from(fileStem, "utf-8")) + fileExtension;
-  } else {
-    // Unsafe file extension, encode the entire file name
-    return fileNameCodec.encode(Buffer.from(fileName, "utf-8"));
   }
+  // Unsafe file extension, encode the entire file name
+  return fileNameCodec.encode(Buffer.from(fileName, "utf-8"));
 };

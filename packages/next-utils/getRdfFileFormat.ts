@@ -16,7 +16,7 @@ export function getRdfFileFormat(
 ): Either<Error, RdfFileFormat> {
   const mimeType = mime.getType(filePath);
   if (mimeType === null) {
-    return Left(new Error("unable to infer MIME type of " + filePath));
+    return Left(new Error(`unable to infer MIME type of ${filePath}`));
   }
 
   for (const compressionMethod of compressionMethods) {
@@ -28,7 +28,7 @@ export function getRdfFileFormat(
       const uncompressedMimeType = mime.getType(uncompressedFileName);
       if (uncompressedMimeType === null) {
         return Left(
-          new Error("unable to infer MIME type of " + uncompressedFileName),
+          new Error(`unable to infer MIME type of ${uncompressedFileName}`),
         );
       }
       for (const rdfFormat of rdfFormats) {
