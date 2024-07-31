@@ -16,7 +16,7 @@ describe("MutableResource", () => {
     stringLiteral: DataFactory.literal("stringLiteralObject"),
   };
 
-  const predicate = DataFactory.namedNode(`http://example.com/predicate`);
+  const predicate = DataFactory.namedNode("http://example.com/predicate");
 
   beforeAll(() => {
     dataset = new Store();
