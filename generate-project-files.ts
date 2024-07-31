@@ -149,7 +149,7 @@ for (const project of projects) {
           "check:write": "biome check --write",
           "check:write:unsafe": "biome check --write --unsafe",
           clean:
-            "rimraf *.d.ts* *.js *.js.map __tests__/*.d.ts* __tests__/*.js __tests__/*.js.map",
+            "rimraf *.d.ts* *.js *.js.map __tests__/*.d.ts* __tests__/*.js __tests__/*.js.map tsconfig.tsbuildinfo",
           format: "biome format",
           "format:write": "biome format --write",
           "format:write:unsafe": "biome format --write --unsafe",

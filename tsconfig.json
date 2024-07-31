@@ -20,5 +20,5 @@
     "**/*.js.map"
   ],
   "extends": ["@tsconfig/strictest/tsconfig.json"],
-  "include": ["*.ts", "**/*.ts"]
+  "include": ["**/*.ts"]
 }
