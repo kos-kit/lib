@@ -1,5 +1,5 @@
-import { Label, LabelsMixin, LanguageTag } from "..";
 import { expect, it } from "vitest";
+import { Label, LabelsMixin, LanguageTag } from "..";
 
 export const behavesLikeLabelsMixin = (
   lazyModel: (includeLanguageTag: LanguageTag) => Promise<LabelsMixin>,

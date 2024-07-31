@@ -1,12 +1,12 @@
 import {
   Concept as IConcept,
   ConceptScheme as IConceptScheme,
-  Identifier,
   NamedModel as INamedModel,
   Stub as IStub,
+  Identifier,
 } from "@kos-kit/models";
-import { ModelFetcher } from "./ModelFetcher.js";
 import { Maybe } from "purify-ts";
+import { ModelFetcher } from "./ModelFetcher.js";
 
 export abstract class Stub<
   SparqlConceptT extends IConcept,
@@ -45,8 +45,7 @@ export abstract class Stub<
     const model = (await this.resolve()).extractNullable();
     if (model !== null) {
       return model;
-    } else {
-      return this;
     }
+    return this;
   }
 }

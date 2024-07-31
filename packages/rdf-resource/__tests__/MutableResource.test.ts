@@ -1,8 +1,8 @@
-import { beforeAll, describe, expect, it } from "vitest";
-import { DataFactory, Store } from "n3";
 import { DatasetCore, Quad, Quad_Object, Variable } from "@rdfjs/types";
-import { MutableResource } from "..";
 import { xsd } from "@tpluscode/rdf-ns-builders";
+import { DataFactory, Store } from "n3";
+import { beforeAll, describe, expect, it } from "vitest";
+import { MutableResource } from "..";
 
 describe("MutableResource", () => {
   let dataset: DatasetCore;
@@ -16,7 +16,7 @@ describe("MutableResource", () => {
     stringLiteral: DataFactory.literal("stringLiteralObject"),
   };
 
-  const predicate = DataFactory.namedNode(`http://example.com/predicate`);
+  const predicate = DataFactory.namedNode("http://example.com/predicate");
 
   beforeAll(() => {
     dataset = new Store();

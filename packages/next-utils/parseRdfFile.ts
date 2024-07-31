@@ -1,3 +1,6 @@
+import fs from "node:fs";
+import { Readable } from "node:stream";
+import zlib from "node:zlib";
 import {
   DataFactory,
   DatasetCore,
@@ -5,13 +8,10 @@ import {
   Quad_Graph,
   Variable,
 } from "@rdfjs/types";
-import fs from "node:fs";
-import { Readable } from "node:stream";
-import zlib from "node:zlib";
-import bz2 from "unbzip2-stream";
 import N3 from "n3";
-import { getRdfFileFormat } from "./getRdfFileFormat.js";
+import bz2 from "unbzip2-stream";
 import { RdfFileFormat } from "./RdfFileFormat.js";
+import { getRdfFileFormat } from "./getRdfFileFormat.js";
 
 export async function parseRdfFile({
   dataFactory,

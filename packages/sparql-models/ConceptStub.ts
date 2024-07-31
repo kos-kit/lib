@@ -2,8 +2,8 @@ import {
   Concept as IConcept,
   ConceptScheme as IConceptScheme,
 } from "@kos-kit/models";
-import { Stub } from "./Stub.js";
 import { Maybe } from "purify-ts";
+import { Stub } from "./Stub.js";
 
 export class ConceptStub<
   SparqlConceptT extends IConcept,

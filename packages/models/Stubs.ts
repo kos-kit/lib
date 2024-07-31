@@ -1,6 +1,6 @@
 import { Maybe } from "purify-ts";
-import { Stub } from "./Stub.js";
 import { NamedModel } from "./NamedModel.js";
+import { Stub } from "./Stub.js";
 
 export namespace Stubs {
   export namespace Array {

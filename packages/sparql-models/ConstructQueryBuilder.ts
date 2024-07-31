@@ -57,11 +57,11 @@ ${indentedStringsToString(
   ),
 )}
 } WHERE {
-${valuesString.length > 0 ? " ".repeat(TAB_SPACES) + valuesString + "\n" : ""}${indentedStringsToString(
-      sortedGraphPatterns.flatMap((graphPattern) =>
-        this.graphPatternToWhereStrings(graphPattern, TAB_SPACES),
-      ),
-    )}
+${valuesString.length > 0 ? `${" ".repeat(TAB_SPACES) + valuesString}\n` : ""}${indentedStringsToString(
+  sortedGraphPatterns.flatMap((graphPattern) =>
+    this.graphPatternToWhereStrings(graphPattern, TAB_SPACES),
+  ),
+)}
 }`;
   }
 
@@ -152,19 +152,15 @@ ${valuesString.length > 0 ? " ".repeat(TAB_SPACES) + valuesString + "\n" : ""}${
         return `<${term.value}>`;
       case "Literal": {
         const literalValue: Omit<Literal, "equals"> = term;
-        return (
-          '"' +
-          literalValue.value +
-          '"' +
-          (literalValue.datatype.value.length > 0 &&
+        return `"${literalValue.value}"${
+          literalValue.datatype.value.length > 0 &&
           literalValue.datatype.value !==
             "http://www.w3.org/2001/XMLSchema#string" &&
           literalValue.datatype.value !==
             "http://www.w3.org/1999/02/22-rdf-syntax-ns#langString"
-            ? "^^" + literalValue.datatype.value
-            : "") +
-          (literalValue.language ? "@" + literalValue.language : "")
-        );
+            ? `^^${literalValue.datatype.value}`
+            : ""
+        }${literalValue.language ? `@${literalValue.language}` : ""}`;
       }
       case "Variable":
         return `?${term.value}`;
@@ -202,9 +198,8 @@ function sortGraphPatterns(
     // Required then optional.
     if (left.optional) {
       return right.optional ? 0 : 1;
-    } else {
-      return right.optional ? -1 : 0;
     }
+    return right.optional ? -1 : 0;
   });
   return sortedGraphPatterns;
 }

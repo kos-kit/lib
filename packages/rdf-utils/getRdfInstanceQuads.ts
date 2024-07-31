@@ -1,3 +1,4 @@
+import TermSet from "@rdfjs/term-set";
 import {
   DatasetCore,
   NamedNode,
@@ -5,7 +6,6 @@ import {
   Quad_Graph,
   Variable,
 } from "@rdfjs/types";
-import TermSet from "@rdfjs/term-set";
 import { rdf, rdfs } from "@tpluscode/rdf-ns-builders";
 
 export interface GetRdfInstanceQuadsParameters {
@@ -86,7 +86,8 @@ function* getRdfInstanceQuadsRecursive({
   for (const quad of dataset.match(null, subClassOfPredicate, class_, graph)) {
     if (quad.subject.termType !== "NamedNode") {
       continue;
-    } else if (visitedClasses.has(quad.subject)) {
+    }
+    if (visitedClasses.has(quad.subject)) {
       continue;
     }
     yield* getRdfInstanceQuadsRecursive({

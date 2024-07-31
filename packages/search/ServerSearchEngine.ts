@@ -37,7 +37,7 @@ export class ServerSearchEngine implements SearchEngine {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const totalHeaderValue = response.headers["x-total-count"];
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    const total = parseInt(totalHeaderValue);
+    const total = Number.parseInt(totalHeaderValue);
 
     const parser = new Parser({ format: "N-Triples" });
     const store = new Store();

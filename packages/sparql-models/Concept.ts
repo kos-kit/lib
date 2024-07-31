@@ -9,13 +9,13 @@ import {
 import { Resource } from "@kos-kit/rdf-resource";
 import { Literal, NamedNode } from "@rdfjs/types";
 import { skos } from "@tpluscode/rdf-ns-builders";
-import { mapResultRowsToCount } from "./mapResultRowsToCount.js";
-import { mapResultRowsToIdentifiers } from "./mapResultRowsToIdentifiers.js";
+import { Maybe } from "purify-ts";
 import { ConceptSchemeStub } from "./ConceptSchemeStub.js";
 import { ConceptStub } from "./ConceptStub.js";
 import { ModelFetcher } from "./ModelFetcher.js";
 import { SparqlClient } from "./SparqlClient.js";
-import { Maybe } from "purify-ts";
+import { mapResultRowsToCount } from "./mapResultRowsToCount.js";
+import { mapResultRowsToIdentifiers } from "./mapResultRowsToIdentifiers.js";
 
 /**
  * The SPARQL-backed models are implemented in the spirit of Labeled Property Graphs:

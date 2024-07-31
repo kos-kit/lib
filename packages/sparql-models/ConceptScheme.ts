@@ -5,14 +5,14 @@ import {
   Label,
 } from "@kos-kit/models";
 import { Resource } from "@kos-kit/rdf-resource";
+import { Literal, NamedNode } from "@rdfjs/types";
 import { rdf, rdfs, skos } from "@tpluscode/rdf-ns-builders";
-import { mapResultRowsToCount } from "./mapResultRowsToCount.js";
-import { mapResultRowsToIdentifiers } from "./mapResultRowsToIdentifiers.js";
-import { ConceptStub } from "./ConceptStub.js";
 import { Just, Maybe } from "purify-ts";
+import { ConceptStub } from "./ConceptStub.js";
 import { ModelFetcher } from "./ModelFetcher.js";
 import { SparqlClient } from "./SparqlClient.js";
-import { Literal, NamedNode } from "@rdfjs/types";
+import { mapResultRowsToCount } from "./mapResultRowsToCount.js";
+import { mapResultRowsToIdentifiers } from "./mapResultRowsToIdentifiers.js";
 
 /**
  * See note in Concept re: the design of this class.

@@ -1,6 +1,6 @@
+import { expect } from "vitest";
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { Concept } from "..";
-import { expect } from "vitest";
 
 /**
  * Basic assertions about every concept.

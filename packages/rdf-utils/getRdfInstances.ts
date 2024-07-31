@@ -1,7 +1,7 @@
 import { BlankNode, NamedNode } from "@rdfjs/types";
 import {
-  getRdfInstanceQuads,
   GetRdfInstanceQuadsParameters,
+  getRdfInstanceQuads,
 } from "./getRdfInstanceQuads.js";
 
 /**

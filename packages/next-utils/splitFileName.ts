@@ -8,6 +8,6 @@ export function splitFileName(fileName: string): readonly string[] {
   }
   return [
     split.slice(0, split.length - 1).join("."),
-    "." + split[split.length - 1],
+    `.${split[split.length - 1]}`,
   ];
 }

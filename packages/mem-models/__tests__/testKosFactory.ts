@@ -1,8 +1,8 @@
-import { LanguageTag, LanguageTagSet } from "@kos-kit/models";
-import { Parser, Store } from "n3";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { LanguageTag, LanguageTagSet } from "@kos-kit/models";
+import { Parser, Store } from "n3";
 import { Concept } from "../Concept.js";
 import { ConceptScheme } from "../ConceptScheme.js";
 import { DefaultModelFactory } from "../DefaultModelFactory.js";

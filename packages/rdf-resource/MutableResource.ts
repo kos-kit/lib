@@ -1,3 +1,4 @@
+import { createRdfList } from "@kos-kit/rdf-utils";
 /* eslint-disable no-inner-declarations */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import {
@@ -9,9 +10,8 @@ import {
   Quad_Object,
   Variable,
 } from "@rdfjs/types";
-import { Resource } from "./Resource.js";
-import { createRdfList } from "@kos-kit/rdf-utils";
 import { rdf } from "@tpluscode/rdf-ns-builders";
+import { Resource } from "./Resource.js";
 
 type Value = Exclude<Quad_Object, Quad | Variable>;
 

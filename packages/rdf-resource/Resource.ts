@@ -289,11 +289,9 @@ export class Resource<
     property: NamedNode,
     filter?: (value: Resource.Value) => boolean,
   ): Resource.Value {
-    if (!filter) {
-      filter = defaultValueFilter;
-    }
+    const filter_ = filter ?? defaultValueFilter;
     for (const value of this.values(property)) {
-      if (filter(value)) {
+      if (filter_(value)) {
         return value;
       }
     }
@@ -307,11 +305,11 @@ export class Resource<
     property: NamedNode,
     filter?: (subject: Resource) => boolean,
   ): Maybe<Resource> {
-    if (!filter) {
-      filter = defaultValueOfFilter;
-    }
+    const filter_ = filter ?? defaultValueOfFilter;
     for (const resource of this.valuesOf(property)) {
-      return Just(resource);
+      if (filter_(resource)) {
+        return Just(resource);
+      }
     }
     return Nothing;
   }
@@ -372,7 +370,8 @@ export namespace Resource {
     }) {
       if (identifier.startsWith("_:")) {
         return dataFactory.blankNode(identifier.substring("_:".length));
-      } else if (
+      }
+      if (
         identifier.startsWith("<") &&
         identifier.endsWith(">") &&
         identifier.length > 2
@@ -380,11 +379,11 @@ export namespace Resource {
         return dataFactory.namedNode(
           identifier.substring(1, identifier.length - 1),
         );
-      } else {
-        throw new RangeError(identifier);
       }
+      throw new RangeError(identifier);
     }
 
+    // biome-ignore lint/suspicious/noShadowRestrictedNames: <explanation>
     export function toString(identifier: Identifier) {
       switch (identifier.termType) {
         case "BlankNode":

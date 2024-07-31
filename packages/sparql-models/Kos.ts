@@ -1,24 +1,26 @@
 import {
   Concept as IConcept,
   ConceptScheme as IConceptScheme,
-  Identifier,
   Kos as IKos,
+  Identifier,
 } from "@kos-kit/models";
 import { rdf, rdfs, skos } from "@tpluscode/rdf-ns-builders";
+import { ConceptSchemeStub } from "./ConceptSchemeStub.js";
+import { ConceptStub } from "./ConceptStub.js";
 import { ModelFetcher } from "./ModelFetcher.js";
 import { SparqlClient } from "./SparqlClient.js";
 import { mapResultRowsToCount } from "./mapResultRowsToCount.js";
 import { mapResultRowsToIdentifiers } from "./mapResultRowsToIdentifiers.js";
-import { ConceptStub } from "./ConceptStub.js";
-import { ConceptSchemeStub } from "./ConceptSchemeStub.js";
 
 export class Kos<
   SparqlConceptT extends IConcept,
   SparqlConceptSchemeT extends IConceptScheme,
 > implements IKos
 {
-  private static readonly CONCEPT_IDENTIFIER_GRAPH_PATTERN = `?concept <${rdf.type.value}>/<${rdfs.subClassOf.value}>* <${skos.Concept.value}> .`;
-  private static readonly CONCEPT_SCHEME_IDENTIFIER_GRAPH_PATTERN = `?conceptScheme <${rdf.type.value}>/<${rdfs.subClassOf.value}>* <${skos.ConceptScheme.value}> .`;
+  private static readonly CONCEPT_IDENTIFIER_GRAPH_PATTERN =
+    `?concept <${rdf.type.value}>/<${rdfs.subClassOf.value}>* <${skos.Concept.value}> .`;
+  private static readonly CONCEPT_SCHEME_IDENTIFIER_GRAPH_PATTERN =
+    `?conceptScheme <${rdf.type.value}>/<${rdfs.subClassOf.value}>* <${skos.ConceptScheme.value}> .`;
 
   private readonly modelFetcher: ModelFetcher<
     SparqlConceptT,

@@ -2,14 +2,17 @@ import * as mem from "@kos-kit/mem-models";
 import {
   Concept as IConcept,
   ConceptScheme as IConceptScheme,
-  Identifier,
   Label as ILabel,
+  Identifier,
   LanguageTagSet,
   noteProperties,
 } from "@kos-kit/models";
 import { Resource } from "@kos-kit/rdf-resource";
 import { isRdfInstanceOf } from "@kos-kit/rdf-utils";
 import { dc11, dcterms, rdf, skos, skosxl } from "@tpluscode/rdf-ns-builders";
+import { Just, Maybe, Nothing } from "purify-ts";
+import { Concept } from "./Concept.js";
+import { ConceptScheme } from "./ConceptScheme.js";
 import { ConstructQueryBuilder } from "./ConstructQueryBuilder.js";
 import {
   GraphPattern,
@@ -18,9 +21,6 @@ import {
 } from "./GraphPattern.js";
 import { ModelFetcher } from "./ModelFetcher.js";
 import { SparqlClient } from "./SparqlClient.js";
-import { Just, Maybe, Nothing } from "purify-ts";
-import { Concept } from "./Concept.js";
-import { ConceptScheme } from "./ConceptScheme.js";
 
 export class DefaultModelFetcher<
   MemConceptT extends IConcept,
@@ -126,10 +126,9 @@ export class DefaultModelFetcher<
             sparqlClient: this.sparqlClient,
           }),
         );
-      } else {
-        console.warn("tried to fetch missing concept scheme", identifier.value);
-        return Nothing;
       }
+      console.warn("tried to fetch missing concept scheme", identifier.value);
+      return Nothing;
     });
   }
 
@@ -171,10 +170,9 @@ export class DefaultModelFetcher<
             sparqlClient: this.sparqlClient,
           }),
         );
-      } else {
-        console.warn("tried to fetch missing concept", identifier.value);
-        return Nothing;
       }
+      console.warn("tried to fetch missing concept", identifier.value);
+      return Nothing;
     });
   }
 
@@ -192,7 +190,7 @@ export class DefaultModelFetcher<
       predicate: skos.notation,
       object: {
         termType: "Variable",
-        value: variablePrefix + "Notation",
+        value: `${variablePrefix}Notation`,
       },
       optional: true,
     });
@@ -264,7 +262,7 @@ export class DefaultModelFetcher<
 
       const skosxlLabelVariable: GraphPatternVariable = {
         termType: "Variable",
-        value: variablePrefix + variableName + "Resource",
+        value: `${variablePrefix + variableName}Resource`,
       };
       graphPatterns.push({
         subject,
@@ -280,7 +278,7 @@ export class DefaultModelFetcher<
             predicate: skosxl.literalForm,
             object: {
               termType: "Variable",
-              value: variablePrefix + variableName + "LiteralForm",
+              value: `${variablePrefix + variableName}LiteralForm`,
             },
             optional: false,
           },
@@ -306,7 +304,7 @@ export class DefaultModelFetcher<
         predicate: rdf.type,
         object: {
           termType: "Variable",
-          value: variablePrefix + "Type",
+          value: `${variablePrefix}Type`,
         },
         optional: true,
       },
@@ -315,14 +313,14 @@ export class DefaultModelFetcher<
         predicate: dcterms.license,
         object: {
           termType: "Variable",
-          value: variablePrefix + "License",
+          value: `${variablePrefix}License`,
         },
         optional: true,
       },
       {
         subject,
         predicate: dcterms.modified,
-        object: { termType: "Variable", value: variablePrefix + "Modified" },
+        object: { termType: "Variable", value: `${variablePrefix}Modified` },
         optional: true,
       },
       {
@@ -331,7 +329,7 @@ export class DefaultModelFetcher<
         object: {
           termType: "Variable",
           plainLiteral: true,
-          value: variablePrefix + "DcRights",
+          value: `${variablePrefix}DcRights`,
         },
         optional: true,
       },
@@ -341,7 +339,7 @@ export class DefaultModelFetcher<
         object: {
           termType: "Variable",
           plainLiteral: true,
-          value: variablePrefix + "DctermsRights",
+          value: `${variablePrefix}DctermsRights`,
         },
         optional: true,
       },
@@ -351,7 +349,7 @@ export class DefaultModelFetcher<
         object: {
           termType: "Variable",
           plainLiteral: true,
-          value: variablePrefix + "RightsHolder",
+          value: `${variablePrefix}RightsHolder`,
         },
         optional: true,
       },

@@ -1,6 +1,6 @@
 import { DataFactory, DatasetCore } from "@rdfjs/types";
-import { Resource } from "./Resource.js";
 import { MutableResource } from "./MutableResource.js";
+import { Resource } from "./Resource.js";
 import { ResourceSet } from "./ResourceSet.js";
 
 /**

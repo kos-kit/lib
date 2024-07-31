@@ -23,7 +23,8 @@ export function* getRdfList({
   const firstQuads = [...dataset.match(node, rdf.first, null, graph)];
   if (firstQuads.length === 0) {
     throw new RangeError("RDF list has no rdf:first quad");
-  } else if (firstQuads.length > 1) {
+  }
+  if (firstQuads.length > 1) {
     throw new RangeError("RDF list has multiple rdf:first quads");
   }
   const firstTerm = firstQuads[0].object;
@@ -41,7 +42,8 @@ export function* getRdfList({
   const restQuads = [...dataset.match(node, rdf.rest, null, graph)];
   if (restQuads.length === 0) {
     throw new RangeError("RDF list has no rdf:rest quad");
-  } else if (restQuads.length > 1) {
+  }
+  if (restQuads.length > 1) {
     throw new RangeError("RDF list has multiple rdf:rest quads");
   }
   const restTerm = restQuads[0].object;

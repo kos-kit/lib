@@ -1,6 +1,6 @@
 import { Literal, NamedNode } from "@rdfjs/types";
-import { Label } from "./Label.js";
 import { Maybe, Nothing } from "purify-ts";
+import { Label } from "./Label.js";
 
 /**
  * A Label that only consists of its literal form.

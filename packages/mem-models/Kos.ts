@@ -1,19 +1,19 @@
 import {
   Concept as IConcept,
   ConceptScheme as IConceptScheme,
-  Identifier,
   Kos as IKos,
   Label as ILabel,
+  Identifier,
 } from "@kos-kit/models";
 import { Resource } from "@kos-kit/rdf-resource";
+import { getRdfInstances } from "@kos-kit/rdf-utils";
 import { DatasetCore } from "@rdfjs/types";
 import { skos } from "@tpluscode/rdf-ns-builders";
+import { ConceptSchemeStub } from "./ConceptSchemeStub.js";
+import { ConceptStub } from "./ConceptStub.js";
 import { ModelFactory } from "./ModelFactory.js";
 import { countIterable } from "./countIterable.js";
 import { paginateIterable } from "./paginateIterable.js";
-import { ConceptStub } from "./ConceptStub.js";
-import { ConceptSchemeStub } from "./ConceptSchemeStub.js";
-import { getRdfInstances } from "@kos-kit/rdf-utils";
 
 export class Kos<
   ConceptT extends IConcept,

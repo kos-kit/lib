@@ -1,15 +1,15 @@
 import {
-  Identifier,
   Label as ILabel,
   LabelsMixin as ILabelsMixin,
+  Identifier,
   LanguageTagSet,
   LiteralLabel,
 } from "@kos-kit/models";
 import { Resource } from "@kos-kit/rdf-resource";
 import { NamedNode } from "@rdfjs/types";
 import { skos, skosxl } from "@tpluscode/rdf-ns-builders";
-import { matchLiteral } from "./matchLiteral.js";
 import { Maybe } from "purify-ts";
+import { matchLiteral } from "./matchLiteral.js";
 import "iterator-helpers-polyfill";
 import { LabelFactory } from "./LabelFactory.js";
 import { NamedModel } from "./NamedModel.js";
