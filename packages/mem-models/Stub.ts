@@ -1,14 +1,14 @@
 import {
   Concept as IConcept,
   ConceptScheme as IConceptScheme,
-  Identifier,
   Label as ILabel,
   NamedModel as INamedModel,
   Stub as IStub,
+  Identifier,
 } from "@kos-kit/models";
-import { ModelFactory } from "./ModelFactory.js";
-import { Maybe } from "purify-ts";
 import { Resource } from "@kos-kit/rdf-resource";
+import { Maybe } from "purify-ts";
+import { ModelFactory } from "./ModelFactory.js";
 
 export abstract class Stub<
   ConceptT extends IConcept,

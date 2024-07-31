@@ -1,6 +1,6 @@
 import {
-  Identifier,
   NamedModel as INamedModel,
+  Identifier,
   LanguageTagSet,
 } from "@kos-kit/models";
 import { Resource } from "@kos-kit/rdf-resource";

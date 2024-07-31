@@ -1,8 +1,8 @@
 import { Label as ILabel } from "@kos-kit/models";
 import { Literal, NamedNode } from "@rdfjs/types";
+import { Maybe } from "purify-ts";
 import { NamedModel } from "./NamedModel.js";
 import { Provenance } from "./Provenance.js";
-import { Maybe } from "purify-ts";
 
 export class Label extends NamedModel implements ILabel {
   private readonly provenance: Provenance;

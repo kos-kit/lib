@@ -2,8 +2,8 @@
 import {
   Concept as IConcept,
   ConceptScheme as IConceptScheme,
-  Identifier,
   Label as ILabel,
+  Identifier,
   NoteProperty,
   SemanticRelationProperty,
 } from "@kos-kit/models";
@@ -11,14 +11,14 @@ import { Resource } from "@kos-kit/rdf-resource";
 import TermSet from "@rdfjs/term-set";
 import { Literal, NamedNode } from "@rdfjs/types";
 import { skos } from "@tpluscode/rdf-ns-builders";
-import { matchLiteral } from "./matchLiteral.js";
+import { Maybe } from "purify-ts";
 import { ConceptSchemeStub } from "./ConceptSchemeStub.js";
 import { ConceptStub } from "./ConceptStub.js";
-import { NamedModel } from "./NamedModel.js";
-import { ModelFactory } from "./ModelFactory.js";
 import { Labels } from "./Labels.js";
+import { ModelFactory } from "./ModelFactory.js";
+import { NamedModel } from "./NamedModel.js";
 import { Provenance } from "./Provenance.js";
-import { Maybe } from "purify-ts";
+import { matchLiteral } from "./matchLiteral.js";
 
 export class Concept<
   ConceptT extends IConcept,

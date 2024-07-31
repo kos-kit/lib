@@ -1,14 +1,14 @@
 import {
-  Identifier,
   ProvenanceMixin as IProvenanceMixin,
+  Identifier,
   LanguageTagSet,
 } from "@kos-kit/models";
+import { Resource } from "@kos-kit/rdf-resource";
 import { Literal, NamedNode } from "@rdfjs/types";
 import { dc11, dcterms } from "@tpluscode/rdf-ns-builders";
-import { matchLiteral } from "./matchLiteral.js";
 import { Just, Maybe, Nothing } from "purify-ts";
-import { Resource } from "@kos-kit/rdf-resource";
 import { NamedModel } from "./NamedModel.js";
+import { matchLiteral } from "./matchLiteral.js";
 
 const rightsPredicates = [dcterms.rights, dc11.rights];
 

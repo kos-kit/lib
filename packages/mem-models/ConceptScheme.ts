@@ -2,22 +2,22 @@
 import {
   Concept as IConcept,
   ConceptScheme as IConceptScheme,
-  Identifier,
   Label as ILabel,
+  Identifier,
 } from "@kos-kit/models";
 import { Resource } from "@kos-kit/rdf-resource";
 import { isRdfInstanceOf } from "@kos-kit/rdf-utils";
 import TermSet from "@rdfjs/term-set";
+import { Literal, NamedNode } from "@rdfjs/types";
 import { skos } from "@tpluscode/rdf-ns-builders";
-import { countIterable } from "./countIterable.js";
-import { paginateIterable } from "./paginateIterable.js";
 import { Just, Maybe, Nothing } from "purify-ts";
 import { ConceptStub } from "./ConceptStub.js";
+import { Labels } from "./Labels.js";
 import { ModelFactory } from "./ModelFactory.js";
 import { NamedModel } from "./NamedModel.js";
-import { Labels } from "./Labels.js";
 import { Provenance } from "./Provenance.js";
-import { Literal, NamedNode } from "@rdfjs/types";
+import { countIterable } from "./countIterable.js";
+import { paginateIterable } from "./paginateIterable.js";
 
 export class ConceptScheme<
     ConceptT extends IConcept,

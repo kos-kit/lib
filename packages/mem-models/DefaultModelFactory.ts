@@ -1,16 +1,16 @@
 import {
   Concept as IConcept,
   ConceptScheme as IConceptScheme,
-  Identifier,
   Label as ILabel,
+  Identifier,
   LanguageTagSet,
 } from "@kos-kit/models";
 import { Resource } from "@kos-kit/rdf-resource";
 import { Literal } from "@rdfjs/types";
-import { Label } from "./Label.js";
-import { ModelFactory } from "./ModelFactory.js";
 import { Concept } from "./Concept.js";
 import { ConceptScheme } from "./ConceptScheme.js";
+import { Label } from "./Label.js";
+import { ModelFactory } from "./ModelFactory.js";
 
 export class DefaultModelFactory<
   ConceptT extends IConcept,

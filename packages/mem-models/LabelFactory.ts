@@ -1,4 +1,4 @@
-import { Identifier, Label as ILabel } from "@kos-kit/models";
+import { Label as ILabel, Identifier } from "@kos-kit/models";
 import { Resource } from "@kos-kit/rdf-resource";
 import { Literal } from "@rdfjs/types";
 

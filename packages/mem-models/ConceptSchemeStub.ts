@@ -3,9 +3,9 @@ import {
   ConceptScheme as IConceptScheme,
   Label as ILabel,
 } from "@kos-kit/models";
-import { Stub } from "./Stub.js";
-import { Just, Maybe, Nothing } from "purify-ts";
 import { skos } from "@tpluscode/rdf-ns-builders";
+import { Just, Maybe, Nothing } from "purify-ts";
+import { Stub } from "./Stub.js";
 
 export class ConceptSchemeStub<
   ConceptT extends IConcept,
