@@ -1,9 +1,9 @@
+import { rdf } from "@tpluscode/rdf-ns-builders";
 import { DataFactory } from "n3";
-import { getRdfList } from "../getRdfList.js";
+import { Store } from "n3";
 import { describe, it } from "vitest";
 import { createRdfList } from "../createRdfList.js";
-import { Store } from "n3";
-import { rdf } from "@tpluscode/rdf-ns-builders";
+import { getRdfList } from "../getRdfList.js";
 
 describe("createRdfList", () => {
   for (const terms of [

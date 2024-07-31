@@ -1,7 +1,7 @@
-import { isRdfInstanceOf } from "..";
-import { describe, expect, it } from "vitest";
-import { DataFactory, Store } from "n3";
 import { rdf, rdfs, skos } from "@tpluscode/rdf-ns-builders";
+import { DataFactory, Store } from "n3";
+import { describe, expect, it } from "vitest";
+import { isRdfInstanceOf } from "..";
 
 describe("isRdfInstanceOf", () => {
   const dataset = new Store();

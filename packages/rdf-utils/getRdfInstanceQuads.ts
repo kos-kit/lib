@@ -1,3 +1,4 @@
+import TermSet from "@rdfjs/term-set";
 import {
   DatasetCore,
   NamedNode,
@@ -5,7 +6,6 @@ import {
   Quad_Graph,
   Variable,
 } from "@rdfjs/types";
-import TermSet from "@rdfjs/term-set";
 import { rdf, rdfs } from "@tpluscode/rdf-ns-builders";
 
 export interface GetRdfInstanceQuadsParameters {
