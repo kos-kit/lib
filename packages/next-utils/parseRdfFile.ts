@@ -8,6 +8,7 @@ import {
   Quad_Graph,
   Variable,
 } from "@rdfjs/types";
+import { JsonLdParser } from "jsonld-streaming-parser";
 import N3 from "n3";
 import bz2 from "unbzip2-stream";
 import { RdfFileFormat } from "./RdfFileFormat.js";
@@ -70,7 +71,7 @@ export async function parseRdfFile({
 
   switch (rdfFileFormat.rdfFormat) {
     case "application/ld+json":
-      await parseRdfFileWithJsonLd({
+      await parseJsonLdFile({
         dataFactory,
         dataset,
         graph,
@@ -81,7 +82,7 @@ export async function parseRdfFile({
     case "application/n-triples":
     case "application/trig":
     case "text/turtle":
-      await parseRdfFileWithN3({
+      await parseN3File({
         dataFactory,
         dataset,
         graph,
@@ -95,7 +96,7 @@ export async function parseRdfFile({
   return dataset;
 }
 
-async function parseRdfFileWithJsonLd({
+async function parseJsonLdFile({
   dataFactory,
   dataset,
   graph,
@@ -106,27 +107,21 @@ async function parseRdfFileWithJsonLd({
   graph?: Exclude<Quad_Graph, Variable>;
   rdfFileStream: Readable;
 }): Promise<void> {
-  const jsonld = (await import("jsonld")).default;
-
-  const chunks: Buffer[] = [];
-  for await (const chunk of rdfFileStream) {
-    chunks.push(Buffer.from(chunk));
-  }
-  const jsonString = Buffer.concat(chunks).toString("utf-8");
-  const json = JSON.parse(jsonString);
-
-  const quads: any = await jsonld.toRDF(json);
-  for (const quad of quads) {
-    addQuad({
-      dataFactory,
-      dataset,
-      graph,
-      quad,
+  return new Promise((resolve, reject) => {
+    const streamParser = new JsonLdParser({ dataFactory });
+    streamParser.on("data", (quad: Quad) => {
+      addQuad({ dataFactory, dataset, graph, quad });
     });
-  }
+    streamParser.on("error", reject);
+    streamParser.on("end", () => {
+      resolve();
+    });
+    streamParser.on("error", reject);
+    rdfFileStream.pipe(streamParser);
+  });
 }
 
-async function parseRdfFileWithN3({
+async function parseN3File({
   dataFactory,
   dataset,
   graph,

@@ -62,6 +62,7 @@ const projects: readonly Project[] = [
       "@types/unbzip2-stream": "^1.4.3",
       "base-x": "^3.0.9",
       envalid: "^8.0.0",
+      "jsonld-streaming-parser": "^3.4.0",
       mime: "^4.0.4",
       n3: "^1.17.3",
       "purify-ts": externalDependencyVersions["purify-ts"],
