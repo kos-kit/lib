@@ -25,7 +25,7 @@ function addQuad({
   graph?: Exclude<Quad_Graph, Variable>;
   quad: Quad;
 }) {
-  if (graph && quad.graph.equals(dataFactory.defaultGraph())) {
+  if (graph && quad.graph.termType === "DefaultGraph") {
     // The quad is probably a triple, add it to the specified graph.
     dataset.add(
       dataFactory.quad(quad.subject, quad.predicate, quad.object, graph),
@@ -116,7 +116,12 @@ async function parseRdfFileWithJsonLd({
 
   const quads: any = await jsonld.toRDF(json);
   for (const quad of quads) {
-    addQuad({ dataFactory, dataset, graph, quad });
+    addQuad({
+      dataFactory,
+      dataset,
+      graph,
+      quad,
+    });
   }
 }
 
