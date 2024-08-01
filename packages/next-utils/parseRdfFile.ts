@@ -14,28 +14,6 @@ import bz2 from "unbzip2-stream";
 import { RdfFileFormat } from "./RdfFileFormat.js";
 import { getRdfFileFormat } from "./getRdfFileFormat.js";
 
-function addQuad({
-  dataFactory,
-  dataset,
-  graph,
-  quad,
-}: {
-  dataFactory: DataFactory;
-  dataset: DatasetCore;
-  graph?: Exclude<Quad_Graph, Variable>;
-  quad: Quad;
-}) {
-  if (graph && quad.graph.termType === "DefaultGraph") {
-    // The quad is probably a triple, add it to the specified graph.
-    dataset.add(
-      dataFactory.quad(quad.subject, quad.predicate, quad.object, graph),
-    );
-  } else {
-    // Add the quad as-is.
-    dataset.add(quad);
-  }
-}
-
 export async function parseRdfFile({
   dataFactory,
   dataset,
@@ -69,12 +47,49 @@ export async function parseRdfFile({
     }
   }
 
+  let addQuad: (quad: Quad) => void;
+  if (graph) {
+    switch (rdfFileFormat.rdfFormat) {
+      case "application/n-triples":
+      case "text/turtle":
+        // Triple formats, always override the graph
+        addQuad = (quad) =>
+          dataset.add(
+            dataFactory.quad(quad.subject, quad.predicate, quad.object, graph),
+          );
+        break;
+      case "application/ld+json":
+      case "application/n-quads":
+      case "application/trig":
+        // Quad formats, override the graph if the parsed quad is in the default graph
+        addQuad = (quad) => {
+          if (quad.graph.termType === "DefaultGraph") {
+            dataset.add(
+              dataFactory.quad(
+                quad.subject,
+                quad.predicate,
+                quad.object,
+                graph,
+              ),
+            );
+          } else {
+            // Add the quad as-is.
+            dataset.add(quad);
+          }
+        };
+        break;
+      case "application/rdf+xml":
+        throw new Error(`format not supported: ${rdfFileFormat.rdfFormat}`);
+    }
+  } else {
+    addQuad = (quad) => dataset.add(quad);
+  }
+
   switch (rdfFileFormat.rdfFormat) {
     case "application/ld+json":
       await parseJsonLdFile({
+        addQuad,
         dataFactory,
-        dataset,
-        graph,
         rdfFileStream,
       });
       break;
@@ -83,9 +98,8 @@ export async function parseRdfFile({
     case "application/trig":
     case "text/turtle":
       await parseN3File({
+        addQuad,
         dataFactory,
-        dataset,
-        graph,
         rdfFileStream,
       });
       break;
@@ -97,21 +111,17 @@ export async function parseRdfFile({
 }
 
 async function parseJsonLdFile({
+  addQuad,
   dataFactory,
-  dataset,
-  graph,
   rdfFileStream,
 }: {
+  addQuad: (quad: Quad) => void;
   dataFactory: DataFactory;
-  dataset: DatasetCore;
-  graph?: Exclude<Quad_Graph, Variable>;
   rdfFileStream: Readable;
 }): Promise<void> {
   return new Promise((resolve, reject) => {
     const streamParser = new JsonLdParser({ dataFactory });
-    streamParser.on("data", (quad: Quad) => {
-      addQuad({ dataFactory, dataset, graph, quad });
-    });
+    streamParser.on("data", addQuad);
     streamParser.on("error", reject);
     streamParser.on("end", () => {
       resolve();
@@ -122,21 +132,17 @@ async function parseJsonLdFile({
 }
 
 async function parseN3File({
+  addQuad,
   dataFactory,
-  dataset,
-  graph,
   rdfFileStream,
 }: {
+  addQuad: (quad: Quad) => void;
   dataFactory: DataFactory;
-  dataset: DatasetCore;
-  graph?: Exclude<Quad_Graph, Variable>;
   rdfFileStream: Readable;
 }): Promise<void> {
   return new Promise((resolve, reject) => {
     const streamParser = new N3.StreamParser({ factory: dataFactory });
-    streamParser.on("data", (quad: Quad) => {
-      addQuad({ dataFactory, dataset, graph, quad });
-    });
+    streamParser.on("data", addQuad);
     streamParser.on("error", reject);
     streamParser.on("end", () => {
       resolve();
