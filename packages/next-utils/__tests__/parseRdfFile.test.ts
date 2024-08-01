@@ -24,6 +24,16 @@ describe("parseRdfFile", () => {
         });
         expect(dataset.size).toBe(88482);
       });
+    } else if (fileName === "place.jsonld") {
+      it(`should parse ${fileName}`, async () => {
+        const dataset = new Store();
+        await parseRdfFile({
+          dataFactory: DataFactory,
+          dataset,
+          rdfFilePath: path.resolve(testDataDirPath, fileName),
+        });
+        expect(dataset.size).toBe(6);
+      });
     }
   }
 });
