@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 
-const VERSION = "2.0.31";
+const VERSION = "2.0.32";
 
 type ProjectName =
   | "mem-models"
@@ -62,6 +62,7 @@ const projects: readonly Project[] = [
       "@types/unbzip2-stream": "^1.4.3",
       "base-x": "^3.0.9",
       envalid: "^8.0.0",
+      "jsonld-streaming-parser": "^3.4.0",
       mime: "^4.0.4",
       n3: "^1.17.3",
       "purify-ts": externalDependencyVersions["purify-ts"],
@@ -168,7 +169,7 @@ for (const project of projects) {
         },
         type: "module",
         types: "index.d.ts",
-        version: "2.0.31",
+        version: "2.0.32",
       },
       undefined,
       2,
