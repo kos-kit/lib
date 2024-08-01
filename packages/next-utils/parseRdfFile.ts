@@ -8,7 +8,6 @@ import {
   Quad_Graph,
   Variable,
 } from "@rdfjs/types";
-import * as jsonld from "jsonld";
 import N3 from "n3";
 import bz2 from "unbzip2-stream";
 import { RdfFileFormat } from "./RdfFileFormat.js";
@@ -107,6 +106,8 @@ async function parseRdfFileWithJsonLd({
   graph?: Exclude<Quad_Graph, Variable>;
   rdfFileStream: Readable;
 }): Promise<void> {
+  const jsonld = (await import("jsonld")).default;
+
   const chunks: Buffer[] = [];
   for await (const chunk of rdfFileStream) {
     chunks.push(Buffer.from(chunk));
