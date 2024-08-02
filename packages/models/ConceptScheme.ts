@@ -1,45 +1,30 @@
+import { Literal, NamedNode } from "@rdfjs/types";
 import { Maybe } from "purify-ts";
 import { Concept } from "./Concept.js";
 import { Identifier } from "./Identifier.js";
-import { LabelsMixin } from "./LabelsMixin.js";
+import { Label } from "./Label.js";
 import { NamedModel } from "./NamedModel.js";
-import { ProvenanceMixin } from "./ProvenanceMixin.js";
 import { Stub } from "./Stub.js";
 
-export interface ConceptScheme
-  extends LabelsMixin,
-    NamedModel,
-    ProvenanceMixin {
+export interface ConceptScheme extends NamedModel {
+  readonly license: Maybe<Literal | NamedNode>;
+  readonly modified: Maybe<Literal>;
+  readonly rights: Maybe<Literal>;
+  readonly rightsHolder: Maybe<Literal>;
+
   conceptByIdentifier(identifier: Identifier): Promise<Maybe<Stub<Concept>>>;
-  concepts(): AsyncGenerator<Stub<Concept>>;
+
+  concepts(kwds?: { limit?: number; offset?: number }): AsyncGenerator<
+    Stub<Concept>
+  >;
   conceptsCount(): Promise<number>;
-  conceptsPage(kwds: {
-    limit: number;
-    offset: number;
-  }): Promise<readonly Stub<Concept>[]>;
+
   equals(other: ConceptScheme): boolean;
-  topConcepts(): AsyncGenerator<Stub<Concept>>;
+
+  labels(type?: Label.Type): readonly Label[];
+
+  topConcepts(kwds?: { limit?: number; offset?: number }): AsyncGenerator<
+    Stub<Concept>
+  >;
   topConceptsCount(): Promise<number>;
-  topConceptsPage(kwds: {
-    limit: number;
-    offset: number;
-  }): Promise<readonly Stub<Concept>[]>;
-}
-
-export namespace ConceptScheme {
-  export function equals(left: ConceptScheme, right: ConceptScheme): boolean {
-    if (!left.identifier.equals(right.identifier)) {
-      return false;
-    }
-
-    if (!LabelsMixin.equals(left, right)) {
-      return false;
-    }
-
-    if (!ProvenanceMixin.equals(left, right)) {
-      return false;
-    }
-
-    return true;
-  }
 }

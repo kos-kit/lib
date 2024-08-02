@@ -1,5 +1,5 @@
 import { expect } from "vitest";
-import { Concept } from "..";
+import { Concept, Label } from "..";
 
 /**
  * Basic assertions about every concept.
@@ -7,8 +7,8 @@ import { Concept } from "..";
 export function expectConcept(concept: Concept | null): void {
   expect(concept).not.toBeNull();
   expect(concept!.identifier).toBeDefined();
-  expect(concept!.prefLabels).not.toHaveLength(0);
-  for (const prefLabel of concept!.prefLabels) {
+  expect(concept!.labels(Label.Type.PREFERRED)).not.toHaveLength(0);
+  for (const prefLabel of concept!.labels(Label.Type.PREFERRED)) {
     expect(prefLabel.literalForm.value).not.toHaveLength(0);
   }
 }

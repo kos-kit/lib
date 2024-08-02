@@ -1,5 +1,5 @@
 import { expect, it } from "vitest";
-import { ConceptScheme, LanguageTag } from "..";
+import { ConceptScheme, Label, LanguageTag } from "..";
 import { behavesLikeConceptScheme } from "./behavesLikeConceptScheme.js";
 import { expectConceptScheme } from "./expectConceptScheme.js";
 
@@ -34,11 +34,11 @@ export const behavesLikeUnescoThesaurusConceptScheme = (
     const conceptSchemeEn = await lazyConceptScheme("en");
     const conceptSchemeFr = await lazyConceptScheme("fr");
 
-    const enPrefLabels = conceptSchemeEn.prefLabels;
+    const enPrefLabels = conceptSchemeEn.labels(Label.Type.PREFERRED);
     expect(enPrefLabels).toHaveLength(1);
     expect(enPrefLabels[0].literalForm.value).toStrictEqual("UNESCO Thesaurus");
 
-    const frPrefLabels = conceptSchemeFr.prefLabels;
+    const frPrefLabels = conceptSchemeFr.labels(Label.Type.PREFERRED);
     expect(frPrefLabels).toHaveLength(1);
     expect(frPrefLabels[0].literalForm.value).toStrictEqual(
       "Thésaurus de l'UNESCO",

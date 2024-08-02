@@ -1,7 +1,9 @@
 import { DataFactory } from "n3";
+import { AsyncIterables } from "purify-ts-helpers";
 import { expect, it } from "vitest";
 import {
   Concept,
+  Label,
   LanguageTag,
   NoteProperty,
   SemanticRelationProperty,
@@ -19,7 +21,7 @@ export const behavesLikeUnescoThesaurusConcept10018 = (
 
   it("should be in the single concept scheme", async () => {
     const concept = await lazyConcept("en");
-    const inSchemes = await concept.inSchemes();
+    const inSchemes = await AsyncIterables.toArray(concept.inSchemes());
     expect(inSchemes).toHaveLength(1);
     expect(
       inSchemes[0].identifier.equals(
@@ -39,13 +41,13 @@ export const behavesLikeUnescoThesaurusConcept10018 = (
     const conceptAr = await lazyConcept("ar");
     const conceptEs = await lazyConcept("es");
 
-    const arAltLabels = conceptAr.altLabels;
+    const arAltLabels = conceptAr.labels(Label.Type.ALTERNATIVE);
     expect(arAltLabels).toHaveLength(1);
     expect(arAltLabels[0].literalForm.value).toStrictEqual(
       "تقييم التأثير على البيئة",
     );
 
-    const esAltLabels = conceptEs.altLabels;
+    const esAltLabels = conceptEs.labels(Label.Type.ALTERNATIVE);
     expect(esAltLabels).toHaveLength(1);
     expect(esAltLabels[0].literalForm.value).toStrictEqual(
       "Valoración del impacto ambiental",
@@ -54,7 +56,7 @@ export const behavesLikeUnescoThesaurusConcept10018 = (
 
   it("should be in the single concept scheme", async () => {
     const concept = await lazyConcept("en");
-    const inSchemes = await concept.inSchemes();
+    const inSchemes = await AsyncIterables.toArray(concept.inSchemes());
     expect(inSchemes).toHaveLength(1);
     expect(
       inSchemes[0].identifier.equals(
@@ -67,13 +69,13 @@ export const behavesLikeUnescoThesaurusConcept10018 = (
     const conceptEn = await lazyConcept("en");
     const conceptFr = await lazyConcept("fr");
 
-    const enPrefLabels = conceptEn.prefLabels;
+    const enPrefLabels = conceptEn.labels(Label.Type.PREFERRED);
     expect(enPrefLabels).toHaveLength(1);
     expect(enPrefLabels[0].literalForm.value).toStrictEqual(
       "Environmental impact assessment",
     );
 
-    const frPrefLabels = conceptFr.prefLabels;
+    const frPrefLabels = conceptFr.labels(Label.Type.PREFERRED);
     expect(frPrefLabels).toHaveLength(1);
     expect(frPrefLabels[0].literalForm.value).toStrictEqual(
       "Évaluation de l'impact sur l'environnement",
@@ -95,8 +97,8 @@ export const behavesLikeUnescoThesaurusConcept10018 = (
       expect(
         await concept.semanticRelationsCount(semanticRelationProperty),
       ).toStrictEqual(conceptNumbers.length);
-      const semanticRelations = await concept.semanticRelations(
-        semanticRelationProperty,
+      const semanticRelations = await AsyncIterables.toArray(
+        concept.semanticRelations(semanticRelationProperty),
       );
       expect(semanticRelations).toHaveLength(conceptNumbers.length);
       for (const conceptNumber of conceptNumbers) {

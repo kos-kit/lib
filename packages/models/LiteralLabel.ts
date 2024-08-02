@@ -1,23 +1,27 @@
-import { Literal, NamedNode } from "@rdfjs/types";
-import { Maybe, Nothing } from "purify-ts";
+import { Literal } from "@rdfjs/types";
+import { abc } from ".";
 import { Label } from "./Label.js";
 
 /**
  * A Label that only consists of its literal form.
  */
 export class LiteralLabel implements Label {
-  readonly license: Maybe<NamedNode | Literal> = Nothing;
-  readonly modified: Maybe<Literal> = Nothing;
-  readonly rights: Maybe<Literal> = Nothing;
-  readonly rightsHolder: Maybe<Literal> = Nothing;
+  readonly literalForm: Literal;
+  readonly type: Label.Type;
 
-  constructor(readonly literalForm: Literal) {}
+  constructor({
+    literalForm,
+    type,
+  }: { literalForm: Literal; type: Label.Type }) {
+    this.literalForm = literalForm;
+    this.type = type;
+  }
 
   get displayLabel(): string {
     return this.literalForm.value;
   }
 
   equals(other: Label): boolean {
-    return Label.equals(this, other);
+    return abc.Label.equals(this, other);
   }
 }

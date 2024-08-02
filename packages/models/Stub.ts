@@ -18,12 +18,3 @@ export interface Stub<ModelT extends NamedModel> extends NamedModel {
    */
   resolveOrStub(): Promise<NamedModel>;
 }
-
-export namespace Stub {
-  export function equals<ModelT extends NamedModel>(
-    left: Stub<ModelT>,
-    right: Stub<ModelT>,
-  ): boolean {
-    return left.identifier.equals(right.identifier);
-  }
-}

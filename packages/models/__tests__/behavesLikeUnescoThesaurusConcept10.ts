@@ -1,6 +1,7 @@
 import { DataFactory } from "n3";
+import { AsyncIterables } from "purify-ts-helpers";
 import { expect, it } from "vitest";
-import { Concept, LanguageTag, SemanticRelationProperty } from "..";
+import { Concept, Label, LanguageTag, SemanticRelationProperty } from "..";
 import { behavesLikeConcept } from "./behavesLikeConcept.js";
 import { expectConcept } from "./expectConcept.js";
 
@@ -15,8 +16,8 @@ export const behavesLikeUnescoThesaurusConcept10 = (
   it("should be in the single concept scheme", async () => {
     const concept = await lazyConcept("en");
     for (const inSchemes of [
-      await concept.topConceptOf(),
-      await concept.inSchemes(),
+      await AsyncIterables.toArray(concept.topConceptOf()),
+      await AsyncIterables.toArray(concept.inSchemes()),
     ]) {
       expect(inSchemes).toHaveLength(1);
       expect(
@@ -38,13 +39,13 @@ export const behavesLikeUnescoThesaurusConcept10 = (
     const conceptEn = await lazyConcept("en");
     const conceptFr = await lazyConcept("fr");
 
-    const enPrefLabels = conceptEn.prefLabels;
+    const enPrefLabels = conceptEn.labels(Label.Type.PREFERRED);
     expect(enPrefLabels).toHaveLength(1);
     expect(enPrefLabels[0].literalForm.value).toStrictEqual(
       "Right to education",
     );
 
-    const frPrefLabels = conceptFr.prefLabels;
+    const frPrefLabels = conceptFr.labels(Label.Type.PREFERRED);
     expect(frPrefLabels).toHaveLength(1);
     expect(frPrefLabels[0].literalForm.value).toStrictEqual(
       "Droit à l'éducation",
@@ -53,7 +54,7 @@ export const behavesLikeUnescoThesaurusConcept10 = (
 
   it("should be a top concept of the single concept scheme", async () => {
     const concept = await lazyConcept("en");
-    const topConceptOf = await concept.topConceptOf();
+    const topConceptOf = await AsyncIterables.toArray(concept.topConceptOf());
     expect(topConceptOf).toHaveLength(1);
     expect(
       topConceptOf[0].identifier.equals(
@@ -77,8 +78,8 @@ export const behavesLikeUnescoThesaurusConcept10 = (
       expect(
         await concept.semanticRelationsCount(semanticRelationProperty),
       ).toStrictEqual(conceptNumbers.length);
-      const semanticRelations = await concept.semanticRelations(
-        semanticRelationProperty,
+      const semanticRelations = await AsyncIterables.toArray(
+        concept.semanticRelations(semanticRelationProperty),
       );
       expect(semanticRelations).toHaveLength(conceptNumbers.length);
       for (const conceptNumber of conceptNumbers) {
