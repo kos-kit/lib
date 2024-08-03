@@ -4,7 +4,7 @@ import { ConceptScheme, Kos, Stub } from "..";
 import { expectConcept } from "./expectConcept.js";
 import { expectConceptScheme } from "./expectConceptScheme.js";
 
-export const behavesLikeKos = (kos: Kos) => {
+export const behavesLikeKos = (kos: Kos<any, any>) => {
   it("should get concepts", async () => {
     const firstConcepts = await AsyncIterables.toArray(
       kos.concepts({ limit: 10, offset: 0 }),
@@ -52,7 +52,7 @@ export const behavesLikeKos = (kos: Kos) => {
   });
 
   it("should get concept schemes", async () => {
-    const conceptSchemes: Stub<ConceptScheme>[] = [];
+    const conceptSchemes: Stub<ConceptScheme<any, any>>[] = [];
     for await (const conceptScheme of kos.conceptSchemes()) {
       conceptSchemes.push(conceptScheme);
     }

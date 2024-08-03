@@ -11,12 +11,12 @@ import { LabeledModel } from "./LabeledModel.js";
 import { Stub } from "./Stub.js";
 
 export abstract class ConceptScheme<
-    ConceptT extends IConcept,
-    ConceptSchemeT extends IConceptScheme,
+    ConceptT extends IConcept<any, any, any>,
+    ConceptSchemeT extends IConceptScheme<any, any>,
     LabelT extends ILabel,
   >
   extends LabeledModel<ConceptT, ConceptSchemeT, LabelT>
-  implements IConceptScheme
+  implements IConceptScheme<ConceptT, LabelT>
 {
   abstract readonly license: Maybe<Literal | NamedNode>;
   abstract readonly modified: Maybe<Literal>;
@@ -55,7 +55,7 @@ export abstract class ConceptScheme<
     });
   }
 
-  equals(other: IConceptScheme): boolean {
+  equals(other: IConceptScheme<any, any>): boolean {
     return ConceptScheme.equals(this, other);
   }
 
@@ -82,7 +82,10 @@ export abstract class ConceptScheme<
 }
 
 export namespace ConceptScheme {
-  export function equals(left: IConceptScheme, right: IConceptScheme): boolean {
+  export function equals(
+    left: IConceptScheme<any, any>,
+    right: IConceptScheme<any, any>,
+  ): boolean {
     if (!left.identifier.equals(right.identifier)) {
       return false;
     }
@@ -99,8 +102,8 @@ export namespace ConceptScheme {
   }
 
   export type Parameters<
-    ConceptT extends IConcept,
-    ConceptSchemeT extends IConceptScheme,
+    ConceptT extends IConcept<any, any, any>,
+    ConceptSchemeT extends IConceptScheme<any, any>,
     LabelT extends ILabel,
   > = LabeledModel.Parameters<ConceptT, ConceptSchemeT, LabelT>;
 }

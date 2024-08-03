@@ -4,7 +4,7 @@ import { Concept, Label } from "..";
 /**
  * Basic assertions about every concept.
  */
-export function expectConcept(concept: Concept | null): void {
+export function expectConcept(concept: Concept<any, any, any> | null): void {
   expect(concept).not.toBeNull();
   expect(concept!.identifier).toBeDefined();
   expect(concept!.labels(Label.Type.PREFERRED)).not.toHaveLength(0);

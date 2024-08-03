@@ -6,7 +6,7 @@ import { expectConceptScheme } from "./expectConceptScheme.js";
 export const behavesLikeUnescoThesaurusConceptScheme = (
   lazyConceptScheme: (
     includeLanguageTag: LanguageTag,
-  ) => Promise<ConceptScheme>,
+  ) => Promise<ConceptScheme<any, any>>,
 ) => {
   it("should satisfy basic expect", async () => {
     const conceptScheme = await lazyConceptScheme("en");

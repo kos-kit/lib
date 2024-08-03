@@ -12,7 +12,9 @@ import { behavesLikeConcept } from "./behavesLikeConcept.js";
 import { expectConcept } from "./expectConcept.js";
 
 export const behavesLikeUnescoThesaurusConcept10018 = (
-  lazyConcept: (includeLanguageTag: LanguageTag) => Promise<Concept>,
+  lazyConcept: (
+    includeLanguageTag: LanguageTag,
+  ) => Promise<Concept<any, any, any>>,
 ) => {
   it("should satisfy basic expect", async () => {
     const concept = await lazyConcept("en");
