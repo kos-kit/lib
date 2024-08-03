@@ -1,6 +1,6 @@
+import { AsyncIterables } from "purify-ts-helpers";
 import { expect, it } from "vitest";
 import { ConceptScheme, LanguageTag } from "..";
-import { behavesLikeLabelsMixin } from "./behavesLikeLabelsMixin.js";
 
 export const behavesLikeConceptScheme = (
   lazyConceptScheme: (
@@ -10,10 +10,12 @@ export const behavesLikeConceptScheme = (
   it("should get a concept by its identifier", async () => {
     const conceptScheme = await lazyConceptScheme("en");
 
-    const firstConcepts = await conceptScheme.conceptsPage({
-      limit: 1,
-      offset: 0,
-    });
+    const firstConcepts = await AsyncIterables.toArray(
+      conceptScheme.concepts({
+        limit: 1,
+        offset: 0,
+      }),
+    );
     expect(firstConcepts).toHaveLength(1);
     const firstConcept = firstConcepts[0];
 
@@ -29,16 +31,20 @@ export const behavesLikeConceptScheme = (
   it("should get concept pages", async () => {
     const conceptScheme = await lazyConceptScheme("en");
 
-    const firstConcepts = await conceptScheme.conceptsPage({
-      limit: 10,
-      offset: 0,
-    });
+    const firstConcepts = await AsyncIterables.toArray(
+      conceptScheme.concepts({
+        limit: 10,
+        offset: 0,
+      }),
+    );
     expect(firstConcepts).toHaveLength(10);
 
-    const nextConcepts = await conceptScheme.conceptsPage({
-      limit: 10,
-      offset: 10,
-    });
+    const nextConcepts = await AsyncIterables.toArray(
+      conceptScheme.concepts({
+        limit: 10,
+        offset: 10,
+      }),
+    );
     expect(nextConcepts).toHaveLength(10);
     for (const nextConcept of nextConcepts) {
       expect(
@@ -65,19 +71,31 @@ export const behavesLikeConceptScheme = (
     expect(await conceptScheme.conceptsCount()).toStrictEqual(4482);
   });
 
+  it("should get labels", async ({ expect }) => {
+    const labels = (await lazyConceptScheme("en")).labels();
+    expect(labels).not.toHaveLength(0);
+    for (const label of labels) {
+      expect(label.literalForm.value).not.toHaveLength(0);
+    }
+  });
+
   it("should get top concept pages", async () => {
     const conceptScheme = await lazyConceptScheme("en");
 
-    const firstConcepts = await conceptScheme.topConceptsPage({
-      limit: 10,
-      offset: 0,
-    });
+    const firstConcepts = await AsyncIterables.toArray(
+      conceptScheme.topConcepts({
+        limit: 10,
+        offset: 0,
+      }),
+    );
     expect(firstConcepts).toHaveLength(10);
 
-    const nextConcepts = await conceptScheme.topConceptsPage({
-      limit: 10,
-      offset: 10,
-    });
+    const nextConcepts = await AsyncIterables.toArray(
+      conceptScheme.topConcepts({
+        limit: 10,
+        offset: 10,
+      }),
+    );
     expect(nextConcepts).toHaveLength(10);
     for (const nextConcept of nextConcepts) {
       expect(
@@ -103,6 +121,4 @@ export const behavesLikeConceptScheme = (
     const conceptScheme = await lazyConceptScheme("en");
     expect(await conceptScheme.topConceptsCount()).toStrictEqual(585);
   });
-
-  behavesLikeLabelsMixin(lazyConceptScheme);
 };

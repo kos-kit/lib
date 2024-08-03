@@ -1,7 +1,5 @@
-import * as mem from "@kos-kit/mem-models";
 import { LanguageTag, LanguageTagSet } from "@kos-kit/models";
-import { Concept, ConceptScheme, HttpSparqlClient, Kos } from "..";
-import { DefaultModelFetcher } from "../DefaultModelFetcher.js";
+import { DefaultKos, HttpSparqlClient } from "..";
 
 export const testKosFactory = (includeLanguageTag: LanguageTag) => {
   const includeLanguageTags = new LanguageTagSet(includeLanguageTag, "");
@@ -26,19 +24,8 @@ export const testKosFactory = (includeLanguageTag: LanguageTag) => {
   //   { format: "nt" },
   // );
   // const sparqlClient = new OxigraphSparqlClient(store);
-  return new Kos({
-    modelFetcher: new DefaultModelFetcher({
-      conceptConstructor: Concept,
-      conceptSchemeConstructor: ConceptScheme,
-      includeLanguageTags,
-      memModelFactory: new mem.DefaultModelFactory({
-        conceptConstructor: mem.Concept,
-        conceptSchemeConstructor: mem.ConceptScheme,
-        includeLanguageTags,
-        labelConstructor: mem.Label,
-      }),
-      sparqlClient,
-    }),
+  return new DefaultKos({
+    includeLanguageTags,
     sparqlClient,
   });
 };

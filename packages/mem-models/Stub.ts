@@ -2,58 +2,50 @@ import {
   Concept as IConcept,
   ConceptScheme as IConceptScheme,
   Label as ILabel,
-  NamedModel as INamedModel,
-  Stub as IStub,
   Identifier,
+  abc,
 } from "@kos-kit/models";
 import { Resource } from "@kos-kit/rdf-resource";
+import { DatasetCore, NamedNode } from "@rdfjs/types";
 import { Maybe } from "purify-ts";
-import { ModelFactory } from "./ModelFactory.js";
 
-export abstract class Stub<
+export class Stub<
   ConceptT extends IConcept,
   ConceptSchemeT extends IConceptScheme,
   LabelT extends ILabel,
-  ModelT extends INamedModel,
-> implements IStub<ModelT>
-{
-  protected readonly modelFactory: ModelFactory<
-    ConceptT,
-    ConceptSchemeT,
-    LabelT
-  >;
-  protected readonly resource: Resource<Identifier>;
+  ModelT extends ConceptT | ConceptSchemeT,
+> extends abc.Stub<ConceptT, ConceptSchemeT, LabelT, ModelT> {
+  protected readonly dataset: DatasetCore;
+  private readonly modelFactory: (identifier: Identifier) => ModelT;
+  private readonly modelRdfType: NamedNode;
 
   constructor({
+    dataset,
     modelFactory,
-    resource,
+    modelRdfType,
+    ...superParameters
   }: {
-    modelFactory: ModelFactory<ConceptT, ConceptSchemeT, LabelT>;
-    resource: Resource<Identifier>;
-  }) {
+    dataset: DatasetCore;
+    modelFactory: (identifier: Identifier) => ModelT;
+    modelRdfType: NamedNode;
+  } & abc.Stub.Parameters<ConceptT, ConceptSchemeT, LabelT>) {
+    super(superParameters);
+    this.dataset = dataset;
     this.modelFactory = modelFactory;
-    this.resource = resource;
+    this.modelRdfType = modelRdfType;
   }
 
-  get displayLabel() {
-    return Identifier.toString(this.identifier);
-  }
-
-  get identifier() {
-    return this.resource.identifier;
-  }
-
-  equals(other: IStub<ModelT>): boolean {
-    return IStub.equals(this, other);
-  }
-
-  abstract resolve(): Promise<Maybe<ModelT>>;
-
-  async resolveOrStub() {
-    const model = (await this.resolve()).extractNullable();
-    if (model !== null) {
-      return model;
+  async resolve(): Promise<Maybe<ModelT>> {
+    // If there's an rdf:type statement then consider that we have the concept.
+    // TODO: fetch all required fields here
+    if (
+      new Resource({
+        dataset: this.dataset,
+        identifier: this.identifier,
+      }).isInstanceOf(this.modelRdfType)
+    ) {
+      return Maybe.of(this.modelFactory(this.identifier));
     }
-    return this;
+    return Maybe.empty();
   }
 }

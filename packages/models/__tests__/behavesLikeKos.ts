@@ -1,3 +1,4 @@
+import { AsyncIterables } from "purify-ts-helpers";
 import { assert, expect, it } from "vitest";
 import { ConceptScheme, Kos, Stub } from "..";
 import { expectConcept } from "./expectConcept.js";
@@ -5,13 +6,17 @@ import { expectConceptScheme } from "./expectConceptScheme.js";
 
 export const behavesLikeKos = (kos: Kos) => {
   it("should get concepts", async () => {
-    const firstConcepts = await kos.conceptsPage({ limit: 10, offset: 0 });
+    const firstConcepts = await AsyncIterables.toArray(
+      kos.concepts({ limit: 10, offset: 0 }),
+    );
     expect(firstConcepts).toHaveLength(10);
     for (const firstConcept of firstConcepts) {
       expectConcept((await firstConcept.resolve()).extractNullable());
     }
 
-    const nextConcepts = await kos.conceptsPage({ limit: 10, offset: 10 });
+    const nextConcepts = await AsyncIterables.toArray(
+      kos.concepts({ limit: 10, offset: 10 }),
+    );
     expect(nextConcepts).toHaveLength(10);
     for (const nextConcept of nextConcepts) {
       expectConcept((await nextConcept.resolve()).extractNullable());
@@ -25,7 +30,7 @@ export const behavesLikeKos = (kos: Kos) => {
   });
 
   it("should get a concept by its identifier", async () => {
-    for (const concept of await kos.conceptsPage({
+    for await (const concept of kos.concepts({
       limit: 1,
       offset: 0,
     })) {

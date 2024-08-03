@@ -1,51 +1,185 @@
 import {
   Concept as IConcept,
   ConceptScheme as IConceptScheme,
-  NamedModel as INamedModel,
-  Stub as IStub,
+  Label as ILabel,
   Identifier,
+  abc,
 } from "@kos-kit/models";
-import { Maybe } from "purify-ts";
-import { ModelFetcher } from "./ModelFetcher.js";
+import { DatasetCore } from "@rdfjs/types";
+import { dc11, dcterms, rdf, skos, skosxl } from "@tpluscode/rdf-ns-builders";
+import {
+  GraphPattern,
+  GraphPatternSubject,
+  GraphPatternVariable,
+} from "./GraphPattern.js";
+import { SparqlClient } from "./SparqlClient.js";
 
 export abstract class Stub<
-  SparqlConceptT extends IConcept,
-  SparqlConceptSchemeT extends IConceptScheme,
-  ModelT extends INamedModel,
-> implements IStub<ModelT>
-{
-  readonly identifier: Identifier;
-  protected readonly modelFetcher: ModelFetcher<
-    SparqlConceptT,
-    SparqlConceptSchemeT
-  >;
+  ConceptT extends IConcept,
+  ConceptSchemeT extends IConceptScheme,
+  LabelT extends ILabel,
+  ModelT extends ConceptT | ConceptSchemeT,
+> extends abc.Stub<ConceptT, ConceptSchemeT, LabelT, ModelT> {
+  protected readonly modelFactory: (_: {
+    dataset: DatasetCore;
+    identifier: Identifier;
+  }) => ModelT;
+  protected readonly sparqlClient: SparqlClient;
 
   constructor({
-    identifier,
-    modelFetcher,
+    modelFactory,
+    sparqlClient,
+    ...superParameters
+  }: Stub.Parameters<ConceptT, ConceptSchemeT, LabelT, ModelT>) {
+    super(superParameters);
+    this.modelFactory = modelFactory;
+    this.sparqlClient = sparqlClient;
+  }
+
+  protected labeledModelPropertyGraphPatterns({
+    subject,
+    variablePrefix,
   }: {
-    identifier: Identifier;
-    modelFetcher: ModelFetcher<SparqlConceptT, SparqlConceptSchemeT>;
-  }) {
-    this.identifier = identifier;
-    this.modelFetcher = modelFetcher;
-  }
+    subject: GraphPatternSubject;
+    variablePrefix: string;
+  }): readonly GraphPattern[] {
+    const graphPatterns: GraphPattern[] = [];
+    for (const { skosPredicate, skosxlPredicate, variableName } of [
+      {
+        skosPredicate: skos.altLabel,
+        skosxlPredicate: skosxl.altLabel,
+        variableName: "AltLabel",
+      },
+      {
+        skosPredicate: skos.hiddenLabel,
+        skosxlPredicate: skosxl.hiddenLabel,
+        variableName: "HiddenLabel",
+      },
+      {
+        skosPredicate: skos.prefLabel,
+        skosxlPredicate: skosxl.prefLabel,
+        variableName: "PrefLabel",
+      },
+    ]) {
+      graphPatterns.push({
+        subject,
+        predicate: skosPredicate,
+        object: {
+          plainLiteral: true,
+          termType: "Variable",
+          value: variablePrefix + variableName,
+        },
+        optional: true,
+      });
 
-  get displayLabel() {
-    return Identifier.toString(this.identifier);
-  }
-
-  equals(other: IStub<ModelT>): boolean {
-    return IStub.equals(this, other);
-  }
-
-  abstract resolve(): Promise<Maybe<ModelT>>;
-
-  async resolveOrStub() {
-    const model = (await this.resolve()).extractNullable();
-    if (model !== null) {
-      return model;
+      const skosxlLabelVariable: GraphPatternVariable = {
+        termType: "Variable",
+        value: `${variablePrefix + variableName}Resource`,
+      };
+      graphPatterns.push({
+        subject,
+        predicate: skosxlPredicate,
+        object: skosxlLabelVariable,
+        optional: true,
+        subGraphPatterns: this.modelPropertyGraphPatterns({
+          subject: skosxlLabelVariable,
+          variablePrefix: skosxlLabelVariable.value,
+        }).concat([
+          {
+            subject: skosxlLabelVariable,
+            predicate: skosxl.literalForm,
+            object: {
+              termType: "Variable",
+              value: `${variablePrefix + variableName}LiteralForm`,
+            },
+            optional: false,
+          },
+        ]),
+      });
     }
-    return this;
+
+    return this.modelPropertyGraphPatterns({ subject, variablePrefix }).concat(
+      graphPatterns,
+    );
+  }
+
+  protected modelPropertyGraphPatterns({
+    subject,
+    variablePrefix,
+  }: {
+    subject: GraphPatternSubject;
+    variablePrefix: string;
+  }): readonly GraphPattern[] {
+    return [
+      {
+        subject,
+        predicate: rdf.type,
+        object: {
+          termType: "Variable",
+          value: `${variablePrefix}Type`,
+        },
+        optional: true,
+      },
+      {
+        subject,
+        predicate: dcterms.license,
+        object: {
+          termType: "Variable",
+          value: `${variablePrefix}License`,
+        },
+        optional: true,
+      },
+      {
+        subject,
+        predicate: dcterms.modified,
+        object: { termType: "Variable", value: `${variablePrefix}Modified` },
+        optional: true,
+      },
+      {
+        subject,
+        predicate: dc11.rights,
+        object: {
+          termType: "Variable",
+          plainLiteral: true,
+          value: `${variablePrefix}DcRights`,
+        },
+        optional: true,
+      },
+      {
+        subject,
+        predicate: dcterms.rights,
+        object: {
+          termType: "Variable",
+          plainLiteral: true,
+          value: `${variablePrefix}DctermsRights`,
+        },
+        optional: true,
+      },
+      {
+        subject,
+        predicate: dcterms.rightsHolder,
+        object: {
+          termType: "Variable",
+          plainLiteral: true,
+          value: `${variablePrefix}RightsHolder`,
+        },
+        optional: true,
+      },
+    ];
+  }
+}
+
+export namespace Stub {
+  export interface Parameters<
+    ConceptT extends IConcept,
+    ConceptSchemeT extends IConceptScheme,
+    LabelT extends ILabel,
+    ModelT extends ConceptT | ConceptSchemeT,
+  > extends abc.Stub.Parameters<ConceptT, ConceptSchemeT, LabelT> {
+    modelFactory: (_: {
+      dataset: DatasetCore;
+      identifier: Identifier;
+    }) => ModelT;
+    sparqlClient: SparqlClient;
   }
 }
