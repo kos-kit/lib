@@ -126,7 +126,7 @@ export abstract class Kos<
     limit?: number;
     offset?: number;
     query?: ConceptsQuery;
-  }): AsyncGenerator<abc.ConceptStub<ConceptT, ConceptSchemeT, LabelT>> {
+  }): AsyncGenerator<abc.Stub<ConceptT, ConceptSchemeT, LabelT, ConceptT>> {
     let concepts = this.queryConcepts(kwds?.query);
     if (kwds?.offset) {
       concepts = offsetGenerator(concepts, kwds.offset);
@@ -145,7 +145,9 @@ export abstract class Kos<
     limit?: number;
     offset?: number;
     query?: ConceptSchemesQuery;
-  }): AsyncGenerator<abc.ConceptSchemeStub<ConceptT, ConceptSchemeT, LabelT>> {
+  }): AsyncGenerator<
+    abc.Stub<ConceptT, ConceptSchemeT, LabelT, ConceptSchemeT>
+  > {
     let conceptSchemes = this.queryConceptSchemes(kwds?.query);
     if (kwds?.offset) {
       conceptSchemes = offsetGenerator(conceptSchemes, kwds.offset);
@@ -163,7 +165,7 @@ export abstract class Kos<
   }
 
   private *allConceptSchemes(): Generator<
-    abc.ConceptSchemeStub<ConceptT, ConceptSchemeT, LabelT>
+    abc.Stub<ConceptT, ConceptSchemeT, LabelT, ConceptSchemeT>
   > {
     for (const identifier of getRdfInstances({
       class_: skos.ConceptScheme,
@@ -177,7 +179,7 @@ export abstract class Kos<
 
   private *queryConcepts(
     query?: ConceptsQuery,
-  ): Generator<abc.ConceptStub<ConceptT, ConceptSchemeT, LabelT>> {
+  ): Generator<abc.Stub<ConceptT, ConceptSchemeT, LabelT, ConceptT>> {
     if (!query) {
       for (const identifier of getRdfInstances({
         class_: skos.Concept,
@@ -281,7 +283,7 @@ export abstract class Kos<
 
   private *queryConceptSchemes(
     query?: ConceptSchemesQuery,
-  ): Generator<abc.ConceptSchemeStub<ConceptT, ConceptSchemeT, LabelT>> {
+  ): Generator<abc.Stub<ConceptT, ConceptSchemeT, LabelT, ConceptSchemeT>> {
     if (!query) {
       yield* this.allConceptSchemes();
       return;

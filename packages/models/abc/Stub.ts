@@ -3,7 +3,6 @@ import {
   Concept as IConcept,
   ConceptScheme as IConceptScheme,
   Label as ILabel,
-  NamedModel as INamedModel,
   Stub as IStub,
   Identifier,
   NamedModel,
@@ -14,7 +13,7 @@ export abstract class Stub<
   ConceptT extends IConcept,
   ConceptSchemeT extends IConceptScheme,
   LabelT extends ILabel,
-  ModelT extends INamedModel,
+  ModelT extends ConceptT | ConceptSchemeT,
 > implements IStub<ModelT>
 {
   readonly identifier: Identifier;

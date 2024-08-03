@@ -8,9 +8,8 @@ import {
 import { Literal } from "@rdfjs/types";
 import { Maybe } from "purify-ts";
 import { Arrays } from "purify-ts-helpers";
-import { ConceptSchemeStub } from "./ConceptSchemeStub.js";
-import { ConceptStub } from "./ConceptStub.js";
 import { LabeledModel } from "./LabeledModel.js";
+import { Stub } from "./Stub.js";
 
 export abstract class Concept<
   ConceptT extends IConcept,
@@ -24,7 +23,7 @@ export abstract class Concept<
   }
 
   async *inSchemes(): AsyncGenerator<
-    ConceptSchemeStub<ConceptT, ConceptSchemeT, LabelT>
+    Stub<ConceptT, ConceptSchemeT, LabelT, ConceptSchemeT>
   > {
     yield* this.kos.conceptSchemes({
       query: { conceptIdentifier: this.identifier, type: "HasConcept" },
@@ -37,7 +36,7 @@ export abstract class Concept<
 
   async *semanticRelations(
     property: SemanticRelationProperty,
-  ): AsyncGenerator<ConceptStub<ConceptT, ConceptSchemeT, LabelT>> {
+  ): AsyncGenerator<Stub<ConceptT, ConceptSchemeT, LabelT, ConceptT>> {
     yield* this.kos.concepts({
       query: {
         semanticRelationProperty: property,
@@ -56,7 +55,7 @@ export abstract class Concept<
   }
 
   async *topConceptOf(): AsyncGenerator<
-    ConceptSchemeStub<ConceptT, ConceptSchemeT, LabelT>
+    Stub<ConceptT, ConceptSchemeT, LabelT, ConceptSchemeT>
   > {
     yield* this.kos.conceptSchemes({
       query: { conceptIdentifier: this.identifier, type: "HasTopConcept" },
