@@ -16,11 +16,11 @@ import {
 import { Stub } from "./Stub.js";
 
 export class ConceptStub<
-  SparqlConceptT extends IConcept,
-  SparqlConceptSchemeT extends IConceptScheme,
+  ConceptT extends IConcept,
+  ConceptSchemeT extends IConceptScheme,
   LabelT extends ILabel,
-> extends Stub<SparqlConceptT, SparqlConceptSchemeT, LabelT, SparqlConceptT> {
-  async resolve(): Promise<Maybe<SparqlConceptT>> {
+> extends Stub<ConceptT, ConceptSchemeT, LabelT, ConceptT> {
+  async resolve(): Promise<Maybe<ConceptT>> {
     const conceptVariable: GraphPatternVariable = {
       termType: "Variable",
       value: "concept",
@@ -47,12 +47,9 @@ export class ConceptStub<
     }
 
     return Maybe.of(
-      new this.conceptConstructor({
-        memModel: this.memModelFactory.createConcept(
-          new Resource({ dataset, identifier }),
-        ),
-        modelFetcher: this,
-        sparqlClient: this.sparqlClient,
+      this.modelFactory({
+        dataset,
+        identifier: this.identifier,
       }),
     );
   }

@@ -6,49 +6,43 @@ import {
   Kos as IKos,
   Label as ILabel,
   Identifier,
+  abc,
 } from "@kos-kit/models";
 import { rdf, rdfs, skos } from "@tpluscode/rdf-ns-builders";
-import { ConceptSchemeStub } from "./ConceptSchemeStub.js";
-import { ConceptStub } from "./ConceptStub.js";
 import { SparqlClient } from "./SparqlClient.js";
 import { mapResultRowsToCount } from "./mapResultRowsToCount.js";
 import { mapResultRowsToIdentifiers } from "./mapResultRowsToIdentifiers.js";
 
-export class Kos<
-  SparqlConceptT extends IConcept,
-  SparqlConceptSchemeT extends IConceptScheme,
-  LabelT extends ILabel,
-> implements IKos
+export abstract class Kos<
+    ConceptT extends IConcept,
+    ConceptSchemeT extends IConceptScheme,
+    LabelT extends ILabel,
+  >
+  extends abc.Kos<ConceptT, ConceptSchemeT, LabelT>
+  implements IKos
 {
   private static readonly CONCEPT_IDENTIFIER_GRAPH_PATTERN =
     `?concept <${rdf.type.value}>/<${rdfs.subClassOf.value}>* <${skos.Concept.value}> .`;
   private static readonly CONCEPT_SCHEME_IDENTIFIER_GRAPH_PATTERN =
     `?conceptScheme <${rdf.type.value}>/<${rdfs.subClassOf.value}>* <${skos.ConceptScheme.value}> .`;
 
-  private readonly sparqlClient: SparqlClient;
+  protected readonly sparqlClient: SparqlClient;
 
   constructor({
     sparqlClient,
+    ...superParameters
   }: {
     sparqlClient: SparqlClient;
-  }) {
+  } & abc.Kos.Parameters) {
+    super(superParameters);
     this.sparqlClient = sparqlClient;
-  }
-
-  conceptByIdentifier(
-    identifier: Identifier,
-  ): ConceptStub<SparqlConceptT, SparqlConceptSchemeT, LabelT> {
-    return new ConceptStub({
-      identifier,
-      modelFetcher: this.modelFetcher,
-    });
   }
 
   async *concepts(kwds?: {
     limit?: number;
     offset?: number;
     query?: ConceptsQuery;
-  }): AsyncGenerator<ConceptStub<SparqlConceptT, SparqlConceptSchemeT>> {
+  }): AsyncGenerator<abc.Stub<ConceptT, ConceptSchemeT, LabelT, ConceptT>> {
     for (const identifier of mapResultRowsToIdentifiers(
       await this.sparqlClient.query.select(`\
 SELECT ?conceptScheme
@@ -75,20 +69,13 @@ ${this.conceptsQueryToWhereGraphPatterns(query).join("\n")}
     );
   }
 
-  conceptSchemeByIdentifier(
-    identifier: Identifier,
-  ): ConceptSchemeStub<SparqlConceptT, SparqlConceptSchemeT> {
-    return new ConceptSchemeStub({
-      identifier,
-      modelFetcher: this.modelFetcher,
-    });
-  }
-
   async *conceptSchemes(kwds?: {
     limit?: number;
     offset?: number;
     query?: ConceptSchemesQuery;
-  }): AsyncGenerator<ConceptSchemeStub<SparqlConceptT, SparqlConceptSchemeT>> {
+  }): AsyncGenerator<
+    abc.Stub<ConceptT, ConceptSchemeT, LabelT, ConceptSchemeT>
+  > {
     for (const identifier of mapResultRowsToIdentifiers(
       await this.sparqlClient.query.select(`\
 SELECT ?conceptScheme

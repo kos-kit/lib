@@ -1,9 +1,7 @@
 import {
   Concept as IConcept,
   ConceptScheme as IConceptScheme,
-  Kos as IKos,
   Label as ILabel,
-  NamedModel as INamedModel,
   Identifier,
   abc,
 } from "@kos-kit/models";
@@ -17,23 +15,24 @@ import {
 import { SparqlClient } from "./SparqlClient.js";
 
 export abstract class Stub<
-  SparqlConceptT extends IConcept,
-  SparqlConceptSchemeT extends IConceptScheme,
+  ConceptT extends IConcept,
+  ConceptSchemeT extends IConceptScheme,
   LabelT extends ILabel,
-  ModelT extends SparqlConceptT | SparqlConceptSchemeT,
-> extends abc.Stub<SparqlConceptT, SparqlConceptSchemeT, LabelT, ModelT> {
-  protected readonly memModelConstructor: {
+  ModelT extends ConceptT | ConceptSchemeT,
+> extends abc.Stub<ConceptT, ConceptSchemeT, LabelT, ModelT> {
+  protected readonly modelFactory: (_: {
     dataset: DatasetCore;
     identifier: Identifier;
-    kos: abc.Kos<SparqlConceptT, SparqlConceptSchemeT, LabelT>;
-  };
+  }) => ModelT;
   protected readonly sparqlClient: SparqlClient;
 
   constructor({
+    modelFactory,
     sparqlClient,
     ...superParameters
-  }: Stub.Parameters<SparqlConceptT, SparqlConceptSchemeT, LabelT>) {
+  }: Stub.Parameters<ConceptT, ConceptSchemeT, LabelT, ModelT>) {
     super(superParameters);
+    this.modelFactory = modelFactory;
     this.sparqlClient = sparqlClient;
   }
 
@@ -172,10 +171,15 @@ export abstract class Stub<
 
 export namespace Stub {
   export interface Parameters<
-    SparqlConceptT extends IConcept,
-    SparqlConceptSchemeT extends IConceptScheme,
+    ConceptT extends IConcept,
+    ConceptSchemeT extends IConceptScheme,
     LabelT extends ILabel,
-  > extends abc.Stub.Parameters<SparqlConceptT, SparqlConceptSchemeT, LabelT> {
+    ModelT extends ConceptT | ConceptSchemeT,
+  > extends abc.Stub.Parameters<ConceptT, ConceptSchemeT, LabelT> {
+    modelFactory: (_: {
+      dataset: DatasetCore;
+      identifier: Identifier;
+    }) => ModelT;
     sparqlClient: SparqlClient;
   }
 }
