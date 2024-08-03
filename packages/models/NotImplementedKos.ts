@@ -6,28 +6,30 @@ import { Identifier } from "./Identifier.js";
 import { Kos } from "./Kos.js";
 import { Stub } from "./Stub.js";
 
-export class NotImplementedKos implements Kos {
-  conceptByIdentifier(_identifier: Identifier): Stub<Concept> {
+export class NotImplementedKos implements Kos<any, any, any> {
+  conceptByIdentifier(_identifier: Identifier): Stub<Concept<any, any, any>> {
     throw new Error("Method not implemented.");
   }
   concepts(_kwds?: {
     limit?: number;
     offset?: number;
     query?: ConceptsQuery;
-  }): AsyncGenerator<Stub<Concept>> {
+  }): AsyncGenerator<Stub<Concept<any, any, any>>> {
     throw new Error("Method not implemented.");
   }
   conceptsCount(_query?: ConceptsQuery): Promise<number> {
     throw new Error("Method not implemented.");
   }
-  conceptSchemeByIdentifier(_identifier: Identifier): Stub<ConceptScheme> {
+  conceptSchemeByIdentifier(
+    _identifier: Identifier,
+  ): Stub<ConceptScheme<any, any>> {
     throw new Error("Method not implemented.");
   }
   conceptSchemes(_kwds?: {
     limit?: number;
     offset?: number;
     query?: ConceptSchemesQuery;
-  }): AsyncGenerator<Stub<ConceptScheme>> {
+  }): AsyncGenerator<Stub<ConceptScheme<any, any>>> {
     throw new Error("Method not implemented.");
   }
   conceptSchemesCount(_query?: ConceptSchemesQuery): Promise<number> {

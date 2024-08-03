@@ -3,7 +3,6 @@ import {
   ConceptsQuery,
   Concept as IConcept,
   ConceptScheme as IConceptScheme,
-  Kos as IKos,
   Label as ILabel,
   Identifier,
   abc,
@@ -108,13 +107,10 @@ function* offsetGenerator<T>(
 }
 
 export abstract class Kos<
-    ConceptT extends IConcept,
-    ConceptSchemeT extends IConceptScheme,
-    LabelT extends ILabel,
-  >
-  extends abc.Kos<ConceptT, ConceptSchemeT, LabelT>
-  implements IKos
-{
+  ConceptT extends IConcept<ConceptT, ConceptSchemeT, LabelT>,
+  ConceptSchemeT extends IConceptScheme<ConceptT, LabelT>,
+  LabelT extends ILabel,
+> extends abc.Kos<ConceptT, ConceptSchemeT, LabelT> {
   readonly dataset: DatasetCore;
 
   constructor({ dataset, ...otherParameters }: Kos.Parameters) {

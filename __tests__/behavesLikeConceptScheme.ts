@@ -1,11 +1,11 @@
+import { ConceptScheme, LanguageTag } from "@kos-kit/models";
 import { AsyncIterables } from "purify-ts-helpers";
 import { expect, it } from "vitest";
-import { ConceptScheme, LanguageTag } from "..";
 
 export const behavesLikeConceptScheme = (
   lazyConceptScheme: (
     includeLanguageTag: LanguageTag,
-  ) => Promise<ConceptScheme>,
+  ) => Promise<ConceptScheme<any, any>>,
 ) => {
   it("should get a concept by its identifier", async () => {
     const conceptScheme = await lazyConceptScheme("en");

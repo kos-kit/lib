@@ -1,12 +1,12 @@
+import { ConceptScheme, Label, LanguageTag } from "@kos-kit/models";
 import { expect, it } from "vitest";
-import { ConceptScheme, Label, LanguageTag } from "..";
 import { behavesLikeConceptScheme } from "./behavesLikeConceptScheme.js";
 import { expectConceptScheme } from "./expectConceptScheme.js";
 
 export const behavesLikeUnescoThesaurusConceptScheme = (
   lazyConceptScheme: (
     includeLanguageTag: LanguageTag,
-  ) => Promise<ConceptScheme>,
+  ) => Promise<ConceptScheme<any, any>>,
 ) => {
   it("should satisfy basic expect", async () => {
     const conceptScheme = await lazyConceptScheme("en");

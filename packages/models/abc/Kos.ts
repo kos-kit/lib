@@ -11,10 +11,10 @@ import {
 import { Stub } from "./Stub.js";
 
 export abstract class Kos<
-  ConceptT extends IConcept,
-  ConceptSchemeT extends IConceptScheme,
+  ConceptT extends IConcept<ConceptT, ConceptSchemeT, LabelT>,
+  ConceptSchemeT extends IConceptScheme<ConceptT, LabelT>,
   LabelT extends ILabel,
-> implements IKos
+> implements IKos<ConceptT, ConceptSchemeT, LabelT>
 {
   readonly includeLanguageTags: LanguageTagSet;
 

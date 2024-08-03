@@ -1,10 +1,10 @@
+import { ConceptScheme, Kos, Stub } from "@kos-kit/models";
 import { AsyncIterables } from "purify-ts-helpers";
 import { assert, expect, it } from "vitest";
-import { ConceptScheme, Kos, Stub } from "..";
 import { expectConcept } from "./expectConcept.js";
 import { expectConceptScheme } from "./expectConceptScheme.js";
 
-export const behavesLikeKos = (kos: Kos) => {
+export const behavesLikeKos = (kos: Kos<any, any, any>) => {
   it("should get concepts", async () => {
     const firstConcepts = await AsyncIterables.toArray(
       kos.concepts({ limit: 10, offset: 0 }),
@@ -52,7 +52,7 @@ export const behavesLikeKos = (kos: Kos) => {
   });
 
   it("should get concept schemes", async () => {
-    const conceptSchemes: Stub<ConceptScheme>[] = [];
+    const conceptSchemes: Stub<ConceptScheme<any, any>>[] = [];
     for await (const conceptScheme of kos.conceptSchemes()) {
       conceptSchemes.push(conceptScheme);
     }

@@ -1,12 +1,19 @@
+import {
+  Concept,
+  Label,
+  LanguageTag,
+  SemanticRelationProperty,
+} from "@kos-kit/models";
 import { DataFactory } from "n3";
 import { AsyncIterables } from "purify-ts-helpers";
 import { expect, it } from "vitest";
-import { Concept, Label, LanguageTag, SemanticRelationProperty } from "..";
 import { behavesLikeConcept } from "./behavesLikeConcept.js";
 import { expectConcept } from "./expectConcept.js";
 
 export const behavesLikeUnescoThesaurusConcept10 = (
-  lazyConcept: (includeLanguageTag: LanguageTag) => Promise<Concept>,
+  lazyConcept: (
+    includeLanguageTag: LanguageTag,
+  ) => Promise<Concept<any, any, any>>,
 ) => {
   it("should satisfy basic expect", async () => {
     const concept = await lazyConcept("en");

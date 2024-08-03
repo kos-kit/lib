@@ -10,8 +10,8 @@ import { DatasetCore, NamedNode } from "@rdfjs/types";
 import { Maybe } from "purify-ts";
 
 export class Stub<
-  ConceptT extends IConcept,
-  ConceptSchemeT extends IConceptScheme,
+  ConceptT extends IConcept<ConceptT, ConceptSchemeT, LabelT>,
+  ConceptSchemeT extends IConceptScheme<ConceptT, LabelT>,
   LabelT extends ILabel,
   ModelT extends ConceptT | ConceptSchemeT,
 > extends abc.Stub<ConceptT, ConceptSchemeT, LabelT, ModelT> {

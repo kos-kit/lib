@@ -1,6 +1,7 @@
 import { Label } from "./Label.js";
+import { LiteralLabel } from "./LiteralLabel.js";
 import { NamedModel } from "./NamedModel.js";
 
-export interface LabeledModel extends NamedModel {
-  labels(type?: Label.Type): readonly Label[];
+export interface LabeledModel<LabelT extends Label> extends NamedModel {
+  labels(type?: Label.Type): readonly (LiteralLabel | LabelT)[];
 }

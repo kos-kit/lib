@@ -1,8 +1,10 @@
+import { Concept, LanguageTag } from "@kos-kit/models";
 import { it } from "vitest";
-import { Concept, LanguageTag } from "..";
 
 export const behavesLikeConcept = (
-  lazyConcept: (includeLanguageTag: LanguageTag) => Promise<Concept>,
+  lazyConcept: (
+    includeLanguageTag: LanguageTag,
+  ) => Promise<Concept<any, any, any>>,
 ) => {
   it("should get labels", async ({ expect }) => {
     const labels = (await lazyConcept("en")).labels();

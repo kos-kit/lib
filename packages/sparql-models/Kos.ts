@@ -3,7 +3,6 @@ import {
   ConceptsQuery,
   Concept as IConcept,
   ConceptScheme as IConceptScheme,
-  Kos as IKos,
   Label as ILabel,
   Identifier,
   abc,
@@ -14,13 +13,10 @@ import { mapResultRowsToCount } from "./mapResultRowsToCount.js";
 import { mapResultRowsToIdentifiers } from "./mapResultRowsToIdentifiers.js";
 
 export abstract class Kos<
-    ConceptT extends IConcept,
-    ConceptSchemeT extends IConceptScheme,
-    LabelT extends ILabel,
-  >
-  extends abc.Kos<ConceptT, ConceptSchemeT, LabelT>
-  implements IKos
-{
+  ConceptT extends IConcept<ConceptT, ConceptSchemeT, LabelT>,
+  ConceptSchemeT extends IConceptScheme<ConceptT, LabelT>,
+  LabelT extends ILabel,
+> extends abc.Kos<ConceptT, ConceptSchemeT, LabelT> {
   private static readonly CONCEPT_IDENTIFIER_GRAPH_PATTERN =
     `?concept <${rdf.type.value}>/<${rdfs.subClassOf.value}>* <${skos.Concept.value}> .`;
   private static readonly CONCEPT_SCHEME_IDENTIFIER_GRAPH_PATTERN =
