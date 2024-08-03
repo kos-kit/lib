@@ -38,10 +38,6 @@ export class ConceptScheme<
     this.resource = new Resource({ dataset, identifier: this.identifier });
   }
 
-  protected get includeLanguageTags() {
-    return this.kos.includeLanguageTags;
-  }
-
   protected labelsByType(type: ILabel.Type): readonly ILabel[] {
     return labelsByType({
       includeLanguageTags: this.kos.includeLanguageTags,
@@ -68,7 +64,7 @@ export class ConceptScheme<
     const literal = literals[0];
     if (
       abc.matchLiteral(literal, {
-        includeLanguageTags: this.includeLanguageTags,
+        includeLanguageTags: this.kos.includeLanguageTags,
       })
     ) {
       return Maybe.of(literal);
@@ -106,7 +102,7 @@ export class ConceptScheme<
     const literal = literals[0];
     if (
       abc.matchLiteral(literal, {
-        includeLanguageTags: this.includeLanguageTags,
+        includeLanguageTags: this.kos.includeLanguageTags,
       })
     ) {
       return Maybe.of(literal);

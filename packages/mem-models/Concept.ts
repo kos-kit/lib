@@ -33,10 +33,6 @@ export class Concept<
     this.resource = new Resource({ dataset, identifier: this.identifier });
   }
 
-  protected get includeLanguageTags() {
-    return this.kos.includeLanguageTags;
-  }
-
   protected labelsByType(type: ILabel.Type): readonly ILabel[] {
     return labelsByType({
       includeLanguageTags: this.kos.includeLanguageTags,
