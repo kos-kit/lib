@@ -3,11 +3,13 @@ import { ConceptScheme } from "./ConceptScheme.js";
 import { ConceptSchemesQuery } from "./ConceptSchemesQuery.js";
 import { ConceptsQuery } from "./ConceptsQuery.js";
 import { Identifier } from "./Identifier.js";
+import { Label } from "./Label.js";
 import { Stub } from "./Stub.js";
 
 export interface Kos<
-  ConceptT extends Concept<any, any, any>,
-  ConceptSchemeT extends ConceptScheme<any, any>,
+  ConceptT extends Concept<ConceptT, ConceptSchemeT, LabelT>,
+  ConceptSchemeT extends ConceptScheme<ConceptT, LabelT>,
+  LabelT extends Label,
 > {
   conceptByIdentifier(identifier: Identifier): Stub<ConceptT>;
   concepts(kwds?: {

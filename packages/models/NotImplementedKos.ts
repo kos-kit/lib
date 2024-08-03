@@ -6,7 +6,7 @@ import { Identifier } from "./Identifier.js";
 import { Kos } from "./Kos.js";
 import { Stub } from "./Stub.js";
 
-export class NotImplementedKos implements Kos<any, any> {
+export class NotImplementedKos implements Kos<any, any, any> {
   conceptByIdentifier(_identifier: Identifier): Stub<Concept<any, any, any>> {
     throw new Error("Method not implemented.");
   }

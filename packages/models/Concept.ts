@@ -8,7 +8,7 @@ import { SemanticRelationProperty } from "./SemanticRelationProperty.js";
 import { Stub } from "./Stub.js";
 
 export interface Concept<
-  ConceptT extends Concept<any, any, any>,
+  ConceptT extends Concept<any, ConceptSchemeT, LabelT>,
   ConceptSchemeT extends ConceptScheme<ConceptT, LabelT>,
   LabelT extends Label,
 > extends LabeledModel<LabelT> {

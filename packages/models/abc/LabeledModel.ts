@@ -8,8 +8,8 @@ import { NamedModel } from "./NamedModel.js";
 import { matchLiteral } from "./matchLiteral.js";
 
 export abstract class LabeledModel<
-  ConceptT extends IConcept<any, any, any>,
-  ConceptSchemeT extends IConceptScheme<any, any>,
+  ConceptT extends IConcept<ConceptT, ConceptSchemeT, LabelT>,
+  ConceptSchemeT extends IConceptScheme<ConceptT, LabelT>,
   LabelT extends ILabel,
 > extends NamedModel {
   protected readonly kos: Kos<ConceptT, ConceptSchemeT, LabelT>;
@@ -57,8 +57,8 @@ export abstract class LabeledModel<
 
 export namespace LabeledModel {
   export interface Parameters<
-    ConceptT extends IConcept<any, any, any>,
-    ConceptSchemeT extends IConceptScheme<any, any>,
+    ConceptT extends IConcept<ConceptT, ConceptSchemeT, LabelT>,
+    ConceptSchemeT extends IConceptScheme<ConceptT, LabelT>,
     LabelT extends ILabel,
   > extends NamedModel.Parameters {
     kos: Kos<ConceptT, ConceptSchemeT, LabelT>;

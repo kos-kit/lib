@@ -7,7 +7,7 @@ import { LabeledModel } from "./LabeledModel.js";
 import { Stub } from "./Stub.js";
 
 export interface ConceptScheme<
-  ConceptT extends Concept<any, any, any>,
+  ConceptT extends Concept<any, any, LabelT>,
   LabelT extends Label,
 > extends LabeledModel<LabelT> {
   readonly license: Maybe<Literal | NamedNode>;

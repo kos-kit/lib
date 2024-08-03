@@ -10,8 +10,8 @@ import {
 import { Kos } from "./Kos.js";
 
 export abstract class Stub<
-  ConceptT extends IConcept<any, any, any>,
-  ConceptSchemeT extends IConceptScheme<any, any>,
+  ConceptT extends IConcept<ConceptT, ConceptSchemeT, LabelT>,
+  ConceptSchemeT extends IConceptScheme<ConceptT, LabelT>,
   LabelT extends ILabel,
   ModelT extends ConceptT | ConceptSchemeT,
 > implements IStub<ModelT>
@@ -55,8 +55,8 @@ export namespace Stub {
   }
 
   export interface Parameters<
-    ConceptT extends IConcept<any, any, any>,
-    ConceptSchemeT extends IConceptScheme<any, any>,
+    ConceptT extends IConcept<ConceptT, ConceptSchemeT, LabelT>,
+    ConceptSchemeT extends IConceptScheme<ConceptT, LabelT>,
     LabelT extends ILabel,
   > {
     identifier: Identifier;
