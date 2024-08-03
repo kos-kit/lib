@@ -20,7 +20,10 @@ export abstract class Stub<
   readonly identifier: Identifier;
   protected readonly kos: Kos<ConceptT, ConceptSchemeT, LabelT>;
 
-  constructor({ identifier, kos }: Stub.Parameters) {
+  constructor({
+    identifier,
+    kos,
+  }: Stub.Parameters<ConceptT, ConceptSchemeT, LabelT>) {
     this.identifier = identifier;
     this.kos = kos;
   }
