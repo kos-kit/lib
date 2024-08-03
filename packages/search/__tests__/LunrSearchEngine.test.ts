@@ -1,6 +1,6 @@
 import { describe } from "vitest";
 import { LunrSearchEngine } from "..";
-import { testKosFactory } from "../../mem-models/__tests__/testKosFactory.js";
+import { testKosFactory } from "../../rdfjs-dataset-models/__tests__/testKosFactory.js";
 import { behavesLikeSearchEngine } from "./behavesLikeSearchEngine.js";
 
 describe("LunrSearchEngine", () => {

@@ -1,10 +1,10 @@
 import fs from "node:fs";
 import path from "node:path";
 
-const VERSION = "2.0.33";
+const VERSION = "2.0.34";
 
 type ProjectName =
-  | "mem-models"
+  | "rdfjs-dataset-models"
   | "models"
   | "next-utils"
   | "rdf-resource"
@@ -42,7 +42,7 @@ const projects: readonly Project[] = [
       "purify-ts": externalDependencyVersions["purify-ts"],
     },
     internalDependencies: ["rdf-resource", "rdf-utils"],
-    name: "mem-models",
+    name: "rdfjs-dataset-models",
   },
   {
     externalDependencies: {
@@ -98,7 +98,7 @@ const projects: readonly Project[] = [
       axios: "^1.7.2",
       lunr: "^2.3.9",
     },
-    internalDependencies: ["mem-models", "models", "rdf-resource"],
+    internalDependencies: ["rdfjs-dataset-models", "models", "rdf-resource"],
     name: "search",
   },
   {
@@ -115,7 +115,7 @@ const projects: readonly Project[] = [
       "purify-ts": externalDependencyVersions["purify-ts"],
       "sparql-http-client": "^3.0.0",
     },
-    internalDependencies: ["mem-models", "models", "rdf-resource"],
+    internalDependencies: ["rdfjs-dataset-models", "models", "rdf-resource"],
     name: "sparql-models",
   },
 ];
@@ -169,7 +169,7 @@ for (const project of projects) {
         },
         type: "module",
         types: "index.d.ts",
-        version: "2.0.33",
+        version: "2.0.34",
       },
       undefined,
       2,

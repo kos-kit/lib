@@ -1,7 +1,7 @@
 {
   "dependencies": {
-    "@kos-kit/rdf-resource": "2.0.33",
-    "@kos-kit/rdf-utils": "2.0.33",
+    "@kos-kit/rdf-resource": "2.0.34",
+    "@kos-kit/rdf-utils": "2.0.34",
     "@rdfjs/types": "^1.1.0",
     "iterator-helpers-polyfill": "^3.0.1",
     "purify-ts": "~2.1.0"
@@ -19,7 +19,7 @@
     "*.js"
   ],
   "license": "Apache-2.0",
-  "name": "@kos-kit/mem-models",
+  "name": "@kos-kit/rdfjs-dataset-models",
   "scripts": {
     "build": "tsc -b",
     "check": "biome check",
@@ -35,7 +35,7 @@
     "lint:write:unsafe": "biome lint --write --unsafe",
     "test": "biome check && vitest run",
     "test:watch": "vitest watch",
-    "unlink": "npm unlink -g @kos-kit/mem-models",
+    "unlink": "npm unlink -g @kos-kit/rdfjs-dataset-models",
     "watch": "tsc -w --preserveWatchOutput"
   },
   "repository": {
@@ -44,5 +44,5 @@
   },
   "type": "module",
   "types": "index.d.ts",
-  "version": "2.0.33"
+  "version": "2.0.34"
 }

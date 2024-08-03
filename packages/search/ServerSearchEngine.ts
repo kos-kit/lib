@@ -1,8 +1,8 @@
 import axios, { AxiosInstance } from "axios";
 
-import * as mem from "@kos-kit/mem-models";
 import { Label, LanguageTag, LanguageTagSet } from "@kos-kit/models";
 import { Resource } from "@kos-kit/rdf-resource";
+import * as mem from "@kos-kit/rdfjs-dataset-models";
 import { Parser, Store } from "n3";
 import { SearchEngine } from "./SearchEngine.js";
 import { SearchEngineJson } from "./SearchEngineJson.js";
