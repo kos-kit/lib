@@ -8,32 +8,20 @@ import { Literal, NamedNode } from "@rdfjs/types";
 import { Maybe } from "purify-ts";
 import { Arrays } from "purify-ts-helpers";
 import { ConceptStub } from "./ConceptStub.js";
-import { Kos } from "./Kos.js";
 import { LabeledModel } from "./LabeledModel.js";
-import { NamedModel } from "./NamedModel.js";
 
 export abstract class ConceptScheme<
     ConceptT extends IConcept,
     ConceptSchemeT extends IConceptScheme,
     LabelT extends ILabel,
   >
-  extends LabeledModel
+  extends LabeledModel<ConceptT, ConceptSchemeT, LabelT>
   implements IConceptScheme
 {
   abstract readonly license: Maybe<Literal | NamedNode>;
   abstract readonly modified: Maybe<Literal>;
   abstract readonly rights: Maybe<Literal>;
   abstract readonly rightsHolder: Maybe<Literal>;
-
-  protected readonly kos: Kos<ConceptT, ConceptSchemeT, LabelT>;
-
-  constructor({
-    kos,
-    ...superParameters
-  }: ConceptScheme.Parameters<ConceptT, ConceptSchemeT, LabelT>) {
-    super(superParameters);
-    this.kos = kos;
-  }
 
   async conceptByIdentifier(
     identifier: Identifier,
@@ -93,11 +81,9 @@ export namespace ConceptScheme {
     return true;
   }
 
-  export interface Parameters<
+  export type Parameters<
     ConceptT extends IConcept,
     ConceptSchemeT extends IConceptScheme,
     LabelT extends ILabel,
-  > extends NamedModel.Parameters {
-    readonly kos: Kos<ConceptT, ConceptSchemeT, LabelT>;
-  }
+  > = LabeledModel.Parameters<ConceptT, ConceptSchemeT, LabelT>;
 }

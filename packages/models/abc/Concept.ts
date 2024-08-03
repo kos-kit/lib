@@ -10,26 +10,14 @@ import { Maybe } from "purify-ts";
 import { Arrays } from "purify-ts-helpers";
 import { ConceptSchemeStub } from "./ConceptSchemeStub.js";
 import { ConceptStub } from "./ConceptStub.js";
-import { Kos } from "./Kos.js";
 import { LabeledModel } from "./LabeledModel.js";
-import { NamedModel } from "./NamedModel.js";
 
 export abstract class Concept<
   ConceptT extends IConcept,
   ConceptSchemeT extends IConceptScheme,
   LabelT extends ILabel,
-> extends LabeledModel {
+> extends LabeledModel<ConceptT, ConceptSchemeT, LabelT> {
   abstract readonly modified: Maybe<Literal>;
-
-  protected readonly kos: Kos<ConceptT, ConceptSchemeT, LabelT>;
-
-  constructor({
-    kos,
-    ...superParameters
-  }: Concept.Parameters<ConceptT, ConceptSchemeT, LabelT>) {
-    super(superParameters);
-    this.kos = kos;
-  }
 
   equals(other: IConcept): boolean {
     return Concept.equals(this, other);
@@ -93,11 +81,9 @@ export namespace Concept {
     return true;
   }
 
-  export interface Parameters<
+  export type Parameters<
     ConceptT extends IConcept,
     ConceptSchemeT extends IConceptScheme,
     LabelT extends ILabel,
-  > extends NamedModel.Parameters {
-    kos: Kos<ConceptT, ConceptSchemeT, LabelT>;
-  }
+  > = LabeledModel.Parameters<ConceptT, ConceptSchemeT, LabelT>;
 }

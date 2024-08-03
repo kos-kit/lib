@@ -1,11 +1,25 @@
+import { Concept as IConcept } from "../Concept.js";
+import { ConceptScheme as IConceptScheme } from "../ConceptScheme.js";
 import { Identifier } from "../Identifier.js";
 import { Label as ILabel } from "../Label.js";
-import { LanguageTagSet } from "../LanguageTagSet.js";
+import { Kos } from "./Kos.js";
 import { NamedModel } from "./NamedModel.js";
 import { matchLiteral } from "./matchLiteral.js";
 
-export abstract class LabeledModel extends NamedModel {
-  protected abstract readonly includeLanguageTags: LanguageTagSet;
+export abstract class LabeledModel<
+  ConceptT extends IConcept,
+  ConceptSchemeT extends IConceptScheme,
+  LabelT extends ILabel,
+> extends NamedModel {
+  protected readonly kos: Kos<ConceptT, ConceptSchemeT, LabelT>;
+
+  constructor({
+    kos,
+    ...superParameters
+  }: LabeledModel.Parameters<ConceptT, ConceptSchemeT, LabelT>) {
+    super(superParameters);
+    this.kos = kos;
+  }
 
   get displayLabel(): string {
     const prefLabels = this.labels(ILabel.Type.PREFERRED);
@@ -13,7 +27,7 @@ export abstract class LabeledModel extends NamedModel {
       for (const prefLabel of prefLabels) {
         if (
           matchLiteral(prefLabel.literalForm, {
-            includeLanguageTags: this.includeLanguageTags,
+            includeLanguageTags: this.kos.includeLanguageTags,
           })
         ) {
           return prefLabel.literalForm.value;
@@ -28,15 +42,22 @@ export abstract class LabeledModel extends NamedModel {
     if (type) {
       return this.labelsByType(type);
     }
-    return this.labelsByType(ILabel.Type.PREFERRED)
-      .concat(this.labelsByType(ILabel.Type.ALTERNATIVE))
-      .concat(this.labelsByType(ILabel.Type.HIDDEN))
-      .concat(this.labelsByType(ILabel.Type.OTHER));
+    const labels: ILabel[] = [];
+    for (const type_ of ILabel.Types) {
+      labels.push(...this.labelsByType(type_));
+    }
+    return labels;
   }
 
   protected abstract labelsByType(type: ILabel.Type): readonly ILabel[];
 }
 
 export namespace LabeledModel {
-  export type Parameters = NamedModel.Parameters;
+  export interface Parameters<
+    ConceptT extends IConcept,
+    ConceptSchemeT extends IConceptScheme,
+    LabelT extends ILabel,
+  > extends NamedModel.Parameters {
+    kos: Kos<ConceptT, ConceptSchemeT, LabelT>;
+  }
 }

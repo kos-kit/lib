@@ -9,10 +9,13 @@ import { Resource } from "@kos-kit/rdf-resource";
 import { DatasetCore, Literal, NamedNode } from "@rdfjs/types";
 import { dc11, dcterms } from "@tpluscode/rdf-ns-builders";
 import { Maybe } from "purify-ts";
+import { Concept } from "./Concept.js";
+import { Label } from "./Label.js";
+import { labelsByType } from "./labelsByType.js";
 
 const rightsPredicates = [dcterms.rights, dc11.rights];
 
-export abstract class ConceptScheme<
+export class ConceptScheme<
     ConceptT extends IConcept,
     ConceptSchemeT extends IConceptScheme,
     LabelT extends ILabel,
@@ -21,12 +24,17 @@ export abstract class ConceptScheme<
   implements IConceptScheme
 {
   protected resource: Resource<Identifier>;
+  private readonly labelConstructor: new (
+    _: Label.Parameters,
+  ) => LabelT;
 
   constructor({
     dataset,
+    labelConstructor,
     ...superParameters
-  }: ConceptScheme.Parameters<ConceptT, ConceptSchemeT, LabelT>) {
+  }: Concept.Parameters<ConceptT, ConceptSchemeT, LabelT>) {
     super(superParameters);
+    this.labelConstructor = labelConstructor;
     this.resource = new Resource({ dataset, identifier: this.identifier });
   }
 
@@ -34,9 +42,14 @@ export abstract class ConceptScheme<
     return this.kos.includeLanguageTags;
   }
 
-  protected abstract override labelsByType(
-    type: ILabel.Type,
-  ): readonly ILabel[];
+  protected labelsByType(type: ILabel.Type): readonly ILabel[] {
+    return labelsByType({
+      includeLanguageTags: this.kos.includeLanguageTags,
+      labelConstructor: this.labelConstructor,
+      resource: this.resource,
+      type,
+    });
+  }
 
   get license(): Maybe<Literal | NamedNode> {
     const literals: Literal[] = [];
@@ -110,5 +123,6 @@ export namespace ConceptScheme {
     LabelT extends ILabel,
   > extends abc.ConceptScheme.Parameters<ConceptT, ConceptSchemeT, LabelT> {
     dataset: DatasetCore;
+    labelConstructor: new (parameters: Label.Parameters) => LabelT;
   }
 }

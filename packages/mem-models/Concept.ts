@@ -10,19 +10,26 @@ import { Resource } from "@kos-kit/rdf-resource";
 import { DatasetCore, Literal } from "@rdfjs/types";
 import { dcterms, skos } from "@tpluscode/rdf-ns-builders";
 import { Maybe } from "purify-ts";
+import { Label } from "./Label.js";
+import { labelsByType } from "./labelsByType.js";
 
-export abstract class Concept<
+export class Concept<
   ConceptT extends IConcept,
   ConceptSchemeT extends IConceptScheme,
   LabelT extends ILabel,
 > extends abc.Concept<ConceptT, ConceptSchemeT, LabelT> {
   protected resource: Resource<Identifier>;
+  private readonly labelConstructor: new (
+    _: Label.Parameters,
+  ) => LabelT;
 
   constructor({
     dataset,
+    labelConstructor,
     ...superParameters
   }: Concept.Parameters<ConceptT, ConceptSchemeT, LabelT>) {
     super(superParameters);
+    this.labelConstructor = labelConstructor;
     this.resource = new Resource({ dataset, identifier: this.identifier });
   }
 
@@ -30,9 +37,14 @@ export abstract class Concept<
     return this.kos.includeLanguageTags;
   }
 
-  protected abstract override labelsByType(
-    type: ILabel.Type,
-  ): readonly ILabel[];
+  protected labelsByType(type: ILabel.Type): readonly ILabel[] {
+    return labelsByType({
+      includeLanguageTags: this.kos.includeLanguageTags,
+      labelConstructor: this.labelConstructor,
+      resource: this.resource,
+      type,
+    });
+  }
 
   get modified(): Maybe<Literal> {
     return this.resource.value(dcterms.modified).toLiteral();
@@ -69,5 +81,6 @@ export namespace Concept {
     LabelT extends ILabel,
   > extends abc.Concept.Parameters<ConceptT, ConceptSchemeT, LabelT> {
     dataset: DatasetCore;
+    labelConstructor: new (parameters: Label.Parameters) => LabelT;
   }
 }

@@ -42,4 +42,11 @@ export namespace Label {
       type: "preferred",
     };
   }
+
+  export const Types: readonly Type[] = [
+    Type.PREFERRED,
+    Type.ALTERNATIVE,
+    Type.HIDDEN,
+    Type.OTHER,
+  ];
 }

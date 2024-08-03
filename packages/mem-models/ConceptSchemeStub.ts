@@ -9,6 +9,7 @@ import { DatasetCore } from "@rdfjs/types";
 import { skos } from "@tpluscode/rdf-ns-builders";
 import { Maybe } from "purify-ts";
 import { ConceptScheme } from "./ConceptScheme.js";
+import { Label } from "./Label.js";
 
 export class ConceptSchemeStub<
   ConceptT extends IConcept,
@@ -16,23 +17,29 @@ export class ConceptSchemeStub<
   LabelT extends ILabel,
 > extends abc.ConceptSchemeStub<ConceptT, ConceptSchemeT, LabelT> {
   private readonly dataset: DatasetCore;
-  private readonly modelConstructor: new (
+  private readonly conceptSchemeConstructor: new (
     _: ConceptScheme.Parameters<ConceptT, ConceptSchemeT, LabelT>,
   ) => ConceptSchemeT;
+  private readonly labelConstructor: new (
+    _: Label.Parameters,
+  ) => LabelT;
 
   constructor({
+    conceptSchemeConstructor,
     dataset,
-    modelConstructor,
+    labelConstructor,
     ...superParameters
   }: {
-    dataset: DatasetCore;
-    modelConstructor: new (
+    conceptSchemeConstructor: new (
       _: ConceptScheme.Parameters<ConceptT, ConceptSchemeT, LabelT>,
     ) => ConceptSchemeT;
+    dataset: DatasetCore;
+    labelConstructor: new (_: Label.Parameters) => LabelT;
   } & abc.Stub.Parameters<ConceptT, ConceptSchemeT, LabelT>) {
     super(superParameters);
     this.dataset = dataset;
-    this.modelConstructor = modelConstructor;
+    this.conceptSchemeConstructor = conceptSchemeConstructor;
+    this.labelConstructor = labelConstructor;
   }
 
   async resolve(): Promise<Maybe<ConceptSchemeT>> {
@@ -44,9 +51,10 @@ export class ConceptSchemeStub<
     });
     if (resource.isInstanceOf(skos.ConceptScheme)) {
       return Maybe.of(
-        new this.modelConstructor({
+        new this.conceptSchemeConstructor({
           dataset: this.dataset,
           identifier: this.identifier,
+          labelConstructor: this.labelConstructor,
           kos: this.kos,
         }),
       );

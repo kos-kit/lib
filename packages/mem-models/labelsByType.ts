@@ -1,37 +1,27 @@
 import {
   Label as ILabel,
-  Identifier,
   LanguageTagSet,
+  LiteralLabel,
   abc,
 } from "@kos-kit/models";
 import { Resource } from "@kos-kit/rdf-resource";
 import { skosxl } from "@tpluscode/rdf-ns-builders";
 import { Maybe } from "purify-ts";
 import "iterator-helpers-polyfill";
-import { Literal } from "@rdfjs/types";
+import { Label } from "./Label.js";
 
-export function labelsByType({
+export function labelsByType<LabelT extends ILabel>({
   includeLanguageTags,
+  labelConstructor,
   resource,
   type,
 }: {
   includeLanguageTags: LanguageTagSet;
+  labelConstructor: new (_: Label.Parameters) => LabelT;
   resource: Resource;
   type: ILabel.Type;
-}): readonly (
-  | {
-      label: Identifier;
-      literalForm: Literal;
-    }
-  | { label: Literal; literalForm: Literal }
-)[] {
-  const labels: (
-    | {
-        label: Identifier;
-        literalForm: Literal;
-      }
-    | { label: Literal; literalForm: Literal }
-  )[] = [
+}): readonly ILabel[] {
+  const labels: ILabel[] = [
     // All literals that are the objects of the skosPredicate
     ...resource
       .values(type.literalPredicate)
@@ -45,7 +35,7 @@ export function labelsByType({
           )
           .toList(),
       )
-      .map((literalForm) => ({ label: literalForm, literalForm })),
+      .map((literalForm) => new LiteralLabel({ literalForm, type })),
   ];
 
   type.skosXlPredicate.ifJust((skosXlPredicate) => {
@@ -68,10 +58,14 @@ export function labelsByType({
                     .toList(),
                 ),
               ].at(0),
-            ).map((literalForm) => ({
-              label: labelResource.identifier,
-              literalForm,
-            })),
+            ).map(
+              (literalForm) =>
+                new labelConstructor({
+                  identifier: labelResource.identifier,
+                  literalForm,
+                  type,
+                }),
+            ),
           )
           .toList(),
       ),
