@@ -9,15 +9,15 @@ import { Maybe } from "purify-ts";
 import { Arrays } from "purify-ts-helpers";
 import { ConceptStub } from "./ConceptStub.js";
 import { Kos } from "./Kos.js";
+import { LabeledModel } from "./LabeledModel.js";
 import { NamedModel } from "./NamedModel.js";
-import { matchLiteral } from "./matchLiteral.js";
 
 export abstract class ConceptScheme<
     ConceptT extends IConcept,
     ConceptSchemeT extends IConceptScheme,
     LabelT extends ILabel,
   >
-  extends NamedModel
+  extends LabeledModel
   implements IConceptScheme
 {
   abstract readonly license: Maybe<Literal | NamedNode>;
@@ -25,13 +25,13 @@ export abstract class ConceptScheme<
   abstract readonly rights: Maybe<Literal>;
   abstract readonly rightsHolder: Maybe<Literal>;
 
-  private readonly kos: Kos<ConceptT, ConceptSchemeT, LabelT>;
+  protected readonly kos: Kos<ConceptT, ConceptSchemeT, LabelT>;
 
   constructor({
     kos,
-    ...namedModelParameters
+    ...superParameters
   }: ConceptScheme.Parameters<ConceptT, ConceptSchemeT, LabelT>) {
-    super(namedModelParameters);
+    super(superParameters);
     this.kos = kos;
   }
 
@@ -57,28 +57,13 @@ export abstract class ConceptScheme<
     return this.kos.conceptsCount({ inScheme: this.identifier });
   }
 
-  get displayLabel(): string {
-    const prefLabels = this.labels(ILabel.Type.PREFERRED);
-    if (prefLabels.length > 0) {
-      for (const prefLabel of prefLabels) {
-        if (
-          matchLiteral(prefLabel.literalForm, {
-            includeLanguageTags: this.kos.includeLanguageTags,
-          })
-        ) {
-          return prefLabel.literalForm.value;
-        }
-      }
-    }
-
-    return Identifier.toString(this.identifier);
-  }
-
   equals(other: IConceptScheme): boolean {
     return ConceptScheme.equals(this, other);
   }
 
-  abstract labels(type?: ILabel.Type): readonly ILabel[];
+  protected abstract override labelsByType(
+    type: ILabel.Type,
+  ): readonly ILabel[];
 
   async *topConcepts(): AsyncGenerator<
     ConceptStub<ConceptT, ConceptSchemeT, LabelT>

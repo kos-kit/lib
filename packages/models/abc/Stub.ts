@@ -20,13 +20,7 @@ export abstract class Stub<
   readonly identifier: Identifier;
   protected readonly kos: Kos<ConceptT, ConceptSchemeT, LabelT>;
 
-  constructor({
-    identifier,
-    kos,
-  }: {
-    identifier: Identifier;
-    kos: Kos<ConceptT, ConceptSchemeT, LabelT>;
-  }) {
+  constructor({ identifier, kos }: Stub.Parameters) {
     this.identifier = identifier;
     this.kos = kos;
   }
@@ -56,5 +50,14 @@ export namespace Stub {
     right: IStub<ModelT>,
   ): boolean {
     return left.identifier.equals(right.identifier);
+  }
+
+  export interface Parameters<
+    ConceptT extends IConcept,
+    ConceptSchemeT extends IConceptScheme,
+    LabelT extends ILabel,
+  > {
+    identifier: Identifier;
+    kos: Kos<ConceptT, ConceptSchemeT, LabelT>;
   }
 }

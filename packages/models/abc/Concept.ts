@@ -2,7 +2,6 @@ import {
   Concept as IConcept,
   ConceptScheme as IConceptScheme,
   Label as ILabel,
-  Identifier,
   NoteProperty,
   SemanticRelationProperty,
 } from "@kos-kit/models";
@@ -12,41 +11,24 @@ import { Arrays } from "purify-ts-helpers";
 import { ConceptSchemeStub } from "./ConceptSchemeStub.js";
 import { ConceptStub } from "./ConceptStub.js";
 import { Kos } from "./Kos.js";
+import { LabeledModel } from "./LabeledModel.js";
 import { NamedModel } from "./NamedModel.js";
-import { matchLiteral } from "./matchLiteral.js";
 
 export abstract class Concept<
   ConceptT extends IConcept,
   ConceptSchemeT extends IConceptScheme,
   LabelT extends ILabel,
-> extends NamedModel {
+> extends LabeledModel {
   abstract readonly modified: Maybe<Literal>;
 
-  private readonly kos: Kos<ConceptT, ConceptSchemeT, LabelT>;
+  protected readonly kos: Kos<ConceptT, ConceptSchemeT, LabelT>;
 
   constructor({
     kos,
-    ...namedModelParameters
+    ...superParameters
   }: Concept.Parameters<ConceptT, ConceptSchemeT, LabelT>) {
-    super(namedModelParameters);
+    super(superParameters);
     this.kos = kos;
-  }
-
-  get displayLabel(): string {
-    const prefLabels = this.labels(ILabel.Type.PREFERRED);
-    if (prefLabels.length > 0) {
-      for (const prefLabel of prefLabels) {
-        if (
-          matchLiteral(prefLabel.literalForm, {
-            includeLanguageTags: this.kos.includeLanguageTags,
-          })
-        ) {
-          return prefLabel.literalForm.value;
-        }
-      }
-    }
-
-    return Identifier.toString(this.identifier);
   }
 
   equals(other: IConcept): boolean {
@@ -58,8 +40,6 @@ export abstract class Concept<
   > {
     yield* this.kos.conceptSchemes({ query: { hasConcept: this.identifier } });
   }
-
-  abstract labels(type?: ILabel["type"]): readonly ILabel[];
 
   abstract readonly notations: readonly Literal[];
 

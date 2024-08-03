@@ -19,9 +19,7 @@ export abstract class Kos<
 {
   readonly includeLanguageTags: LanguageTagSet;
 
-  protected constructor({
-    includeLanguageTags,
-  }: { includeLanguageTags: LanguageTagSet }) {
+  protected constructor({ includeLanguageTags }: Kos.Parameters) {
     this.includeLanguageTags = includeLanguageTags;
   }
 
@@ -48,4 +46,10 @@ export abstract class Kos<
   }): AsyncGenerator<ConceptSchemeStub<ConceptT, ConceptSchemeT, LabelT>>;
 
   abstract conceptSchemesCount(query?: ConceptSchemesQuery): Promise<number>;
+}
+
+export namespace Kos {
+  export interface Parameters {
+    includeLanguageTags: LanguageTagSet;
+  }
 }

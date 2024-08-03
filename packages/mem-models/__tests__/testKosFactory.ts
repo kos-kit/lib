@@ -3,11 +3,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { LanguageTag, LanguageTagSet } from "@kos-kit/models";
 import { Parser, Store } from "n3";
-import { Concept } from "../Concept.js";
-import { ConceptScheme } from "../ConceptScheme.js";
-import { DefaultModelFactory } from "../DefaultModelFactory.js";
-import { Kos } from "../Kos.js";
-import { Label } from "../Label.js";
+import { DefaultKos } from "../DefaultKos.js";
 
 const ntriplesStringToDataset = (input: string): Store => {
   const parser = new Parser({ format: "N-Triples" });
@@ -32,12 +28,7 @@ const testDataset: Store = ntriplesStringToDataset(
 );
 
 export const testKosFactory = (includeLanguageTag: LanguageTag) =>
-  new Kos({
+  new DefaultKos({
     dataset: testDataset,
-    modelFactory: new DefaultModelFactory({
-      conceptConstructor: Concept,
-      conceptSchemeConstructor: ConceptScheme,
-      includeLanguageTags: new LanguageTagSet(includeLanguageTag, ""),
-      labelConstructor: Label,
-    }),
+    includeLanguageTags: new LanguageTagSet(includeLanguageTag, ""),
   });
