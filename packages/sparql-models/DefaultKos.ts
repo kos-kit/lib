@@ -1,5 +1,5 @@
-import { Concept, ConceptScheme, Label } from "@kos-kit/mem-models";
 import { Identifier } from "@kos-kit/models";
+import { Concept, ConceptScheme, Label } from "@kos-kit/rdfjs-dataset-models";
 import { ConceptSchemeStub } from "./ConceptSchemeStub.js";
 import { ConceptStub } from "./ConceptStub.js";
 import { Kos } from "./Kos.js";
