@@ -45,14 +45,14 @@ export abstract class Kos<
   }): AsyncGenerator<abc.Stub<ConceptT, ConceptSchemeT, LabelT, ConceptT>> {
     for (const identifier of mapResultRowsToIdentifiers(
       await this.sparqlClient.query.select(`\
-SELECT ?conceptScheme
+SELECT DISTINCT ?concept
 WHERE {
 ${this.conceptsQueryToWhereGraphPatterns(kwds?.query).join("\n")}
 }
 ${kwds?.limit && kwds.limit > 0 ? `LIMIT ${kwds.limit}` : ""}
 ${kwds?.offset && kwds.offset >= 0 ? `OFFSET ${kwds.offset}` : ""}
 `),
-      "conceptScheme",
+      "concept",
     )) {
       yield this.conceptByIdentifier(identifier);
     }
@@ -61,7 +61,7 @@ ${kwds?.offset && kwds.offset >= 0 ? `OFFSET ${kwds.offset}` : ""}
   async conceptsCount(query?: ConceptsQuery): Promise<number> {
     return mapResultRowsToCount(
       await this.sparqlClient.query.select(`\
-SELECT (COUNT(?concept) AS ?count)
+SELECT (COUNT(DISTINCT ?concept) AS ?count)
 WHERE {
 ${this.conceptsQueryToWhereGraphPatterns(query).join("\n")}
 }`),
@@ -78,7 +78,7 @@ ${this.conceptsQueryToWhereGraphPatterns(query).join("\n")}
   > {
     for (const identifier of mapResultRowsToIdentifiers(
       await this.sparqlClient.query.select(`\
-SELECT ?conceptScheme
+SELECT DISTINCT ?conceptScheme
 WHERE {
 ${this.conceptSchemesQueryToWhereGraphPatterns(kwds?.query).join("\n")}
 }
@@ -127,7 +127,7 @@ ${this.conceptSchemesQueryToWhereGraphPatterns(query).join("\n")}
         } else {
           whereGraphPatterns.push(
             // skos:inScheme has an open domain, so we have to check the concept's rdf:type
-            `{ ?concept <${skos.inScheme.value}> ${conceptSchemeIdentifierString} . ${Kos.CONCEPT_IDENTIFIER_GRAPH_PATTERN} . }`,
+            `{ ?concept <${skos.inScheme.value}> ${conceptSchemeIdentifierString} . ${Kos.CONCEPT_IDENTIFIER_GRAPH_PATTERN} }`,
             "UNION",
           );
         }
