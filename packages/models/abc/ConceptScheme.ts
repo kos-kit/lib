@@ -35,10 +35,10 @@ export abstract class ConceptScheme<
     return Maybe.empty();
   }
 
-  async *concepts(): AsyncGenerator<
+  async *concepts(kwds?: { limit?: number; offset?: number }): AsyncGenerator<
     ConceptStub<ConceptT, ConceptSchemeT, LabelT>
   > {
-    yield* this.kos.concepts({ query: { inScheme: this.identifier } });
+    yield* this.kos.concepts({ query: { inScheme: this.identifier }, ...kwds });
   }
 
   conceptsCount(): Promise<number> {
@@ -53,10 +53,14 @@ export abstract class ConceptScheme<
     type: ILabel.Type,
   ): readonly ILabel[];
 
-  async *topConcepts(): AsyncGenerator<
-    ConceptStub<ConceptT, ConceptSchemeT, LabelT>
-  > {
-    yield* this.kos.concepts({ query: { topConceptOf: this.identifier } });
+  async *topConcepts(kwds?: {
+    limit?: number;
+    offset?: number;
+  }): AsyncGenerator<ConceptStub<ConceptT, ConceptSchemeT, LabelT>> {
+    yield* this.kos.concepts({
+      query: { topConceptOf: this.identifier },
+      ...kwds,
+    });
   }
 
   topConceptsCount(): Promise<number> {
