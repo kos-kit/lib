@@ -6,6 +6,7 @@ export * from "./Identifier.js";
 export * from "./Identifier.js";
 export * from "./Kos.js";
 export * from "./Label.js";
+export * from "./LabeledModel.js";
 export * from "./LanguageTag.js";
 export * from "./LanguageTagSet.js";
 export * from "./LiteralLabel.js";
