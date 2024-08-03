@@ -24,7 +24,7 @@ export class LunrSearchEngine implements SearchEngine {
   }: {
     conceptsLimit?: number;
     languageTag: LanguageTag;
-    kos: Kos;
+    kos: Kos<any, any, any>;
   }): Promise<LunrSearchEngine> {
     interface IndexDocument {
       readonly identifier: string;
@@ -34,7 +34,7 @@ export class LunrSearchEngine implements SearchEngine {
     }
 
     const toIndexDocument = (
-      model: LabeledModel,
+      model: LabeledModel<any>,
       type: SearchResult["type"],
     ): IndexDocument | null => {
       const prefLabels = model.labels(Label.Type.PREFERRED);
