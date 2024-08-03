@@ -6,7 +6,7 @@ import {
   Stub as IStub,
   Identifier,
   NamedModel,
-} from "..";
+} from "../index.js";
 import { Kos } from "./Kos.js";
 
 export abstract class Stub<

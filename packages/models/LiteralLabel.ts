@@ -1,6 +1,6 @@
 import { Literal } from "@rdfjs/types";
-import { abc } from ".";
 import { Label } from "./Label.js";
+import * as abc from "./abc/index.js";
 
 /**
  * A Label that only consists of its literal form.

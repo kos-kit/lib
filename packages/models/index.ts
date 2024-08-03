@@ -20,4 +20,4 @@ export * from "./semanticRelationProperties.js";
 export * from "./SemanticRelationProperty.js";
 export * from "./Stub.js";
 export * from "./Stubs.js";
-export * as abc from "./abc";
+export * as abc from "./abc/index.js";
