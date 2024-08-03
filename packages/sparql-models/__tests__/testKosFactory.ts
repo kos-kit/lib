@@ -16,7 +16,8 @@ export const testKosFactory = (includeLanguageTag: LanguageTag) => {
   //         "..",
   //         "..",
   //         "..",
-  //         "test-data",
+  //          "__tests__",
+  //         "data",
   //         "unesco-thesaurus.nt",
   //       ),
   //     )

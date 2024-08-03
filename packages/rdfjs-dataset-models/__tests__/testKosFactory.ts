@@ -20,7 +20,8 @@ const testDataset: Store = ntriplesStringToDataset(
         "..",
         "..",
         "..",
-        "test-data",
+        "__tests__",
+        "data",
         "unesco-thesaurus.nt",
       ),
     )

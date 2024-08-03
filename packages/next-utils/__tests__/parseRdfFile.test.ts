@@ -11,7 +11,8 @@ describe("parseRdfFile", () => {
     "..",
     "..",
     "..",
-    "test-data",
+    "__tests__",
+    "data",
   );
   for (const fileName of fs.readdirSync(testDataDirPath)) {
     if (fileName.startsWith("unesco-thesaurus")) {
