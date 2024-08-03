@@ -26,7 +26,9 @@ export abstract class Concept<
   async *inSchemes(): AsyncGenerator<
     ConceptSchemeStub<ConceptT, ConceptSchemeT, LabelT>
   > {
-    yield* this.kos.conceptSchemes({ query: { hasConcept: this.identifier } });
+    yield* this.kos.conceptSchemes({
+      query: { conceptIdentifier: this.identifier, type: "HasConcept" },
+    });
   }
 
   abstract readonly notations: readonly Literal[];
@@ -37,13 +39,19 @@ export abstract class Concept<
     property: SemanticRelationProperty,
   ): AsyncGenerator<ConceptStub<ConceptT, ConceptSchemeT, LabelT>> {
     yield* this.kos.concepts({
-      query: { semanticRelationOf: { property, subject: this.identifier } },
+      query: {
+        semanticRelationProperty: property,
+        subjectConceptIdentifier: this.identifier,
+        type: "SemanticRelationOf",
+      },
     });
   }
 
   semanticRelationsCount(property: SemanticRelationProperty): Promise<number> {
     return this.kos.conceptsCount({
-      semanticRelationOf: { property, subject: this.identifier },
+      semanticRelationProperty: property,
+      subjectConceptIdentifier: this.identifier,
+      type: "SemanticRelationOf",
     });
   }
 
@@ -51,7 +59,7 @@ export abstract class Concept<
     ConceptSchemeStub<ConceptT, ConceptSchemeT, LabelT>
   > {
     yield* this.kos.conceptSchemes({
-      query: { hasTopConcept: this.identifier },
+      query: { conceptIdentifier: this.identifier, type: "HasTopConcept" },
     });
   }
 }

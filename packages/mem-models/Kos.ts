@@ -8,9 +8,69 @@ import {
   Identifier,
   abc,
 } from "@kos-kit/models";
+import { Resource } from "@kos-kit/rdf-resource";
 import { getRdfInstances } from "@kos-kit/rdf-utils";
+import TermSet from "@rdfjs/term-set";
 import { DatasetCore } from "@rdfjs/types";
 import { skos } from "@tpluscode/rdf-ns-builders";
+
+function isConceptInScheme({
+  conceptIdentifier,
+  conceptSchemeIdentifier,
+  dataset,
+}: {
+  conceptIdentifier: Identifier;
+  conceptSchemeIdentifier: Identifier;
+  dataset: DatasetCore;
+}) {
+  if (
+    isConceptTopConceptOf({
+      conceptIdentifier,
+      conceptSchemeIdentifier,
+      dataset,
+    })
+  ) {
+    return true;
+  }
+
+  for (const _ of dataset.match(
+    conceptIdentifier,
+    skos.inScheme,
+    conceptSchemeIdentifier,
+  )) {
+    return true;
+  }
+
+  return false;
+}
+
+function isConceptTopConceptOf({
+  conceptIdentifier,
+  conceptSchemeIdentifier,
+  dataset,
+}: {
+  conceptIdentifier: Identifier;
+  conceptSchemeIdentifier: Identifier;
+  dataset: DatasetCore;
+}) {
+  for (const _ of dataset.match(
+    conceptIdentifier,
+    skos.topConceptOf,
+    conceptSchemeIdentifier,
+  )) {
+    return true;
+  }
+
+  for (const _ of dataset.match(
+    conceptSchemeIdentifier,
+    skos.hasTopConcept,
+    conceptIdentifier,
+  )) {
+    return true;
+  }
+
+  return false;
+}
 
 function* limitGenerator<T>(
   generator: Generator<T>,
@@ -96,19 +156,6 @@ export abstract class Kos<
     yield* conceptSchemes;
   }
 
-  private *allConcepts(): Generator<
-    abc.ConceptStub<ConceptT, ConceptSchemeT, LabelT>
-  > {
-    for (const identifier of getRdfInstances({
-      class_: skos.Concept,
-      dataset: this.dataset,
-    })) {
-      if (identifier.termType === "NamedNode") {
-        yield this.conceptByIdentifier(identifier);
-      }
-    }
-  }
-
   override async conceptSchemesCount(
     query?: ConceptSchemesQuery,
   ): Promise<number> {
@@ -132,89 +179,103 @@ export abstract class Kos<
     query?: ConceptsQuery,
   ): Generator<abc.ConceptStub<ConceptT, ConceptSchemeT, LabelT>> {
     if (!query) {
-      yield* this.allConcepts();
+      for (const identifier of getRdfInstances({
+        class_: skos.Concept,
+        dataset: this.dataset,
+      })) {
+        if (identifier.termType === "NamedNode") {
+          yield this.conceptByIdentifier(identifier);
+        }
+      }
       return;
     }
 
-    // resource skos:topConceptOf conceptScheme entails resource is a skos:Concept because of the
-    // domain of skos:topConceptOf
-    // resource skos:inScheme conceptScheme does not entail resource is a skos:Concept, since
-    // skos:inScheme has an open domain
-
-    let conceptStubs: Iterable<
-      abc.ConceptStub<ConceptT, ConceptSchemeT, LabelT>
-    >;
-    if (query.identifier) {
-      conceptStubs = [this.conceptByIdentifier(query.identifier)];
-    } else {
-      conceptStubs = this.allConcepts();
+    if (query.type === "InScheme" && query.conceptIdentifier) {
+      if (
+        isConceptInScheme({
+          conceptIdentifier: query.conceptIdentifier,
+          conceptSchemeIdentifier: query.conceptSchemeIdentifier,
+          dataset: this.dataset,
+        })
+      ) {
+        yield this.conceptByIdentifier(query.conceptIdentifier);
+      }
+      return;
     }
 
-    for (const conceptStub of conceptStubs) {
-      const conceptIdentifier = conceptStub.identifier;
+    if (query.type === "InScheme" || query.type === "TopConceptOf") {
+      const yieldedConceptIdentifiers = new TermSet<Identifier>();
 
-      if (query.inScheme || query.topConceptOf) {
-        // Is the concept in the given scheme?
-
-        const isConceptInScheme = (conceptSchemeIdentifier: Identifier) => {
-          if (isConceptTopConceptOf(conceptSchemeIdentifier)) {
-            return true;
-          }
-
-          for (const _ of this.dataset.match(
-            conceptIdentifier,
-            skos.inScheme,
-            conceptSchemeIdentifier,
-          )) {
-            return true;
-          }
-
-          return false;
-        };
-
-        const isConceptTopConceptOf = (conceptSchemeIdentifier: Identifier) => {
-          for (const _ of this.dataset.match(
-            conceptIdentifier,
-            skos.topConceptOf,
-            conceptSchemeIdentifier,
-          )) {
-            return true;
-          }
-
-          for (const _ of this.dataset.match(
-            conceptSchemeIdentifier,
-            skos.hasTopConcept,
-            conceptIdentifier,
-          )) {
-            return true;
-          }
-
-          return false;
-        };
-
-        if (query.inScheme && !isConceptInScheme(query.inScheme)) {
-          continue;
-        }
-
-        if (query.topConceptOf && !isConceptTopConceptOf(query.topConceptOf)) {
-          continue;
-        }
-      }
-
-      if (query.semanticRelationOf) {
-        // Is the concept a semantic relation of another concept?
+      for (const quad of this.dataset.match(
+        query.conceptSchemeIdentifier,
+        skos.hasTopConcept,
+      )) {
+        // conceptScheme skos:hasTopConcept resource entails resource is a skos:Concept because of
+        // the range of skos:hasTopConcept
         if (
-          this.dataset.match(
-            query.semanticRelationOf.subject,
-            query.semanticRelationOf.property.identifier,
-            conceptStub.identifier,
-          ).size === 0
+          quad.object.termType === "NamedNode" &&
+          !yieldedConceptIdentifiers.has(quad.object)
         ) {
-          continue;
+          yield this.conceptByIdentifier(quad.object);
+          yieldedConceptIdentifiers.add(quad.object);
         }
       }
 
-      yield conceptStub;
+      for (const quad of this.dataset.match(
+        null,
+        skos.topConceptOf,
+        query.conceptSchemeIdentifier,
+      )) {
+        // resource skos:topConceptOf conceptScheme entails resource is a skos:Concept because of the
+        // domain of skos:topConceptOf
+        if (
+          quad.subject.termType === "NamedNode" &&
+          !yieldedConceptIdentifiers.has(quad.subject)
+        ) {
+          yield this.conceptByIdentifier(quad.subject);
+          yieldedConceptIdentifiers.add(quad.subject);
+        }
+      }
+
+      if (query.type === "InScheme") {
+        for (const quad of this.dataset.match(
+          null,
+          skos.inScheme,
+          query.conceptSchemeIdentifier,
+        )) {
+          if (quad.subject.termType !== "NamedNode") {
+            continue;
+          }
+          if (yieldedConceptIdentifiers.has(quad.subject)) {
+            continue;
+          }
+          // resource skos:inScheme conceptScheme does not entail resource is a skos:Concept, since
+          // skos:inScheme has an open domain
+          if (
+            !new Resource({
+              dataset: this.dataset,
+              identifier: quad.subject,
+            }).isInstanceOf(skos.Concept)
+          ) {
+            continue;
+          }
+          yield this.conceptByIdentifier(quad.subject);
+          yieldedConceptIdentifiers.add(quad.subject);
+        }
+      }
+      return;
+    }
+
+    // Semantic relation query
+    for (const quad of this.dataset.match(
+      query.subjectConceptIdentifier,
+      query.semanticRelationProperty.identifier,
+      null,
+    )) {
+      // The semantic relation properties have a range of skos:Concept
+      if (quad.object.termType === "NamedNode") {
+        yield this.conceptByIdentifier(quad.object);
+      }
     }
   }
 
@@ -263,12 +324,17 @@ export abstract class Kos<
         return false;
       };
 
-      if (query.hasConcept && !hasConcept(query.hasConcept)) {
-        continue;
-      }
-
-      if (query.hasTopConcept && !hasTopConcept(query.hasTopConcept)) {
-        continue;
+      switch (query.type) {
+        case "HasConcept":
+          if (!hasConcept(query.conceptIdentifier)) {
+            continue;
+          }
+          break;
+        case "HasTopConcept":
+          if (!hasTopConcept(query.conceptIdentifier)) {
+            continue;
+          }
+          break;
       }
 
       yield conceptSchemeStub;

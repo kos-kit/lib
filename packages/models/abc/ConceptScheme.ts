@@ -28,7 +28,11 @@ export abstract class ConceptScheme<
   ): Promise<Maybe<ConceptStub<ConceptT, ConceptSchemeT, LabelT>>> {
     for await (const conceptStub of this.kos.concepts({
       limit: 1,
-      query: { identifier },
+      query: {
+        conceptIdentifier: identifier,
+        conceptSchemeIdentifier: this.identifier,
+        type: "InScheme",
+      },
     })) {
       return Maybe.of(conceptStub);
     }
@@ -38,11 +42,17 @@ export abstract class ConceptScheme<
   async *concepts(kwds?: { limit?: number; offset?: number }): AsyncGenerator<
     ConceptStub<ConceptT, ConceptSchemeT, LabelT>
   > {
-    yield* this.kos.concepts({ query: { inScheme: this.identifier }, ...kwds });
+    yield* this.kos.concepts({
+      query: { conceptSchemeIdentifier: this.identifier, type: "InScheme" },
+      ...kwds,
+    });
   }
 
   conceptsCount(): Promise<number> {
-    return this.kos.conceptsCount({ inScheme: this.identifier });
+    return this.kos.conceptsCount({
+      conceptSchemeIdentifier: this.identifier,
+      type: "InScheme",
+    });
   }
 
   equals(other: IConceptScheme): boolean {
@@ -58,13 +68,16 @@ export abstract class ConceptScheme<
     offset?: number;
   }): AsyncGenerator<ConceptStub<ConceptT, ConceptSchemeT, LabelT>> {
     yield* this.kos.concepts({
-      query: { topConceptOf: this.identifier },
+      query: { conceptSchemeIdentifier: this.identifier, type: "TopConceptOf" },
       ...kwds,
     });
   }
 
   topConceptsCount(): Promise<number> {
-    return this.kos.conceptsCount({ topConceptOf: this.identifier });
+    return this.kos.conceptsCount({
+      conceptSchemeIdentifier: this.identifier,
+      type: "TopConceptOf",
+    });
   }
 }
 
