@@ -1,5 +1,5 @@
+import { Concept, LanguageTag } from "@kos-kit/models";
 import { it } from "vitest";
-import { Concept, LanguageTag } from "..";
 
 export const behavesLikeConcept = (
   lazyConcept: (

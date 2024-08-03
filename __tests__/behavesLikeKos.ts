@@ -1,6 +1,6 @@
+import { ConceptScheme, Kos, Stub } from "@kos-kit/models";
 import { AsyncIterables } from "purify-ts-helpers";
 import { assert, expect, it } from "vitest";
-import { ConceptScheme, Kos, Stub } from "..";
 import { expectConcept } from "./expectConcept.js";
 import { expectConceptScheme } from "./expectConceptScheme.js";
 

@@ -1,13 +1,13 @@
-import { DataFactory } from "n3";
-import { AsyncIterables } from "purify-ts-helpers";
-import { expect, it } from "vitest";
 import {
   Concept,
   Label,
   LanguageTag,
   NoteProperty,
   SemanticRelationProperty,
-} from "..";
+} from "@kos-kit/models";
+import { DataFactory } from "n3";
+import { AsyncIterables } from "purify-ts-helpers";
+import { expect, it } from "vitest";
 import { behavesLikeConcept } from "./behavesLikeConcept.js";
 import { expectConcept } from "./expectConcept.js";
 

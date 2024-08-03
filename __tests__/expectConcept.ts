@@ -1,5 +1,5 @@
+import { Concept, Label } from "@kos-kit/models";
 import { expect } from "vitest";
-import { Concept, Label } from "..";
 
 /**
  * Basic assertions about every concept.

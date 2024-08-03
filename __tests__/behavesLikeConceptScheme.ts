@@ -1,6 +1,6 @@
+import { ConceptScheme, LanguageTag } from "@kos-kit/models";
 import { AsyncIterables } from "purify-ts-helpers";
 import { expect, it } from "vitest";
-import { ConceptScheme, LanguageTag } from "..";
 
 export const behavesLikeConceptScheme = (
   lazyConceptScheme: (

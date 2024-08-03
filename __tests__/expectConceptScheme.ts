@@ -1,5 +1,5 @@
+import { ConceptScheme, Label } from "@kos-kit/models";
 import { expect } from "vitest";
-import { ConceptScheme, Label } from "..";
 
 /**
  * Basic assertions about every conceptScheme scheme.
