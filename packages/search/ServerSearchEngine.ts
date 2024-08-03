@@ -1,7 +1,7 @@
 import axios, { AxiosInstance } from "axios";
 
 import * as mem from "@kos-kit/mem-models";
-import { LanguageTag, LanguageTagSet } from "@kos-kit/models";
+import { Label, LanguageTag, LanguageTagSet } from "@kos-kit/models";
 import { Resource } from "@kos-kit/rdf-resource";
 import { Parser, Store } from "n3";
 import { SearchEngine } from "./SearchEngine.js";
@@ -39,21 +39,16 @@ export class ServerSearchEngine implements SearchEngine {
     const parser = new Parser({ format: "N-Triples" });
     const store = new Store();
     store.addQuads(parser.parse(response.data));
-    const kos = new mem.Kos({
+    const kos = new mem.DefaultKos({
       dataset: store,
-      modelFactory: new mem.DefaultModelFactory({
-        conceptConstructor: mem.Concept,
-        conceptSchemeConstructor: mem.ConceptScheme,
-        includeLanguageTags: new LanguageTagSet(params.languageTag, ""),
-        labelConstructor: mem.Label,
-      }),
+      includeLanguageTags: new LanguageTagSet(params.languageTag, ""),
     });
 
     const page: SearchResult[] = [];
 
     for await (const concept of kos.concepts()) {
       (await concept.resolve()).ifJust((concept) => {
-        const prefLabels = concept.prefLabels;
+        const prefLabels = concept.labels(Label.Type.PREFERRED);
         if (prefLabels.length === 0) {
           return;
         }
@@ -67,7 +62,7 @@ export class ServerSearchEngine implements SearchEngine {
 
     for await (const conceptScheme of kos.conceptSchemes()) {
       (await conceptScheme.resolve()).ifJust((conceptScheme) => {
-        const prefLabels = conceptScheme.prefLabels;
+        const prefLabels = conceptScheme.labels(Label.Type.PREFERRED);
         if (prefLabels.length === 0) {
           return;
         }

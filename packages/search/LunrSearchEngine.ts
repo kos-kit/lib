@@ -1,4 +1,4 @@
-import { Kos, LabelsMixin, LanguageTag, NamedModel } from "@kos-kit/models";
+import { Kos, Label, LabeledModel, LanguageTag } from "@kos-kit/models";
 import { Resource } from "@kos-kit/rdf-resource";
 import lunr, { Index } from "lunr";
 import { LunrIndexCompactor } from "./LunrIndexCompactor.js";
@@ -34,22 +34,21 @@ export class LunrSearchEngine implements SearchEngine {
     }
 
     const toIndexDocument = (
-      model: NamedModel & LabelsMixin,
+      model: LabeledModel,
       type: SearchResult["type"],
     ): IndexDocument | null => {
-      const prefLabels = model.prefLabels;
+      const prefLabels = model.labels(Label.Type.PREFERRED);
       if (prefLabels.length === 0) {
         return null;
       }
-      const altLabels = model.altLabels;
-      const hiddenLabels = model.hiddenLabels;
 
       const identifierString = Resource.Identifier.toString(model.identifier);
 
       return {
         identifier: identifierString,
-        joinedLabels: [altLabels, hiddenLabels, prefLabels]
-          .flatMap((labels) => labels.map((label) => label.literalForm.value))
+        joinedLabels: model
+          .labels()
+          .map((label) => label.literalForm.value)
           .join(" "),
         prefLabel: prefLabels[0].literalForm.value,
         type,
@@ -60,7 +59,7 @@ export class LunrSearchEngine implements SearchEngine {
 
     if (conceptsLimit != null) {
       // Don't index all concepts in the set, in testing
-      for (const concept of await kos.conceptsPage({
+      for await (const concept of kos.concepts({
         limit: conceptsLimit,
         offset: 0,
       })) {
