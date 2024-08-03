@@ -16,8 +16,8 @@ import {
 import { Stub } from "./Stub.js";
 
 export class ConceptStub<
-  ConceptT extends IConcept,
-  ConceptSchemeT extends IConceptScheme,
+  ConceptT extends IConcept<ConceptT, ConceptSchemeT, LabelT>,
+  ConceptSchemeT extends IConceptScheme<ConceptT, LabelT>,
   LabelT extends ILabel,
 > extends Stub<ConceptT, ConceptSchemeT, LabelT, ConceptT> {
   async resolve(): Promise<Maybe<ConceptT>> {
