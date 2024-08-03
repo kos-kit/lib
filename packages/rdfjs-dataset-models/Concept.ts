@@ -14,8 +14,8 @@ import { Label } from "./Label.js";
 import { labelsByType } from "./labelsByType.js";
 
 export class Concept<
-  ConceptT extends IConcept,
-  ConceptSchemeT extends IConceptScheme,
+  ConceptT extends IConcept<ConceptT, ConceptSchemeT, LabelT>,
+  ConceptSchemeT extends IConceptScheme<ConceptT, LabelT>,
   LabelT extends ILabel,
 > extends abc.Concept<ConceptT, ConceptSchemeT, LabelT> {
   protected resource: Resource<Identifier>;
@@ -72,8 +72,8 @@ export class Concept<
 
 export namespace Concept {
   export interface Parameters<
-    ConceptT extends IConcept,
-    ConceptSchemeT extends IConceptScheme,
+    ConceptT extends IConcept<ConceptT, ConceptSchemeT, LabelT>,
+    ConceptSchemeT extends IConceptScheme<ConceptT, LabelT>,
     LabelT extends ILabel,
   > extends abc.Concept.Parameters<ConceptT, ConceptSchemeT, LabelT> {
     dataset: DatasetCore;

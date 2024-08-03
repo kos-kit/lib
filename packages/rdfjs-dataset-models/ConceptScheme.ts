@@ -16,13 +16,10 @@ import { labelsByType } from "./labelsByType.js";
 const rightsPredicates = [dcterms.rights, dc11.rights];
 
 export class ConceptScheme<
-    ConceptT extends IConcept,
-    ConceptSchemeT extends IConceptScheme,
-    LabelT extends ILabel,
-  >
-  extends abc.ConceptScheme<ConceptT, ConceptSchemeT, LabelT>
-  implements IConceptScheme
-{
+  ConceptT extends IConcept<ConceptT, ConceptSchemeT, LabelT>,
+  ConceptSchemeT extends IConceptScheme<ConceptT, LabelT>,
+  LabelT extends ILabel,
+> extends abc.ConceptScheme<ConceptT, ConceptSchemeT, LabelT> {
   protected resource: Resource<Identifier>;
   private readonly labelConstructor: new (
     _: Label.Parameters,
@@ -114,8 +111,8 @@ export class ConceptScheme<
 
 export namespace ConceptScheme {
   export interface Parameters<
-    ConceptT extends IConcept,
-    ConceptSchemeT extends IConceptScheme,
+    ConceptT extends IConcept<ConceptT, ConceptSchemeT, LabelT>,
+    ConceptSchemeT extends IConceptScheme<ConceptT, LabelT>,
     LabelT extends ILabel,
   > extends abc.ConceptScheme.Parameters<ConceptT, ConceptSchemeT, LabelT> {
     dataset: DatasetCore;
