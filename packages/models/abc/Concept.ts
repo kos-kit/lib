@@ -21,7 +21,7 @@ export abstract class Concept<
 {
   abstract readonly modified: Maybe<Literal>;
 
-  equals(other: IConcept<ConceptT, ConceptSchemeT, LabelT>): boolean {
+  equals(other: IConcept<any, any, any>): boolean {
     return Concept.equals(this, other);
   }
 
@@ -67,13 +67,9 @@ export abstract class Concept<
 }
 
 export namespace Concept {
-  export function equals<
-    ConceptT extends IConcept<ConceptT, ConceptSchemeT, LabelT>,
-    ConceptSchemeT extends IConceptScheme<ConceptT, LabelT>,
-    LabelT extends ILabel,
-  >(
-    left: IConcept<ConceptT, ConceptSchemeT, LabelT>,
-    right: IConcept<ConceptT, ConceptSchemeT, LabelT>,
+  export function equals(
+    left: IConcept<any, any, any>,
+    right: IConcept<any, any, any>,
   ): boolean {
     if (!left.identifier.equals(right.identifier)) {
       return false;

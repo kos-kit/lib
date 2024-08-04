@@ -22,7 +22,7 @@ export interface ConceptScheme<
   >;
   conceptsCount(): Promise<number>;
 
-  equals(other: ConceptScheme<ConceptT, LabelT>): boolean;
+  equals(other: ConceptScheme<any, any>): boolean;
 
   topConcepts(kwds?: { limit?: number; offset?: number }): AsyncGenerator<
     Stub<ConceptT>

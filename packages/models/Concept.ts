@@ -15,7 +15,7 @@ export interface Concept<
   readonly modified: Maybe<Literal>;
   readonly notations: readonly Literal[];
 
-  equals(other: ConceptT): boolean;
+  equals(other: Concept<any, any, any>): boolean;
   inSchemes(): AsyncGenerator<Stub<ConceptSchemeT>>;
   notes(property: NoteProperty): readonly Literal[];
   semanticRelations(
