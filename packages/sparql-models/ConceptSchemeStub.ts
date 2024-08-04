@@ -2,6 +2,7 @@ import {
   Concept as IConcept,
   ConceptScheme as IConceptScheme,
   Label as ILabel,
+  Identifier,
 } from "@kos-kit/models";
 import { Resource } from "@kos-kit/rdf-resource";
 import { skos } from "@tpluscode/rdf-ns-builders";
@@ -41,9 +42,9 @@ export class ConceptSchemeStub<
 
     const resource = new Resource({ dataset, identifier: this.identifier });
     if (!resource.isInstanceOf(skos.ConceptScheme)) {
-      console.warn(
-        "tried to resolve missing concept scheme",
-        this.identifier.value,
+      this.logger.warn(
+        "%s is missing or not an instance of skos.ConceptScheme, unable to resolve",
+        Identifier.toString(this.identifier),
       );
       return Maybe.empty();
     }
