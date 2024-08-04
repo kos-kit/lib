@@ -5,6 +5,7 @@ export * from "./DefaultKos.js";
 export * from "./GraphPattern.js";
 export * from "./HttpSparqlClient.js";
 export * from "./Kos.js";
+export * from "./LoggingSparqlClient.js";
 export * from "./SparqlClient.js";
 export * from "./Stub.js";
 export * from "./mapResultRowsToCount.js";

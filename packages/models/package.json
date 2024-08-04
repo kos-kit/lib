@@ -2,6 +2,7 @@
   "dependencies": {
     "@rdfjs/types": "^1.1.0",
     "@tpluscode/rdf-ns-builders": "^4.3.0",
+    "pino": "^9.1.0",
     "purify-ts": "~2.1.0",
     "purify-ts-helpers": "1.0.3"
   },

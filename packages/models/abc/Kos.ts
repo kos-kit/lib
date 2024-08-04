@@ -8,6 +8,7 @@ import {
   Identifier,
   LanguageTagSet,
 } from "@kos-kit/models";
+import { Logger, pino } from "pino";
 import { ConceptSchemeStub } from "./ConceptSchemeStub.js";
 import { ConceptStub } from "./ConceptStub.js";
 
@@ -18,9 +19,15 @@ export abstract class Kos<
 > implements IKos<ConceptT, ConceptSchemeT, LabelT>
 {
   readonly includeLanguageTags: LanguageTagSet;
+  readonly logger: Logger;
 
-  protected constructor({ includeLanguageTags }: Kos.Parameters) {
+  protected constructor({ includeLanguageTags, logger }: Kos.Parameters) {
     this.includeLanguageTags = includeLanguageTags;
+    this.logger =
+      logger ??
+      pino({
+        level: "silent",
+      });
   }
 
   abstract conceptByIdentifier(
@@ -51,5 +58,6 @@ export abstract class Kos<
 export namespace Kos {
   export interface Parameters {
     includeLanguageTags: LanguageTagSet;
+    logger?: Logger;
   }
 }

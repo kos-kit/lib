@@ -46,6 +46,11 @@ export class Stub<
     ) {
       return Maybe.of(this.modelFactory(this.identifier));
     }
+    this.logger.warn(
+      "%s is missing or not an instance of %s, unable to resolve",
+      Identifier.toString(this.identifier),
+      Identifier.toString(this.modelRdfType),
+    );
     return Maybe.empty();
   }
 }

@@ -3,6 +3,7 @@ import { ResultRow } from "sparql-http-client/ResultParser";
 
 export interface SparqlClient {
   readonly query: SparqlClient.Query;
+  readonly update: SparqlClient.Update;
 }
 
 export namespace SparqlClient {
