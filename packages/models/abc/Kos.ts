@@ -8,7 +8,8 @@ import {
   Identifier,
   LanguageTagSet,
 } from "@kos-kit/models";
-import { Stub } from "./Stub.js";
+import { ConceptSchemeStub } from "./ConceptSchemeStub.js";
+import { ConceptStub } from "./ConceptStub.js";
 
 export abstract class Kos<
   ConceptT extends IConcept<ConceptT, ConceptSchemeT, LabelT>,
@@ -24,25 +25,25 @@ export abstract class Kos<
 
   abstract conceptByIdentifier(
     identifier: Identifier,
-  ): Stub<ConceptT, ConceptSchemeT, LabelT, ConceptT>;
+  ): ConceptStub<ConceptT, ConceptSchemeT, LabelT>;
 
   abstract concepts(kwds?: {
     limit?: number;
     offset?: number;
     query?: ConceptsQuery;
-  }): AsyncGenerator<Stub<ConceptT, ConceptSchemeT, LabelT, ConceptT>>;
+  }): AsyncGenerator<ConceptStub<ConceptT, ConceptSchemeT, LabelT>>;
 
   abstract conceptsCount(query?: ConceptsQuery): Promise<number>;
 
   abstract conceptSchemeByIdentifier(
     identifier: Identifier,
-  ): Stub<ConceptT, ConceptSchemeT, LabelT, ConceptSchemeT>;
+  ): ConceptSchemeStub<ConceptT, ConceptSchemeT, LabelT>;
 
   abstract conceptSchemes(kwds?: {
     limit?: number;
     offset?: number;
     query?: ConceptSchemesQuery;
-  }): AsyncGenerator<Stub<ConceptT, ConceptSchemeT, LabelT, ConceptSchemeT>>;
+  }): AsyncGenerator<ConceptSchemeStub<ConceptT, ConceptSchemeT, LabelT>>;
 
   abstract conceptSchemesCount(query?: ConceptSchemesQuery): Promise<number>;
 }

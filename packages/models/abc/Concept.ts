@@ -8,6 +8,7 @@ import {
 import { Literal } from "@rdfjs/types";
 import { Maybe } from "purify-ts";
 import { Arrays } from "purify-ts-helpers";
+import { ConceptStub } from "./ConceptStub.js";
 import { LabeledModel } from "./LabeledModel.js";
 import { Stub } from "./Stub.js";
 
@@ -39,7 +40,7 @@ export abstract class Concept<
 
   async *semanticRelations(
     property: SemanticRelationProperty,
-  ): AsyncGenerator<Stub<ConceptT, ConceptSchemeT, LabelT, ConceptT>> {
+  ): AsyncGenerator<ConceptStub<ConceptT, ConceptSchemeT, LabelT>> {
     yield* this.kos.concepts({
       query: {
         semanticRelationProperty: property,
