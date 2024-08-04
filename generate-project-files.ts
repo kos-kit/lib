@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 
-const VERSION = "2.0.39";
+const VERSION = "2.0.40";
 
 type ProjectName =
   | "rdfjs-dataset-models"
@@ -15,6 +15,7 @@ type ProjectName =
 interface Project {
   devDependencies?: Record<string, string>;
   externalDependencies: Record<string, string>;
+  files?: readonly string[];
   internalDependencies: readonly ProjectName[];
   name: ProjectName;
 }
@@ -40,6 +41,7 @@ const projects: readonly Project[] = [
       "purify-ts": externalDependencyVersions["purify-ts"],
       "purify-ts-helpers": externalDependencyVersions["purify-ts-helpers"],
     },
+    files: ["abc/*.d.ts", "abc/*.js", "*.d.ts", "*.js"],
     internalDependencies: [],
     name: "models",
   },
@@ -144,7 +146,7 @@ for (const project of projects) {
           node: ">=20",
         },
         main: "index.js",
-        files: ["*.d.ts", "*.js"],
+        files: project.files ?? ["*.d.ts", "*.js"],
         license: "Apache-2.0",
         name: `@kos-kit/${project.name}`,
         scripts: {
@@ -172,7 +174,7 @@ for (const project of projects) {
         },
         type: "module",
         types: "index.d.ts",
-        version: "2.0.39",
+        version: "2.0.40",
       },
       undefined,
       2,
