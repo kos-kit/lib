@@ -15,7 +15,7 @@ export type ConceptsQuery =
       // (subjectConceptIdentifier, skos:broader, ?otherConcept)
       readonly semanticRelationProperty: SemanticRelationProperty;
       readonly subjectConceptIdentifier: Identifier;
-      readonly type: "SemanticRelationOf";
+      readonly type: "ObjectsOfSemanticRelation";
     }
   | {
       // Concepts that are the top concept of the given concept scheme

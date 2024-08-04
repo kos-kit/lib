@@ -140,7 +140,7 @@ ${this.conceptSchemesQueryToWhereGraphPatterns(query).join("\n")}
       return whereGraphPatterns;
     }
 
-    if (query.type === "SemanticRelationOf") {
+    if (query.type === "ObjectsOfSemanticRelation") {
       return [
         // The semantic relations have a range of skos:Concept, so no need to check the rdf:type
         `${Identifier.toString(query.subjectConceptIdentifier)} <${query.semanticRelationProperty.identifier.value}> ?concept`,
