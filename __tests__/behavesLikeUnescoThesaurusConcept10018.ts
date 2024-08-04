@@ -1,5 +1,7 @@
 import {
   Concept,
+  ConceptScheme,
+  Kos,
   Label,
   LanguageTag,
   NoteProperty,
@@ -11,18 +13,36 @@ import { expect, it } from "vitest";
 import { behavesLikeConcept } from "./behavesLikeConcept.js";
 import { expectConcept } from "./expectConcept.js";
 
-export const behavesLikeUnescoThesaurusConcept10018 = (
-  lazyConcept: (
+export function behavesLikeUnescoThesaurusConcept10018<
+  ConceptT extends Concept<any, ConceptSchemeT, LabelT>,
+  ConceptSchemeT extends ConceptScheme<ConceptT, LabelT>,
+  LabelT extends Label,
+>(
+  kosFactory: (
     includeLanguageTag: LanguageTag,
-  ) => Promise<Concept<any, any, any>>,
-) => {
+  ) => Kos<ConceptT, ConceptSchemeT, LabelT>,
+) {
+  const testConcept = (includeLanguageTag: LanguageTag) =>
+    kosFactory(includeLanguageTag)
+      .conceptByIdentifier(
+        DataFactory.namedNode(
+          "http://vocabularies.unesco.org/thesaurus/concept10018",
+        ),
+      )
+      .resolve()
+      .then((concept) =>
+        concept.orDefaultLazy(() => {
+          throw new Error("missing concept");
+        }),
+      );
+
   it("should satisfy basic expect", async () => {
-    const concept = await lazyConcept("en");
+    const concept = await testConcept("en");
     expectConcept(concept);
   });
 
   it("should be in the single concept scheme", async () => {
-    const concept = await lazyConcept("en");
+    const concept = await testConcept("en");
     const inSchemes = await AsyncIterables.toArray(concept.inSchemes());
     expect(inSchemes).toHaveLength(1);
     expect(
@@ -33,15 +53,15 @@ export const behavesLikeUnescoThesaurusConcept10018 = (
   });
 
   it("should have a modified date", async () => {
-    const concept = await lazyConcept("en");
+    const concept = await testConcept("en");
     expect(concept.modified.extractNullable()?.value).toStrictEqual(
       "2019-12-15T13:44:31Z",
     );
   });
 
   it("should have multiple alt labels", async () => {
-    const conceptAr = await lazyConcept("ar");
-    const conceptEs = await lazyConcept("es");
+    const conceptAr = await testConcept("ar");
+    const conceptEs = await testConcept("es");
 
     const arAltLabels = conceptAr.labels(Label.Type.ALTERNATIVE);
     expect(arAltLabels).toHaveLength(1);
@@ -57,7 +77,7 @@ export const behavesLikeUnescoThesaurusConcept10018 = (
   });
 
   it("should be in the single concept scheme", async () => {
-    const concept = await lazyConcept("en");
+    const concept = await testConcept("en");
     const inSchemes = await AsyncIterables.toArray(concept.inSchemes());
     expect(inSchemes).toHaveLength(1);
     expect(
@@ -68,8 +88,8 @@ export const behavesLikeUnescoThesaurusConcept10018 = (
   });
 
   it("should have multiple prefLabels", async () => {
-    const conceptEn = await lazyConcept("en");
-    const conceptFr = await lazyConcept("fr");
+    const conceptEn = await testConcept("en");
+    const conceptFr = await testConcept("fr");
 
     const enPrefLabels = conceptEn.labels(Label.Type.PREFERRED);
     expect(enPrefLabels).toHaveLength(1);
@@ -85,7 +105,7 @@ export const behavesLikeUnescoThesaurusConcept10018 = (
   });
 
   it("should have known semantic relations", async () => {
-    const concept = await lazyConcept("en");
+    const concept = await testConcept("en");
     for (const { semanticRelationProperty, conceptNumbers } of [
       {
         semanticRelationProperty: SemanticRelationProperty.BROADER,
@@ -117,8 +137,8 @@ export const behavesLikeUnescoThesaurusConcept10018 = (
   });
 
   it("should have multiple notes", async () => {
-    const conceptEn = await lazyConcept("en");
-    const conceptFr = await lazyConcept("fr");
+    const conceptEn = await testConcept("en");
+    const conceptFr = await testConcept("fr");
 
     const notesEn = await conceptEn.notes(NoteProperty.SCOPE_NOTE);
     expect(notesEn).toHaveLength(1);
@@ -133,5 +153,5 @@ export const behavesLikeUnescoThesaurusConcept10018 = (
     );
   });
 
-  behavesLikeConcept(lazyConcept);
-};
+  behavesLikeConcept(testConcept);
+}

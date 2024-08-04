@@ -45,7 +45,7 @@ export abstract class Concept<
       query: {
         semanticRelationProperty: property,
         subjectConceptIdentifier: this.identifier,
-        type: "SemanticRelationOf",
+        type: "ObjectsOfSemanticRelation",
       },
     });
   }
@@ -54,7 +54,7 @@ export abstract class Concept<
     return this.kos.conceptsCount({
       semanticRelationProperty: property,
       subjectConceptIdentifier: this.identifier,
-      type: "SemanticRelationOf",
+      type: "ObjectsOfSemanticRelation",
     });
   }
 

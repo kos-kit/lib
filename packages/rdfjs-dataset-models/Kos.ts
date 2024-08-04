@@ -262,17 +262,35 @@ export abstract class Kos<
       return;
     }
 
-    // Semantic relation query
-    for (const quad of this.dataset.match(
-      query.subjectConceptIdentifier,
-      query.semanticRelationProperty.identifier,
-      null,
-    )) {
-      // The semantic relation properties have a range of skos:Concept
-      if (quad.object.termType === "NamedNode") {
-        yield this.conceptByIdentifier(quad.object);
+    if (query.type === "ObjectsOfSemanticRelation") {
+      for (const quad of this.dataset.match(
+        query.subjectConceptIdentifier,
+        query.semanticRelationProperty.identifier,
+        null,
+      )) {
+        // The semantic relation properties have a range of skos:Concept
+        if (quad.object.termType === "NamedNode") {
+          yield this.conceptByIdentifier(quad.object);
+        }
       }
+      return;
     }
+
+    if (query.type === "SubjectsOfSemanticRelation") {
+      for (const quad of this.dataset.match(
+        null,
+        query.semanticRelationProperty.identifier,
+        query.objectConceptIdentifier,
+      )) {
+        // The semantic relation properties have a domain of skos:Concept
+        if (quad.subject.termType === "NamedNode") {
+          yield this.conceptByIdentifier(quad.subject);
+        }
+      }
+      return;
+    }
+
+    throw new RangeError();
   }
 
   private *queryConceptSchemes(
