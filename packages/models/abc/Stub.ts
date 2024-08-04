@@ -5,25 +5,26 @@ import {
   Label as ILabel,
   Stub as IStub,
   Identifier,
-  NamedModel,
 } from "../index.js";
 import { Kos } from "./Kos.js";
+import { NamedModel } from "./NamedModel.js";
 
 export abstract class Stub<
-  ConceptT extends IConcept<ConceptT, ConceptSchemeT, LabelT>,
-  ConceptSchemeT extends IConceptScheme<ConceptT, LabelT>,
-  LabelT extends ILabel,
-  ModelT extends ConceptT | ConceptSchemeT,
-> implements IStub<ModelT>
+    ConceptT extends IConcept<ConceptT, ConceptSchemeT, LabelT>,
+    ConceptSchemeT extends IConceptScheme<ConceptT, LabelT>,
+    LabelT extends ILabel,
+    ModelT extends ConceptT | ConceptSchemeT,
+  >
+  extends NamedModel
+  implements IStub<ModelT>
 {
-  readonly identifier: Identifier;
   protected readonly kos: Kos<ConceptT, ConceptSchemeT, LabelT>;
 
-  constructor({
-    identifier,
+  protected constructor({
     kos,
+    ...superParameters
   }: Stub.Parameters<ConceptT, ConceptSchemeT, LabelT>) {
-    this.identifier = identifier;
+    super(superParameters);
     this.kos = kos;
   }
 
@@ -35,6 +36,10 @@ export abstract class Stub<
     return Stub.equals(this, other);
   }
 
+  protected get logger() {
+    return this.kos.logger;
+  }
+
   abstract resolve(): Promise<Maybe<ModelT>>;
 
   async resolveOrStub() {
@@ -42,6 +47,10 @@ export abstract class Stub<
     if (model !== null) {
       return model;
     }
+    this.logger.info(
+      "%s did not resolve, returning the stub",
+      Identifier.toString(this.identifier),
+    );
     return this;
   }
 }
@@ -58,8 +67,7 @@ export namespace Stub {
     ConceptT extends IConcept<ConceptT, ConceptSchemeT, LabelT>,
     ConceptSchemeT extends IConceptScheme<ConceptT, LabelT>,
     LabelT extends ILabel,
-  > {
-    identifier: Identifier;
+  > extends NamedModel.Parameters {
     kos: Kos<ConceptT, ConceptSchemeT, LabelT>;
   }
 }

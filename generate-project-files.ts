@@ -25,30 +25,18 @@ const externalDependencyVersions = {
   "@types/n3": "^1.16.4",
   "iterator-helpers-polyfill": "^3.0.1",
   n3: "^1.17.3",
+  pino: "^9.1.0",
   "purify-ts": "~2.1.0",
   "purify-ts-helpers": "1.0.3",
 };
 
 const projects: readonly Project[] = [
   {
-    devDependencies: {
-      "@types/n3": externalDependencyVersions["@types/n3"],
-      n3: externalDependencyVersions.n3,
-    },
-    externalDependencies: {
-      "@rdfjs/types": externalDependencyVersions["@rdfjs/types"],
-      "iterator-helpers-polyfill":
-        externalDependencyVersions["iterator-helpers-polyfill"],
-      "purify-ts": externalDependencyVersions["purify-ts"],
-    },
-    internalDependencies: ["rdf-resource", "rdf-utils"],
-    name: "rdfjs-dataset-models",
-  },
-  {
     externalDependencies: {
       "@rdfjs/types": externalDependencyVersions["@rdfjs/types"],
       "@tpluscode/rdf-ns-builders":
         externalDependencyVersions["@tpluscode/rdf-ns-builders"],
+      pino: externalDependencyVersions["pino"],
       "purify-ts": externalDependencyVersions["purify-ts"],
       "purify-ts-helpers": externalDependencyVersions["purify-ts-helpers"],
     },
@@ -92,6 +80,21 @@ const projects: readonly Project[] = [
     name: "rdf-utils",
   },
   {
+    devDependencies: {
+      "@types/n3": externalDependencyVersions["@types/n3"],
+      n3: externalDependencyVersions.n3,
+    },
+    externalDependencies: {
+      "@rdfjs/types": externalDependencyVersions["@rdfjs/types"],
+      "iterator-helpers-polyfill":
+        externalDependencyVersions["iterator-helpers-polyfill"],
+      pino: externalDependencyVersions["pino"],
+      "purify-ts": externalDependencyVersions["purify-ts"],
+    },
+    internalDependencies: ["rdf-resource", "rdf-utils"],
+    name: "rdfjs-dataset-models",
+  },
+  {
     externalDependencies: {
       "@rdfjs/types": externalDependencyVersions["@rdfjs/types"],
       "@types/lunr": "^2.3.7",
@@ -111,7 +114,7 @@ const projects: readonly Project[] = [
       "@tpluscode/rdf-ns-builders":
         externalDependencyVersions["@tpluscode/rdf-ns-builders"],
       "@types/sparql-http-client": "^3.0.2",
-      pino: "^9.1.0",
+      pino: externalDependencyVersions["pino"],
       "purify-ts": externalDependencyVersions["purify-ts"],
       "sparql-http-client": "^3.0.0",
     },

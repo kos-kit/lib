@@ -50,6 +50,10 @@ export abstract class LabeledModel<
     return labels;
   }
 
+  protected get logger() {
+    return this.kos.logger;
+  }
+
   protected abstract labelsByType(
     type: ILabel.Type,
   ): readonly (LiteralLabel | LabelT)[];

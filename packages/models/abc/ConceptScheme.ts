@@ -36,6 +36,11 @@ export abstract class ConceptScheme<
     })) {
       return Maybe.of(conceptStub);
     }
+    this.logger.info(
+      "concept %s is not part of concept scheme %s",
+      Identifier.toString(identifier),
+      Identifier.toString(this.identifier),
+    );
     return Maybe.empty();
   }
 
