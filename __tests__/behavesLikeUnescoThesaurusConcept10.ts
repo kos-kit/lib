@@ -90,7 +90,7 @@ export function behavesLikeUnescoThesaurusConcept10<
     );
   });
 
-  it("should have known semantic relations", async () => {
+  it("should have known semantic relations (direct only)", async () => {
     const concept = await testConcept("en");
     for (const { semanticRelationProperty, conceptNumbers } of [
       {
@@ -108,6 +108,40 @@ export function behavesLikeUnescoThesaurusConcept10<
       const semanticRelations = await AsyncIterables.toArray(
         concept.semanticRelations(semanticRelationProperty),
       );
+      expect(semanticRelations).toHaveLength(conceptNumbers.length);
+      for (const conceptNumber of conceptNumbers) {
+        const conceptIdentifier = DataFactory.namedNode(
+          `http://vocabularies.unesco.org/thesaurus/concept${conceptNumber}`,
+        );
+        expect(
+          semanticRelations.find((semanticRelation) =>
+            semanticRelation.identifier.equals(conceptIdentifier),
+          ),
+        ).toBeDefined();
+      }
+    }
+  });
+
+  it("should have known semantic relations (direct and inverse)", async () => {
+    const concept = await testConcept("en");
+    for (const { semanticRelationProperty, conceptNumbers } of [
+      {
+        semanticRelationProperty: SemanticRelationProperty.NARROWER,
+        conceptNumbers: [4938, 7597],
+      },
+      {
+        semanticRelationProperty: SemanticRelationProperty.RELATED,
+        conceptNumbers: [9, 556, 557, 1519, 5052],
+      },
+    ]) {
+      const semanticRelations = await AsyncIterables.toArray(
+        concept.semanticRelations(semanticRelationProperty, {
+          includeInverse: true,
+        }),
+      );
+      expect(
+        await concept.semanticRelationsCount(semanticRelationProperty),
+      ).toStrictEqual(conceptNumbers.length);
       expect(semanticRelations).toHaveLength(conceptNumbers.length);
       for (const conceptNumber of conceptNumbers) {
         const conceptIdentifier = DataFactory.namedNode(

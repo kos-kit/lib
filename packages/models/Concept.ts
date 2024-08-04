@@ -20,6 +20,7 @@ export interface Concept<
   notes(property: NoteProperty): readonly Literal[];
   semanticRelations(
     property: SemanticRelationProperty,
+    options?: { includeInverse?: boolean },
   ): AsyncGenerator<Stub<ConceptT>>;
   semanticRelationsCount(property: SemanticRelationProperty): Promise<number>;
   topConceptOf(): AsyncGenerator<Stub<ConceptSchemeT>>;
