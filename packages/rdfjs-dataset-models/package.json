@@ -4,6 +4,7 @@
     "@kos-kit/rdf-utils": "2.0.39",
     "@rdfjs/types": "^1.1.0",
     "iterator-helpers-polyfill": "^3.0.1",
+    "pino": "^9.1.0",
     "purify-ts": "~2.1.0"
   },
   "devDependencies": {
