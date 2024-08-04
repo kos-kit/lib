@@ -1,3 +1,4 @@
+import { Maybe } from "purify-ts";
 import { MappingProperty } from "./MappingProperty.js";
 import { SemanticRelationProperty } from "./SemanticRelationProperty.js";
 
@@ -17,6 +18,17 @@ export const semanticRelationProperties: readonly SemanticRelationProperty[] = [
   SemanticRelationProperty.NARROWER_TRANSITIVE,
   SemanticRelationProperty.RELATED,
 ].concat(mappingProperties);
+
+export function inverseSemanticRelationProperty(
+  semanticRelationProperty: SemanticRelationProperty,
+): Maybe<SemanticRelationProperty> {
+  return semanticRelationProperty.inverseIdentifier.map(
+    (inverseIdentifier) =>
+      semanticRelationProperties.find((semanticRelationProperty) =>
+        semanticRelationProperty.identifier.equals(inverseIdentifier),
+      )!,
+  );
+}
 
 export const semanticRelationPropertiesByName =
   semanticRelationProperties.reduce<Record<string, SemanticRelationProperty>>(

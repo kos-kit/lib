@@ -8,7 +8,7 @@ import {
 } from "@kos-kit/models";
 import { DataFactory } from "n3";
 import { AsyncIterables } from "purify-ts-helpers";
-import { it } from "vitest";
+import { expect, it } from "vitest";
 import { behavesLikeKos } from "./behavesLikeKos.js";
 
 export const behavesLikeUnescoThesaurusKos = <
@@ -46,6 +46,14 @@ export const behavesLikeUnescoThesaurusKos = <
         ),
       ),
     ).toBeDefined;
+  });
+
+  it("should get a count of concepts", async () => {
+    expect(await testKos.conceptsCount()).toStrictEqual(4482);
+  });
+
+  it("should get a count of concept schemes", async () => {
+    expect(await testKos.conceptSchemesCount()).toStrictEqual(1);
   });
 
   behavesLikeKos(testKos);

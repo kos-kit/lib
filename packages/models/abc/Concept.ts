@@ -2,9 +2,12 @@ import {
   Concept as IConcept,
   ConceptScheme as IConceptScheme,
   Label as ILabel,
+  Identifier,
   NoteProperty,
   SemanticRelationProperty,
+  inverseSemanticRelationProperty,
 } from "@kos-kit/models";
+import TermSet from "@rdfjs/term-set";
 import { Literal } from "@rdfjs/types";
 import { Maybe } from "purify-ts";
 import { Arrays } from "purify-ts-helpers";
@@ -40,17 +43,46 @@ export abstract class Concept<
 
   async *semanticRelations(
     property: SemanticRelationProperty,
+    options?: { includeInverse?: false },
   ): AsyncGenerator<ConceptStub<ConceptT, ConceptSchemeT, LabelT>> {
-    yield* this.kos.concepts({
+    const yieldedConceptIdentifiers = new TermSet<Identifier>();
+
+    for await (const conceptStub of this.kos.concepts({
       query: {
         semanticRelationProperty: property,
         subjectConceptIdentifier: this.identifier,
         type: "ObjectsOfSemanticRelation",
       },
-    });
+    })) {
+      if (!yieldedConceptIdentifiers.has(conceptStub.identifier)) {
+        yield conceptStub;
+        yieldedConceptIdentifiers.add(conceptStub.identifier);
+      }
+    }
+
+    if (options?.includeInverse) {
+      const inverseProperty =
+        inverseSemanticRelationProperty(property).extractNullable();
+      if (inverseProperty !== null) {
+        for await (const conceptStub of this.kos.concepts({
+          query: {
+            objectConceptIdentifier: this.identifier,
+            semanticRelationProperty: inverseProperty,
+            type: "SubjectsOfSemanticRelation",
+          },
+        })) {
+          if (!yieldedConceptIdentifiers.has(conceptStub.identifier)) {
+            yield conceptStub;
+            yieldedConceptIdentifiers.add(conceptStub.identifier);
+          }
+        }
+      }
+    }
   }
 
-  semanticRelationsCount(property: SemanticRelationProperty): Promise<number> {
+  async semanticRelationsCount(
+    property: SemanticRelationProperty,
+  ): Promise<number> {
     return this.kos.conceptsCount({
       semanticRelationProperty: property,
       subjectConceptIdentifier: this.identifier,

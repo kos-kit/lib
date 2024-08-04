@@ -48,7 +48,7 @@ export const behavesLikeKos = (kos: Kos<any, any, any>) => {
   });
 
   it("should get a count of concepts", async () => {
-    expect(await kos.conceptsCount()).toStrictEqual(4482);
+    expect(await kos.conceptsCount()).not.toStrictEqual(0);
   });
 
   it("should get concept schemes", async () => {
@@ -56,7 +56,7 @@ export const behavesLikeKos = (kos: Kos<any, any, any>) => {
     for await (const conceptScheme of kos.conceptSchemes()) {
       conceptSchemes.push(conceptScheme);
     }
-    expect(conceptSchemes).toHaveLength(1);
+    expect(conceptSchemes).not.toHaveLength(0);
     expectConceptScheme((await conceptSchemes[0].resolve()).extractNullable());
   });
 
