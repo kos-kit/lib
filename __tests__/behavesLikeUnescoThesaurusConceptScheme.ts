@@ -82,9 +82,5 @@ export const behavesLikeUnescoThesaurusConceptScheme = <
     expect(rightsHolder?.value).toStrictEqual("UNESCO");
   });
 
-  // it("should get the subjects of a semantic relation", async () => {
-  //   const objectConcept = await testConceptScheme("en");
-  // });
-
   behavesLikeConceptScheme(testConceptScheme);
 };

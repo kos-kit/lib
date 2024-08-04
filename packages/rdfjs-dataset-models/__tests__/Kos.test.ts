@@ -1,5 +1,5 @@
 import { describe } from "vitest";
-import { behavesLikeKos } from "../../../__tests__/behavesLikeKos.js";
+import { behavesLikeUnescoThesaurusKos } from "../../../__tests__/behavesLikeUnescoThesaurusKos.js";
 import { testKosFactory } from "./testKosFactory.js";
 
 describe("mem.Kos", () => {
@@ -20,5 +20,5 @@ describe("mem.Kos", () => {
   //   );
   // });
 
-  behavesLikeKos(testKosFactory("en"));
+  behavesLikeUnescoThesaurusKos(testKosFactory);
 });

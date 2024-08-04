@@ -147,6 +147,13 @@ ${this.conceptSchemesQueryToWhereGraphPatterns(query).join("\n")}
       ];
     }
 
+    if (query.type === "SubjectsOfSemanticRelation") {
+      return [
+        // The semantic relations have a domain of skos:Concept, so no need to check the rdf:type
+        `?concept <${query.semanticRelationProperty.identifier.value}> ${Identifier.toString(query.objectConceptIdentifier)}`,
+      ];
+    }
+
     throw new RangeError();
   }
 
