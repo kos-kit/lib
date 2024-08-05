@@ -1,3 +1,4 @@
+import TermSet from "@rdfjs/term-set";
 import {
   BlankNode,
   DatasetCore,
@@ -20,52 +21,64 @@ export function* getRdfList({
     return;
   }
 
-  const firstQuads = [...dataset.match(node, rdf.first, null, graph)];
-  if (firstQuads.length === 0) {
+  const firstObjects = [
+    ...new TermSet(
+      [...dataset.match(node, rdf.first, null, graph)].map(
+        (quad) => quad.object,
+      ),
+    ),
+  ];
+  if (firstObjects.length === 0) {
     throw new RangeError(`RDF list ${node.value} has no rdf:first quad`);
   }
-  if (firstQuads.length > 1) {
+  if (firstObjects.length > 1) {
     throw new RangeError(
-      `RDF list ${node.value} has multiple rdf:first quads: ${JSON.stringify(firstQuads.map((quad) => quad.object.value))}`,
+      `RDF list ${node.value} has multiple rdf:first objects: ${JSON.stringify(firstObjects.map((object) => object.value))}`,
     );
   }
-  const firstTerm = firstQuads[0].object;
-  switch (firstTerm.termType) {
+  const firstObject = firstObjects[0];
+  switch (firstObject.termType) {
     case "BlankNode":
     case "Literal":
     case "NamedNode":
       break;
     default:
       throw new RangeError(
-        `rdf:first from ${node.value} must point to a blank or named node or a literal, not ${firstTerm.termType}`,
+        `rdf:first from ${node.value} must point to a blank or named node or a literal, not ${firstObject.termType}`,
       );
   }
 
-  const restQuads = [...dataset.match(node, rdf.rest, null, graph)];
-  if (restQuads.length === 0) {
+  const restObjects = [
+    ...new TermSet(
+      [...dataset.match(node, rdf.rest, null, graph)].map(
+        (quad) => quad.object,
+      ),
+    ),
+  ];
+  if (restObjects.length === 0) {
     throw new RangeError(`RDF list ${node.value} has no rdf:rest quad`);
   }
-  if (restQuads.length > 1) {
+  if (restObjects.length > 1) {
     throw new RangeError(
-      `RDF list ${node.value} has multiple rdf:rest quads: ${JSON.stringify(restQuads.map((quad) => quad.object.value))}`,
+      `RDF list ${node.value} has multiple rdf:rest objects: ${JSON.stringify(restObjects.map((object) => object.value))}`,
     );
   }
-  const restTerm = restQuads[0].object;
-  switch (restTerm.termType) {
+  const restObject = restObjects[0];
+  switch (restObject.termType) {
     case "BlankNode":
     case "NamedNode":
       break;
     default:
       throw new RangeError(
-        `rdf:rest from ${node.value} must point to a blank or named node, not ${restTerm.termType}`,
+        `rdf:rest from ${node.value} must point to a blank or named node, not ${restObject.termType}`,
       );
   }
 
-  yield firstTerm;
+  yield firstObject;
 
   yield* getRdfList({
     dataset,
     graph,
-    node: restTerm,
+    node: restObject,
   });
 }
