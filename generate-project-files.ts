@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 
-const VERSION = "2.0.42";
+const VERSION = "2.0.43";
 
 type ProjectName =
   | "rdfjs-dataset-models"
@@ -174,7 +174,7 @@ for (const project of projects) {
         },
         type: "module",
         types: "index.d.ts",
-        version: "2.0.42",
+        version: "2.0.43",
       },
       undefined,
       2,
