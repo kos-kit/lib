@@ -22,10 +22,12 @@ export function* getRdfList({
 
   const firstQuads = [...dataset.match(node, rdf.first, null, graph)];
   if (firstQuads.length === 0) {
-    throw new RangeError("RDF list has no rdf:first quad");
+    throw new RangeError(`RDF list ${node.value} has no rdf:first quad`);
   }
   if (firstQuads.length > 1) {
-    throw new RangeError("RDF list has multiple rdf:first quads");
+    throw new RangeError(
+      `RDF list ${node.value} has multiple rdf:first quads: ${JSON.stringify(firstQuads.map((quad) => quad.object.value))}`,
+    );
   }
   const firstTerm = firstQuads[0].object;
   switch (firstTerm.termType) {
@@ -35,16 +37,18 @@ export function* getRdfList({
       break;
     default:
       throw new RangeError(
-        "rdf:first must point to a blank or named node or a literal",
+        `rdf:first from ${node.value} must point to a blank or named node or a literal, not ${firstTerm.termType}`,
       );
   }
 
   const restQuads = [...dataset.match(node, rdf.rest, null, graph)];
   if (restQuads.length === 0) {
-    throw new RangeError("RDF list has no rdf:rest quad");
+    throw new RangeError(`RDF list ${node.value} has no rdf:rest quad`);
   }
   if (restQuads.length > 1) {
-    throw new RangeError("RDF list has multiple rdf:rest quads");
+    throw new RangeError(
+      `RDF list ${node.value} has multiple rdf:rest quads: ${JSON.stringify(restQuads.map((quad) => quad.object.value))}`,
+    );
   }
   const restTerm = restQuads[0].object;
   switch (restTerm.termType) {
@@ -52,7 +56,9 @@ export function* getRdfList({
     case "NamedNode":
       break;
     default:
-      throw new RangeError("rdf:rest must point to a blank or named node");
+      throw new RangeError(
+        `rdf:rest from ${node.value} must point to a blank or named node, not ${restTerm.termType}`,
+      );
   }
 
   yield firstTerm;
