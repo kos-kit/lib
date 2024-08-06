@@ -1,6 +1,7 @@
 import { DatasetCore, Quad, Quad_Object, Variable } from "@rdfjs/types";
 import { xsd } from "@tpluscode/rdf-ns-builders";
 import { DataFactory, Store } from "n3";
+import { Maybe } from "purify-ts";
 import { beforeAll, describe, expect, it } from "vitest";
 import { MutableResource } from "..";
 
@@ -26,6 +27,14 @@ describe("MutableResource", () => {
       identifier: DataFactory.namedNode("http://example.com/subject"),
       mutateGraph: DataFactory.defaultGraph(),
     });
+  });
+
+  it("should add a Maybe value", () => {
+    expect(dataset.size).toStrictEqual(0);
+    resource.addMaybe(predicate, Maybe.empty());
+    expect(dataset.size).toStrictEqual(0);
+    resource.addMaybe(predicate, Maybe.of(objects["stringLiteral"]));
+    expect(dataset.size).toStrictEqual(1);
   });
 
   it("should set a value", () => {

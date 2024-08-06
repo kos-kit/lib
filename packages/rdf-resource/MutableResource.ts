@@ -9,6 +9,7 @@ import {
   Variable,
 } from "@rdfjs/types";
 import { rdf } from "@tpluscode/rdf-ns-builders";
+import { Maybe } from "purify-ts";
 import { Resource } from "./Resource.js";
 
 type Value = Exclude<Quad_Object, Quad | Variable>;
@@ -41,6 +42,11 @@ export class MutableResource<
         this.mutateGraph,
       ),
     );
+    return this;
+  }
+
+  addMaybe(predicate: NamedNode, value: Maybe<Value>): this {
+    value.ifJust((value) => this.add(predicate, value));
     return this;
   }
 
