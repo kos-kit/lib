@@ -27,6 +27,8 @@ export const behavesLikeUnescoThesaurusKos = <
   }) => {
     const subjectConcepts = await AsyncIterables.toArray(
       testKos.concepts({
+        limit: null,
+        offset: 0,
         query: {
           objectConceptIdentifier: DataFactory.namedNode(
             "http://vocabularies.unesco.org/thesaurus/concept10018",
@@ -49,11 +51,11 @@ export const behavesLikeUnescoThesaurusKos = <
   });
 
   it("should get a count of concepts", async () => {
-    expect(await testKos.conceptsCount()).toStrictEqual(4482);
+    expect(await testKos.conceptsCount({ type: "All" })).toStrictEqual(4482);
   });
 
   it("should get a count of concept schemes", async () => {
-    expect(await testKos.conceptSchemesCount()).toStrictEqual(1);
+    expect(await testKos.conceptSchemesCount({ type: "All" })).toStrictEqual(1);
   });
 
   behavesLikeKos(testKos);

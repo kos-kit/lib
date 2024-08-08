@@ -7,7 +7,7 @@ import { expectConceptScheme } from "./expectConceptScheme.js";
 export const behavesLikeKos = (kos: Kos<any, any, any>) => {
   it("should get concepts", async () => {
     const firstConcepts = await AsyncIterables.toArray(
-      kos.concepts({ limit: 10, offset: 0 }),
+      kos.concepts({ limit: 10, offset: 0, query: { type: "All" } }),
     );
     expect(firstConcepts).toHaveLength(10);
     for (const firstConcept of firstConcepts) {
@@ -15,7 +15,7 @@ export const behavesLikeKos = (kos: Kos<any, any, any>) => {
     }
 
     const nextConcepts = await AsyncIterables.toArray(
-      kos.concepts({ limit: 10, offset: 10 }),
+      kos.concepts({ limit: 10, offset: 10, query: { type: "All" } }),
     );
     expect(nextConcepts).toHaveLength(10);
     for (const nextConcept of nextConcepts) {
@@ -33,6 +33,7 @@ export const behavesLikeKos = (kos: Kos<any, any, any>) => {
     for await (const concept of kos.concepts({
       limit: 1,
       offset: 0,
+      query: { type: "All" },
     })) {
       expectConcept((await concept.resolve()).extractNullable());
       const conceptByIdentifier = (
@@ -48,12 +49,16 @@ export const behavesLikeKos = (kos: Kos<any, any, any>) => {
   });
 
   it("should get a count of concepts", async () => {
-    expect(await kos.conceptsCount()).not.toStrictEqual(0);
+    expect(await kos.conceptsCount({ type: "All" })).not.toStrictEqual(0);
   });
 
   it("should get concept schemes", async () => {
     const conceptSchemes: Stub<ConceptScheme<any, any>>[] = [];
-    for await (const conceptScheme of kos.conceptSchemes()) {
+    for await (const conceptScheme of kos.conceptSchemes({
+      limit: null,
+      offset: 0,
+      query: { type: "All" },
+    })) {
       conceptSchemes.push(conceptScheme);
     }
     expect(conceptSchemes).not.toHaveLength(0);
@@ -61,7 +66,11 @@ export const behavesLikeKos = (kos: Kos<any, any, any>) => {
   });
 
   it("should get a concept scheme by an identifier", async () => {
-    for await (const conceptScheme of kos.conceptSchemes()) {
+    for await (const conceptScheme of kos.conceptSchemes({
+      limit: null,
+      offset: 0,
+      query: { type: "All" },
+    })) {
       expectConceptScheme((await conceptScheme.resolve()).extractNullable());
       const conceptSchemeByIdentifier = (
         await kos.conceptSchemeByIdentifier(conceptScheme.identifier).resolve()
