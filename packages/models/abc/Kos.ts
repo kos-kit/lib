@@ -34,25 +34,25 @@ export abstract class Kos<
     identifier: Identifier,
   ): ConceptStub<ConceptT, ConceptSchemeT, LabelT>;
 
-  abstract concepts(kwds?: {
-    limit?: number;
-    offset?: number;
-    query?: ConceptsQuery;
+  abstract concepts(kwds: {
+    limit: number | null;
+    offset: number;
+    query: ConceptsQuery;
   }): AsyncGenerator<ConceptStub<ConceptT, ConceptSchemeT, LabelT>>;
 
-  abstract conceptsCount(query?: ConceptsQuery): Promise<number>;
+  abstract conceptsCount(query: ConceptsQuery): Promise<number>;
 
   abstract conceptSchemeByIdentifier(
     identifier: Identifier,
   ): ConceptSchemeStub<ConceptT, ConceptSchemeT, LabelT>;
 
-  abstract conceptSchemes(kwds?: {
-    limit?: number;
-    offset?: number;
-    query?: ConceptSchemesQuery;
+  abstract conceptSchemes(kwds: {
+    limit: number | null;
+    offset: number;
+    query: ConceptSchemesQuery;
   }): AsyncGenerator<ConceptSchemeStub<ConceptT, ConceptSchemeT, LabelT>>;
 
-  abstract conceptSchemesCount(query?: ConceptSchemesQuery): Promise<number>;
+  abstract conceptSchemesCount(query: ConceptSchemesQuery): Promise<number>;
 }
 
 export namespace Kos {

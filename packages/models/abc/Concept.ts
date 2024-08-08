@@ -33,6 +33,8 @@ export abstract class Concept<
     Stub<ConceptT, ConceptSchemeT, LabelT, ConceptSchemeT>
   > {
     yield* this.kos.conceptSchemes({
+      limit: null,
+      offset: 0,
       query: { conceptIdentifier: this.identifier, type: "HasConcept" },
     });
   }
@@ -48,6 +50,8 @@ export abstract class Concept<
     const yieldedConceptIdentifiers = new TermSet<Identifier>();
 
     for await (const conceptStub of this.kos.concepts({
+      limit: null,
+      offset: 0,
       query: {
         semanticRelationProperty: property,
         subjectConceptIdentifier: this.identifier,
@@ -65,6 +69,8 @@ export abstract class Concept<
         inverseSemanticRelationProperty(property).extractNullable();
       if (inverseProperty !== null) {
         for await (const conceptStub of this.kos.concepts({
+          limit: null,
+          offset: 0,
           query: {
             objectConceptIdentifier: this.identifier,
             semanticRelationProperty: inverseProperty,
@@ -94,6 +100,8 @@ export abstract class Concept<
     Stub<ConceptT, ConceptSchemeT, LabelT, ConceptSchemeT>
   > {
     yield* this.kos.conceptSchemes({
+      limit: null,
+      offset: 0,
       query: { conceptIdentifier: this.identifier, type: "HasTopConcept" },
     });
   }

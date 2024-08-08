@@ -10,14 +10,14 @@ export class NotImplementedKos implements Kos<any, any, any> {
   conceptByIdentifier(_identifier: Identifier): Stub<Concept<any, any, any>> {
     throw new Error("Method not implemented.");
   }
-  concepts(_kwds?: {
-    limit?: number;
-    offset?: number;
-    query?: ConceptsQuery;
+  concepts(_kwds: {
+    limit: number | null;
+    offset: number;
+    query: ConceptsQuery;
   }): AsyncGenerator<Stub<Concept<any, any, any>>> {
     throw new Error("Method not implemented.");
   }
-  conceptsCount(_query?: ConceptsQuery): Promise<number> {
+  conceptsCount(_query: ConceptsQuery): Promise<number> {
     throw new Error("Method not implemented.");
   }
   conceptSchemeByIdentifier(
@@ -25,14 +25,14 @@ export class NotImplementedKos implements Kos<any, any, any> {
   ): Stub<ConceptScheme<any, any>> {
     throw new Error("Method not implemented.");
   }
-  conceptSchemes(_kwds?: {
-    limit?: number;
-    offset?: number;
-    query?: ConceptSchemesQuery;
+  conceptSchemes(_kwds: {
+    limit: number | null;
+    offset: number;
+    query: ConceptSchemesQuery;
   }): AsyncGenerator<Stub<ConceptScheme<any, any>>> {
     throw new Error("Method not implemented.");
   }
-  conceptSchemesCount(_query?: ConceptSchemesQuery): Promise<number> {
+  conceptSchemesCount(_query: ConceptSchemesQuery): Promise<number> {
     throw new Error("Method not implemented.");
   }
 }

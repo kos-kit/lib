@@ -28,6 +28,7 @@ export abstract class ConceptScheme<
   ): Promise<Maybe<ConceptStub<ConceptT, ConceptSchemeT, LabelT>>> {
     for await (const conceptStub of this.kos.concepts({
       limit: 1,
+      offset: 0,
       query: {
         conceptIdentifier: identifier,
         conceptSchemeIdentifier: this.identifier,
@@ -48,6 +49,8 @@ export abstract class ConceptScheme<
     ConceptStub<ConceptT, ConceptSchemeT, LabelT>
   > {
     yield* this.kos.concepts({
+      limit: null,
+      offset: 0,
       query: { conceptSchemeIdentifier: this.identifier, type: "InScheme" },
       ...kwds,
     });
@@ -73,6 +76,8 @@ export abstract class ConceptScheme<
     offset?: number;
   }): AsyncGenerator<ConceptStub<ConceptT, ConceptSchemeT, LabelT>> {
     yield* this.kos.concepts({
+      limit: null,
+      offset: 0,
       query: { conceptSchemeIdentifier: this.identifier, type: "TopConceptOf" },
       ...kwds,
     });
