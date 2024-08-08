@@ -142,7 +142,7 @@ export abstract class Kos<
     offset,
     query,
   }: {
-    limit: number;
+    limit: number | null;
     offset: number;
     query: ConceptSchemesQuery;
   }): AsyncGenerator<abc.ConceptSchemeStub<ConceptT, ConceptSchemeT, LabelT>> {

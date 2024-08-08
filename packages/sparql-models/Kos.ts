@@ -34,19 +34,23 @@ export abstract class Kos<
     this.sparqlClient = sparqlClient;
   }
 
-  async *concepts(kwds?: {
-    limit?: number;
-    offset?: number;
-    query?: ConceptsQuery;
+  async *concepts({
+    limit,
+    offset,
+    query,
+  }: {
+    limit: number | null;
+    offset: number;
+    query: ConceptsQuery;
   }): AsyncGenerator<abc.Stub<ConceptT, ConceptSchemeT, LabelT, ConceptT>> {
     for (const identifier of mapResultRowsToIdentifiers(
       await this.sparqlClient.query.select(`\
 SELECT DISTINCT ?concept
 WHERE {
-${this.conceptsQueryToWhereGraphPatterns(kwds?.query).join("\n")}
+${this.conceptsQueryToWhereGraphPatterns(query).join("\n")}
 }
-${kwds?.limit && kwds.limit > 0 ? `LIMIT ${kwds.limit}` : ""}
-${kwds?.offset && kwds.offset >= 0 ? `OFFSET ${kwds.offset}` : ""}
+${limit !== null && limit > 0 ? `LIMIT ${limit}` : ""}
+${offset >= 0 ? `OFFSET ${offset}` : ""}
 `),
       "concept",
     )) {
@@ -54,7 +58,7 @@ ${kwds?.offset && kwds.offset >= 0 ? `OFFSET ${kwds.offset}` : ""}
     }
   }
 
-  async conceptsCount(query?: ConceptsQuery): Promise<number> {
+  async conceptsCount(query: ConceptsQuery): Promise<number> {
     return mapResultRowsToCount(
       await this.sparqlClient.query.select(`\
 SELECT (COUNT(DISTINCT ?concept) AS ?count)
@@ -65,10 +69,14 @@ ${this.conceptsQueryToWhereGraphPatterns(query).join("\n")}
     );
   }
 
-  async *conceptSchemes(kwds?: {
-    limit?: number;
-    offset?: number;
-    query?: ConceptSchemesQuery;
+  async *conceptSchemes({
+    limit,
+    offset,
+    query,
+  }: {
+    limit: number | null;
+    offset: number;
+    query: ConceptSchemesQuery;
   }): AsyncGenerator<
     abc.Stub<ConceptT, ConceptSchemeT, LabelT, ConceptSchemeT>
   > {
@@ -76,10 +84,10 @@ ${this.conceptsQueryToWhereGraphPatterns(query).join("\n")}
       await this.sparqlClient.query.select(`\
 SELECT DISTINCT ?conceptScheme
 WHERE {
-${this.conceptSchemesQueryToWhereGraphPatterns(kwds?.query).join("\n")}
+${this.conceptSchemesQueryToWhereGraphPatterns(query).join("\n")}
 }
-${kwds?.limit && kwds.limit > 0 ? `LIMIT ${kwds.limit}` : ""}
-${kwds?.offset && kwds.offset >= 0 ? `OFFSET ${kwds.offset}` : ""}
+${limit !== null && limit > 0 ? `LIMIT ${limit}` : ""}
+${offset !== null && offset >= 0 ? `OFFSET ${offset}` : ""}
 `),
       "conceptScheme",
     )) {
@@ -87,7 +95,7 @@ ${kwds?.offset && kwds.offset >= 0 ? `OFFSET ${kwds.offset}` : ""}
     }
   }
 
-  async conceptSchemesCount(query?: ConceptSchemesQuery): Promise<number> {
+  async conceptSchemesCount(query: ConceptSchemesQuery): Promise<number> {
     return mapResultRowsToCount(
       await this.sparqlClient.query.select(`\
 SELECT (COUNT(DISTINCT ?conceptScheme) AS ?count)
@@ -99,9 +107,9 @@ ${this.conceptSchemesQueryToWhereGraphPatterns(query).join("\n")}
   }
 
   private conceptsQueryToWhereGraphPatterns(
-    query?: ConceptsQuery,
+    query: ConceptsQuery,
   ): readonly string[] {
-    if (!query) {
+    if (query.type === "All") {
       return [Kos.CONCEPT_IDENTIFIER_GRAPH_PATTERN];
     }
 

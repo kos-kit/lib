@@ -62,6 +62,7 @@ export class LunrSearchEngine implements SearchEngine {
       for await (const concept of kos.concepts({
         limit: conceptsLimit,
         offset: 0,
+        query: { type: "All" },
       })) {
         (await concept.resolve()).ifJust((concept) =>
           indexDocuments.push(toIndexDocument(concept, "Concept")),
@@ -69,7 +70,11 @@ export class LunrSearchEngine implements SearchEngine {
       }
     } else {
       // Index all concepts in the set
-      for await (const concept of kos.concepts()) {
+      for await (const concept of kos.concepts({
+        limit: null,
+        offset: 0,
+        query: { type: "All" },
+      })) {
         (await concept.resolve()).ifJust((concept) =>
           indexDocuments.push(toIndexDocument(concept, "Concept")),
         );
@@ -77,7 +82,11 @@ export class LunrSearchEngine implements SearchEngine {
     }
 
     // Index concept schemes
-    for await (const conceptScheme of kos.conceptSchemes()) {
+    for await (const conceptScheme of kos.conceptSchemes({
+      limit: null,
+      offset: 0,
+      query: { type: "All" },
+    })) {
       (await conceptScheme.resolve()).ifJust((conceptScheme) =>
         indexDocuments.push(toIndexDocument(conceptScheme, "ConceptScheme")),
       );
