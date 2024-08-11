@@ -4,6 +4,7 @@ import { ConceptSchemesQuery } from "./ConceptSchemesQuery.js";
 import { ConceptsQuery } from "./ConceptsQuery.js";
 import { Identifier } from "./Identifier.js";
 import { Kos } from "./Kos.js";
+import { LanguageTagSet } from "./LanguageTagSet.js";
 import { Stub } from "./Stub.js";
 
 export class NotImplementedKos implements Kos<any, any, any> {
@@ -33,6 +34,9 @@ export class NotImplementedKos implements Kos<any, any, any> {
     throw new Error("Method not implemented.");
   }
   conceptSchemesCount(_query: ConceptSchemesQuery): Promise<number> {
+    throw new Error("Method not implemented.");
+  }
+  get includeLanguageTags(): LanguageTagSet {
     throw new Error("Method not implemented.");
   }
 }

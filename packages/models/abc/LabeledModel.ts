@@ -1,9 +1,10 @@
+import { Logger } from "pino";
 import { Concept as IConcept } from "../Concept.js";
 import { ConceptScheme as IConceptScheme } from "../ConceptScheme.js";
 import { Identifier } from "../Identifier.js";
+import { Kos } from "../Kos.js";
 import { Label as ILabel } from "../Label.js";
 import { LiteralLabel } from "../LiteralLabel.js";
-import { Kos } from "./Kos.js";
 import { NamedModel } from "./NamedModel.js";
 import { matchLiteral } from "./matchLiteral.js";
 
@@ -13,13 +14,16 @@ export abstract class LabeledModel<
   LabelT extends ILabel,
 > extends NamedModel {
   protected readonly kos: Kos<ConceptT, ConceptSchemeT, LabelT>;
+  protected readonly logger: Logger;
 
   constructor({
     kos,
+    logger,
     ...superParameters
   }: LabeledModel.Parameters<ConceptT, ConceptSchemeT, LabelT>) {
     super(superParameters);
     this.kos = kos;
+    this.logger = logger;
   }
 
   get displayLabel(): string {
@@ -50,10 +54,6 @@ export abstract class LabeledModel<
     return labels;
   }
 
-  protected get logger() {
-    return this.kos.logger;
-  }
-
   protected abstract labelsByType(
     type: ILabel.Type,
   ): readonly (LiteralLabel | LabelT)[];
@@ -66,5 +66,6 @@ export namespace LabeledModel {
     LabelT extends ILabel,
   > extends NamedModel.Parameters {
     kos: Kos<ConceptT, ConceptSchemeT, LabelT>;
+    logger: Logger;
   }
 }

@@ -4,6 +4,7 @@ import { ConceptSchemesQuery } from "./ConceptSchemesQuery.js";
 import { ConceptsQuery } from "./ConceptsQuery.js";
 import { Identifier } from "./Identifier.js";
 import { Label } from "./Label.js";
+import { LanguageTagSet } from "./LanguageTagSet.js";
 import { Stub } from "./Stub.js";
 
 export interface Kos<
@@ -11,6 +12,8 @@ export interface Kos<
   ConceptSchemeT extends ConceptScheme<ConceptT, LabelT>,
   LabelT extends Label,
 > {
+  readonly includeLanguageTags: LanguageTagSet;
+
   conceptByIdentifier(identifier: Identifier): Stub<ConceptT>;
   concepts(kwds: {
     limit: number | null;
