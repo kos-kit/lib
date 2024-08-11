@@ -19,15 +19,17 @@ type Value = Exclude<Quad_Object, Quad | Variable>;
  */
 export class MutableResource<
   IdentifierT extends Resource.Identifier = Resource.Identifier,
+  MutateGraphT extends
+    MutableResource.MutateGraph = MutableResource.MutateGraph,
 > extends Resource<IdentifierT> {
   readonly dataFactory: DataFactory;
-  readonly mutateGraph: MutableResource.MutateGraph;
+  readonly mutateGraph: MutateGraphT;
 
   constructor({
     dataFactory,
     mutateGraph,
     ...resourceParameters
-  }: MutableResource.Parameters<IdentifierT>) {
+  }: MutableResource.Parameters<IdentifierT, MutateGraphT>) {
     super(resourceParameters);
     this.dataFactory = dataFactory;
     this.mutateGraph = mutateGraph;
@@ -95,8 +97,6 @@ export class MutableResource<
 }
 
 export namespace MutableResource {
-  export type MutateGraph = Exclude<Quad_Graph, Variable>;
-
   export interface AddListOptions {
     generateIdentifier?: (
       item: Value,
@@ -105,9 +105,13 @@ export namespace MutableResource {
     rdfType?: NamedNode;
   }
 
-  export interface Parameters<IdentifierT extends Resource.Identifier>
-    extends Resource.Parameters<IdentifierT> {
+  export type MutateGraph = Exclude<Quad_Graph, Variable>;
+
+  export interface Parameters<
+    IdentifierT extends Resource.Identifier,
+    MutateGraphT extends MutateGraph,
+  > extends Resource.Parameters<IdentifierT> {
     dataFactory: DataFactory;
-    mutateGraph: Exclude<Quad_Graph, Variable>;
+    mutateGraph: MutateGraphT;
   }
 }
