@@ -1,4 +1,4 @@
-import { Maybe } from "purify-ts";
+import { Maybe as Maybe_ } from "purify-ts";
 import { NamedModel } from "./NamedModel.js";
 import { Stub } from "./Stub.js";
 
@@ -25,7 +25,7 @@ export namespace Stubs {
      */
     export async function resolve<ModelT extends NamedModel>(
       stubs: readonly Stub<ModelT>[],
-    ): Promise<readonly Maybe<ModelT>[]> {
+    ): Promise<readonly Maybe_<ModelT>[]> {
       return await Promise.all(stubs.map((model) => model.resolve()));
     }
 
@@ -70,10 +70,23 @@ export namespace Stubs {
      */
     export async function* resolve<ModelT extends NamedModel>(
       stubs: AsyncIterable<Stub<ModelT>>,
-    ): AsyncGenerator<Maybe<ModelT>> {
+    ): AsyncGenerator<Maybe_<ModelT>> {
       for await (const stub of stubs) {
         yield stub.resolve();
       }
+    }
+  }
+
+  export namespace Maybe {
+    export async function resolve<ModelT extends NamedModel>(
+      maybeStub: Maybe_<Stub<ModelT>>,
+    ): Promise<Maybe_<ModelT>> {
+      const stub = maybeStub.extractNullable();
+      if (stub === null) {
+        return Maybe_.empty();
+      }
+
+      return await stub.resolve();
     }
   }
 }
