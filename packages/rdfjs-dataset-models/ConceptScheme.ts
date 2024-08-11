@@ -71,7 +71,9 @@ export class ConceptScheme<
   }
 
   get modified(): Maybe<Literal> {
-    return this.resource.value(dcterms.modified).toLiteral();
+    return this.resource
+      .value(dcterms.modified)
+      .chain((value) => value.toLiteral());
   }
 
   get rights(): Maybe<Literal> {
