@@ -6,7 +6,7 @@ import { termToString } from "./termToString.js";
 
 export class ConstructQueryBuilder {
   private graphPatterns: GraphPattern[] = [];
-  private includeLanguageTags: LanguageTagSet;
+  private readonly includeLanguageTags: LanguageTagSet;
   private values: [
     GraphPatternVariable,
     (Literal | BlankNode | NamedNode)[],

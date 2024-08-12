@@ -9,7 +9,7 @@ import {
 } from "@kos-kit/models";
 import { skos } from "@tpluscode/rdf-ns-builders";
 import { GraphPattern } from "./GraphPattern.js";
-import { IndentedString } from "./IndentedString";
+import { IndentedString } from "./IndentedString.js";
 import { SparqlClient } from "./SparqlClient.js";
 import { mapResultRowsToCount } from "./mapResultRowsToCount.js";
 import { mapResultRowsToIdentifiers } from "./mapResultRowsToIdentifiers.js";
