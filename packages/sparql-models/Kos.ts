@@ -109,7 +109,6 @@ ${this.conceptSchemesQueryToWhereGraphPatterns(query).join("\n")}
     if (query.type === "All") {
       return GraphPattern.toWhereIndentedStrings(
         GraphPattern.rdfType({
-          optional: false,
           rdfType: skos.Concept,
           subject: {
             termType: "Variable",
@@ -138,7 +137,7 @@ ${this.conceptSchemesQueryToWhereGraphPatterns(query).join("\n")}
         } else {
           whereGraphPatterns.push(
             // skos:inScheme has an open domain, so we have to check the concept's rdf:type
-            `{ ?concept <${skos.inScheme.value}> ${conceptSchemeIdentifierString} . ${GraphPattern.toWhereString(GraphPattern.rdfType({ optional: false, rdfType: skos.Concept, subject: { termType: "Variable", value: "concept" } }))} }`,
+            `{ ?concept <${skos.inScheme.value}> ${conceptSchemeIdentifierString} . ${GraphPattern.toWhereString(GraphPattern.rdfType({ rdfType: skos.Concept, subject: { termType: "Variable", value: "concept" } }))} }`,
             "UNION",
           );
         }
@@ -178,7 +177,6 @@ ${this.conceptSchemesQueryToWhereGraphPatterns(query).join("\n")}
     const whereGraphPatterns: string[] = [
       GraphPattern.toWhereString(
         GraphPattern.rdfType({
-          optional: false,
           rdfType: skos.ConceptScheme,
           subject: { termType: "Variable", value: "conceptScheme" },
         }),
@@ -204,7 +202,6 @@ ${this.conceptSchemesQueryToWhereGraphPatterns(query).join("\n")}
           // skos:inScheme has an open domain, so we have to check the concept's rdf:type
           `{ ?concept <${skos.inScheme.value}> ?conceptScheme . ${GraphPattern.toWhereString(
             GraphPattern.rdfType({
-              optional: false,
               rdfType: skos.Concept,
               subject: { termType: "Variable", value: "concept" },
             }),

@@ -20,7 +20,7 @@ type NamedNode = Omit<rdfjs.NamedNode, "equals">;
 
 export interface GraphPattern {
   object: GraphPatternObject;
-  optional: boolean;
+  optional?: boolean;
   predicate: GraphPatternPredicate;
   subGraphPatterns?: readonly GraphPattern[];
   // For ?label ?license ...
@@ -89,7 +89,7 @@ export namespace GraphPattern {
     rdfType,
     subject,
   }: {
-    optional: boolean;
+    optional?: boolean;
     rdfType: NamedNode;
     subject: GraphPatternSubject;
   }): GraphPattern {

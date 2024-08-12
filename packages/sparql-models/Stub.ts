@@ -92,7 +92,6 @@ export abstract class Stub<
               termType: "Variable",
               value: `${variablePrefix + variableName}LiteralForm`,
             },
-            optional: false,
           },
         ]),
       });
