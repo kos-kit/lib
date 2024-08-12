@@ -7,7 +7,9 @@ import {
   Identifier,
   abc,
 } from "@kos-kit/models";
-import { rdf, rdfs, skos } from "@tpluscode/rdf-ns-builders";
+import { skos } from "@tpluscode/rdf-ns-builders";
+import { GraphPattern } from "./GraphPattern.js";
+import { IndentedString } from "./IndentedString";
 import { SparqlClient } from "./SparqlClient.js";
 import { mapResultRowsToCount } from "./mapResultRowsToCount.js";
 import { mapResultRowsToIdentifiers } from "./mapResultRowsToIdentifiers.js";
@@ -17,11 +19,6 @@ export abstract class Kos<
   ConceptSchemeT extends IConceptScheme<ConceptT, LabelT>,
   LabelT extends ILabel,
 > extends abc.Kos<ConceptT, ConceptSchemeT, LabelT> {
-  private static readonly CONCEPT_IDENTIFIER_GRAPH_PATTERN =
-    `?concept <${rdf.type.value}>/<${rdfs.subClassOf.value}>* <${skos.Concept.value}> .`;
-  private static readonly CONCEPT_SCHEME_IDENTIFIER_GRAPH_PATTERN =
-    `?conceptScheme <${rdf.type.value}>/<${rdfs.subClassOf.value}>* <${skos.ConceptScheme.value}> .`;
-
   protected readonly sparqlClient: SparqlClient;
 
   constructor({
@@ -110,7 +107,17 @@ ${this.conceptSchemesQueryToWhereGraphPatterns(query).join("\n")}
     query: ConceptsQuery,
   ): readonly string[] {
     if (query.type === "All") {
-      return [Kos.CONCEPT_IDENTIFIER_GRAPH_PATTERN];
+      return GraphPattern.toWhereIndentedStrings(
+        GraphPattern.rdfType({
+          optional: false,
+          rdfType: skos.Concept,
+          subject: {
+            termType: "Variable",
+            value: "concept",
+          },
+        }),
+        0,
+      ).map(IndentedString.toString);
     }
 
     if (query.type === "InScheme" || query.type === "TopConceptOf") {
@@ -131,7 +138,7 @@ ${this.conceptSchemesQueryToWhereGraphPatterns(query).join("\n")}
         } else {
           whereGraphPatterns.push(
             // skos:inScheme has an open domain, so we have to check the concept's rdf:type
-            `{ ?concept <${skos.inScheme.value}> ${conceptSchemeIdentifierString} . ${Kos.CONCEPT_IDENTIFIER_GRAPH_PATTERN} }`,
+            `{ ?concept <${skos.inScheme.value}> ${conceptSchemeIdentifierString} . ${GraphPattern.toWhereString(GraphPattern.rdfType({ optional: false, rdfType: skos.Concept, subject: { termType: "Variable", value: "concept" } }))} }`,
             "UNION",
           );
         }
@@ -169,7 +176,13 @@ ${this.conceptSchemesQueryToWhereGraphPatterns(query).join("\n")}
     query?: ConceptSchemesQuery,
   ): string[] {
     const whereGraphPatterns: string[] = [
-      Kos.CONCEPT_SCHEME_IDENTIFIER_GRAPH_PATTERN,
+      GraphPattern.toWhereString(
+        GraphPattern.rdfType({
+          optional: false,
+          rdfType: skos.ConceptScheme,
+          subject: { termType: "Variable", value: "conceptScheme" },
+        }),
+      ),
     ];
 
     if (!query) {
@@ -189,7 +202,13 @@ ${this.conceptSchemesQueryToWhereGraphPatterns(query).join("\n")}
         whereGraphPatterns.push(
           "UNION",
           // skos:inScheme has an open domain, so we have to check the concept's rdf:type
-          `{ ?concept <${skos.inScheme.value}> ?conceptScheme . ${Kos.CONCEPT_IDENTIFIER_GRAPH_PATTERN} }`,
+          `{ ?concept <${skos.inScheme.value}> ?conceptScheme . ${GraphPattern.toWhereString(
+            GraphPattern.rdfType({
+              optional: false,
+              rdfType: skos.Concept,
+              subject: { termType: "Variable", value: "concept" },
+            }),
+          )} }`,
         );
       }
     }
