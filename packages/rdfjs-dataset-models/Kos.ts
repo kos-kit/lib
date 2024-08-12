@@ -73,9 +73,9 @@ function isConceptTopConceptOf({
 
 function* limitGenerator<T>(
   generator: Generator<T>,
-  limit: number,
+  limit: number | null,
 ): Generator<T> {
-  if (limit <= 0) {
+  if (limit === null || limit <= 0) {
     yield* generator;
     return;
   }
@@ -118,42 +118,42 @@ export abstract class Kos<
     this.dataset = dataset;
   }
 
-  async *concepts(kwds?: {
-    limit?: number;
-    offset?: number;
-    query?: ConceptsQuery;
+  async *concepts({
+    limit,
+    offset,
+    query,
+  }: {
+    limit: number | null;
+    offset: number;
+    query: ConceptsQuery;
   }): AsyncGenerator<abc.ConceptStub<ConceptT, ConceptSchemeT, LabelT>> {
-    let concepts = this.queryConcepts(kwds?.query);
-    if (kwds?.offset) {
-      concepts = offsetGenerator(concepts, kwds.offset);
-    }
-    if (kwds?.limit) {
-      concepts = limitGenerator(concepts, kwds.limit);
-    }
-    yield* concepts;
+    yield* limitGenerator(
+      offsetGenerator(this.queryConcepts(query), offset),
+      limit,
+    );
   }
 
-  override async conceptsCount(query?: ConceptsQuery): Promise<number> {
+  override async conceptsCount(query: ConceptsQuery): Promise<number> {
     return this.queryConcepts(query).count();
   }
 
-  async *conceptSchemes(kwds?: {
-    limit?: number;
-    offset?: number;
-    query?: ConceptSchemesQuery;
+  async *conceptSchemes({
+    limit,
+    offset,
+    query,
+  }: {
+    limit: number | null;
+    offset: number;
+    query: ConceptSchemesQuery;
   }): AsyncGenerator<abc.ConceptSchemeStub<ConceptT, ConceptSchemeT, LabelT>> {
-    let conceptSchemes = this.queryConceptSchemes(kwds?.query);
-    if (kwds?.offset) {
-      conceptSchemes = offsetGenerator(conceptSchemes, kwds.offset);
-    }
-    if (kwds?.limit) {
-      conceptSchemes = limitGenerator(conceptSchemes, kwds.limit);
-    }
-    yield* conceptSchemes;
+    yield* limitGenerator(
+      offsetGenerator(this.queryConceptSchemes(query), offset),
+      limit,
+    );
   }
 
   override async conceptSchemesCount(
-    query?: ConceptSchemesQuery,
+    query: ConceptSchemesQuery,
   ): Promise<number> {
     return this.queryConceptSchemes(query).count();
   }
@@ -172,9 +172,9 @@ export abstract class Kos<
   }
 
   private *queryConcepts(
-    query?: ConceptsQuery,
+    query: ConceptsQuery,
   ): Generator<abc.ConceptStub<ConceptT, ConceptSchemeT, LabelT>> {
-    if (!query) {
+    if (query.type === "All") {
       for (const identifier of getRdfInstances({
         class_: skos.Concept,
         dataset: this.dataset,
@@ -294,9 +294,9 @@ export abstract class Kos<
   }
 
   private *queryConceptSchemes(
-    query?: ConceptSchemesQuery,
+    query: ConceptSchemesQuery,
   ): Generator<abc.ConceptSchemeStub<ConceptT, ConceptSchemeT, LabelT>> {
-    if (!query) {
+    if (query.type === "All") {
       yield* this.allConceptSchemes();
       return;
     }

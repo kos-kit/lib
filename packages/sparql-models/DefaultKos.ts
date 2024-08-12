@@ -30,12 +30,14 @@ export class DefaultKos extends Kos<
     return new ConceptStub({
       identifier,
       kos: this,
+      logger: this.logger,
       modelFactory: ({ dataset, identifier }) =>
         new DefaultConcept({
           dataset,
           identifier,
           kos: this,
           labelConstructor: Label,
+          logger: this.logger,
         }),
       sparqlClient: this.sparqlClient,
     });
@@ -52,12 +54,14 @@ export class DefaultKos extends Kos<
     return new ConceptSchemeStub({
       identifier,
       kos: this,
+      logger: this.logger,
       modelFactory: ({ dataset, identifier }) =>
         new DefaultConceptScheme({
           dataset,
           identifier,
           kos: this,
           labelConstructor: Label,
+          logger: this.logger,
         }),
       sparqlClient: this.sparqlClient,
     });

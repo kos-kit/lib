@@ -42,8 +42,8 @@ describe("MutableResource", () => {
     expect(dataset.size).toStrictEqual(1);
     resource.set(predicate, objects["intLiteral"]);
     expect(dataset.size).toStrictEqual(1);
-    const values = [...resource.values(predicate)].flatMap((value) =>
-      value.toTerm().toList(),
+    const values = [...resource.values(predicate)].map((value) =>
+      value.toTerm(),
     );
     expect(values).toHaveLength(1);
     expect(values[0].equals(objects["intLiteral"])).toBe(true);

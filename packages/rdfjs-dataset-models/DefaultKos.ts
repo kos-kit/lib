@@ -31,12 +31,14 @@ export class DefaultKos extends Kos<
     return new Stub({
       dataset: this.dataset,
       identifier,
+      logger: this.logger,
       modelFactory: (identifier) =>
         new DefaultConcept({
           dataset: this.dataset,
           identifier,
           kos: this,
           labelConstructor: Label,
+          logger: this.logger,
         }),
       modelRdfType: skos.Concept,
       kos: this,
@@ -54,12 +56,14 @@ export class DefaultKos extends Kos<
     return new Stub({
       dataset: this.dataset,
       identifier,
+      logger: this.logger,
       modelFactory: (identifier) =>
         new DefaultConceptScheme({
           dataset: this.dataset,
           identifier,
           kos: this,
           labelConstructor: Label,
+          logger: this.logger,
         }),
       modelRdfType: skos.ConceptScheme,
       kos: this,

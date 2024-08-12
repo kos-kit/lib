@@ -3,6 +3,10 @@ import { SemanticRelationProperty } from "./SemanticRelationProperty.js";
 
 export type ConceptsQuery =
   | {
+      // All concepts
+      readonly type: "All";
+    }
+  | {
       // Concepts that are in the given concept scheme
       // If conceptIdentifier is supplied, only check if it's in the given concept scheme
       readonly conceptIdentifier?: Identifier;

@@ -46,7 +46,11 @@ export class ServerSearchEngine implements SearchEngine {
 
     const page: SearchResult[] = [];
 
-    for await (const concept of kos.concepts()) {
+    for await (const concept of kos.concepts({
+      limit: null,
+      offset: 0,
+      query: { type: "All" },
+    })) {
       (await concept.resolve()).ifJust((concept) => {
         const prefLabels = concept.labels(Label.Type.PREFERRED);
         if (prefLabels.length === 0) {
@@ -60,7 +64,11 @@ export class ServerSearchEngine implements SearchEngine {
       });
     }
 
-    for await (const conceptScheme of kos.conceptSchemes()) {
+    for await (const conceptScheme of kos.conceptSchemes({
+      limit: null,
+      offset: 0,
+      query: { type: "All" },
+    })) {
       (await conceptScheme.resolve()).ifJust((conceptScheme) => {
         const prefLabels = conceptScheme.labels(Label.Type.PREFERRED);
         if (prefLabels.length === 0) {

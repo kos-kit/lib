@@ -3,11 +3,11 @@ import {
   ConceptScheme as IConceptScheme,
   Label as ILabel,
   Identifier,
+  Stub,
 } from "@kos-kit/models";
 import { Literal, NamedNode } from "@rdfjs/types";
 import { Maybe } from "purify-ts";
 import { Arrays } from "purify-ts-helpers";
-import { ConceptStub } from "./ConceptStub.js";
 import { LabeledModel } from "./LabeledModel.js";
 
 export abstract class ConceptScheme<
@@ -25,9 +25,10 @@ export abstract class ConceptScheme<
 
   async conceptByIdentifier(
     identifier: Identifier,
-  ): Promise<Maybe<ConceptStub<ConceptT, ConceptSchemeT, LabelT>>> {
+  ): Promise<Maybe<Stub<ConceptT>>> {
     for await (const conceptStub of this.kos.concepts({
       limit: 1,
+      offset: 0,
       query: {
         conceptIdentifier: identifier,
         conceptSchemeIdentifier: this.identifier,
@@ -45,9 +46,11 @@ export abstract class ConceptScheme<
   }
 
   async *concepts(kwds?: { limit?: number; offset?: number }): AsyncGenerator<
-    ConceptStub<ConceptT, ConceptSchemeT, LabelT>
+    Stub<ConceptT>
   > {
     yield* this.kos.concepts({
+      limit: null,
+      offset: 0,
       query: { conceptSchemeIdentifier: this.identifier, type: "InScheme" },
       ...kwds,
     });
@@ -71,8 +74,10 @@ export abstract class ConceptScheme<
   async *topConcepts(kwds?: {
     limit?: number;
     offset?: number;
-  }): AsyncGenerator<ConceptStub<ConceptT, ConceptSchemeT, LabelT>> {
+  }): AsyncGenerator<Stub<ConceptT>> {
     yield* this.kos.concepts({
+      limit: null,
+      offset: 0,
       query: { conceptSchemeIdentifier: this.identifier, type: "TopConceptOf" },
       ...kwds,
     });

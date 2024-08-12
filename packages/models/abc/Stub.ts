@@ -1,3 +1,4 @@
+import { Logger } from "pino";
 import { Maybe } from "purify-ts";
 import {
   Concept as IConcept,
@@ -5,8 +6,8 @@ import {
   Label as ILabel,
   Stub as IStub,
   Identifier,
+  Kos,
 } from "../index.js";
-import { Kos } from "./Kos.js";
 import { NamedModel } from "./NamedModel.js";
 
 export abstract class Stub<
@@ -19,13 +20,16 @@ export abstract class Stub<
   implements IStub<ModelT>
 {
   protected readonly kos: Kos<ConceptT, ConceptSchemeT, LabelT>;
+  protected readonly logger: Logger;
 
   protected constructor({
     kos,
+    logger,
     ...superParameters
   }: Stub.Parameters<ConceptT, ConceptSchemeT, LabelT>) {
     super(superParameters);
     this.kos = kos;
+    this.logger = logger;
   }
 
   get displayLabel() {
@@ -34,10 +38,6 @@ export abstract class Stub<
 
   equals(other: IStub<ModelT>): boolean {
     return Stub.equals(this, other);
-  }
-
-  protected get logger() {
-    return this.kos.logger;
   }
 
   abstract resolve(): Promise<Maybe<ModelT>>;
@@ -69,5 +69,6 @@ export namespace Stub {
     LabelT extends ILabel,
   > extends NamedModel.Parameters {
     kos: Kos<ConceptT, ConceptSchemeT, LabelT>;
+    logger: Logger;
   }
 }

@@ -34,7 +34,6 @@ describe("Resource", () => {
     expect(
       resource
         .value(DataFactory.namedNode("http://example.com/nonexistent"))
-        .toTerm()
         .extract(),
     ).toBeUndefined();
   });
@@ -50,8 +49,8 @@ describe("Resource", () => {
   });
 
   it("should get a value (filtered)", () => {
-    const value = resource.value(predicate, (value) => value.isIri());
-    expect(value.isIri()).toBe(true);
+    const value = resource.value(predicate, (value) => value.isIri()).extract();
+    expect(value?.isIri()).toBe(true);
   });
 
   it("should get all values", () => {
@@ -59,7 +58,7 @@ describe("Resource", () => {
     expect(values).toHaveLength(Object.keys(objects).length);
     for (const object of Object.values(objects)) {
       expect(
-        values.find((value) => value.toTerm().extract()?.equals(object)),
+        values.find((value) => value.toTerm().equals(object)),
       ).toBeDefined();
     }
   });
@@ -100,7 +99,8 @@ describe("Resource", () => {
         resourceValue
           .valueOf(predicate)
           .unsafeCoerce()
-          .identifier.equals(resource.identifier),
+          .toIdentifier()
+          .equals(resource.identifier),
       ).toBe(true);
     }
   });
@@ -113,7 +113,7 @@ describe("Resource", () => {
     for (const resourceValue of resourceValues) {
       const valuesOf = [...resourceValue.valuesOf(predicate)];
       expect(valuesOf).toHaveLength(1);
-      expect(valuesOf[0].identifier.equals(resource.identifier)).toBe(true);
+      expect(valuesOf[0].toIdentifier().equals(resource.identifier)).toBe(true);
     }
   });
 });

@@ -4,6 +4,7 @@ import { ConceptSchemesQuery } from "./ConceptSchemesQuery.js";
 import { ConceptsQuery } from "./ConceptsQuery.js";
 import { Identifier } from "./Identifier.js";
 import { Label } from "./Label.js";
+import { LanguageTagSet } from "./LanguageTagSet.js";
 import { Stub } from "./Stub.js";
 
 export interface Kos<
@@ -11,19 +12,21 @@ export interface Kos<
   ConceptSchemeT extends ConceptScheme<ConceptT, LabelT>,
   LabelT extends Label,
 > {
+  readonly includeLanguageTags: LanguageTagSet;
+
   conceptByIdentifier(identifier: Identifier): Stub<ConceptT>;
-  concepts(kwds?: {
-    limit?: number;
-    offset?: number;
-    query?: ConceptsQuery;
+  concepts(kwds: {
+    limit: number | null;
+    offset: number;
+    query: ConceptsQuery;
   }): AsyncGenerator<Stub<ConceptT>>;
-  conceptsCount(query?: ConceptsQuery): Promise<number>;
+  conceptsCount(query: ConceptsQuery): Promise<number>;
 
   conceptSchemeByIdentifier(identifier: Identifier): Stub<ConceptSchemeT>;
-  conceptSchemes(kwds?: {
-    limit?: number;
-    offset?: number;
-    query?: ConceptSchemesQuery;
+  conceptSchemes(kwds: {
+    limit: number | null;
+    offset: number;
+    query: ConceptSchemesQuery;
   }): AsyncGenerator<Stub<ConceptSchemeT>>;
-  conceptSchemesCount(query?: ConceptSchemesQuery): Promise<number>;
+  conceptSchemesCount(query: ConceptSchemesQuery): Promise<number>;
 }

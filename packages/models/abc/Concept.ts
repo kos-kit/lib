@@ -5,15 +5,14 @@ import {
   Identifier,
   NoteProperty,
   SemanticRelationProperty,
+  Stub,
   inverseSemanticRelationProperty,
 } from "@kos-kit/models";
 import TermSet from "@rdfjs/term-set";
 import { Literal } from "@rdfjs/types";
 import { Maybe } from "purify-ts";
 import { Arrays } from "purify-ts-helpers";
-import { ConceptStub } from "./ConceptStub.js";
 import { LabeledModel } from "./LabeledModel.js";
-import { Stub } from "./Stub.js";
 
 export abstract class Concept<
     ConceptT extends IConcept<ConceptT, ConceptSchemeT, LabelT>,
@@ -29,10 +28,10 @@ export abstract class Concept<
     return Concept.equals(this, other);
   }
 
-  async *inSchemes(): AsyncGenerator<
-    Stub<ConceptT, ConceptSchemeT, LabelT, ConceptSchemeT>
-  > {
+  async *inSchemes(): AsyncGenerator<Stub<ConceptSchemeT>> {
     yield* this.kos.conceptSchemes({
+      limit: null,
+      offset: 0,
       query: { conceptIdentifier: this.identifier, type: "HasConcept" },
     });
   }
@@ -44,10 +43,12 @@ export abstract class Concept<
   async *semanticRelations(
     property: SemanticRelationProperty,
     options?: { includeInverse?: false },
-  ): AsyncGenerator<ConceptStub<ConceptT, ConceptSchemeT, LabelT>> {
+  ): AsyncGenerator<Stub<ConceptT>> {
     const yieldedConceptIdentifiers = new TermSet<Identifier>();
 
     for await (const conceptStub of this.kos.concepts({
+      limit: null,
+      offset: 0,
       query: {
         semanticRelationProperty: property,
         subjectConceptIdentifier: this.identifier,
@@ -65,6 +66,8 @@ export abstract class Concept<
         inverseSemanticRelationProperty(property).extractNullable();
       if (inverseProperty !== null) {
         for await (const conceptStub of this.kos.concepts({
+          limit: null,
+          offset: 0,
           query: {
             objectConceptIdentifier: this.identifier,
             semanticRelationProperty: inverseProperty,
@@ -90,10 +93,10 @@ export abstract class Concept<
     });
   }
 
-  async *topConceptOf(): AsyncGenerator<
-    Stub<ConceptT, ConceptSchemeT, LabelT, ConceptSchemeT>
-  > {
+  async *topConceptOf(): AsyncGenerator<Stub<ConceptSchemeT>> {
     yield* this.kos.conceptSchemes({
+      limit: null,
+      offset: 0,
       query: { conceptIdentifier: this.identifier, type: "HasTopConcept" },
     });
   }
