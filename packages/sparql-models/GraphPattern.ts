@@ -84,6 +84,20 @@ export namespace GraphPattern {
     }
   }
 
+  export function fromTriple(
+    subject: GraphPatternSubject,
+    predicate: GraphPatternPredicate,
+    object: GraphPatternObject,
+    options?: Omit<GraphPattern, "object" | "predicate" | "subject">,
+  ): GraphPattern {
+    return {
+      object,
+      predicate,
+      subject,
+      ...options,
+    };
+  }
+
   export function rdfType({
     optional,
     rdfType,
