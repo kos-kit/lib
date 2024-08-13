@@ -1,5 +1,4 @@
-import { DatasetCore } from "@rdfjs/types";
-import { ResultRow } from "sparql-http-client/ResultParser";
+import { DatasetCore, Term } from "@rdfjs/types";
 
 export interface SparqlClient {
   readonly query: SparqlClient.Query;
@@ -10,7 +9,7 @@ export namespace SparqlClient {
   export interface Query {
     ask(query: string): Promise<boolean>;
     construct(query: string): Promise<DatasetCore>;
-    select(query: string): Promise<readonly ResultRow[]>;
+    select(query: string): Promise<readonly Record<string, Term>[]>;
   }
 
   export interface Update {

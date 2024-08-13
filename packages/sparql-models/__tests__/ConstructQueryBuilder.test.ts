@@ -25,7 +25,6 @@ describe("ConstructQueryBuilder", () => {
           subject,
           predicate,
           object,
-          optional: false,
         })
         .build(),
     ).toStrictEqual(`\
@@ -65,7 +64,6 @@ CONSTRUCT {
           subject,
           predicate,
           object: { ...object, plainLiteral: true },
-          optional: false,
         })
         .build(),
     ).toStrictEqual(`\

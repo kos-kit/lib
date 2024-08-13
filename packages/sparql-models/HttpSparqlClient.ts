@@ -1,5 +1,5 @@
 import { QueryOptions } from "sparql-http-client";
-import Delegate, { Options } from "sparql-http-client/ParsingClient";
+import Delegate, { Options } from "sparql-http-client/ParsingClient.js";
 import { SparqlClient } from "./SparqlClient.js";
 
 export class HttpSparqlClient implements SparqlClient {
