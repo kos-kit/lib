@@ -47,7 +47,7 @@ WHERE {
 ${this.conceptsQueryToWhereGraphPatterns(query).join("\n")}
 }
 ${limit !== null && limit > 0 ? `LIMIT ${limit}` : ""}
-${offset >= 0 ? `OFFSET ${offset}` : ""}
+${offset > 0 ? `OFFSET ${offset}` : ""}
 `),
       "concept",
     )) {
@@ -84,7 +84,7 @@ WHERE {
 ${this.conceptSchemesQueryToWhereGraphPatterns(query).join("\n")}
 }
 ${limit !== null && limit > 0 ? `LIMIT ${limit}` : ""}
-${offset !== null && offset >= 0 ? `OFFSET ${offset}` : ""}
+${offset > 0 ? `OFFSET ${offset}` : ""}
 `),
       "conceptScheme",
     )) {
