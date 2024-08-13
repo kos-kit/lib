@@ -5,13 +5,8 @@ export function termToString(
     | Omit<BlankNode, "equals">
     | Omit<Literal, "equals">
     | Omit<NamedNode, "equals">
-    | Omit<Variable, "equals">
-    | string,
+    | Omit<Variable, "equals">,
 ): string {
-  if (typeof term === "string") {
-    return term;
-  }
-
   switch (term.termType) {
     case "BlankNode":
       return `_:${term.value}`;
