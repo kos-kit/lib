@@ -33,6 +33,8 @@ export const testKosFactory = (includeLanguageTag: LanguageTag) => {
     datasetCoreFactoryConstructor: N3DatasetCoreFactory,
     queryEndpointUrl: "http://localhost:7878/sparql",
     operation: "postDirect",
+    storeEndpointUrl: null,
+    updateEndpointUrl: null,
   });
   // const store = new Store();
   // store.load(

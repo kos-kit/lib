@@ -2,7 +2,8 @@ import { DatasetCore, Quad_Graph, Stream, Term } from "@rdfjs/types";
 
 export interface SparqlClient {
   readonly query: SparqlClient.Query;
-  readonly update: SparqlClient.Update;
+  readonly store: SparqlClient.Store | null;
+  readonly update: SparqlClient.Update | null;
 }
 
 export namespace SparqlClient {
