@@ -2,10 +2,10 @@ import fs from "node:fs";
 import { Readable } from "node:stream";
 import zlib from "node:zlib";
 import { DataFactory, DatasetCore } from "@rdfjs/types";
-import { JsonLdParser } from "jsonld-streaming-parser";
-import N3 from "n3";
 import bz2 from "unbzip2-stream";
 import { RdfFileFormat } from "./RdfFileFormat.js";
+import { parseJsonLdStream } from "./parseJsonLdStream.js";
+import { parseN3Stream } from "./parseN3Stream.js";
 
 export async function parseRdfFile({
   dataFactory,
@@ -36,20 +36,20 @@ export async function parseRdfFile({
 
   switch (rdfFileFormat.rdfFormat) {
     case "application/ld+json":
-      await parseJsonLdFile({
+      await parseJsonLdStream({
         dataFactory,
         dataset,
-        rdfFileStream,
+        jsonLdStream: rdfFileStream,
       });
       break;
     case "application/n-quads":
     case "application/n-triples":
     case "application/trig":
     case "text/turtle":
-      await parseN3File({
+      await parseN3Stream({
         dataFactory,
         dataset,
-        rdfFileStream,
+        n3Stream: rdfFileStream,
       });
       break;
     case "application/rdf+xml":
@@ -57,50 +57,4 @@ export async function parseRdfFile({
   }
 
   return dataset;
-}
-
-async function parseJsonLdFile({
-  dataFactory,
-  dataset,
-  rdfFileStream,
-}: {
-  dataFactory: DataFactory;
-  dataset: DatasetCore;
-  rdfFileStream: Readable;
-}): Promise<void> {
-  return new Promise((resolve, reject) => {
-    const streamParser = new JsonLdParser({ dataFactory });
-    streamParser.on("data", (quad) => {
-      dataset.add(quad);
-    });
-    streamParser.on("error", reject);
-    streamParser.on("end", () => {
-      resolve();
-    });
-    streamParser.on("error", reject);
-    rdfFileStream.pipe(streamParser);
-  });
-}
-
-async function parseN3File({
-  dataFactory,
-  dataset,
-  rdfFileStream,
-}: {
-  dataFactory: DataFactory;
-  dataset: DatasetCore;
-  rdfFileStream: Readable;
-}): Promise<void> {
-  return new Promise((resolve, reject) => {
-    const streamParser = new N3.StreamParser({ factory: dataFactory });
-    streamParser.on("data", (quad) => {
-      dataset.add(quad);
-    });
-    streamParser.on("error", reject);
-    streamParser.on("end", () => {
-      resolve();
-    });
-    streamParser.on("error", reject);
-    rdfFileStream.pipe(streamParser);
-  });
 }
