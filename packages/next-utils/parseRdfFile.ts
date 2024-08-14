@@ -34,44 +34,6 @@ export async function parseRdfFile({
     }
   }
 
-  // let addQuad: (quad: Quad) => void;
-  // if (graph) {
-  //   switch (rdfFileFormat.rdfFormat) {
-  //     case "application/n-triples":
-  //     case "text/turtle":
-  //       // Triple formats, always override the graph
-  //       addQuad = (quad) =>
-  //         dataset.add(
-  //           dataFactory.quad(quad.subject, quad.predicate, quad.object, graph),
-  //         );
-  //       break;
-  //     case "application/ld+json":
-  //     case "application/n-quads":
-  //     case "application/trig":
-  //       // Quad formats, override the graph if the parsed quad is in the default graph
-  //       addQuad = (quad) => {
-  //         if (quad.graph.termType === "DefaultGraph") {
-  //           dataset.add(
-  //             dataFactory.quad(
-  //               quad.subject,
-  //               quad.predicate,
-  //               quad.object,
-  //               graph,
-  //             ),
-  //           );
-  //         } else {
-  //           // Add the quad as-is.
-  //           dataset.add(quad);
-  //         }
-  //       };
-  //       break;
-  //     case "application/rdf+xml":
-  //       throw new Error(`format not supported: ${rdfFileFormat.rdfFormat}`);
-  //   }
-  // } else {
-  //   addQuad = (quad) => dataset.add(quad);
-  // }
-
   switch (rdfFileFormat.rdfFormat) {
     case "application/ld+json":
       await parseJsonLdFile({
