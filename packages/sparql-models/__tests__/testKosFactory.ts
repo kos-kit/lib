@@ -30,7 +30,7 @@ export const testKosFactory = (includeLanguageTag: LanguageTag) => {
   const includeLanguageTags = new LanguageTagSet(includeLanguageTag, "");
   const sparqlClient = new HttpSparqlClient({
     dataFactoryConstructor: N3DataFactory,
-    datasetFactoryConstructor: N3DatasetCoreFactory,
+    datasetCoreFactoryConstructor: N3DatasetCoreFactory,
     queryEndpointUrl: "http://localhost:7878/sparql",
     operation: "postDirect",
   });

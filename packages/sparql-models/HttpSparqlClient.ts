@@ -18,21 +18,21 @@ export class HttpSparqlClient implements SparqlClient {
 
   constructor({
     dataFactoryConstructor,
-    datasetFactoryConstructor,
+    datasetCoreFactoryConstructor,
     queryEndpointUrl,
     storeEndpointUrl,
     updateEndpointUrl,
     ...queryOptions
   }: {
     dataFactoryConstructor: new () => DataFactory;
-    datasetFactoryConstructor: new () => DatasetCoreFactory;
+    datasetCoreFactoryConstructor: new () => DatasetCoreFactory;
     queryEndpointUrl: string;
     storeEndpointUrl?: string;
     updateEndpointUrl?: string;
   } & QueryOptions) {
     const factory = new Environment([
       dataFactoryConstructor,
-      datasetFactoryConstructor,
+      datasetCoreFactoryConstructor,
     ]);
     this.queryDelegate = new ParsingDelegate({
       endpointUrl: queryEndpointUrl,
