@@ -3,6 +3,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { DataFactory, Store } from "n3";
 import { describe, expect, it } from "vitest";
+import { getRdfFileFormat } from "../getRdfFileFormat";
 import { parseRdfFile } from "../parseRdfFile.js";
 
 describe("parseRdfFile", () => {
@@ -15,13 +16,15 @@ describe("parseRdfFile", () => {
     "data",
   );
   for (const fileName of fs.readdirSync(testDataDirPath)) {
+    const rdfFilePath = path.resolve(testDataDirPath, fileName);
     if (fileName.startsWith("unesco-thesaurus")) {
       it(`should parse ${fileName}`, async () => {
         const dataset = new Store();
         await parseRdfFile({
           dataFactory: DataFactory,
           dataset,
-          rdfFilePath: path.resolve(testDataDirPath, fileName),
+          rdfFileFormat: getRdfFileFormat(rdfFilePath).unsafeCoerce(),
+          rdfFilePath,
         });
         expect(dataset.size).toBe(88482);
       });
@@ -31,7 +34,8 @@ describe("parseRdfFile", () => {
         await parseRdfFile({
           dataFactory: DataFactory,
           dataset,
-          rdfFilePath: path.resolve(testDataDirPath, fileName),
+          rdfFileFormat: getRdfFileFormat(rdfFilePath).unsafeCoerce(),
+          rdfFilePath,
         });
         expect(dataset.size).toBe(6);
       });
