@@ -1,8 +1,9 @@
-import { DatasetCore, Term } from "@rdfjs/types";
+import { DatasetCore, Quad_Graph, Stream, Term } from "@rdfjs/types";
 
 export interface SparqlClient {
   readonly query: SparqlClient.Query;
-  readonly update: SparqlClient.Update;
+  readonly store: SparqlClient.Store | null;
+  readonly update: SparqlClient.Update | null;
 }
 
 export namespace SparqlClient {
@@ -10,6 +11,11 @@ export namespace SparqlClient {
     ask(query: string): Promise<boolean>;
     construct(query: string): Promise<DatasetCore>;
     select(query: string): Promise<readonly Record<string, Term>[]>;
+  }
+
+  export interface Store {
+    post(stream: Stream, options?: { graph?: Quad_Graph }): Promise<void>;
+    put(stream: Stream, options?: { graph?: Quad_Graph }): Promise<void>;
   }
 
   export interface Update {

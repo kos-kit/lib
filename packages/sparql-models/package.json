@@ -3,6 +3,7 @@
     "@kos-kit/rdfjs-dataset-models": "2.0.49",
     "@kos-kit/models": "2.0.49",
     "@kos-kit/rdf-resource": "2.0.49",
+    "@rdfjs/environment": "^1.0.0",
     "@rdfjs/types": "^1.1.0",
     "@tpluscode/rdf-ns-builders": "^4.3.0",
     "@types/sparql-http-client": "^3.0.2",

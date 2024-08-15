@@ -1,4 +1,4 @@
-import { DatasetCore } from "@rdfjs/types";
+import { DatasetCore, Quad_Graph, Stream } from "@rdfjs/types";
 import { Logger } from "pino";
 import { ResultRow } from "sparql-http-client/ResultParser";
 import { SparqlClient } from "./SparqlClient.js";
@@ -8,7 +8,8 @@ import { SparqlClient } from "./SparqlClient.js";
  */
 export class LoggingSparqlClient implements SparqlClient {
   readonly query: SparqlClient.Query;
-  readonly update: SparqlClient.Update;
+  readonly store: SparqlClient.Store | null;
+  readonly update: SparqlClient.Update | null;
 
   constructor({
     delegate,
@@ -37,12 +38,32 @@ export class LoggingSparqlClient implements SparqlClient {
         return result;
       },
     };
-    this.update = {
-      async update(query: string): Promise<void> {
-        logger.debug("SPARQL UPDATE:\n%s", query);
-        await delegate.update.update(query);
-        logger.debug("SPARQL UPDATE executed successfully");
-      },
-    };
+
+    this.store = delegate.store
+      ? {
+          post: async (
+            stream: Stream,
+            options?: { graph?: Quad_Graph },
+          ): Promise<void> => {
+            await delegate.store!.post(stream, options);
+          },
+          put: async (
+            stream: Stream,
+            options?: { graph?: Quad_Graph },
+          ): Promise<void> => {
+            await delegate.store!.put(stream, options);
+          },
+        }
+      : null;
+
+    this.update = delegate.update
+      ? {
+          async update(query: string): Promise<void> {
+            logger.debug("SPARQL UPDATE:\n%s", query);
+            await delegate.update!.update(query);
+            logger.debug("SPARQL UPDATE executed successfully");
+          },
+        }
+      : null;
   }
 }
