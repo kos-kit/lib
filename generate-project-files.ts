@@ -124,10 +124,8 @@ const projects: readonly Project[] = [
       "@rdfjs/types": externalDependencyVersions["@rdfjs/types"],
       "@tpluscode/rdf-ns-builders":
         externalDependencyVersions["@tpluscode/rdf-ns-builders"],
-      "@types/sparql-http-client": "^3.0.2",
       pino: externalDependencyVersions["pino"],
       "purify-ts": externalDependencyVersions["purify-ts"],
-      "sparql-http-client": "^3.0.0",
     },
     internalDependencies: ["rdfjs-dataset-models", "models", "rdf-resource"],
     name: "sparql-models",
