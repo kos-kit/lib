@@ -110,7 +110,8 @@ const projects: readonly Project[] = [
     externalDependencies: {
       "@rdfjs/types": externalDependencyVersions["@rdfjs/types"],
       pino: externalDependencyVersions["pino"],
-      "purify-ts": externalDependencyVersions["purify-ts"],
+      "@types/n3": "^1.16.4",
+      n3: "^1.17.3",
     },
     internalDependencies: [],
     name: "sparql-client",

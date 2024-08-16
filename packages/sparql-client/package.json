@@ -2,7 +2,8 @@
   "dependencies": {
     "@rdfjs/types": "^1.1.0",
     "pino": "^9.1.0",
-    "purify-ts": "~2.1.0"
+    "@types/n3": "^1.16.4",
+    "n3": "^1.17.3"
   },
   "engines": {
     "node": ">=20"
