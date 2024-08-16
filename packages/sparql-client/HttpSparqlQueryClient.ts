@@ -8,7 +8,7 @@ import {
   NamedNode,
 } from "@rdfjs/types";
 import N3 from "n3";
-import { HttpSparqlProtocolClient } from "./HttpSparqlProtocolClient";
+import { HttpSparqlProtocolClient } from "./HttpSparqlProtocolClient.js";
 import { SparqlQueryClient } from "./SparqlQueryClient.js";
 
 export class HttpSparqlQueryClient
@@ -184,6 +184,7 @@ export class HttpSparqlQueryClient
 
         const urlEncodedParameters = new URLSearchParams();
         this.requestOptionsToUrlSearchParams(urlEncodedParameters, options);
+        urlEncodedParameters.set("query", query);
 
         return this.checkResponse(
           await fetch(url, {
