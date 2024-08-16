@@ -100,7 +100,6 @@ const projects: readonly Project[] = [
     externalDependencies: {
       "@rdfjs/types": externalDependencyVersions["@rdfjs/types"],
       "@types/lunr": "^2.3.7",
-      axios: "^1.7.2",
       lunr: "^2.3.9",
     },
     internalDependencies: ["rdfjs-dataset-models", "models", "rdf-resource"],
