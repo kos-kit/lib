@@ -1,18 +1,8 @@
 {
   "dependencies": {
-    "@kos-kit/rdfjs-dataset-models": "2.0.50",
-    "@kos-kit/models": "2.0.50",
-    "@kos-kit/rdf-resource": "2.0.50",
     "@rdfjs/types": "^1.1.0",
-    "@tpluscode/rdf-ns-builders": "^4.3.0",
-    "@types/sparql-http-client": "^3.0.2",
     "pino": "^9.1.0",
-    "purify-ts": "~2.1.0",
-    "sparql-http-client": "^3.0.0"
-  },
-  "devDependencies": {
-    "@types/n3": "^1.16.4",
-    "n3": "^1.17.3"
+    "purify-ts": "~2.1.0"
   },
   "engines": {
     "node": ">=20"
@@ -23,7 +13,7 @@
     "*.js"
   ],
   "license": "Apache-2.0",
-  "name": "@kos-kit/sparql-models",
+  "name": "@kos-kit/sparql-client",
   "scripts": {
     "build": "tsc -b",
     "check": "biome check",
@@ -39,7 +29,7 @@
     "lint:write:unsafe": "biome lint --write --unsafe",
     "test": "biome check && vitest run",
     "test:watch": "vitest watch",
-    "unlink": "npm unlink -g @kos-kit/sparql-models",
+    "unlink": "npm unlink -g @kos-kit/sparql-client",
     "watch": "tsc -w --preserveWatchOutput"
   },
   "repository": {

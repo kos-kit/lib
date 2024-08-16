@@ -10,6 +10,7 @@ type ProjectName =
   | "rdf-resource"
   | "rdf-utils"
   | "search"
+  | "sparql-client"
   | "sparql-models";
 
 interface Project {
@@ -106,6 +107,15 @@ const projects: readonly Project[] = [
     name: "search",
   },
   {
+    externalDependencies: {
+      "@rdfjs/types": externalDependencyVersions["@rdfjs/types"],
+      pino: externalDependencyVersions["pino"],
+      "purify-ts": externalDependencyVersions["purify-ts"],
+    },
+    internalDependencies: [],
+    name: "sparql-client",
+  },
+  {
     devDependencies: {
       "@types/n3": externalDependencyVersions["@types/n3"],
       n3: externalDependencyVersions.n3,
@@ -131,6 +141,8 @@ for (const project of projects) {
   }
 
   const projectDirectoryPath = path.join(__dirname, "packages", project.name);
+
+  fs.mkdirSync(projectDirectoryPath, { recursive: true });
 
   fs.writeFileSync(
     path.join(projectDirectoryPath, "package.json"),
