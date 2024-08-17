@@ -1,4 +1,4 @@
-import { BlankNode, Literal, NamedNode, Quad } from "@rdfjs/types";
+import { BlankNode, DatasetCore, Literal, NamedNode } from "@rdfjs/types";
 
 /**
  * SPARQL 1.1 Protocol query operations (https://www.w3.org/TR/2013/REC-sparql11-protocol-20130321/#query-operation).
@@ -22,5 +22,5 @@ export interface SparqlQueryClient {
   /**
    * CONSTRUCT or DESCRIBE queries
    */
-  queryQuads(query: string): Promise<readonly Quad[]>;
+  queryDataset(query: string): Promise<DatasetCore>;
 }

@@ -1,5 +1,12 @@
 import { URLSearchParams } from "node:url";
-import { BlankNode, DataFactory, Literal, NamedNode, Quad } from "@rdfjs/types";
+import {
+  BlankNode,
+  DataFactory,
+  DatasetCore,
+  DatasetCoreFactory,
+  Literal,
+  NamedNode,
+} from "@rdfjs/types";
 import N3 from "n3";
 import { HttpSparqlProtocolClient } from "./HttpSparqlProtocolClient.js";
 import { SparqlQueryClient } from "./SparqlQueryClient.js";
@@ -9,15 +16,16 @@ export class HttpSparqlQueryClient
   implements SparqlQueryClient
 {
   private readonly dataFactory: DataFactory;
+  private readonly datasetCoreFactory: DatasetCoreFactory;
 
   constructor({
     dataFactory,
+    datasetCoreFactory,
     ...superParameters
-  }: {
-    dataFactory: DataFactory;
-  } & HttpSparqlQueryClient.Parameters) {
+  }: HttpSparqlQueryClient.Parameters) {
     super(superParameters);
     this.dataFactory = dataFactory;
+    this.datasetCoreFactory = datasetCoreFactory;
   }
 
   async queryBindings(
@@ -99,10 +107,10 @@ export class HttpSparqlQueryClient
     return (await response.json()).boolean;
   }
 
-  async queryQuads(
+  async queryDataset(
     query: string,
     options?: HttpSparqlQueryClient.RequestOptions,
-  ): Promise<readonly Quad[]> {
+  ): Promise<DatasetCore> {
     const response = await this.request(
       query,
       {
@@ -110,10 +118,12 @@ export class HttpSparqlQueryClient
       },
       options,
     );
-    return new N3.Parser({
-      factory: this.dataFactory,
-      format: "application/n-triples",
-    }).parse(await response.text());
+    return this.datasetCoreFactory.dataset(
+      new N3.Parser({
+        factory: this.dataFactory,
+        format: "application/n-triples",
+      }).parse(await response.text()),
+    );
   }
 
   private async request(
@@ -184,7 +194,11 @@ export class HttpSparqlQueryClient
 }
 
 export namespace HttpSparqlQueryClient {
-  export type Parameters = HttpSparqlProtocolClient.Parameters<RequestOptions>;
+  export interface Parameters
+    extends HttpSparqlProtocolClient.Parameters<RequestOptions> {
+    dataFactory: DataFactory;
+    datasetCoreFactory: DatasetCoreFactory;
+  }
 
   export interface RequestOptions
     extends HttpSparqlProtocolClient.RequestOptions {

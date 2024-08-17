@@ -11,6 +11,9 @@ import { HttpSparqlGraphStoreClient } from "../HttpSparqlGraphStoreClient.js";
 describe("HttpSparqlGraphStoreClient", () => {
   const sut = new HttpSparqlGraphStoreClient({
     dataFactory: N3.DataFactory,
+    datasetCoreFactory: {
+      dataset: (quads) => new N3.Store(quads),
+    },
     endpointUrl: "http://example.com/",
   });
 
@@ -34,7 +37,7 @@ describe("HttpSparqlGraphStoreClient", () => {
       '<http://example.org/book/book1> <http://purl.org/dc/elements/1.1/title> "SPARQL Tutorial" .\n',
     );
     const quads = await sut.getGraph(N3.DataFactory.defaultGraph());
-    expect(quads).toHaveLength(1);
+    expect(quads.size).toStrictEqual(1);
     expect(fetchMocker.requests()).toHaveLength(1);
     const request = fetchMocker.requests()[0];
     expect(request.method).toStrictEqual("GET");
