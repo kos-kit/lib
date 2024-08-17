@@ -20,9 +20,9 @@ export class LoggingSparqlQueryClient implements SparqlQueryClient {
   async queryBindings(
     query: string,
   ): Promise<readonly Record<string, BlankNode | Literal | NamedNode>[]> {
-    this.logger.debug("queryBindings:\n%s", query);
+    this.logger.trace("queryBindings:\n%s", query);
     const result = await this.delegate.queryBindings(query);
-    this.logger.debug(
+    this.logger.trace(
       "queryBindings results:\n%s",
       JSON.stringify(result, undefined, 2),
     );
@@ -30,16 +30,16 @@ export class LoggingSparqlQueryClient implements SparqlQueryClient {
   }
 
   async queryBoolean(query: string): Promise<boolean> {
-    this.logger.debug("queryBoolean:\n%s", query);
+    this.logger.trace("queryBoolean:\n%s", query);
     const result = await this.delegate.queryBoolean(query);
-    this.logger.debug("queryBoolean result: %s", result);
+    this.logger.trace("queryBoolean result: %s", result);
     return result;
   }
 
   async queryDataset(query: string): Promise<DatasetCore> {
-    this.logger.debug("queryQuads:\n%s", query);
+    this.logger.trace("queryQuads:\n%s", query);
     const result = await this.delegate.queryDataset(query);
-    this.logger.debug("queryQuads result: %d quads", result.size);
+    this.logger.trace("queryQuads result: %d quads", result.size);
     return result;
   }
 }

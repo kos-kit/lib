@@ -8,11 +8,11 @@ import {
   NamedNode,
 } from "@rdfjs/types";
 import N3 from "n3";
-import { HttpSparqlProtocolClient } from "./HttpSparqlProtocolClient.js";
+import { HttpSparqlBaseClient } from "./HttpSparqlBaseClient.js";
 import { SparqlQueryClient } from "./SparqlQueryClient.js";
 
 export class HttpSparqlQueryClient
-  extends HttpSparqlProtocolClient<HttpSparqlQueryClient.RequestOptions>
+  extends HttpSparqlBaseClient<HttpSparqlQueryClient.RequestOptions>
   implements SparqlQueryClient
 {
   private readonly dataFactory: DataFactory;
@@ -185,17 +185,44 @@ export class HttpSparqlQueryClient
       }
     }
   }
+
+  private requestOptionsToUrlSearchParams(
+    urlSearchParams: URLSearchParams,
+    requestOptions?: HttpSparqlQueryClient.RequestOptions,
+  ): void {
+    for (const defaultGraphUri of requestOptions?.defaultGraphUris ??
+      this.defaultRequestOptions?.defaultGraphUris ??
+      []) {
+      urlSearchParams.append("default-graph-uri", defaultGraphUri.value);
+    }
+
+    for (const namedGraphUri of requestOptions?.namedGraphUris ??
+      this.defaultRequestOptions?.namedGraphUris ??
+      []) {
+      urlSearchParams.append("named-graph-uri", namedGraphUri.value);
+    }
+
+    if (
+      requestOptions?.unionDefaultGraph ??
+      this.defaultRequestOptions?.unionDefaultGraph ??
+      false
+    ) {
+      urlSearchParams.append("union-default-graph", "");
+    }
+  }
 }
 
 export namespace HttpSparqlQueryClient {
   export interface Parameters
-    extends HttpSparqlProtocolClient.Parameters<RequestOptions> {
+    extends HttpSparqlBaseClient.Parameters<RequestOptions> {
     dataFactory: DataFactory;
     datasetCoreFactory: DatasetCoreFactory;
   }
 
-  export interface RequestOptions
-    extends HttpSparqlProtocolClient.RequestOptions {
+  export interface RequestOptions extends HttpSparqlBaseClient.RequestOptions {
+    defaultGraphUris?: readonly NamedNode[];
     method?: "GET" | "POSTDirectly" | "POSTWithUrlEncodedParameters";
+    namedGraphUris?: readonly NamedNode[];
+    unionDefaultGraph?: boolean; // Oxigraph extension
   }
 }

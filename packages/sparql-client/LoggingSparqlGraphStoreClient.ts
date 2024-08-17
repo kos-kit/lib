@@ -15,15 +15,15 @@ export class LoggingSparqlGraphStoreClient implements SparqlGraphStoreClient {
   }
 
   async deleteGraph(graph: DefaultGraph | NamedNode): Promise<void> {
-    this.logger.debug("deleting graph %s", this.loggableGraph(graph));
+    this.logger.trace("deleting graph %s", this.loggableGraph(graph));
     await this.delegate.deleteGraph(graph);
-    this.logger.debug("deleted graph %s", this.loggableGraph(graph));
+    this.logger.trace("deleted graph %s", this.loggableGraph(graph));
   }
 
   async getGraph(graph: DefaultGraph | NamedNode): Promise<DatasetCore> {
-    this.logger.debug("getting dataset from %s", this.loggableGraph(graph));
+    this.logger.trace("getting dataset from %s", this.loggableGraph(graph));
     const result = await this.delegate.getGraph(graph);
-    this.logger.debug(
+    this.logger.trace(
       "got %d-quad dataset from %s",
       result.size,
       this.loggableGraph(graph),
@@ -35,13 +35,13 @@ export class LoggingSparqlGraphStoreClient implements SparqlGraphStoreClient {
     graph: DefaultGraph | NamedNode,
     payload: DatasetCore,
   ): Promise<void> {
-    this.logger.debug(
+    this.logger.trace(
       "posting %d-quad dataset to %s",
       payload.size,
       this.loggableGraph(graph),
     );
     await this.delegate.postGraph(graph, payload);
-    this.logger.debug(
+    this.logger.trace(
       "posted %d-quad dataset to %s",
       payload.size,
       this.loggableGraph(graph),
@@ -52,13 +52,13 @@ export class LoggingSparqlGraphStoreClient implements SparqlGraphStoreClient {
     graph: DefaultGraph | NamedNode,
     payload: DatasetCore,
   ): Promise<void> {
-    this.logger.debug(
+    this.logger.trace(
       "putting %d-quad dataset to %s",
       payload.size,
       this.loggableGraph(graph),
     );
     await this.delegate.putGraph(graph, payload);
-    this.logger.debug(
+    this.logger.trace(
       "put %d-quad dataset to %s",
       payload.size,
       this.loggableGraph(graph),

@@ -17,8 +17,8 @@ export class LoggingSparqlUpdateClient implements SparqlUpdateClient {
   }
 
   async update(update: string): Promise<void> {
-    this.logger.debug("SPARQL update:\n%s", update);
+    this.logger.trace("SPARQL update:\n%s", update);
     await this.delegate.update(update);
-    this.logger.debug("SPARQL update executed successfully");
+    this.logger.trace("SPARQL update executed successfully");
   }
 }
