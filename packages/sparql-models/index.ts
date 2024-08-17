@@ -5,5 +5,5 @@ export * from "./DefaultKos.js";
 export * from "./GraphPattern.js";
 export * from "./Kos.js";
 export * from "./Stub.js";
-export * from "./mapBindingsToCount";
-export * from "./mapBindingsToIdentifiers";
+export * from "./mapBindingsToCount.js";
+export * from "./mapBindingsToIdentifiers.js";
