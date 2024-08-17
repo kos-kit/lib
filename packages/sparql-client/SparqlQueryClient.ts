@@ -8,16 +8,16 @@ import { BlankNode, DatasetCore, Literal, NamedNode } from "@rdfjs/types";
  */
 export interface SparqlQueryClient {
   /**
-   * ASK queries.
-   */
-  queryBoolean(query: string): Promise<boolean>;
-
-  /**
    * SELECT queries.
    */
   queryBindings(
     query: string,
   ): Promise<readonly Record<string, BlankNode | Literal | NamedNode>[]>;
+
+  /**
+   * ASK queries.
+   */
+  queryBoolean(query: string): Promise<boolean>;
 
   /**
    * CONSTRUCT or DESCRIBE queries
