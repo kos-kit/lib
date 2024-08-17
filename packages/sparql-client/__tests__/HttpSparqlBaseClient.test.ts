@@ -47,10 +47,7 @@ describe("HttpSparqlBaseClient", () => {
         ["name", "value2"],
         ["name", "value3"],
       ],
-      expectedHeaders: [
-        ["name", "value2"],
-        ["name", "value3"],
-      ],
+      expectedHeaders: [["name", "value2, value3"]],
     },
     {
       defaultRequestHeaders: [
@@ -98,7 +95,6 @@ describe("HttpSparqlBaseClient", () => {
         expect(actualHeaders).toStrictEqual(
           [
             // Include headers added by our code
-            ["accept", "*/*"],
             ["content-type", "application/sparql-update; charset=utf-8"],
           ].concat(expectedHeaders),
         );
