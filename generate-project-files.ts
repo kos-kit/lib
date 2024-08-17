@@ -203,3 +203,48 @@ for (const project of projects) {
     fs.symlinkSync(`../../${fileName}`, projectFilePath);
   }
 }
+
+// Root package.json
+fs.writeFileSync(
+  path.join(__dirname, "package.json"),
+  `${JSON.stringify(
+    {
+      devDependencies: {
+        "@biomejs/biome": "1.8.3",
+        "@tsconfig/strictest": "^2.0.5",
+        "@types/node": "^20",
+        eslint: "^8",
+        "npm-run-all": "^4.1.5",
+        rimraf: "^6.0.1",
+        tsx: "^4.16.2",
+        typescript: "~5.5",
+        vitest: "^2.0.5",
+      },
+      name: "@kos-kit/lib",
+      private: true,
+      scripts: {
+        build: "npm run build --workspaces",
+        check: "npm run check --workspaces",
+        clean: "npm run clean --workspaces",
+        "generate-project-files": "tsx generate-project-files.ts",
+        link: "npm link --workspaces",
+        lint: "npm run lint --workspaces",
+        rebuild: "npm run rebuild --workspaces",
+        test: "npm run test --if-present --workspaces",
+        unlink: "npm run unlink --workspaces",
+        watch: "run-p watch:*",
+        ...projects.reduce(
+          (watchEntries, project) => {
+            watchEntries[`watch:${project.name}`] =
+              `npm run watch -w @kos-kit/${project.name}`;
+            return watchEntries;
+          },
+          {} as Record<string, string>,
+        ),
+      },
+      workspaces: projects.map((project) => `packages/${project.name}`),
+    },
+    undefined,
+    2,
+  )}\n`,
+);
