@@ -1,4 +1,4 @@
-import { BlankNode, DatasetCore, Literal, NamedNode } from "@rdfjs/types";
+import { BlankNode, Literal, NamedNode, Quad } from "@rdfjs/types";
 import { Logger } from "pino";
 import { SparqlQueryClient } from "./SparqlQueryClient.js";
 
@@ -17,29 +17,29 @@ export class LoggingSparqlQueryClient implements SparqlQueryClient {
     this.logger = logger;
   }
 
-  async queryBoolean(query: string): Promise<boolean> {
-    this.logger.debug("SPARQL ASK:\n%s", query);
-    const result = await this.delegate.queryBoolean(query);
-    this.logger.debug("SPARQL ASK result: %s", result);
-    return result;
-  }
-
-  async queryQuads(query: string): Promise<DatasetCore> {
-    this.logger.debug("SPARQL CONSTRUCT:\n%s", query);
-    const result = await this.delegate.queryQuads(query);
-    this.logger.debug("SPARQL CONSTRUCT result: %d quads", result.size);
-    return result;
-  }
-
   async queryBindings(
     query: string,
   ): Promise<readonly Record<string, BlankNode | Literal | NamedNode>[]> {
-    this.logger.debug("SPARQL SELECT:\n%s", query);
+    this.logger.debug("queryBindings:\n%s", query);
     const result = await this.delegate.queryBindings(query);
     this.logger.debug(
-      "SPARQL SELECT results:\n%s",
+      "queryBindings results:\n%s",
       JSON.stringify(result, undefined, 2),
     );
+    return result;
+  }
+
+  async queryBoolean(query: string): Promise<boolean> {
+    this.logger.debug("queryBoolean:\n%s", query);
+    const result = await this.delegate.queryBoolean(query);
+    this.logger.debug("queryBoolean result: %s", result);
+    return result;
+  }
+
+  async queryQuads(query: string): Promise<readonly Quad[]> {
+    this.logger.debug("queryQuads:\n%s", query);
+    const result = await this.delegate.queryQuads(query);
+    this.logger.debug("queryQuads result: %d quads", result.length);
     return result;
   }
 }

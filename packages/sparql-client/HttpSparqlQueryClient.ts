@@ -1,12 +1,5 @@
 import { URLSearchParams } from "node:url";
-import {
-  BlankNode,
-  DataFactory,
-  DatasetCore,
-  DatasetCoreFactory,
-  Literal,
-  NamedNode,
-} from "@rdfjs/types";
+import { BlankNode, DataFactory, Literal, NamedNode, Quad } from "@rdfjs/types";
 import N3 from "n3";
 import { HttpSparqlProtocolClient } from "./HttpSparqlProtocolClient.js";
 import { SparqlQueryClient } from "./SparqlQueryClient.js";
@@ -16,54 +9,15 @@ export class HttpSparqlQueryClient
   implements SparqlQueryClient
 {
   private readonly dataFactory: DataFactory;
-  private readonly datasetCoreFactory: DatasetCoreFactory;
 
   constructor({
     dataFactory,
-    datasetCoreFactory,
     ...superParameters
   }: {
     dataFactory: DataFactory;
-    datasetCoreFactory: DatasetCoreFactory;
   } & HttpSparqlQueryClient.Parameters) {
     super(superParameters);
     this.dataFactory = dataFactory;
-    this.datasetCoreFactory = datasetCoreFactory;
-  }
-
-  async queryBoolean(
-    query: string,
-    options?: HttpSparqlQueryClient.RequestOptions,
-  ): Promise<boolean> {
-    const response = await this.request(
-      query,
-      {
-        accept: "application/sparql-results+json",
-      },
-      options,
-    );
-    return (await response.json()).boolean;
-  }
-
-  async queryQuads(
-    query: string,
-    options?: HttpSparqlQueryClient.RequestOptions,
-  ): Promise<DatasetCore> {
-    const response = await this.request(
-      query,
-      {
-        accept: "application/n-triples",
-      },
-      options,
-    );
-    const dataset = this.datasetCoreFactory.dataset();
-    for (const quad of new N3.Parser({
-      factory: this.dataFactory,
-      format: "application/n-triples",
-    }).parse(await response.text())) {
-      dataset.add(quad);
-    }
-    return dataset;
   }
 
   async queryBindings(
@@ -129,6 +83,37 @@ export class HttpSparqlQueryClient
       }
       return rdfjsBinding;
     });
+  }
+
+  async queryBoolean(
+    query: string,
+    options?: HttpSparqlQueryClient.RequestOptions,
+  ): Promise<boolean> {
+    const response = await this.request(
+      query,
+      {
+        accept: "application/sparql-results+json",
+      },
+      options,
+    );
+    return (await response.json()).boolean;
+  }
+
+  async queryQuads(
+    query: string,
+    options?: HttpSparqlQueryClient.RequestOptions,
+  ): Promise<readonly Quad[]> {
+    const response = await this.request(
+      query,
+      {
+        accept: "application/n-triples",
+      },
+      options,
+    );
+    return new N3.Parser({
+      factory: this.dataFactory,
+      format: "application/n-triples",
+    }).parse(await response.text());
   }
 
   private async request(

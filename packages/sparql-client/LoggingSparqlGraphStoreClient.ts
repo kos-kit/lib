@@ -1,4 +1,10 @@
-import { BlankNode, DatasetCore, DefaultGraph, NamedNode } from "@rdfjs/types";
+import {
+  BlankNode,
+  DatasetCore,
+  DefaultGraph,
+  NamedNode,
+  Quad,
+} from "@rdfjs/types";
 import { Logger } from "pino";
 import { SparqlGraphStoreClient } from "./SparqlGraphStoreClient.js";
 
@@ -22,63 +28,59 @@ export class LoggingSparqlGraphStoreClient implements SparqlGraphStoreClient {
     this.logger.debug("deleted graph %s", this.loggableGraph(graph));
   }
 
-  async getGraph(options?: {
-    graph?: BlankNode | DefaultGraph | NamedNode;
-  }): Promise<DatasetCore> {
-    this.logger.debug(
-      "getting dataset from %s",
-      this.loggableGraph(options?.graph),
-    );
-    const result = await this.delegate.getGraph(options);
+  async getGraph(
+    graph: BlankNode | DefaultGraph | NamedNode,
+  ): Promise<readonly Quad[]> {
+    this.logger.debug("getting dataset from %s", this.loggableGraph(graph));
+    const result = await this.delegate.getGraph(graph);
     this.logger.debug(
       "got %d-quad dataset from %s",
-      result.size,
-      this.loggableGraph(options?.graph),
+      result.length,
+      this.loggableGraph(graph),
     );
     return result;
   }
 
   async postGraph(
+    graph: BlankNode | DefaultGraph | NamedNode,
     payload: DatasetCore,
-    options?: { graph?: BlankNode | DefaultGraph | NamedNode },
   ): Promise<void> {
     this.logger.debug(
       "posting %d-quad dataset from %s",
       payload.size,
-      this.loggableGraph(options?.graph),
+      this.loggableGraph(graph),
     );
-    await this.delegate.putGraph(payload, options);
+    await this.delegate.putGraph(graph, payload);
     this.logger.debug(
       "posted %d-quad dataset from %s",
       payload.size,
-      this.loggableGraph(options?.graph),
+      this.loggableGraph(graph),
     );
   }
 
   async putGraph(
+    graph: BlankNode | DefaultGraph | NamedNode,
     payload: DatasetCore,
-    options?: { graph?: BlankNode | DefaultGraph | NamedNode },
   ): Promise<void> {
     this.logger.debug(
       "putting %d-quad dataset from %s",
       payload.size,
-      this.loggableGraph(options?.graph),
+      this.loggableGraph(graph),
     );
-    await this.delegate.putGraph(payload, options);
+    await this.delegate.putGraph(graph, payload);
     this.logger.debug(
       "put %d-quad dataset from %s",
       payload.size,
-      this.loggableGraph(options?.graph),
+      this.loggableGraph(graph),
     );
   }
 
-  private loggableGraph(graph?: BlankNode | DefaultGraph | NamedNode) {
-    if (!graph || graph.termType === "DefaultGraph") {
-      return "default graph";
-    }
+  private loggableGraph(graph: BlankNode | DefaultGraph | NamedNode) {
     switch (graph.termType) {
       case "BlankNode":
         return `graph _:${graph.value}`;
+      case "DefaultGraph":
+        return "default graph";
       case "NamedNode":
         return `graph <${graph.value}>`;
     }

@@ -9,9 +9,9 @@ import {
 export interface SparqlGraphStoreClient {
   deleteGraph(graph: BlankNode | DefaultGraph | NamedNode): Promise<void>;
 
-  getGraph(options?: {
-    graph: BlankNode | DefaultGraph | NamedNode;
-  }): Promise<readonly Quad[]>;
+  getGraph(
+    graph: BlankNode | DefaultGraph | NamedNode,
+  ): Promise<readonly Quad[]>;
 
   postGraph(
     graph: BlankNode | DefaultGraph | NamedNode,

@@ -7,12 +7,10 @@ fetchMocker.enableMocks();
 import N3 from "n3";
 import { describe, it } from "vitest";
 import { HttpSparqlQueryClient } from "../HttpSparqlQueryClient.js";
-import { N3DatasetCoreFactory } from "./N3DatasetCoreFactory.js";
 
 describe("HttpSparqlQueryClient", () => {
   const sut = new HttpSparqlQueryClient({
     dataFactory: N3.DataFactory,
-    datasetCoreFactory: new N3DatasetCoreFactory(),
     endpointUrl: "http://example.com",
   });
 
@@ -29,8 +27,8 @@ describe("HttpSparqlQueryClient", () => {
     fetchMocker.mockResponseOnce(
       '<http://example.org/book/book1> <http://purl.org/dc/elements/1.1/title> "SPARQL Tutorial" .\n',
     );
-    const dataset = await sut.queryQuads("CONSTRUCT");
-    expect(dataset.size).toStrictEqual(1);
+    const quads = await sut.queryQuads("CONSTRUCT");
+    expect(quads).toHaveLength(1);
   });
 
   it("should make a SELECT query", async ({ expect }) => {
