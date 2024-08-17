@@ -1,8 +1,9 @@
 {
   "dependencies": {
-    "@kos-kit/rdfjs-dataset-models": "2.0.50",
     "@kos-kit/models": "2.0.50",
     "@kos-kit/rdf-resource": "2.0.50",
+    "@kos-kit/rdfjs-dataset-models": "2.0.50",
+    "@kos-kit/sparql-client": "2.0.50",
     "@rdfjs/types": "^1.1.0",
     "@tpluscode/rdf-ns-builders": "^4.3.0",
     "pino": "^9.1.0",

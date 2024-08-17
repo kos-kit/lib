@@ -39,7 +39,7 @@ export class DefaultKos extends Kos<
           labelConstructor: Label,
           logger: this.logger,
         }),
-      sparqlClient: this.sparqlClient,
+      sparqlQueryClient: this.sparqlQueryClient,
     });
   }
 
@@ -63,7 +63,7 @@ export class DefaultKos extends Kos<
           labelConstructor: Label,
           logger: this.logger,
         }),
-      sparqlClient: this.sparqlClient,
+      sparqlQueryClient: this.sparqlQueryClient,
     });
   }
 }

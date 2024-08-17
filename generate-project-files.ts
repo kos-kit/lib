@@ -131,7 +131,12 @@ const projects: readonly Project[] = [
       pino: externalDependencyVersions["pino"],
       "purify-ts": externalDependencyVersions["purify-ts"],
     },
-    internalDependencies: ["rdfjs-dataset-models", "models", "rdf-resource"],
+    internalDependencies: [
+      "models",
+      "rdf-resource",
+      "rdfjs-dataset-models",
+      "sparql-client",
+    ],
     name: "sparql-models",
   },
 ];

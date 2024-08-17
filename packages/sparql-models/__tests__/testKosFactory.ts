@@ -1,40 +1,19 @@
 import { LanguageTag, LanguageTagSet } from "@kos-kit/models";
-import {
-  DataFactory,
-  DatasetCore,
-  DatasetCoreFactory,
-  Quad,
-} from "@rdfjs/types";
+import { HttpSparqlQueryClient } from "@kos-kit/sparql-client";
 import N3 from "n3";
-import { DefaultKos, HttpSparqlClient } from "..";
-
-class N3DataFactory implements DataFactory {
-  blankNode = N3.DataFactory.blankNode;
-  defaultGraph = N3.DataFactory.defaultGraph;
-  literal = N3.DataFactory.literal;
-  namedNode = N3.DataFactory.namedNode;
-  quad = N3.DataFactory.quad;
-}
-
-class N3DatasetCoreFactory implements DatasetCoreFactory {
-  dataset(quads?: Quad[]): DatasetCore {
-    const store = new N3.Store();
-    if (quads) {
-      store.addQuads(quads);
-    }
-    return store;
-  }
-}
+import { DefaultKos } from "..";
 
 export const testKosFactory = (includeLanguageTag: LanguageTag) => {
   const includeLanguageTags = new LanguageTagSet(includeLanguageTag, "");
-  const sparqlClient = new HttpSparqlClient({
-    dataFactoryConstructor: N3DataFactory,
-    datasetCoreFactoryConstructor: N3DatasetCoreFactory,
-    queryEndpointUrl: "http://localhost:7878/sparql",
-    operation: "postDirect",
-    storeEndpointUrl: null,
-    updateEndpointUrl: null,
+  const sparqlQueryClient = new HttpSparqlQueryClient({
+    dataFactory: N3.DataFactory,
+    datasetCoreFactory: {
+      dataset: (quads) => new N3.Store(quads),
+    },
+    endpointUrl: "http://localhost:7878/sparql",
+    defaultRequestOptions: {
+      method: "POSTDirectly",
+    },
   });
   // const store = new Store();
   // store.load(
@@ -53,9 +32,9 @@ export const testKosFactory = (includeLanguageTag: LanguageTag) => {
   //     .toString(),
   //   { format: "nt" },
   // );
-  // const sparqlClient = new OxigraphSparqlClient(store);
+  // const sparqlQueryClient = new OxigraphSparqlClient(store);
   return new DefaultKos({
     includeLanguageTags,
-    sparqlClient,
+    sparqlQueryClient,
   });
 };

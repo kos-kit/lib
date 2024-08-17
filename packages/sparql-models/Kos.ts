@@ -7,28 +7,28 @@ import {
   Identifier,
   abc,
 } from "@kos-kit/models";
+import { SparqlQueryClient } from "@kos-kit/sparql-client";
 import { skos } from "@tpluscode/rdf-ns-builders";
 import { GraphPattern } from "./GraphPattern.js";
 import { IndentedString } from "./IndentedString.js";
-import { SparqlClient } from "./SparqlClient.js";
-import { mapResultRowsToCount } from "./mapResultRowsToCount.js";
-import { mapResultRowsToIdentifiers } from "./mapResultRowsToIdentifiers.js";
+import { mapBindingsToCount } from "./mapBindingsToCount";
+import { mapBindingsToIdentifiers } from "./mapBindingsToIdentifiers";
 
 export abstract class Kos<
   ConceptT extends IConcept<ConceptT, ConceptSchemeT, LabelT>,
   ConceptSchemeT extends IConceptScheme<ConceptT, LabelT>,
   LabelT extends ILabel,
 > extends abc.Kos<ConceptT, ConceptSchemeT, LabelT> {
-  protected readonly sparqlClient: SparqlClient;
+  protected readonly sparqlQueryClient: SparqlQueryClient;
 
   constructor({
-    sparqlClient,
+    sparqlQueryClient,
     ...superParameters
   }: {
-    sparqlClient: SparqlClient;
+    sparqlQueryClient: SparqlQueryClient;
   } & abc.Kos.Parameters) {
     super(superParameters);
-    this.sparqlClient = sparqlClient;
+    this.sparqlQueryClient = sparqlQueryClient;
   }
 
   async *concepts({
@@ -40,8 +40,8 @@ export abstract class Kos<
     offset: number;
     query: ConceptsQuery;
   }): AsyncGenerator<abc.Stub<ConceptT, ConceptSchemeT, LabelT, ConceptT>> {
-    for (const identifier of mapResultRowsToIdentifiers(
-      await this.sparqlClient.query.select(`\
+    for (const identifier of mapBindingsToIdentifiers(
+      await this.sparqlQueryClient.queryBindings(`\
 SELECT DISTINCT ?concept
 WHERE {
 ${this.conceptsQueryToWhereGraphPatterns(query).join("\n")}
@@ -56,8 +56,8 @@ ${offset > 0 ? `OFFSET ${offset}` : ""}
   }
 
   async conceptsCount(query: ConceptsQuery): Promise<number> {
-    return mapResultRowsToCount(
-      await this.sparqlClient.query.select(`\
+    return mapBindingsToCount(
+      await this.sparqlQueryClient.queryBindings(`\
 SELECT (COUNT(DISTINCT ?concept) AS ?count)
 WHERE {
 ${this.conceptsQueryToWhereGraphPatterns(query).join("\n")}
@@ -77,8 +77,8 @@ ${this.conceptsQueryToWhereGraphPatterns(query).join("\n")}
   }): AsyncGenerator<
     abc.Stub<ConceptT, ConceptSchemeT, LabelT, ConceptSchemeT>
   > {
-    for (const identifier of mapResultRowsToIdentifiers(
-      await this.sparqlClient.query.select(`\
+    for (const identifier of mapBindingsToIdentifiers(
+      await this.sparqlQueryClient.queryBindings(`\
 SELECT DISTINCT ?conceptScheme
 WHERE {
 ${this.conceptSchemesQueryToWhereGraphPatterns(query).join("\n")}
@@ -93,8 +93,8 @@ ${offset > 0 ? `OFFSET ${offset}` : ""}
   }
 
   async conceptSchemesCount(query: ConceptSchemesQuery): Promise<number> {
-    return mapResultRowsToCount(
-      await this.sparqlClient.query.select(`\
+    return mapBindingsToCount(
+      await this.sparqlQueryClient.queryBindings(`\
 SELECT (COUNT(DISTINCT ?conceptScheme) AS ?count)
 WHERE {
 ${this.conceptSchemesQueryToWhereGraphPatterns(query).join("\n")}
