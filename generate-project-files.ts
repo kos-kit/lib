@@ -107,6 +107,9 @@ const projects: readonly Project[] = [
     name: "search",
   },
   {
+    devDependencies: {
+      "vitest-fetch-mock": "^0.3.0",
+    },
     externalDependencies: {
       "@rdfjs/types": externalDependencyVersions["@rdfjs/types"],
       pino: externalDependencyVersions["pino"],
