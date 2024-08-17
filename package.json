@@ -8,7 +8,7 @@
     "rimraf": "^6.0.1",
     "tsx": "^4.16.2",
     "typescript": "~5.5",
-    "vitest": "^1.6.0"
+    "vitest": "^2.0.5"
   },
   "name": "@kos-kit/lib",
   "private": true,
@@ -23,21 +23,23 @@
     "test": "npm run test --if-present --workspaces",
     "unlink": "npm run unlink --workspaces",
     "watch": "run-p watch:*",
-    "watch:rdfjs-dataset-models": "npm run watch -w @kos-kit/rdfjs-dataset-models",
     "watch:models": "npm run watch -w @kos-kit/models",
     "watch:next-utils": "npm run watch -w @kos-kit/next-utils",
     "watch:rdf-resource": "npm run watch -w @kos-kit/rdf-resource",
     "watch:rdf-utils": "npm run watch -w @kos-kit/rdf-utils",
+    "watch:rdfjs-dataset-models": "npm run watch -w @kos-kit/rdfjs-dataset-models",
     "watch:search": "npm run watch -w @kos-kit/search",
+    "watch:sparql-client": "npm run watch -w @kos-kit/sparql-client",
     "watch:sparql-models": "npm run watch -w @kos-kit/sparql-models"
   },
   "workspaces": [
+    "packages/models",
     "packages/next-utils",
     "packages/rdf-resource",
     "packages/rdf-utils",
-    "packages/models",
     "packages/rdfjs-dataset-models",
     "packages/search",
+    "packages/sparql-client",
     "packages/sparql-models"
   ]
 }

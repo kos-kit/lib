@@ -1,5 +1,3 @@
-import axios, { AxiosInstance } from "axios";
-
 import { Label, LanguageTag, LanguageTagSet } from "@kos-kit/models";
 import { Resource } from "@kos-kit/rdf-resource";
 import * as mem from "@kos-kit/rdfjs-dataset-models";
@@ -13,11 +11,7 @@ import { SearchResults } from "./SearchResults.js";
  * A SearchEngine implementation that makes HTTP requests to a kos-kit/server search endpoint.
  */
 export class ServerSearchEngine implements SearchEngine {
-  private readonly axios: AxiosInstance;
-
-  constructor(private readonly endpoint: string) {
-    this.axios = axios.create();
-  }
+  constructor(private readonly endpoint: string) {}
 
   static fromJson(json: SearchEngineJson) {
     return new ServerSearchEngine(json["endpoint"]);
@@ -29,16 +23,18 @@ export class ServerSearchEngine implements SearchEngine {
     offset: number;
     query: string;
   }): Promise<SearchResults> {
-    const response = await this.axios.get(this.endpoint, {
-      params,
-    });
+    const url = new URL(this.endpoint);
+    for (const [key, value] of Object.entries(params)) {
+      url.searchParams.append(key, value.toString());
+    }
+    const response = await fetch(url);
 
-    const totalHeaderValue = response.headers["x-total-count"];
+    const totalHeaderValue = response.headers.get("x-total-count")!;
     const total = Number.parseInt(totalHeaderValue);
 
     const parser = new Parser({ format: "N-Triples" });
     const store = new Store();
-    store.addQuads(parser.parse(response.data));
+    store.addQuads(parser.parse(await response.text()));
     const kos = new mem.DefaultKos({
       dataset: store,
       includeLanguageTags: new LanguageTagSet(params.languageTag, ""),

@@ -5,6 +5,7 @@ import {
   Identifier,
   abc,
 } from "@kos-kit/models";
+import { SparqlQueryClient } from "@kos-kit/sparql-client";
 import { DatasetCore } from "@rdfjs/types";
 import { dc11, dcterms, rdf, skos, skosxl } from "@tpluscode/rdf-ns-builders";
 import {
@@ -12,7 +13,6 @@ import {
   GraphPatternSubject,
   GraphPatternVariable,
 } from "./GraphPattern.js";
-import { SparqlClient } from "./SparqlClient.js";
 
 export abstract class Stub<
   ConceptT extends IConcept<ConceptT, ConceptSchemeT, LabelT>,
@@ -24,16 +24,16 @@ export abstract class Stub<
     dataset: DatasetCore;
     identifier: Identifier;
   }) => ModelT;
-  protected readonly sparqlClient: SparqlClient;
+  protected readonly sparqlQueryClient: SparqlQueryClient;
 
   constructor({
     modelFactory,
-    sparqlClient,
+    sparqlQueryClient,
     ...superParameters
   }: Stub.Parameters<ConceptT, ConceptSchemeT, LabelT, ModelT>) {
     super(superParameters);
     this.modelFactory = modelFactory;
-    this.sparqlClient = sparqlClient;
+    this.sparqlQueryClient = sparqlQueryClient;
   }
 
   protected labeledModelPropertyGraphPatterns({
@@ -179,6 +179,6 @@ export namespace Stub {
       dataset: DatasetCore;
       identifier: Identifier;
     }) => ModelT;
-    sparqlClient: SparqlClient;
+    sparqlQueryClient: SparqlQueryClient;
   }
 }

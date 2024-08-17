@@ -26,7 +26,7 @@ export class ConceptSchemeStub<
       value: "conceptScheme",
     };
 
-    const dataset = await this.sparqlClient.query.construct(
+    const dataset = await this.sparqlQueryClient.queryDataset(
       new ConstructQueryBuilder({
         includeLanguageTags: this.kos.includeLanguageTags,
       })
