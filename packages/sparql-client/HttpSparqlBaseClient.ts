@@ -7,7 +7,7 @@ export abstract class HttpSparqlBaseClient<
   protected defaultRequestOptions?: RequestOptionsT;
   protected readonly endpointUrl: string;
 
-  protected constructor({
+  constructor({
     defaultRequestOptions,
     endpointUrl,
   }: HttpSparqlBaseClient.Parameters<RequestOptionsT>) {
