@@ -11,8 +11,8 @@ import { SparqlQueryClient } from "@kos-kit/sparql-client";
 import { skos } from "@tpluscode/rdf-ns-builders";
 import { GraphPattern } from "./GraphPattern.js";
 import { IndentedString } from "./IndentedString.js";
-import { mapBindingsToCount } from "./mapBindingsToCount";
-import { mapBindingsToIdentifiers } from "./mapBindingsToIdentifiers";
+import { mapBindingsToCount } from "./mapBindingsToCount.js";
+import { mapBindingsToIdentifiers } from "./mapBindingsToIdentifiers.js";
 
 export abstract class Kos<
   ConceptT extends IConcept<ConceptT, ConceptSchemeT, LabelT>,
