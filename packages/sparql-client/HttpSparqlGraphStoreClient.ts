@@ -31,29 +31,25 @@ export class HttpSparqlGraphStoreClient
     graph: DefaultGraph | NamedNode,
     options?: HttpSparqlGraphStoreClient.RequestOptions,
   ): Promise<void> {
-    await this.checkResponse(
-      await fetch(this.graphUrl(graph), {
-        headers: this.requestHeaders({}, options),
-        method: "DELETE",
-      }),
-    );
+    await this.fetch(this.graphUrl(graph), {
+      headers: this.requestHeaders({}, options),
+      method: "DELETE",
+    });
   }
 
   async getGraph(
     graph: DefaultGraph | NamedNode,
     options?: HttpSparqlGraphStoreClient.RequestOptions,
   ): Promise<DatasetCore> {
-    const response = await this.checkResponse(
-      await fetch(this.graphUrl(graph), {
-        headers: this.requestHeaders(
-          {
-            accept: "application/n-triples; charset=utf-8",
-          },
-          options,
-        ),
-        method: "GET",
-      }),
-    );
+    const response = await this.fetch(this.graphUrl(graph), {
+      headers: this.requestHeaders(
+        {
+          accept: "application/n-triples; charset=utf-8",
+        },
+        options,
+      ),
+      method: "GET",
+    });
     return this.datasetCoreFactory.dataset(
       new N3.Parser({
         factory: this.dataFactory,
@@ -67,20 +63,7 @@ export class HttpSparqlGraphStoreClient
     payload: Iterable<Quad>,
     options?: HttpSparqlGraphStoreClient.RequestOptions,
   ): Promise<void> {
-    await this.checkResponse(
-      await fetch(this.graphUrl(graph), {
-        body: new N3.Writer({
-          format: "application/n-triples",
-        }).quadsToString([...payload]),
-        headers: this.requestHeaders(
-          {
-            contentType: "application/n-triples; charset=utf-8",
-          },
-          options,
-        ),
-        method: "POST",
-      }),
-    );
+    return this.postOrPutGraph(graph, "POST", payload, options);
   }
 
   async putGraph(
@@ -88,20 +71,7 @@ export class HttpSparqlGraphStoreClient
     payload: Iterable<Quad>,
     options?: HttpSparqlGraphStoreClient.RequestOptions,
   ): Promise<void> {
-    await this.checkResponse(
-      await fetch(this.graphUrl(graph), {
-        body: new N3.Writer({
-          format: "application/n-triples",
-        }).quadsToString([...payload]),
-        headers: this.requestHeaders(
-          {
-            contentType: "application/n-triples; charset=utf-8",
-          },
-          options,
-        ),
-        method: "PUT",
-      }),
-    );
+    return this.postOrPutGraph(graph, "PUT", payload, options);
   }
 
   private graphUrl(graph: DefaultGraph | NamedNode): URL {
@@ -115,6 +85,40 @@ export class HttpSparqlGraphStoreClient
         break;
     }
     return url;
+  }
+
+  private async postOrPutGraph(
+    graph: DefaultGraph | NamedNode,
+    method: "POST" | "PUT",
+    payload: Iterable<Quad>,
+    options?: HttpSparqlGraphStoreClient.RequestOptions,
+  ): Promise<void> {
+    // Strip named graphs out of the payload quads, since everything should go to the same graph.
+    const quads: Quad[] = [];
+    for (const quad of payload) {
+      if (quad.graph.termType === "DefaultGraph") {
+        quads.push(quad);
+      } else {
+        quads.push(
+          this.dataFactory.quad(quad.subject, quad.predicate, quad.object),
+        );
+      }
+    }
+
+    await this.fetch(this.graphUrl(graph), {
+      body: new N3.Writer({
+        format: "application/n-triples",
+      })
+        .quadsToString(quads)
+        .trimEnd(),
+      headers: this.requestHeaders(
+        {
+          contentType: "application/n-triples; charset=utf-8",
+        },
+        options,
+      ),
+      method,
+    });
   }
 }
 

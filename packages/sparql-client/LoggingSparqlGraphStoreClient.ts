@@ -36,13 +36,13 @@ export class LoggingSparqlGraphStoreClient implements SparqlGraphStoreClient {
     payload: DatasetCore,
   ): Promise<void> {
     this.logger.debug(
-      "posting %d-quad dataset from %s",
+      "posting %d-quad dataset to %s",
       payload.size,
       this.loggableGraph(graph),
     );
-    await this.delegate.putGraph(graph, payload);
+    await this.delegate.postGraph(graph, payload);
     this.logger.debug(
-      "posted %d-quad dataset from %s",
+      "posted %d-quad dataset to %s",
       payload.size,
       this.loggableGraph(graph),
     );
@@ -53,13 +53,13 @@ export class LoggingSparqlGraphStoreClient implements SparqlGraphStoreClient {
     payload: DatasetCore,
   ): Promise<void> {
     this.logger.debug(
-      "putting %d-quad dataset from %s",
+      "putting %d-quad dataset to %s",
       payload.size,
       this.loggableGraph(graph),
     );
     await this.delegate.putGraph(graph, payload);
     this.logger.debug(
-      "put %d-quad dataset from %s",
+      "put %d-quad dataset to %s",
       payload.size,
       this.loggableGraph(graph),
     );

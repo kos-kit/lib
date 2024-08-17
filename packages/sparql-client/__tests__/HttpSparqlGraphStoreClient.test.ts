@@ -64,7 +64,29 @@ describe("HttpSparqlGraphStoreClient", () => {
     );
     expect(request.url).toStrictEqual("http://example.com/?default=");
     expect(await request.text()).toStrictEqual(
-      "<http://example.com/s> <http://example.com/p> <http://example.com/o> .\n",
+      "<http://example.com/s> <http://example.com/p> <http://example.com/o> .",
+    );
+  });
+
+  it("should strip a named graph when posting a graph", async ({ expect }) => {
+    fetchMocker.mockResponseOnce("");
+    await sut.postGraph(N3.DataFactory.defaultGraph(), [
+      N3.DataFactory.quad(
+        N3.DataFactory.namedNode("http://example.com/s"),
+        N3.DataFactory.namedNode("http://example.com/p"),
+        N3.DataFactory.namedNode("http://example.com/o"),
+        N3.DataFactory.namedNode("http://example.com/g"),
+      ),
+    ]);
+    expect(fetchMocker.requests()).toHaveLength(1);
+    const request = fetchMocker.requests()[0];
+    expect(request.method).toStrictEqual("POST");
+    expect(request.headers.get("content-type")).toStrictEqual(
+      "application/n-triples; charset=utf-8",
+    );
+    expect(request.url).toStrictEqual("http://example.com/?default=");
+    expect(await request.text()).toStrictEqual(
+      "<http://example.com/s> <http://example.com/p> <http://example.com/o> .",
     );
   });
 
@@ -85,7 +107,7 @@ describe("HttpSparqlGraphStoreClient", () => {
     );
     expect(request.url).toStrictEqual("http://example.com/?default=");
     expect(await request.text()).toStrictEqual(
-      "<http://example.com/s> <http://example.com/p> <http://example.com/o> .\n",
+      "<http://example.com/s> <http://example.com/p> <http://example.com/o> .",
     );
   });
 });

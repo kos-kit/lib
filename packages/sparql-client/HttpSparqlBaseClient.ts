@@ -15,7 +15,12 @@ export abstract class HttpSparqlBaseClient<
     this.endpointUrl = endpointUrl;
   }
 
-  protected async checkResponse(response: Response): Promise<Response> {
+  protected async fetch(
+    input: string | URL | globalThis.Request,
+    init?: RequestInit,
+  ): Promise<Response> {
+    const response = await fetch(input, init);
+
     if (response.ok) {
       return response;
     }
