@@ -22,14 +22,14 @@ describe("HttpSparqlQueryClient", () => {
 
   it("should make an ASK query", async ({ expect }) => {
     fetchMocker.mockResponseOnce(JSON.stringify({ boolean: true }));
-    expect(await sut.ask("ASK")).toStrictEqual(true);
+    expect(await sut.queryBoolean("ASK")).toStrictEqual(true);
   });
 
   it("should make a CONSTRUCT query", async ({ expect }) => {
     fetchMocker.mockResponseOnce(
       '<http://example.org/book/book1> <http://purl.org/dc/elements/1.1/title> "SPARQL Tutorial" .\n',
     );
-    const dataset = await sut.construct("CONSTRUCT");
+    const dataset = await sut.queryQuads("CONSTRUCT");
     expect(dataset.size).toStrictEqual(1);
   });
 
@@ -76,14 +76,16 @@ describe("HttpSparqlQueryClient", () => {
         },
       }),
     );
-    const bindings = await sut.select("SELECT");
+    const bindings = await sut.queryBindings("SELECT");
     expect(bindings).toHaveLength(2);
     expect(bindings[0]["name"].value).toStrictEqual("Alice");
   });
 
   it("should use the GET method", async ({ expect }) => {
     fetchMocker.mockResponseOnce(JSON.stringify({ boolean: true }));
-    expect(await sut.ask("ASK", { method: "GET" })).toStrictEqual(true);
+    expect(await sut.queryBoolean("ASK", { method: "GET" })).toStrictEqual(
+      true,
+    );
     expect(fetchMocker.requests()).toHaveLength(1);
     const request = fetchMocker.requests()[0];
     expect(request.url).toStrictEqual("http://example.com/?query=ASK");
@@ -92,9 +94,9 @@ describe("HttpSparqlQueryClient", () => {
 
   it("should use the POST directly method", async ({ expect }) => {
     fetchMocker.mockResponseOnce(JSON.stringify({ boolean: true }));
-    expect(await sut.ask("ASK", { method: "POSTDirectly" })).toStrictEqual(
-      true,
-    );
+    expect(
+      await sut.queryBoolean("ASK", { method: "POSTDirectly" }),
+    ).toStrictEqual(true);
     expect(fetchMocker.requests()).toHaveLength(1);
     const request = fetchMocker.requests()[0];
     expect(request.url).toStrictEqual("http://example.com/");
@@ -109,7 +111,7 @@ describe("HttpSparqlQueryClient", () => {
   }) => {
     fetchMocker.mockResponseOnce(JSON.stringify({ boolean: true }));
     expect(
-      await sut.ask("ASK", { method: "POSTWithUrlEncodedParameters" }),
+      await sut.queryBoolean("ASK", { method: "POSTWithUrlEncodedParameters" }),
     ).toStrictEqual(true);
     expect(fetchMocker.requests()).toHaveLength(1);
     const request = fetchMocker.requests()[0];

@@ -1,9 +1,26 @@
-import { BlankNode, DatasetCore, Literal, NamedNode } from "@rdfjs/types";
+import { BlankNode, Literal, NamedNode, Quad } from "@rdfjs/types";
 
+/**
+ * SPARQL 1.1 Protocol query operations (https://www.w3.org/TR/2013/REC-sparql11-protocol-20130321/#query-operation).
+ *
+ * Loosely modeled on the RDF/JS: Query specification (https://rdf.js.org/query-spec/#queryquads-interface),
+ * returning arrays rather than streams.
+ */
 export interface SparqlQueryClient {
-  ask(query: string): Promise<boolean>;
-  construct(query: string): Promise<DatasetCore>;
-  select(
+  /**
+   * ASK queries.
+   */
+  queryBoolean(query: string): Promise<boolean>;
+
+  /**
+   * SELECT queries.
+   */
+  queryBindings(
     query: string,
   ): Promise<readonly Record<string, BlankNode | Literal | NamedNode>[]>;
+
+  /**
+   * CONSTRUCT or DESCRIBE queries
+   */
+  queryQuads(query: string): Promise<readonly Quad[]>;
 }

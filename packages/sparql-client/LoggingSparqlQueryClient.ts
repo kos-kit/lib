@@ -17,25 +17,25 @@ export class LoggingSparqlQueryClient implements SparqlQueryClient {
     this.logger = logger;
   }
 
-  async ask(query: string): Promise<boolean> {
+  async queryBoolean(query: string): Promise<boolean> {
     this.logger.debug("SPARQL ASK:\n%s", query);
-    const result = await this.delegate.ask(query);
+    const result = await this.delegate.queryBoolean(query);
     this.logger.debug("SPARQL ASK result: %s", result);
     return result;
   }
 
-  async construct(query: string): Promise<DatasetCore> {
+  async queryQuads(query: string): Promise<DatasetCore> {
     this.logger.debug("SPARQL CONSTRUCT:\n%s", query);
-    const result = await this.delegate.construct(query);
+    const result = await this.delegate.queryQuads(query);
     this.logger.debug("SPARQL CONSTRUCT result: %d quads", result.size);
     return result;
   }
 
-  async select(
+  async queryBindings(
     query: string,
   ): Promise<readonly Record<string, BlankNode | Literal | NamedNode>[]> {
     this.logger.debug("SPARQL SELECT:\n%s", query);
-    const result = await this.delegate.select(query);
+    const result = await this.delegate.queryBindings(query);
     this.logger.debug(
       "SPARQL SELECT results:\n%s",
       JSON.stringify(result, undefined, 2),

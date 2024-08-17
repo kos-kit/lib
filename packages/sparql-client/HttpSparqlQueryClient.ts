@@ -31,7 +31,7 @@ export class HttpSparqlQueryClient
     this.datasetCoreFactory = datasetCoreFactory;
   }
 
-  async ask(
+  async queryBoolean(
     query: string,
     options?: HttpSparqlQueryClient.RequestOptions,
   ): Promise<boolean> {
@@ -45,7 +45,7 @@ export class HttpSparqlQueryClient
     return (await response.json()).boolean;
   }
 
-  async construct(
+  async queryQuads(
     query: string,
     options?: HttpSparqlQueryClient.RequestOptions,
   ): Promise<DatasetCore> {
@@ -66,7 +66,7 @@ export class HttpSparqlQueryClient
     return dataset;
   }
 
-  async select(
+  async queryBindings(
     query: string,
     options?: HttpSparqlQueryClient.RequestOptions,
   ): Promise<readonly Record<string, BlankNode | Literal | NamedNode>[]> {

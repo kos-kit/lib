@@ -1,19 +1,25 @@
-import { BlankNode, DatasetCore, DefaultGraph, NamedNode } from "@rdfjs/types";
+import {
+  BlankNode,
+  DatasetCore,
+  DefaultGraph,
+  NamedNode,
+  Quad,
+} from "@rdfjs/types";
 
 export interface SparqlGraphStoreClient {
-  delete(graph: BlankNode | DefaultGraph | NamedNode): Promise<void>;
+  deleteGraph(graph: BlankNode | DefaultGraph | NamedNode): Promise<void>;
 
-  getDataset(options?: {
-    graph?: BlankNode | DefaultGraph | NamedNode;
-  }): Promise<DatasetCore>;
+  getGraph(options?: {
+    graph: BlankNode | DefaultGraph | NamedNode;
+  }): Promise<readonly Quad[]>;
 
-  postDataset(
+  postGraph(
+    graph: BlankNode | DefaultGraph | NamedNode,
     payload: DatasetCore,
-    options?: { graph?: BlankNode | DefaultGraph | NamedNode },
   ): Promise<void>;
 
-  putDataset(
+  putGraph(
+    graph: BlankNode | DefaultGraph | NamedNode,
     payload: DatasetCore,
-    options?: { graph?: BlankNode | DefaultGraph | NamedNode },
   ): Promise<void>;
 }

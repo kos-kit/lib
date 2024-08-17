@@ -14,20 +14,22 @@ export class LoggingSparqlGraphStoreClient implements SparqlGraphStoreClient {
     this.logger = logger;
   }
 
-  async delete(graph: BlankNode | DefaultGraph | NamedNode): Promise<void> {
+  async deleteGraph(
+    graph: BlankNode | DefaultGraph | NamedNode,
+  ): Promise<void> {
     this.logger.debug("deleting graph %s", this.loggableGraph(graph));
-    await this.delegate.delete(graph);
+    await this.delegate.deleteGraph(graph);
     this.logger.debug("deleted graph %s", this.loggableGraph(graph));
   }
 
-  async getDataset(options?: {
+  async getGraph(options?: {
     graph?: BlankNode | DefaultGraph | NamedNode;
   }): Promise<DatasetCore> {
     this.logger.debug(
       "getting dataset from %s",
       this.loggableGraph(options?.graph),
     );
-    const result = await this.delegate.getDataset(options);
+    const result = await this.delegate.getGraph(options);
     this.logger.debug(
       "got %d-quad dataset from %s",
       result.size,
@@ -36,7 +38,7 @@ export class LoggingSparqlGraphStoreClient implements SparqlGraphStoreClient {
     return result;
   }
 
-  async postDataset(
+  async postGraph(
     payload: DatasetCore,
     options?: { graph?: BlankNode | DefaultGraph | NamedNode },
   ): Promise<void> {
@@ -45,7 +47,7 @@ export class LoggingSparqlGraphStoreClient implements SparqlGraphStoreClient {
       payload.size,
       this.loggableGraph(options?.graph),
     );
-    await this.delegate.putDataset(payload, options);
+    await this.delegate.putGraph(payload, options);
     this.logger.debug(
       "posted %d-quad dataset from %s",
       payload.size,
@@ -53,7 +55,7 @@ export class LoggingSparqlGraphStoreClient implements SparqlGraphStoreClient {
     );
   }
 
-  async putDataset(
+  async putGraph(
     payload: DatasetCore,
     options?: { graph?: BlankNode | DefaultGraph | NamedNode },
   ): Promise<void> {
@@ -62,7 +64,7 @@ export class LoggingSparqlGraphStoreClient implements SparqlGraphStoreClient {
       payload.size,
       this.loggableGraph(options?.graph),
     );
-    await this.delegate.putDataset(payload, options);
+    await this.delegate.putGraph(payload, options);
     this.logger.debug(
       "put %d-quad dataset from %s",
       payload.size,
