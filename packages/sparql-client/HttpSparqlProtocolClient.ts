@@ -22,6 +22,14 @@ export abstract class HttpSparqlProtocolClient<
       []) {
       urlSearchParams.append("using-named-graph-uri", usingNamedGraphUri.value);
     }
+
+    if (
+      requestOptions?.usingUnionGraph ??
+      this.defaultRequestOptions?.usingUnionGraph ??
+      false
+    ) {
+      urlSearchParams.append("using-union-graph", "");
+    }
   }
 }
 
@@ -33,5 +41,6 @@ export namespace HttpSparqlProtocolClient {
     usingDefaultGraphAsUnion?: boolean;
     usingGraphUris?: readonly NamedNode[];
     usingNamedGraphUris?: readonly NamedNode[];
+    usingUnionGraph?: boolean; // Oxigraph extension
   }
 }
