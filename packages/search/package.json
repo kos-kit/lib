@@ -1,8 +1,8 @@
 {
   "dependencies": {
-    "@kos-kit/rdfjs-dataset-models": "2.0.50",
-    "@kos-kit/models": "2.0.50",
-    "@kos-kit/rdf-resource": "2.0.50",
+    "@kos-kit/rdfjs-dataset-models": "2.0.51",
+    "@kos-kit/models": "2.0.51",
+    "@kos-kit/rdf-resource": "2.0.51",
     "@rdfjs/types": "^1.1.0",
     "@types/lunr": "^2.3.7",
     "lunr": "^2.3.9"
@@ -41,5 +41,5 @@
   },
   "type": "module",
   "types": "index.d.ts",
-  "version": "2.0.50"
+  "version": "2.0.51"
 }
