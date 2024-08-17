@@ -7,19 +7,17 @@ import {
 } from "@rdfjs/types";
 
 export interface SparqlGraphStoreClient {
-  deleteGraph(graph: BlankNode | DefaultGraph | NamedNode): Promise<void>;
+  deleteGraph(graph: DefaultGraph | NamedNode): Promise<void>;
 
-  getGraph(
-    graph: BlankNode | DefaultGraph | NamedNode,
-  ): Promise<readonly Quad[]>;
+  getGraph(graph: DefaultGraph | NamedNode): Promise<readonly Quad[]>;
 
   postGraph(
-    graph: BlankNode | DefaultGraph | NamedNode,
-    payload: DatasetCore,
+    graph: DefaultGraph | NamedNode,
+    payload: Iterable<Quad>,
   ): Promise<void>;
 
   putGraph(
-    graph: BlankNode | DefaultGraph | NamedNode,
-    payload: DatasetCore,
+    graph: DefaultGraph | NamedNode,
+    payload: Iterable<Quad>,
   ): Promise<void>;
 }

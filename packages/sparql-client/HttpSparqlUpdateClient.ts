@@ -18,7 +18,6 @@ export class HttpSparqlUpdateClient
       case "POSTDirectly": {
         const headers = this.requestHeaders(
           {
-            accept: "*/*",
             contentType: "application/sparql-update; charset=utf-8",
           },
           options,
@@ -38,7 +37,6 @@ export class HttpSparqlUpdateClient
       case "POSTWithUrlEncodedParameters": {
         const headers = this.requestHeaders(
           {
-            accept: "*/*",
             contentType: "application/x-www-form-urlencoded",
           },
           options,

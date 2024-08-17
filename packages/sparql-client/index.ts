@@ -1,3 +1,6 @@
+export * from "./HttpSparqlGraphStoreClient.js";
+export * from "./HttpSparqlQueryClient.js";
+export * from "./HttpSparqlUpdateClient.js";
 export * from "./LoggingSparqlGraphStoreClient.js";
 export * from "./LoggingSparqlQueryClient.js";
 export * from "./LoggingSparqlUpdateClient.js";

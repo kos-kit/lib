@@ -35,7 +35,7 @@ export abstract class HttpSparqlBaseClient<
       accept,
       contentType,
     }: {
-      accept: string;
+      accept?: string;
       contentType?: string;
     },
     requestOptions?: RequestOptionsT,
@@ -68,8 +68,10 @@ export abstract class HttpSparqlBaseClient<
       }
     }
 
-    // Enforce our preference on accept
-    mergedHeaders.set("accept", accept);
+    if (accept) {
+      // Enforce our preference on accept
+      mergedHeaders.set("accept", accept);
+    }
 
     if (contentType) {
       mergedHeaders.append("content-type", contentType);

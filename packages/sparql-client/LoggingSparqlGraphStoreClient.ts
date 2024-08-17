@@ -1,10 +1,4 @@
-import {
-  BlankNode,
-  DatasetCore,
-  DefaultGraph,
-  NamedNode,
-  Quad,
-} from "@rdfjs/types";
+import { DatasetCore, DefaultGraph, NamedNode, Quad } from "@rdfjs/types";
 import { Logger } from "pino";
 import { SparqlGraphStoreClient } from "./SparqlGraphStoreClient.js";
 
@@ -20,17 +14,13 @@ export class LoggingSparqlGraphStoreClient implements SparqlGraphStoreClient {
     this.logger = logger;
   }
 
-  async deleteGraph(
-    graph: BlankNode | DefaultGraph | NamedNode,
-  ): Promise<void> {
+  async deleteGraph(graph: DefaultGraph | NamedNode): Promise<void> {
     this.logger.debug("deleting graph %s", this.loggableGraph(graph));
     await this.delegate.deleteGraph(graph);
     this.logger.debug("deleted graph %s", this.loggableGraph(graph));
   }
 
-  async getGraph(
-    graph: BlankNode | DefaultGraph | NamedNode,
-  ): Promise<readonly Quad[]> {
+  async getGraph(graph: DefaultGraph | NamedNode): Promise<readonly Quad[]> {
     this.logger.debug("getting dataset from %s", this.loggableGraph(graph));
     const result = await this.delegate.getGraph(graph);
     this.logger.debug(
@@ -42,7 +32,7 @@ export class LoggingSparqlGraphStoreClient implements SparqlGraphStoreClient {
   }
 
   async postGraph(
-    graph: BlankNode | DefaultGraph | NamedNode,
+    graph: DefaultGraph | NamedNode,
     payload: DatasetCore,
   ): Promise<void> {
     this.logger.debug(
@@ -59,7 +49,7 @@ export class LoggingSparqlGraphStoreClient implements SparqlGraphStoreClient {
   }
 
   async putGraph(
-    graph: BlankNode | DefaultGraph | NamedNode,
+    graph: DefaultGraph | NamedNode,
     payload: DatasetCore,
   ): Promise<void> {
     this.logger.debug(
@@ -75,10 +65,8 @@ export class LoggingSparqlGraphStoreClient implements SparqlGraphStoreClient {
     );
   }
 
-  private loggableGraph(graph: BlankNode | DefaultGraph | NamedNode) {
+  private loggableGraph(graph: DefaultGraph | NamedNode) {
     switch (graph.termType) {
-      case "BlankNode":
-        return `graph _:${graph.value}`;
       case "DefaultGraph":
         return "default graph";
       case "NamedNode":
