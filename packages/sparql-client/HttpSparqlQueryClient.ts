@@ -203,6 +203,6 @@ export namespace HttpSparqlQueryClient {
 
   export interface RequestOptions
     extends HttpSparqlProtocolClient.RequestOptions {
-    method: "GET" | "POSTDirectly" | "POSTWithUrlEncodedParameters";
+    method?: "GET" | "POSTDirectly" | "POSTWithUrlEncodedParameters";
   }
 }

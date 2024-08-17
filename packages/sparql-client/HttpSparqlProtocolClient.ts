@@ -17,8 +17,8 @@ export abstract class HttpSparqlProtocolClient<
       urlSearchParams.append("using-graph-uri", usingGraphUri.value);
     }
 
-    for (const usingNamedGraphUri of requestOptions?.usingGraphUris ??
-      this.defaultRequestOptions?.usingGraphUris ??
+    for (const usingNamedGraphUri of requestOptions?.usingNamedGraphUris ??
+      this.defaultRequestOptions?.usingNamedGraphUris ??
       []) {
       urlSearchParams.append("using-named-graph-uri", usingNamedGraphUri.value);
     }

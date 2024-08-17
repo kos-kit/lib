@@ -65,6 +65,6 @@ export namespace HttpSparqlUpdateClient {
 
   export interface RequestOptions
     extends HttpSparqlProtocolClient.RequestOptions {
-    method: "POSTDirectly" | "POSTWithUrlEncodedParameters";
+    method?: "POSTDirectly" | "POSTWithUrlEncodedParameters";
   }
 }

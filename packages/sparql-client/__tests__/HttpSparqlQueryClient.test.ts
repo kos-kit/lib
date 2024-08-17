@@ -1,4 +1,4 @@
-import { vi } from "vitest";
+import { beforeEach, vi } from "vitest";
 import createFetchMock from "vitest-fetch-mock";
 
 const fetchMocker = createFetchMock(vi);
@@ -14,6 +14,10 @@ describe("HttpSparqlQueryClient", () => {
     dataFactory: N3.DataFactory,
     datasetCoreFactory: new N3DatasetCoreFactory(),
     endpointUrl: "http://example.com",
+  });
+
+  beforeEach(() => {
+    fetchMocker.resetMocks();
   });
 
   it("should make an ASK query", async ({ expect }) => {
@@ -75,5 +79,44 @@ describe("HttpSparqlQueryClient", () => {
     const bindings = await sut.select("SELECT");
     expect(bindings).toHaveLength(2);
     expect(bindings[0]["name"].value).toStrictEqual("Alice");
+  });
+
+  it("should use the GET method", async ({ expect }) => {
+    fetchMocker.mockResponseOnce(JSON.stringify({ boolean: true }));
+    expect(await sut.ask("ASK", { method: "GET" })).toStrictEqual(true);
+    expect(fetchMocker.requests()).toHaveLength(1);
+    const request = fetchMocker.requests()[0];
+    expect(request.url).toStrictEqual("http://example.com/?query=ASK");
+    expect(await request.text()).toStrictEqual("");
+  });
+
+  it("should use the POST directly method", async ({ expect }) => {
+    fetchMocker.mockResponseOnce(JSON.stringify({ boolean: true }));
+    expect(await sut.ask("ASK", { method: "POSTDirectly" })).toStrictEqual(
+      true,
+    );
+    expect(fetchMocker.requests()).toHaveLength(1);
+    const request = fetchMocker.requests()[0];
+    expect(request.url).toStrictEqual("http://example.com/");
+    expect(request.headers.get("content-type")).toStrictEqual(
+      "application/sparql-query; charset=utf-8",
+    );
+    expect(await request.text()).toStrictEqual("ASK");
+  });
+
+  it("should use the POST with URL-encoded parameters method", async ({
+    expect,
+  }) => {
+    fetchMocker.mockResponseOnce(JSON.stringify({ boolean: true }));
+    expect(
+      await sut.ask("ASK", { method: "POSTWithUrlEncodedParameters" }),
+    ).toStrictEqual(true);
+    expect(fetchMocker.requests()).toHaveLength(1);
+    const request = fetchMocker.requests()[0];
+    expect(request.url).toStrictEqual("http://example.com/");
+    expect(request.headers.get("content-type")).toStrictEqual(
+      "application/x-www-form-urlencoded",
+    );
+    expect(await request.text()).toStrictEqual("query=ASK");
   });
 });
