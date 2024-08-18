@@ -198,12 +198,7 @@ ${this.conceptSchemesQueryToWhereGraphPatterns(query).join("\n")}
       whereGraphPatterns.push(
         "UNION",
         // skos:inScheme has an open domain, so we have to check the concept's rdf:type
-        `{ ?concept <${skos.inScheme.value}> ?conceptScheme . ${GraphPattern.toWhereString(
-          GraphPattern.rdfType({
-            rdfType: skos.Concept,
-            subject: { termType: "Variable", value: "concept" },
-          }),
-        )} }`,
+        `{ ?concept <${skos.inScheme.value}> ?conceptScheme . }`,
       );
     }
 
