@@ -5,6 +5,7 @@ import {
   ConceptScheme as IConceptScheme,
   Label as ILabel,
   Identifier,
+  StubArray,
   abc,
 } from "@kos-kit/models";
 import { Resource } from "@kos-kit/rdf-resource";
@@ -12,6 +13,8 @@ import { getRdfInstances } from "@kos-kit/rdf-utils";
 import TermSet from "@rdfjs/term-set";
 import { DatasetCore } from "@rdfjs/types";
 import { skos } from "@tpluscode/rdf-ns-builders";
+import { limitGenerator } from "./limitGenerator.js";
+import { offsetGenerator } from "./offsetGenerator.js";
 
 function isConceptInScheme({
   conceptIdentifier,
@@ -71,41 +74,6 @@ function isConceptTopConceptOf({
   return false;
 }
 
-function* limitGenerator<T>(
-  generator: Generator<T>,
-  limit: number | null,
-): Generator<T> {
-  if (limit === null || limit <= 0) {
-    yield* generator;
-    return;
-  }
-
-  let yieldedItemCount = 0;
-  for (const item of generator) {
-    yield item;
-    if (++yieldedItemCount === limit) {
-      return;
-    }
-  }
-}
-
-function* offsetGenerator<T>(
-  generator: Generator<T>,
-  offset: number,
-): Generator<T> {
-  if (offset <= 0) {
-    yield* generator;
-    return;
-  }
-
-  let itemI = 0;
-  for (const item of generator) {
-    if (itemI++ >= offset) {
-      yield item;
-    }
-  }
-}
-
 export abstract class Kos<
   ConceptT extends IConcept<ConceptT, ConceptSchemeT, LabelT>,
   ConceptSchemeT extends IConceptScheme<ConceptT, LabelT>,
@@ -118,7 +86,7 @@ export abstract class Kos<
     this.dataset = dataset;
   }
 
-  async *concepts({
+  async concepts({
     limit,
     offset,
     query,
@@ -126,18 +94,20 @@ export abstract class Kos<
     limit: number | null;
     offset: number;
     query: ConceptsQuery;
-  }): AsyncGenerator<abc.ConceptStub<ConceptT, ConceptSchemeT, LabelT>> {
-    yield* limitGenerator(
-      offsetGenerator(this.queryConcepts(query), offset),
-      limit,
-    );
+  }): Promise<StubArray<ConceptT>> {
+    return new StubArray([
+      ...limitGenerator(
+        offsetGenerator(this.queryConcepts(query), offset),
+        limit,
+      ),
+    ]);
   }
 
   override async conceptsCount(query: ConceptsQuery): Promise<number> {
     return this.queryConcepts(query).count();
   }
 
-  async *conceptSchemes({
+  async conceptSchemes({
     limit,
     offset,
     query,
@@ -145,11 +115,13 @@ export abstract class Kos<
     limit: number | null;
     offset: number;
     query: ConceptSchemesQuery;
-  }): AsyncGenerator<abc.ConceptSchemeStub<ConceptT, ConceptSchemeT, LabelT>> {
-    yield* limitGenerator(
-      offsetGenerator(this.queryConceptSchemes(query), offset),
-      limit,
-    );
+  }): Promise<StubArray<ConceptSchemeT>> {
+    return new StubArray([
+      ...limitGenerator(
+        offsetGenerator(this.queryConceptSchemes(query), offset),
+        limit,
+      ),
+    ]);
   }
 
   override async conceptSchemesCount(
