@@ -59,7 +59,7 @@ export class LunrSearchEngine implements SearchEngine {
 
     if (conceptsLimit != null) {
       // Don't index all concepts in the set, in testing
-      for await (const concept of kos.concepts({
+      for (const concept of await kos.concepts({
         limit: conceptsLimit,
         offset: 0,
         query: { type: "All" },
@@ -70,7 +70,7 @@ export class LunrSearchEngine implements SearchEngine {
       }
     } else {
       // Index all concepts in the set
-      for await (const concept of kos.concepts({
+      for (const concept of await kos.concepts({
         limit: null,
         offset: 0,
         query: { type: "All" },
@@ -82,7 +82,7 @@ export class LunrSearchEngine implements SearchEngine {
     }
 
     // Index concept schemes
-    for await (const conceptScheme of kos.conceptSchemes({
+    for (const conceptScheme of await kos.conceptSchemes({
       limit: null,
       offset: 0,
       query: { type: "All" },
