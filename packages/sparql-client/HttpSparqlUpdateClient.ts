@@ -1,9 +1,10 @@
 import { URLSearchParams } from "node:url";
-import { HttpSparqlProtocolClient } from "./HttpSparqlProtocolClient.js";
+import { NamedNode } from "@rdfjs/types";
+import { HttpSparqlBaseClient } from "./HttpSparqlBaseClient.js";
 import { SparqlUpdateClient } from "./SparqlUpdateClient.js";
 
 export class HttpSparqlUpdateClient
-  extends HttpSparqlProtocolClient<HttpSparqlUpdateClient.RequestOptions>
+  extends HttpSparqlBaseClient<HttpSparqlUpdateClient.RequestOptions>
   implements SparqlUpdateClient
 {
   async update(
@@ -25,13 +26,11 @@ export class HttpSparqlUpdateClient
 
         this.requestOptionsToUrlSearchParams(url.searchParams, options);
 
-        await this.checkResponse(
-          await fetch(url, {
-            body: update,
-            headers,
-            method: "POST",
-          }),
-        );
+        await this.fetch(url, {
+          body: update,
+          headers,
+          method: "POST",
+        });
         return;
       }
       case "POSTWithUrlEncodedParameters": {
@@ -46,23 +45,48 @@ export class HttpSparqlUpdateClient
         this.requestOptionsToUrlSearchParams(urlEncodedParameters, options);
         urlEncodedParameters.set("update", update);
 
-        await this.checkResponse(
-          await fetch(url, {
-            body: urlEncodedParameters,
-            headers,
-            method: "POST",
-          }),
-        );
+        await this.fetch(url, {
+          body: urlEncodedParameters,
+          headers,
+          method: "POST",
+        });
       }
+    }
+  }
+
+  private requestOptionsToUrlSearchParams(
+    urlSearchParams: URLSearchParams,
+    requestOptions?: HttpSparqlUpdateClient.RequestOptions,
+  ): void {
+    for (const usingGraphUri of requestOptions?.usingGraphUris ??
+      this.defaultRequestOptions?.usingGraphUris ??
+      []) {
+      urlSearchParams.append("using-graph-uri", usingGraphUri.value);
+    }
+
+    for (const usingNamedGraphUri of requestOptions?.usingNamedGraphUris ??
+      this.defaultRequestOptions?.usingNamedGraphUris ??
+      []) {
+      urlSearchParams.append("using-named-graph-uri", usingNamedGraphUri.value);
+    }
+
+    if (
+      requestOptions?.usingUnionGraph ??
+      this.defaultRequestOptions?.usingUnionGraph ??
+      false
+    ) {
+      urlSearchParams.append("using-union-graph", "");
     }
   }
 }
 
 export namespace HttpSparqlUpdateClient {
-  export type Parameters = HttpSparqlProtocolClient.Parameters<RequestOptions>;
+  export type Parameters = HttpSparqlBaseClient.Parameters<RequestOptions>;
 
-  export interface RequestOptions
-    extends HttpSparqlProtocolClient.RequestOptions {
+  export interface RequestOptions extends HttpSparqlBaseClient.RequestOptions {
     method?: "POSTDirectly" | "POSTWithUrlEncodedParameters";
+    usingGraphUris?: readonly NamedNode[];
+    usingNamedGraphUris?: readonly NamedNode[];
+    usingUnionGraph?: boolean; // Oxigraph extension
   }
 }

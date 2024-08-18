@@ -8,11 +8,11 @@ import {
   NamedNode,
 } from "@rdfjs/types";
 import N3 from "n3";
-import { HttpSparqlProtocolClient } from "./HttpSparqlProtocolClient.js";
+import { HttpSparqlBaseClient } from "./HttpSparqlBaseClient.js";
 import { SparqlQueryClient } from "./SparqlQueryClient.js";
 
 export class HttpSparqlQueryClient
-  extends HttpSparqlProtocolClient<HttpSparqlQueryClient.RequestOptions>
+  extends HttpSparqlBaseClient<HttpSparqlQueryClient.RequestOptions>
   implements SparqlQueryClient
 {
   private readonly dataFactory: DataFactory;
@@ -142,12 +142,10 @@ export class HttpSparqlQueryClient
         url.searchParams.set("query", query);
         this.requestOptionsToUrlSearchParams(url.searchParams, options);
 
-        return this.checkResponse(
-          await fetch(url, {
-            headers,
-            method: "GET",
-          }),
-        );
+        return this.fetch(url, {
+          headers,
+          method: "GET",
+        });
       }
       case "POSTDirectly": {
         const headers = this.requestHeaders(
@@ -160,13 +158,11 @@ export class HttpSparqlQueryClient
 
         this.requestOptionsToUrlSearchParams(url.searchParams, options);
 
-        return this.checkResponse(
-          await fetch(url, {
-            body: query,
-            headers,
-            method: "POST",
-          }),
-        );
+        return this.fetch(url, {
+          body: query,
+          headers,
+          method: "POST",
+        });
       }
       case "POSTWithUrlEncodedParameters": {
         const headers = this.requestHeaders(
@@ -181,27 +177,52 @@ export class HttpSparqlQueryClient
         this.requestOptionsToUrlSearchParams(urlEncodedParameters, options);
         urlEncodedParameters.set("query", query);
 
-        return this.checkResponse(
-          await fetch(url, {
-            body: urlEncodedParameters,
-            headers,
-            method: "POST",
-          }),
-        );
+        return this.fetch(url, {
+          body: urlEncodedParameters,
+          headers,
+          method: "POST",
+        });
       }
+    }
+  }
+
+  private requestOptionsToUrlSearchParams(
+    urlSearchParams: URLSearchParams,
+    requestOptions?: HttpSparqlQueryClient.RequestOptions,
+  ): void {
+    for (const defaultGraphUri of requestOptions?.defaultGraphUris ??
+      this.defaultRequestOptions?.defaultGraphUris ??
+      []) {
+      urlSearchParams.append("default-graph-uri", defaultGraphUri.value);
+    }
+
+    for (const namedGraphUri of requestOptions?.namedGraphUris ??
+      this.defaultRequestOptions?.namedGraphUris ??
+      []) {
+      urlSearchParams.append("named-graph-uri", namedGraphUri.value);
+    }
+
+    if (
+      requestOptions?.unionDefaultGraph ??
+      this.defaultRequestOptions?.unionDefaultGraph ??
+      false
+    ) {
+      urlSearchParams.append("union-default-graph", "");
     }
   }
 }
 
 export namespace HttpSparqlQueryClient {
   export interface Parameters
-    extends HttpSparqlProtocolClient.Parameters<RequestOptions> {
+    extends HttpSparqlBaseClient.Parameters<RequestOptions> {
     dataFactory: DataFactory;
     datasetCoreFactory: DatasetCoreFactory;
   }
 
-  export interface RequestOptions
-    extends HttpSparqlProtocolClient.RequestOptions {
+  export interface RequestOptions extends HttpSparqlBaseClient.RequestOptions {
+    defaultGraphUris?: readonly NamedNode[];
     method?: "GET" | "POSTDirectly" | "POSTWithUrlEncodedParameters";
+    namedGraphUris?: readonly NamedNode[];
+    unionDefaultGraph?: boolean; // Oxigraph extension
   }
 }

@@ -1,3 +1,5 @@
+import { Logger, pino } from "pino";
+
 /**
  * Abstract base class for HTTP-based SPARQL clients.
  */
@@ -6,16 +8,42 @@ export abstract class HttpSparqlBaseClient<
 > {
   protected defaultRequestOptions?: RequestOptionsT;
   protected readonly endpointUrl: string;
+  protected readonly logger: Logger;
 
   constructor({
     defaultRequestOptions,
     endpointUrl,
+    logger,
   }: HttpSparqlBaseClient.Parameters<RequestOptionsT>) {
     this.defaultRequestOptions = defaultRequestOptions;
     this.endpointUrl = endpointUrl;
+    this.logger =
+      logger ??
+      pino({
+        level: "silent",
+      });
   }
 
-  protected async checkResponse(response: Response): Promise<Response> {
+  protected async fetch(input: URL, init?: RequestInit): Promise<Response> {
+    this.logger.debug("fetching %s", input);
+    if (this.logger.isLevelEnabled("trace")) {
+      this.logger.trace("request method: %s", init?.method ?? "GET");
+      if (init?.headers && init.headers instanceof Headers) {
+        for (const [name, value] of init.headers.entries()) {
+          this.logger.trace("request header: %s: %s", name, value);
+        }
+      }
+      if (init?.body && typeof init.body === "string") {
+        this.logger.trace(
+          "request body (length=%s):\n%s",
+          init.body.length,
+          init.body,
+        );
+      }
+    }
+
+    const response = await fetch(input, init);
+
     if (response.ok) {
       return response;
     }
@@ -87,6 +115,7 @@ export namespace HttpSparqlBaseClient {
   export interface Parameters<RequestOptionsT extends RequestOptions> {
     defaultRequestOptions?: RequestOptionsT;
     endpointUrl: string;
+    logger?: Logger;
   }
 
   export interface RequestOptions {

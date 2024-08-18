@@ -13,7 +13,7 @@ export abstract class LabeledModel<
   ConceptSchemeT extends IConceptScheme<ConceptT, LabelT>,
   LabelT extends ILabel,
 > extends NamedModel {
-  protected readonly kos: Kos<ConceptT, ConceptSchemeT, LabelT>;
+  kos: Kos<ConceptT, ConceptSchemeT, LabelT>; // Intentionally mutable
   protected readonly logger: Logger;
 
   constructor({

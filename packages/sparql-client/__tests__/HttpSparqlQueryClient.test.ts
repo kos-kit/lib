@@ -122,4 +122,42 @@ describe("HttpSparqlQueryClient", () => {
     );
     expect(await request.text()).toStrictEqual("query=ASK");
   });
+
+  it("should add default graph URIs with request options", async ({
+    expect,
+  }) => {
+    fetchMocker.mockResponseOnce(JSON.stringify({ boolean: true }));
+    await sut.queryBoolean("ASK", {
+      method: "POSTDirectly",
+      defaultGraphUris: [N3.DataFactory.namedNode("http://test.com")],
+    });
+    expect(fetchMocker.requests()).toHaveLength(1);
+    const request = fetchMocker.requests()[0];
+    expect(request.url).toStrictEqual(
+      "http://example.com/?default-graph-uri=http%3A%2F%2Ftest.com",
+    );
+  });
+
+  it("should add using named graph URIs with default request options", async ({
+    expect,
+  }) => {
+    fetchMocker.mockResponseOnce(JSON.stringify({ boolean: true }));
+    await new HttpSparqlQueryClient({
+      dataFactory: N3.DataFactory,
+      datasetCoreFactory: {
+        dataset: (quads) => new N3.Store(quads),
+      },
+      defaultRequestOptions: {
+        namedGraphUris: [N3.DataFactory.namedNode("http://test.com")],
+      },
+      endpointUrl: "http://example.com",
+    }).queryBoolean("ASK", {
+      method: "POSTDirectly",
+    });
+    expect(fetchMocker.requests()).toHaveLength(1);
+    const request = fetchMocker.requests()[0];
+    expect(request.url).toStrictEqual(
+      "http://example.com/?named-graph-uri=http%3A%2F%2Ftest.com",
+    );
+  });
 });
