@@ -2,6 +2,7 @@ export * from "./Concept.js";
 export * from "./ConceptsQuery.js";
 export * from "./ConceptScheme.js";
 export * from "./ConceptSchemesQuery.js";
+export * from "./EmptyStubSequence.js";
 export * from "./Identifier.js";
 export * from "./Identifier.js";
 export * from "./Kos.js";

@@ -27,7 +27,7 @@ export abstract class ConceptScheme<
   async conceptByIdentifier(
     identifier: Identifier,
   ): Promise<Maybe<Stub<ConceptT>>> {
-    for await (const conceptStub of await this.kos.concepts({
+    for (const conceptStub of await this.kos.concepts({
       limit: 1,
       offset: 0,
       query: {

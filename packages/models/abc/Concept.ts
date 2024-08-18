@@ -68,7 +68,7 @@ export abstract class Concept<
       const inverseProperty =
         inverseSemanticRelationProperty(property).extractNullable();
       if (inverseProperty !== null) {
-        for await (const conceptStub of await this.kos.concepts({
+        for (const conceptStub of await this.kos.concepts({
           limit: null,
           offset: 0,
           query: {
