@@ -25,8 +25,8 @@ export abstract class HttpSparqlBaseClient<
   }
 
   protected async fetch(input: URL, init?: RequestInit): Promise<Response> {
-    this.logger.debug("fetching %s", input);
     if (this.logger.isLevelEnabled("trace")) {
+      this.logger.trace("request URL: %s", input);
       this.logger.trace("request method: %s", init?.method ?? "GET");
       if (init?.headers && init.headers instanceof Headers) {
         for (const [name, value] of init.headers.entries()) {
