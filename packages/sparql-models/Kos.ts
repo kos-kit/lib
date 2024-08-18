@@ -5,6 +5,7 @@ import {
   ConceptScheme as IConceptScheme,
   Label as ILabel,
   Identifier,
+  StubArray,
   abc,
 } from "@kos-kit/models";
 import { SparqlQueryClient } from "@kos-kit/sparql-client";
@@ -31,7 +32,7 @@ export abstract class Kos<
     this.sparqlQueryClient = sparqlQueryClient;
   }
 
-  async *concepts({
+  async concepts({
     limit,
     offset,
     query,
@@ -39,9 +40,10 @@ export abstract class Kos<
     limit: number | null;
     offset: number;
     query: ConceptsQuery;
-  }): AsyncGenerator<abc.Stub<ConceptT, ConceptSchemeT, LabelT, ConceptT>> {
-    for (const identifier of mapBindingsToIdentifiers(
-      await this.sparqlQueryClient.queryBindings(`\
+  }): Promise<StubArray<ConceptT>> {
+    return new StubArray(
+      mapBindingsToIdentifiers(
+        await this.sparqlQueryClient.queryBindings(`\
 SELECT DISTINCT ?concept
 WHERE {
 ${this.conceptsQueryToWhereGraphPatterns(query).join("\n")}
@@ -49,10 +51,9 @@ ${this.conceptsQueryToWhereGraphPatterns(query).join("\n")}
 ${limit !== null && limit > 0 ? `LIMIT ${limit}` : ""}
 ${offset > 0 ? `OFFSET ${offset}` : ""}
 `),
-      "concept",
-    )) {
-      yield this.conceptByIdentifier(identifier);
-    }
+        "concept",
+      ).map((identifier) => this.conceptByIdentifier(identifier)),
+    );
   }
 
   async conceptsCount(query: ConceptsQuery): Promise<number> {
@@ -66,7 +67,7 @@ ${this.conceptsQueryToWhereGraphPatterns(query).join("\n")}
     );
   }
 
-  async *conceptSchemes({
+  async conceptSchemes({
     limit,
     offset,
     query,
@@ -74,11 +75,10 @@ ${this.conceptsQueryToWhereGraphPatterns(query).join("\n")}
     limit: number | null;
     offset: number;
     query: ConceptSchemesQuery;
-  }): AsyncGenerator<
-    abc.Stub<ConceptT, ConceptSchemeT, LabelT, ConceptSchemeT>
-  > {
-    for (const identifier of mapBindingsToIdentifiers(
-      await this.sparqlQueryClient.queryBindings(`\
+  }): Promise<StubArray<ConceptSchemeT>> {
+    return new StubArray(
+      mapBindingsToIdentifiers(
+        await this.sparqlQueryClient.queryBindings(`\
 SELECT DISTINCT ?conceptScheme
 WHERE {
 ${this.conceptSchemesQueryToWhereGraphPatterns(query).join("\n")}
@@ -86,10 +86,9 @@ ${this.conceptSchemesQueryToWhereGraphPatterns(query).join("\n")}
 ${limit !== null && limit > 0 ? `LIMIT ${limit}` : ""}
 ${offset > 0 ? `OFFSET ${offset}` : ""}
 `),
-      "conceptScheme",
-    )) {
-      yield this.conceptSchemeByIdentifier(identifier);
-    }
+        "conceptScheme",
+      ).map((identifier) => this.conceptSchemeByIdentifier(identifier)),
+    );
   }
 
   async conceptSchemesCount(query: ConceptSchemesQuery): Promise<number> {
