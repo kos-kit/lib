@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "@kos-kit/rdf-utils": "2.0.53",
+    "@kos-kit/rdf-utils": "2.0.54",
     "@rdfjs/types": "^1.1.0",
     "purify-ts": "~2.1.0",
     "rdf-literal": "^1.3.2"
@@ -39,5 +39,5 @@
   },
   "type": "module",
   "types": "index.d.ts",
-  "version": "2.0.53"
+  "version": "2.0.54"
 }
