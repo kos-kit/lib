@@ -6,6 +6,7 @@ import {
   NoteProperty,
   SemanticRelationProperty,
   Stub,
+  StubArray,
   inverseSemanticRelationProperty,
 } from "@kos-kit/models";
 import TermSet from "@rdfjs/term-set";
@@ -28,8 +29,8 @@ export abstract class Concept<
     return Concept.equals(this, other);
   }
 
-  async *inSchemes(): AsyncGenerator<Stub<ConceptSchemeT>> {
-    yield* this.kos.conceptSchemes({
+  async inSchemes(): Promise<StubArray<ConceptSchemeT>> {
+    return this.kos.conceptSchemes({
       limit: null,
       offset: 0,
       query: { conceptIdentifier: this.identifier, type: "HasConcept" },
@@ -40,13 +41,14 @@ export abstract class Concept<
 
   abstract notes(property: NoteProperty): readonly Literal[];
 
-  async *semanticRelations(
+  async semanticRelations(
     property: SemanticRelationProperty,
     options?: { includeInverse?: false },
-  ): AsyncGenerator<Stub<ConceptT>> {
-    const yieldedConceptIdentifiers = new TermSet<Identifier>();
+  ): Promise<StubArray<ConceptT>> {
+    const conceptIdentifiers = new TermSet<Identifier>();
+    const conceptStubs: Stub<ConceptT>[] = [];
 
-    for await (const conceptStub of this.kos.concepts({
+    for (const conceptStub of await this.kos.concepts({
       limit: null,
       offset: 0,
       query: {
@@ -55,9 +57,9 @@ export abstract class Concept<
         type: "ObjectsOfSemanticRelation",
       },
     })) {
-      if (!yieldedConceptIdentifiers.has(conceptStub.identifier)) {
-        yield conceptStub;
-        yieldedConceptIdentifiers.add(conceptStub.identifier);
+      if (!conceptIdentifiers.has(conceptStub.identifier)) {
+        conceptIdentifiers.add(conceptStub.identifier);
+        conceptStubs.push(conceptStub);
       }
     }
 
@@ -65,7 +67,7 @@ export abstract class Concept<
       const inverseProperty =
         inverseSemanticRelationProperty(property).extractNullable();
       if (inverseProperty !== null) {
-        for await (const conceptStub of this.kos.concepts({
+        for await (const conceptStub of await this.kos.concepts({
           limit: null,
           offset: 0,
           query: {
@@ -74,13 +76,15 @@ export abstract class Concept<
             type: "SubjectsOfSemanticRelation",
           },
         })) {
-          if (!yieldedConceptIdentifiers.has(conceptStub.identifier)) {
-            yield conceptStub;
-            yieldedConceptIdentifiers.add(conceptStub.identifier);
+          if (!conceptIdentifiers.has(conceptStub.identifier)) {
+            conceptIdentifiers.add(conceptStub.identifier);
+            conceptStubs.push(conceptStub);
           }
         }
       }
     }
+
+    return new StubArray(conceptStubs);
   }
 
   async semanticRelationsCount(
@@ -93,8 +97,8 @@ export abstract class Concept<
     });
   }
 
-  async *topConceptOf(): AsyncGenerator<Stub<ConceptSchemeT>> {
-    yield* this.kos.conceptSchemes({
+  topConceptOf(): Promise<StubArray<ConceptSchemeT>> {
+    return this.kos.conceptSchemes({
       limit: null,
       offset: 0,
       query: { conceptIdentifier: this.identifier, type: "HasTopConcept" },

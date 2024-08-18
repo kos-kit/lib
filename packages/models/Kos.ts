@@ -6,6 +6,7 @@ import { Identifier } from "./Identifier.js";
 import { Label } from "./Label.js";
 import { LanguageTagSet } from "./LanguageTagSet.js";
 import { Stub } from "./Stub.js";
+import { StubArray } from "./StubArray.js";
 
 export interface Kos<
   ConceptT extends Concept<ConceptT, ConceptSchemeT, LabelT>,
@@ -19,7 +20,7 @@ export interface Kos<
     limit: number | null;
     offset: number;
     query: ConceptsQuery;
-  }): AsyncGenerator<Stub<ConceptT>>;
+  }): Promise<StubArray<ConceptT>>;
   conceptsCount(query: ConceptsQuery): Promise<number>;
 
   conceptSchemeByIdentifier(identifier: Identifier): Stub<ConceptSchemeT>;
@@ -27,6 +28,6 @@ export interface Kos<
     limit: number | null;
     offset: number;
     query: ConceptSchemesQuery;
-  }): AsyncGenerator<Stub<ConceptSchemeT>>;
+  }): Promise<StubArray<ConceptSchemeT>>;
   conceptSchemesCount(query: ConceptSchemesQuery): Promise<number>;
 }

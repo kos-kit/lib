@@ -5,6 +5,7 @@ import { Identifier } from "./Identifier.js";
 import { Label } from "./Label.js";
 import { LabeledModel } from "./LabeledModel.js";
 import { Stub } from "./Stub.js";
+import { StubArray } from "./StubArray.js";
 
 export interface ConceptScheme<
   ConceptT extends Concept<any, any, LabelT>,
@@ -17,15 +18,15 @@ export interface ConceptScheme<
 
   conceptByIdentifier(identifier: Identifier): Promise<Maybe<Stub<ConceptT>>>;
 
-  concepts(kwds?: { limit?: number; offset?: number }): AsyncGenerator<
-    Stub<ConceptT>
+  concepts(kwds?: { limit?: number; offset?: number }): Promise<
+    StubArray<ConceptT>
   >;
   conceptsCount(): Promise<number>;
 
   equals(other: ConceptScheme<any, any>): boolean;
 
-  topConcepts(kwds?: { limit?: number; offset?: number }): AsyncGenerator<
-    Stub<ConceptT>
+  topConcepts(kwds?: { limit?: number; offset?: number }): Promise<
+    StubArray<ConceptT>
   >;
   topConceptsCount(): Promise<number>;
 }

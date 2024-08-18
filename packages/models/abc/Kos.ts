@@ -7,6 +7,7 @@ import {
   Label as ILabel,
   Identifier,
   LanguageTagSet,
+  StubArray,
 } from "@kos-kit/models";
 import { Logger, pino } from "pino";
 import { ConceptSchemeStub } from "./ConceptSchemeStub.js";
@@ -38,7 +39,7 @@ export abstract class Kos<
     limit: number | null;
     offset: number;
     query: ConceptsQuery;
-  }): AsyncGenerator<ConceptStub<ConceptT, ConceptSchemeT, LabelT>>;
+  }): Promise<StubArray<ConceptT>>;
 
   abstract conceptsCount(query: ConceptsQuery): Promise<number>;
 
@@ -50,7 +51,7 @@ export abstract class Kos<
     limit: number | null;
     offset: number;
     query: ConceptSchemesQuery;
-  }): AsyncGenerator<ConceptSchemeStub<ConceptT, ConceptSchemeT, LabelT>>;
+  }): Promise<StubArray<ConceptSchemeT>>;
 
   abstract conceptSchemesCount(query: ConceptSchemesQuery): Promise<number>;
 }
