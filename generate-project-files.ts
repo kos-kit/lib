@@ -29,7 +29,7 @@ const externalDependencyVersions = {
   n3: "^1.17.3",
   pino: "^9.1.0",
   "purify-ts": "~2.1.0",
-  "purify-ts-helpers": "1.0.3",
+  "purify-ts-helpers": "1.0.4",
 };
 
 const projects: readonly Project[] = [
