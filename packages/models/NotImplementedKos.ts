@@ -7,7 +7,7 @@ import { Kos } from "./Kos.js";
 import { Label } from "./Label.js";
 import { LanguageTagSet } from "./LanguageTagSet.js";
 import { Stub } from "./Stub.js";
-import { StubArray } from "./StubArray.js";
+import { StubSequence } from "./StubSequence.js";
 
 export class NotImplementedKos<
   ConceptT extends Concept<any, ConceptSchemeT, LabelT>,
@@ -22,7 +22,7 @@ export class NotImplementedKos<
     limit: number | null;
     offset: number;
     query: ConceptsQuery;
-  }): Promise<StubArray<ConceptT>> {
+  }): Promise<StubSequence<ConceptT>> {
     throw new Error("Method not implemented.");
   }
   conceptsCount(_query: ConceptsQuery): Promise<number> {
@@ -35,7 +35,7 @@ export class NotImplementedKos<
     limit: number | null;
     offset: number;
     query: ConceptSchemesQuery;
-  }): Promise<StubArray<ConceptSchemeT>> {
+  }): Promise<StubSequence<ConceptSchemeT>> {
     throw new Error("Method not implemented.");
   }
   conceptSchemesCount(_query: ConceptSchemesQuery): Promise<number> {

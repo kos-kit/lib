@@ -19,6 +19,6 @@ export * from "./NotImplementedKos.js";
 export * from "./semanticRelationProperties.js";
 export * from "./SemanticRelationProperty.js";
 export * from "./Stub.js";
-export * from "./StubArray.js";
-export * from "./Stubs.js";
+export * from "./StubSequence.js";
+export * from "./UnbatchedStubSequence.js";
 export * as abc from "./abc/index.js";

@@ -4,7 +4,7 @@ import {
   Label as ILabel,
   Identifier,
   Stub,
-  StubArray,
+  StubSequence,
 } from "@kos-kit/models";
 import { Literal, NamedNode } from "@rdfjs/types";
 import { Maybe } from "purify-ts";
@@ -49,7 +49,7 @@ export abstract class ConceptScheme<
   concepts(kwds?: {
     limit?: number;
     offset?: number;
-  }): Promise<StubArray<ConceptT>> {
+  }): Promise<StubSequence<ConceptT>> {
     return this.kos.concepts({
       limit: null,
       offset: 0,
@@ -76,7 +76,7 @@ export abstract class ConceptScheme<
   topConcepts(kwds?: {
     limit?: number;
     offset?: number;
-  }): Promise<StubArray<ConceptT>> {
+  }): Promise<StubSequence<ConceptT>> {
     return this.kos.concepts({
       limit: null,
       offset: 0,

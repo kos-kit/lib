@@ -6,7 +6,8 @@ import {
   NoteProperty,
   SemanticRelationProperty,
   Stub,
-  StubArray,
+  StubSequence,
+  UnbatchedStubSequence,
   inverseSemanticRelationProperty,
 } from "@kos-kit/models";
 import TermSet from "@rdfjs/term-set";
@@ -29,7 +30,7 @@ export abstract class Concept<
     return Concept.equals(this, other);
   }
 
-  async inSchemes(): Promise<StubArray<ConceptSchemeT>> {
+  async inSchemes(): Promise<StubSequence<ConceptSchemeT>> {
     return this.kos.conceptSchemes({
       limit: null,
       offset: 0,
@@ -44,7 +45,7 @@ export abstract class Concept<
   async semanticRelations(
     property: SemanticRelationProperty,
     options?: { includeInverse?: false },
-  ): Promise<StubArray<ConceptT>> {
+  ): Promise<StubSequence<ConceptT>> {
     const conceptIdentifiers = new TermSet<Identifier>();
     const conceptStubs: Stub<ConceptT>[] = [];
 
@@ -84,7 +85,7 @@ export abstract class Concept<
       }
     }
 
-    return new StubArray(conceptStubs);
+    return new UnbatchedStubSequence(conceptStubs);
   }
 
   async semanticRelationsCount(
@@ -97,7 +98,7 @@ export abstract class Concept<
     });
   }
 
-  topConceptOf(): Promise<StubArray<ConceptSchemeT>> {
+  topConceptOf(): Promise<StubSequence<ConceptSchemeT>> {
     return this.kos.conceptSchemes({
       limit: null,
       offset: 0,

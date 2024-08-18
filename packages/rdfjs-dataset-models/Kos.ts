@@ -5,7 +5,8 @@ import {
   ConceptScheme as IConceptScheme,
   Label as ILabel,
   Identifier,
-  StubArray,
+  StubSequence,
+  UnbatchedStubSequence,
   abc,
 } from "@kos-kit/models";
 import { Resource } from "@kos-kit/rdf-resource";
@@ -94,8 +95,8 @@ export abstract class Kos<
     limit: number | null;
     offset: number;
     query: ConceptsQuery;
-  }): Promise<StubArray<ConceptT>> {
-    return new StubArray([
+  }): Promise<StubSequence<ConceptT>> {
+    return new UnbatchedStubSequence([
       ...limitGenerator(
         offsetGenerator(this.queryConcepts(query), offset),
         limit,
@@ -115,8 +116,8 @@ export abstract class Kos<
     limit: number | null;
     offset: number;
     query: ConceptSchemesQuery;
-  }): Promise<StubArray<ConceptSchemeT>> {
-    return new StubArray([
+  }): Promise<StubSequence<ConceptSchemeT>> {
+    return new UnbatchedStubSequence([
       ...limitGenerator(
         offsetGenerator(this.queryConceptSchemes(query), offset),
         limit,

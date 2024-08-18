@@ -1,11 +1,19 @@
 import { Maybe } from "purify-ts";
 import { NamedModel } from "./NamedModel.js";
 import { Stub } from "./Stub.js";
+import { StubSequence } from "./StubSequence.js";
 
-export class StubArray<ModelT extends NamedModel>
-  implements Iterable<Stub<ModelT>>
+/**
+ * An inefficient implementation of StubSequence that takes an array of Stubs and resolves them individually.
+ */
+export class UnbatchedStubSequence<ModelT extends NamedModel>
+  implements StubSequence<ModelT>
 {
   constructor(private readonly delegate: readonly Stub<ModelT>[]) {}
+
+  at(index: number): Stub<ModelT> | undefined {
+    return this.delegate.at(index);
+  }
 
   async flatResolve(): Promise<readonly ModelT[]> {
     return (await this.resolve()).flatMap((modelMaybe) => modelMaybe.toList());

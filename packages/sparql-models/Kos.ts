@@ -5,7 +5,8 @@ import {
   ConceptScheme as IConceptScheme,
   Label as ILabel,
   Identifier,
-  StubArray,
+  StubSequence,
+  UnbatchedStubSequence,
   abc,
 } from "@kos-kit/models";
 import { SparqlQueryClient } from "@kos-kit/sparql-client";
@@ -40,8 +41,8 @@ export abstract class Kos<
     limit: number | null;
     offset: number;
     query: ConceptsQuery;
-  }): Promise<StubArray<ConceptT>> {
-    return new StubArray(
+  }): Promise<StubSequence<ConceptT>> {
+    return new UnbatchedStubSequence(
       mapBindingsToIdentifiers(
         await this.sparqlQueryClient.queryBindings(`\
 SELECT DISTINCT ?concept
@@ -75,8 +76,8 @@ ${this.conceptsQueryToWhereGraphPatterns(query).join("\n")}
     limit: number | null;
     offset: number;
     query: ConceptSchemesQuery;
-  }): Promise<StubArray<ConceptSchemeT>> {
-    return new StubArray(
+  }): Promise<StubSequence<ConceptSchemeT>> {
+    return new UnbatchedStubSequence(
       mapBindingsToIdentifiers(
         await this.sparqlQueryClient.queryBindings(`\
 SELECT DISTINCT ?conceptScheme

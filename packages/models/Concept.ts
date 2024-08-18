@@ -5,7 +5,7 @@ import { Label } from "./Label.js";
 import { LabeledModel } from "./LabeledModel.js";
 import { NoteProperty } from "./NoteProperty.js";
 import { SemanticRelationProperty } from "./SemanticRelationProperty.js";
-import { StubArray } from "./StubArray.js";
+import { StubSequence } from "./StubSequence.js";
 
 export interface Concept<
   ConceptT extends Concept<any, ConceptSchemeT, LabelT>,
@@ -16,12 +16,12 @@ export interface Concept<
   readonly notations: readonly Literal[];
 
   equals(other: Concept<any, any, any>): boolean;
-  inSchemes(): Promise<StubArray<ConceptSchemeT>>;
+  inSchemes(): Promise<StubSequence<ConceptSchemeT>>;
   notes(property: NoteProperty): readonly Literal[];
   semanticRelations(
     property: SemanticRelationProperty,
     options?: { includeInverse?: boolean },
-  ): Promise<StubArray<ConceptT>>;
+  ): Promise<StubSequence<ConceptT>>;
   semanticRelationsCount(property: SemanticRelationProperty): Promise<number>;
-  topConceptOf(): Promise<StubArray<ConceptSchemeT>>;
+  topConceptOf(): Promise<StubSequence<ConceptSchemeT>>;
 }
