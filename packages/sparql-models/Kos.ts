@@ -172,42 +172,39 @@ ${this.conceptSchemesQueryToWhereGraphPatterns(query).join("\n")}
   }
 
   private conceptSchemesQueryToWhereGraphPatterns(
-    query?: ConceptSchemesQuery,
+    query: ConceptSchemesQuery,
   ): string[] {
-    const whereGraphPatterns: string[] = [
-      GraphPattern.toWhereString(
-        GraphPattern.rdfType({
-          rdfType: skos.ConceptScheme,
-          subject: { termType: "Variable", value: "conceptScheme" },
-        }),
-      ),
-    ];
-
-    if (!query) {
-      return whereGraphPatterns;
+    if (query.type === "All") {
+      return [
+        GraphPattern.toWhereString(
+          GraphPattern.rdfType({
+            rdfType: skos.ConceptScheme,
+            subject: { termType: "Variable", value: "conceptScheme" },
+          }),
+        ),
+      ];
     }
 
-    if (query.type === "HasConcept" || query.type === "HasTopConcept") {
-      whereGraphPatterns.push(
-        // skos:topConceptOf's domain is skos:Concept, so we don't have to check the rdf:type
-        `{ ?concept <${skos.topConceptOf.value}> ?conceptScheme . }`,
-        "UNION",
-        // skos:hasTopConcept's range is skos:Concept, so we don't have to check the rdf:type
-        `{ ?conceptScheme <${skos.hasTopConcept.value}> ?concept . }`,
-      );
+    const whereGraphPatterns: string[] = [
+      `VALUES ?concept { ${Identifier.toString(query.conceptIdentifier)} }`,
+      // skos:topConceptOf's range is skos:ConceptScheme, so we don't have to check the rdf:type
+      `{ ?concept <${skos.topConceptOf.value}> ?conceptScheme . }`,
+      "UNION",
+      // skos:hasTopConcept's domain is skos:ConceptScheme, so we don't have to check the rdf:type
+      `{ ?conceptScheme <${skos.hasTopConcept.value}> ?concept . }`,
+    ];
 
-      if (query.type === "HasConcept") {
-        whereGraphPatterns.push(
-          "UNION",
-          // skos:inScheme has an open domain, so we have to check the concept's rdf:type
-          `{ ?concept <${skos.inScheme.value}> ?conceptScheme . ${GraphPattern.toWhereString(
-            GraphPattern.rdfType({
-              rdfType: skos.Concept,
-              subject: { termType: "Variable", value: "concept" },
-            }),
-          )} }`,
-        );
-      }
+    if (query.type === "HasConcept") {
+      whereGraphPatterns.push(
+        "UNION",
+        // skos:inScheme has an open domain, so we have to check the concept's rdf:type
+        `{ ?concept <${skos.inScheme.value}> ?conceptScheme . ${GraphPattern.toWhereString(
+          GraphPattern.rdfType({
+            rdfType: skos.Concept,
+            subject: { termType: "Variable", value: "concept" },
+          }),
+        )} }`,
+      );
     }
 
     return whereGraphPatterns;
