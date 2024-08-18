@@ -1,5 +1,4 @@
 import { ConceptScheme, LanguageTag } from "@kos-kit/models";
-import { AsyncIterables } from "purify-ts-helpers";
 import { expect, it } from "vitest";
 
 export const behavesLikeConceptScheme = (
@@ -10,12 +9,12 @@ export const behavesLikeConceptScheme = (
   it("should get a concept by its identifier", async () => {
     const conceptScheme = await lazyConceptScheme("en");
 
-    const firstConcepts = await AsyncIterables.toArray(
-      conceptScheme.concepts({
+    const firstConcepts = [
+      ...(await conceptScheme.concepts({
         limit: 1,
         offset: 0,
-      }),
-    );
+      })),
+    ];
     expect(firstConcepts).toHaveLength(1);
     const firstConcept = firstConcepts[0];
 
@@ -31,20 +30,20 @@ export const behavesLikeConceptScheme = (
   it("should get concept pages", async () => {
     const conceptScheme = await lazyConceptScheme("en");
 
-    const firstConcepts = await AsyncIterables.toArray(
-      conceptScheme.concepts({
+    const firstConcepts = [
+      ...(await conceptScheme.concepts({
         limit: 10,
         offset: 0,
-      }),
-    );
+      })),
+    ];
     expect(firstConcepts).toHaveLength(10);
 
-    const nextConcepts = await AsyncIterables.toArray(
-      conceptScheme.concepts({
+    const nextConcepts = [
+      ...(await conceptScheme.concepts({
         limit: 10,
         offset: 10,
-      }),
-    );
+      })),
+    ];
     expect(nextConcepts).toHaveLength(10);
     for (const nextConcept of nextConcepts) {
       expect(
@@ -58,7 +57,7 @@ export const behavesLikeConceptScheme = (
 
   it("should get concepts", async () => {
     const conceptScheme = await lazyConceptScheme("en");
-    for await (const concept of conceptScheme.concepts()) {
+    for (const concept of await conceptScheme.concepts()) {
       expect(
         (await concept.resolve()).extractNullable()?.displayLabel,
       ).toBeDefined();
@@ -82,20 +81,20 @@ export const behavesLikeConceptScheme = (
   it("should get top concept pages", async () => {
     const conceptScheme = await lazyConceptScheme("en");
 
-    const firstConcepts = await AsyncIterables.toArray(
-      conceptScheme.topConcepts({
+    const firstConcepts = [
+      ...(await conceptScheme.topConcepts({
         limit: 10,
         offset: 0,
-      }),
-    );
+      })),
+    ];
     expect(firstConcepts).toHaveLength(10);
 
-    const nextConcepts = await AsyncIterables.toArray(
-      conceptScheme.topConcepts({
+    const nextConcepts = [
+      ...(await conceptScheme.topConcepts({
         limit: 10,
         offset: 10,
-      }),
-    );
+      })),
+    ];
     expect(nextConcepts).toHaveLength(10);
     for (const nextConcept of nextConcepts) {
       expect(
@@ -109,7 +108,7 @@ export const behavesLikeConceptScheme = (
 
   it("should get top concepts", async () => {
     const conceptScheme = await lazyConceptScheme("en");
-    for await (const topConcept of conceptScheme.topConcepts()) {
+    for (const topConcept of await conceptScheme.topConcepts()) {
       expect(
         (await topConcept.resolve()).extractNullable()?.displayLabel,
       ).toBeTruthy();

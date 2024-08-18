@@ -1,22 +1,25 @@
 import { ConceptScheme, Kos, Stub } from "@kos-kit/models";
-import { AsyncIterables } from "purify-ts-helpers";
 import { assert, expect, it } from "vitest";
 import { expectConcept } from "./expectConcept.js";
 import { expectConceptScheme } from "./expectConceptScheme.js";
 
 export const behavesLikeKos = (kos: Kos<any, any, any>) => {
   it("should get concepts", async () => {
-    const firstConcepts = await AsyncIterables.toArray(
-      kos.concepts({ limit: 10, offset: 0, query: { type: "All" } }),
-    );
+    const firstConcepts = [
+      ...(await kos.concepts({ limit: 10, offset: 0, query: { type: "All" } })),
+    ];
     expect(firstConcepts).toHaveLength(10);
     for (const firstConcept of firstConcepts) {
       expectConcept((await firstConcept.resolve()).extractNullable());
     }
 
-    const nextConcepts = await AsyncIterables.toArray(
-      kos.concepts({ limit: 10, offset: 10, query: { type: "All" } }),
-    );
+    const nextConcepts = [
+      ...(await kos.concepts({
+        limit: 10,
+        offset: 10,
+        query: { type: "All" },
+      })),
+    ];
     expect(nextConcepts).toHaveLength(10);
     for (const nextConcept of nextConcepts) {
       expectConcept((await nextConcept.resolve()).extractNullable());
@@ -30,7 +33,7 @@ export const behavesLikeKos = (kos: Kos<any, any, any>) => {
   });
 
   it("should get a concept by its identifier", async () => {
-    for await (const concept of kos.concepts({
+    for (const concept of await kos.concepts({
       limit: 1,
       offset: 0,
       query: { type: "All" },
@@ -54,7 +57,7 @@ export const behavesLikeKos = (kos: Kos<any, any, any>) => {
 
   it("should get concept schemes", async () => {
     const conceptSchemes: Stub<ConceptScheme<any, any>>[] = [];
-    for await (const conceptScheme of kos.conceptSchemes({
+    for (const conceptScheme of await kos.conceptSchemes({
       limit: null,
       offset: 0,
       query: { type: "All" },
@@ -66,7 +69,7 @@ export const behavesLikeKos = (kos: Kos<any, any, any>) => {
   });
 
   it("should get a concept scheme by an identifier", async () => {
-    for await (const conceptScheme of kos.conceptSchemes({
+    for (const conceptScheme of await kos.conceptSchemes({
       limit: null,
       offset: 0,
       query: { type: "All" },

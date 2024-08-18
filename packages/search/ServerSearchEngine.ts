@@ -42,7 +42,7 @@ export class ServerSearchEngine implements SearchEngine {
 
     const page: SearchResult[] = [];
 
-    for await (const concept of kos.concepts({
+    for (const concept of await kos.concepts({
       limit: null,
       offset: 0,
       query: { type: "All" },
@@ -60,7 +60,7 @@ export class ServerSearchEngine implements SearchEngine {
       });
     }
 
-    for await (const conceptScheme of kos.conceptSchemes({
+    for (const conceptScheme of await kos.conceptSchemes({
       limit: null,
       offset: 0,
       query: { type: "All" },
