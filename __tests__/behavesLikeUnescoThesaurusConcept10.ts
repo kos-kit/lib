@@ -7,7 +7,6 @@ import {
   SemanticRelationProperty,
 } from "@kos-kit/models";
 import { DataFactory } from "n3";
-import { AsyncIterables } from "purify-ts-helpers";
 import { expect, it } from "vitest";
 import { behavesLikeConcept } from "./behavesLikeConcept.js";
 import { expectConcept } from "./expectConcept.js";
@@ -43,8 +42,8 @@ export function behavesLikeUnescoThesaurusConcept10<
   it("should be in the single concept scheme", async () => {
     const concept = await testConcept("en");
     for (const inSchemes of [
-      await AsyncIterables.toArray(concept.topConceptOf()),
-      await AsyncIterables.toArray(concept.inSchemes()),
+      [...(await concept.topConceptOf())],
+      [...(await concept.inSchemes())],
     ]) {
       expect(inSchemes).toHaveLength(1);
       expect(
@@ -81,7 +80,7 @@ export function behavesLikeUnescoThesaurusConcept10<
 
   it("should be a top concept of the single concept scheme", async () => {
     const concept = await testConcept("en");
-    const topConceptOf = await AsyncIterables.toArray(concept.topConceptOf());
+    const topConceptOf = [...(await concept.topConceptOf())];
     expect(topConceptOf).toHaveLength(1);
     expect(
       topConceptOf[0].identifier.equals(
@@ -105,9 +104,9 @@ export function behavesLikeUnescoThesaurusConcept10<
       expect(
         await concept.semanticRelationsCount(semanticRelationProperty),
       ).toStrictEqual(conceptNumbers.length);
-      const semanticRelations = await AsyncIterables.toArray(
-        concept.semanticRelations(semanticRelationProperty),
-      );
+      const semanticRelations = [
+        ...(await concept.semanticRelations(semanticRelationProperty)),
+      ];
       expect(semanticRelations).toHaveLength(conceptNumbers.length);
       for (const conceptNumber of conceptNumbers) {
         const conceptIdentifier = DataFactory.namedNode(
@@ -134,11 +133,11 @@ export function behavesLikeUnescoThesaurusConcept10<
         conceptNumbers: [9, 556, 557, 1519, 5052],
       },
     ]) {
-      const semanticRelations = await AsyncIterables.toArray(
-        concept.semanticRelations(semanticRelationProperty, {
+      const semanticRelations = [
+        ...(await concept.semanticRelations(semanticRelationProperty, {
           includeInverse: true,
-        }),
-      );
+        })),
+      ];
       expect(
         await concept.semanticRelationsCount(semanticRelationProperty),
       ).toStrictEqual(conceptNumbers.length);

@@ -8,7 +8,6 @@ import {
   SemanticRelationProperty,
 } from "@kos-kit/models";
 import { DataFactory } from "n3";
-import { AsyncIterables } from "purify-ts-helpers";
 import { expect, it } from "vitest";
 import { behavesLikeConcept } from "./behavesLikeConcept.js";
 import { expectConcept } from "./expectConcept.js";
@@ -43,7 +42,7 @@ export function behavesLikeUnescoThesaurusConcept10018<
 
   it("should be in the single concept scheme", async () => {
     const concept = await testConcept("en");
-    const inSchemes = await AsyncIterables.toArray(concept.inSchemes());
+    const inSchemes = [...(await concept.inSchemes())];
     expect(inSchemes).toHaveLength(1);
     expect(
       inSchemes[0].identifier.equals(
@@ -78,7 +77,7 @@ export function behavesLikeUnescoThesaurusConcept10018<
 
   it("should be in the single concept scheme", async () => {
     const concept = await testConcept("en");
-    const inSchemes = await AsyncIterables.toArray(concept.inSchemes());
+    const inSchemes = [...(await concept.inSchemes())];
     expect(inSchemes).toHaveLength(1);
     expect(
       inSchemes[0].identifier.equals(
@@ -119,9 +118,9 @@ export function behavesLikeUnescoThesaurusConcept10018<
       expect(
         await concept.semanticRelationsCount(semanticRelationProperty),
       ).toStrictEqual(conceptNumbers.length);
-      const semanticRelations = await AsyncIterables.toArray(
-        concept.semanticRelations(semanticRelationProperty),
-      );
+      const semanticRelations = [
+        ...(await concept.semanticRelations(semanticRelationProperty)),
+      ];
       expect(semanticRelations).toHaveLength(conceptNumbers.length);
       for (const conceptNumber of conceptNumbers) {
         const conceptIdentifier = DataFactory.namedNode(

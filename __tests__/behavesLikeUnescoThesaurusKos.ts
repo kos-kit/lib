@@ -7,7 +7,6 @@ import {
   SemanticRelationProperty,
 } from "@kos-kit/models";
 import { DataFactory } from "n3";
-import { AsyncIterables } from "purify-ts-helpers";
 import { expect, it } from "vitest";
 import { behavesLikeKos } from "./behavesLikeKos.js";
 
@@ -25,8 +24,8 @@ export const behavesLikeUnescoThesaurusKos = <
   it("should get the subject concepts of a semantic relation", async ({
     expect,
   }) => {
-    const subjectConcepts = await AsyncIterables.toArray(
-      testKos.concepts({
+    const subjectConcepts = [
+      ...(await testKos.concepts({
         limit: null,
         offset: 0,
         query: {
@@ -36,8 +35,8 @@ export const behavesLikeUnescoThesaurusKos = <
           semanticRelationProperty: SemanticRelationProperty.NARROWER,
           type: "SubjectsOfSemanticRelation",
         },
-      }),
-    );
+      })),
+    ];
     expect(subjectConcepts).toHaveLength(1);
     expect(
       subjectConcepts.find((subjectConcept) =>
