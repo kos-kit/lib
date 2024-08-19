@@ -14,7 +14,7 @@ describe("mem.Kos", () => {
   //   );
   //   dataset.add(DataFactory.quad(conceptIdentifier, rdf.type, skos.Concept));
   //   expect(
-  //     (await kos.conceptByIdentifier(conceptIdentifier).resolve())
+  //     (await kos.concept(conceptIdentifier).resolve())
   //       .unsafeCoerce()
   //       .identifier.equals(conceptIdentifier),
   //   );

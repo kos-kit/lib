@@ -53,7 +53,7 @@ ${limit !== null && limit > 0 ? `LIMIT ${limit}` : ""}
 ${offset > 0 ? `OFFSET ${offset}` : ""}
 `),
         "concept",
-      ).map((identifier) => this.conceptByIdentifier(identifier)),
+      ).map((identifier) => this.concept(identifier)),
     );
   }
 
@@ -88,7 +88,7 @@ ${limit !== null && limit > 0 ? `LIMIT ${limit}` : ""}
 ${offset > 0 ? `OFFSET ${offset}` : ""}
 `),
         "conceptScheme",
-      ).map((identifier) => this.conceptSchemeByIdentifier(identifier)),
+      ).map((identifier) => this.conceptScheme(identifier)),
     );
   }
 

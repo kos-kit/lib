@@ -16,7 +16,7 @@ export interface ConceptScheme<
   readonly rights: Maybe<Literal>;
   readonly rightsHolder: Maybe<Literal>;
 
-  conceptByIdentifier(identifier: Identifier): Promise<Maybe<Stub<ConceptT>>>;
+  concept(identifier: Identifier): Promise<Maybe<Stub<ConceptT>>>;
 
   concepts(kwds?: { limit?: number; offset?: number }): Promise<
     StubSequence<ConceptT>

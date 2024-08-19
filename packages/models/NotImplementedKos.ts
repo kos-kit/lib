@@ -15,7 +15,7 @@ export class NotImplementedKos<
   LabelT extends Label,
 > implements Kos<any, any, any>
 {
-  conceptByIdentifier(_identifier: Identifier): Stub<ConceptT> {
+  concept(_identifier: Identifier): Stub<ConceptT> {
     throw new Error("Method not implemented.");
   }
   concepts(_kwds: {
@@ -28,7 +28,7 @@ export class NotImplementedKos<
   conceptsCount(_query: ConceptsQuery): Promise<number> {
     throw new Error("Method not implemented.");
   }
-  conceptSchemeByIdentifier(_identifier: Identifier): Stub<ConceptSchemeT> {
+  conceptScheme(_identifier: Identifier): Stub<ConceptSchemeT> {
     throw new Error("Method not implemented.");
   }
   conceptSchemes(_kwds: {

@@ -139,7 +139,7 @@ export abstract class Kos<
       dataset: this.dataset,
     })) {
       if (identifier.termType === "NamedNode") {
-        yield this.conceptSchemeByIdentifier(identifier);
+        yield this.conceptScheme(identifier);
       }
     }
   }
@@ -153,7 +153,7 @@ export abstract class Kos<
         dataset: this.dataset,
       })) {
         if (identifier.termType === "NamedNode") {
-          yield this.conceptByIdentifier(identifier);
+          yield this.concept(identifier);
         }
       }
       return;
@@ -167,7 +167,7 @@ export abstract class Kos<
           dataset: this.dataset,
         })
       ) {
-        yield this.conceptByIdentifier(query.conceptIdentifier);
+        yield this.concept(query.conceptIdentifier);
       }
       return;
     }
@@ -185,7 +185,7 @@ export abstract class Kos<
           quad.object.termType === "NamedNode" &&
           !yieldedConceptIdentifiers.has(quad.object)
         ) {
-          yield this.conceptByIdentifier(quad.object);
+          yield this.concept(quad.object);
           yieldedConceptIdentifiers.add(quad.object);
         }
       }
@@ -201,7 +201,7 @@ export abstract class Kos<
           quad.subject.termType === "NamedNode" &&
           !yieldedConceptIdentifiers.has(quad.subject)
         ) {
-          yield this.conceptByIdentifier(quad.subject);
+          yield this.concept(quad.subject);
           yieldedConceptIdentifiers.add(quad.subject);
         }
       }
@@ -228,7 +228,7 @@ export abstract class Kos<
           ) {
             continue;
           }
-          yield this.conceptByIdentifier(quad.subject);
+          yield this.concept(quad.subject);
           yieldedConceptIdentifiers.add(quad.subject);
         }
       }
@@ -243,7 +243,7 @@ export abstract class Kos<
       )) {
         // The semantic relation properties have a range of skos:Concept
         if (quad.object.termType === "NamedNode") {
-          yield this.conceptByIdentifier(quad.object);
+          yield this.concept(quad.object);
         }
       }
       return;
@@ -257,7 +257,7 @@ export abstract class Kos<
       )) {
         // The semantic relation properties have a domain of skos:Concept
         if (quad.subject.termType === "NamedNode") {
-          yield this.conceptByIdentifier(quad.subject);
+          yield this.concept(quad.subject);
         }
       }
       return;

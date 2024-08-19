@@ -25,7 +25,7 @@ export class DefaultKos extends Kos<
   DefaultConceptScheme,
   DefaultLabel
 > {
-  conceptByIdentifier(
+  concept(
     identifier: Identifier,
   ): Stub<DefaultConcept, DefaultConceptScheme, DefaultLabel, DefaultConcept> {
     return new Stub({
@@ -45,7 +45,7 @@ export class DefaultKos extends Kos<
     });
   }
 
-  conceptSchemeByIdentifier(
+  conceptScheme(
     identifier: Identifier,
   ): Stub<
     DefaultConcept,

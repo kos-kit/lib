@@ -24,9 +24,7 @@ export abstract class ConceptScheme<
   abstract readonly rights: Maybe<Literal>;
   abstract readonly rightsHolder: Maybe<Literal>;
 
-  async conceptByIdentifier(
-    identifier: Identifier,
-  ): Promise<Maybe<Stub<ConceptT>>> {
+  async concept(identifier: Identifier): Promise<Maybe<Stub<ConceptT>>> {
     for (const conceptStub of await this.kos.concepts({
       limit: 1,
       offset: 0,

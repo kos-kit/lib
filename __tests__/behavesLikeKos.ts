@@ -40,7 +40,7 @@ export const behavesLikeKos = (kos: Kos<any, any, any>) => {
     })) {
       expectConcept((await concept.resolve()).extractNullable());
       const conceptByIdentifier = (
-        await kos.conceptByIdentifier(concept.identifier).resolve()
+        await kos.concept(concept.identifier).resolve()
       ).extractNullable();
       expectConcept(conceptByIdentifier);
       expect(
@@ -76,7 +76,7 @@ export const behavesLikeKos = (kos: Kos<any, any, any>) => {
     })) {
       expectConceptScheme((await conceptScheme.resolve()).extractNullable());
       const conceptSchemeByIdentifier = (
-        await kos.conceptSchemeByIdentifier(conceptScheme.identifier).resolve()
+        await kos.conceptScheme(conceptScheme.identifier).resolve()
       ).extractNullable();
       expect(conceptSchemeByIdentifier).toBeTruthy();
       expectConceptScheme(conceptSchemeByIdentifier!);
