@@ -8,11 +8,7 @@ import { Resource } from "@kos-kit/rdf-resource";
 import { skos } from "@tpluscode/rdf-ns-builders";
 import { Maybe } from "purify-ts";
 import { ConstructQueryBuilder } from "./ConstructQueryBuilder.js";
-import {
-  GraphPattern,
-  GraphPatternSubject,
-  GraphPatternVariable,
-} from "./GraphPattern.js";
+import { GraphPatternVariable } from "./GraphPattern.js";
 import { Stub } from "./Stub.js";
 
 export class ConceptSchemeStub<
@@ -55,12 +51,5 @@ export class ConceptSchemeStub<
         identifier: this.identifier,
       }),
     );
-  }
-
-  protected conceptSchemePropertyGraphPatterns(kwds: {
-    subject: GraphPatternSubject;
-    variablePrefix: string;
-  }): readonly GraphPattern[] {
-    return this.labeledModelPropertyGraphPatterns(kwds);
   }
 }
