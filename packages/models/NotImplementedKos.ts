@@ -15,22 +15,18 @@ export class NotImplementedKos<
   LabelT extends Label,
 > implements Kos<any, any, any>
 {
+  get includeLanguageTags(): LanguageTagSet {
+    throw new Error("Method not implemented.");
+  }
+
   concept(_identifier: Identifier): Stub<ConceptT> {
     throw new Error("Method not implemented.");
   }
-  concepts(_kwds: {
-    limit: number | null;
-    offset: number;
-    query: ConceptsQuery;
-  }): Promise<StubSequence<ConceptT>> {
-    throw new Error("Method not implemented.");
-  }
-  conceptsCount(_query: ConceptsQuery): Promise<number> {
-    throw new Error("Method not implemented.");
-  }
+
   conceptScheme(_identifier: Identifier): Stub<ConceptSchemeT> {
     throw new Error("Method not implemented.");
   }
+
   conceptSchemes(_kwds: {
     limit: number | null;
     offset: number;
@@ -38,10 +34,20 @@ export class NotImplementedKos<
   }): Promise<StubSequence<ConceptSchemeT>> {
     throw new Error("Method not implemented.");
   }
+
   conceptSchemesCount(_query: ConceptSchemesQuery): Promise<number> {
     throw new Error("Method not implemented.");
   }
-  get includeLanguageTags(): LanguageTagSet {
+
+  concepts(_kwds: {
+    limit: number | null;
+    offset: number;
+    query: ConceptsQuery;
+  }): Promise<StubSequence<ConceptT>> {
+    throw new Error("Method not implemented.");
+  }
+
+  conceptsCount(_query: ConceptsQuery): Promise<number> {
     throw new Error("Method not implemented.");
   }
 }

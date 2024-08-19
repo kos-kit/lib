@@ -17,16 +17,15 @@ export interface ConceptScheme<
   readonly rightsHolder: Maybe<Literal>;
 
   concept(identifier: Identifier): Promise<Maybe<Stub<ConceptT>>>;
-
-  concepts(kwds?: { limit?: number; offset?: number }): Promise<
-    StubSequence<ConceptT>
-  >;
+  concepts(kwds?: {
+    limit?: number;
+    offset?: number;
+  }): Promise<StubSequence<ConceptT>>;
   conceptsCount(): Promise<number>;
-
   equals(other: ConceptScheme<any, any>): boolean;
-
-  topConcepts(kwds?: { limit?: number; offset?: number }): Promise<
-    StubSequence<ConceptT>
-  >;
+  topConcepts(kwds?: {
+    limit?: number;
+    offset?: number;
+  }): Promise<StubSequence<ConceptT>>;
   topConceptsCount(): Promise<number>;
 }

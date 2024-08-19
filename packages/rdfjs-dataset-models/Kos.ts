@@ -87,27 +87,6 @@ export abstract class Kos<
     this.dataset = dataset;
   }
 
-  async concepts({
-    limit,
-    offset,
-    query,
-  }: {
-    limit: number | null;
-    offset: number;
-    query: ConceptsQuery;
-  }): Promise<StubSequence<ConceptT>> {
-    return new UnbatchedStubSequence([
-      ...limitGenerator(
-        offsetGenerator(this.queryConcepts(query), offset),
-        limit,
-      ),
-    ]);
-  }
-
-  override async conceptsCount(query: ConceptsQuery): Promise<number> {
-    return this.queryConcepts(query).count();
-  }
-
   async conceptSchemes({
     limit,
     offset,
@@ -131,6 +110,27 @@ export abstract class Kos<
     return this.queryConceptSchemes(query).count();
   }
 
+  async concepts({
+    limit,
+    offset,
+    query,
+  }: {
+    limit: number | null;
+    offset: number;
+    query: ConceptsQuery;
+  }): Promise<StubSequence<ConceptT>> {
+    return new UnbatchedStubSequence([
+      ...limitGenerator(
+        offsetGenerator(this.queryConcepts(query), offset),
+        limit,
+      ),
+    ]);
+  }
+
+  override async conceptsCount(query: ConceptsQuery): Promise<number> {
+    return this.queryConcepts(query).count();
+  }
+
   private *allConceptSchemes(): Generator<
     abc.ConceptSchemeStub<ConceptT, ConceptSchemeT, LabelT>
   > {
@@ -141,6 +141,68 @@ export abstract class Kos<
       if (identifier.termType === "NamedNode") {
         yield this.conceptScheme(identifier);
       }
+    }
+  }
+
+  private *queryConceptSchemes(
+    query: ConceptSchemesQuery,
+  ): Generator<abc.ConceptSchemeStub<ConceptT, ConceptSchemeT, LabelT>> {
+    if (query.type === "All") {
+      yield* this.allConceptSchemes();
+      return;
+    }
+
+    for (const conceptSchemeStub of this.allConceptSchemes()) {
+      const conceptSchemeIdentifier = conceptSchemeStub.identifier;
+
+      const hasConcept = (conceptIdentifier: Identifier) => {
+        if (hasTopConcept(conceptIdentifier)) {
+          return true;
+        }
+
+        for (const _ of this.dataset.match(
+          conceptIdentifier,
+          skos.inScheme,
+          conceptSchemeIdentifier,
+        )) {
+          return true;
+        }
+
+        return false;
+      };
+
+      const hasTopConcept = (conceptIdentifier: Identifier) => {
+        for (const _ of this.dataset.match(
+          conceptSchemeIdentifier,
+          skos.hasTopConcept,
+          conceptIdentifier,
+        )) {
+          return true;
+        }
+        for (const _ of this.dataset.match(
+          conceptIdentifier,
+          skos.topConceptOf,
+          conceptSchemeIdentifier,
+        )) {
+          return true;
+        }
+        return false;
+      };
+
+      switch (query.type) {
+        case "HasConcept":
+          if (!hasConcept(query.conceptIdentifier)) {
+            continue;
+          }
+          break;
+        case "HasTopConcept":
+          if (!hasTopConcept(query.conceptIdentifier)) {
+            continue;
+          }
+          break;
+      }
+
+      yield conceptSchemeStub;
     }
   }
 
@@ -264,68 +326,6 @@ export abstract class Kos<
     }
 
     throw new RangeError();
-  }
-
-  private *queryConceptSchemes(
-    query: ConceptSchemesQuery,
-  ): Generator<abc.ConceptSchemeStub<ConceptT, ConceptSchemeT, LabelT>> {
-    if (query.type === "All") {
-      yield* this.allConceptSchemes();
-      return;
-    }
-
-    for (const conceptSchemeStub of this.allConceptSchemes()) {
-      const conceptSchemeIdentifier = conceptSchemeStub.identifier;
-
-      const hasConcept = (conceptIdentifier: Identifier) => {
-        if (hasTopConcept(conceptIdentifier)) {
-          return true;
-        }
-
-        for (const _ of this.dataset.match(
-          conceptIdentifier,
-          skos.inScheme,
-          conceptSchemeIdentifier,
-        )) {
-          return true;
-        }
-
-        return false;
-      };
-
-      const hasTopConcept = (conceptIdentifier: Identifier) => {
-        for (const _ of this.dataset.match(
-          conceptSchemeIdentifier,
-          skos.hasTopConcept,
-          conceptIdentifier,
-        )) {
-          return true;
-        }
-        for (const _ of this.dataset.match(
-          conceptIdentifier,
-          skos.topConceptOf,
-          conceptSchemeIdentifier,
-        )) {
-          return true;
-        }
-        return false;
-      };
-
-      switch (query.type) {
-        case "HasConcept":
-          if (!hasConcept(query.conceptIdentifier)) {
-            continue;
-          }
-          break;
-        case "HasTopConcept":
-          if (!hasTopConcept(query.conceptIdentifier)) {
-            continue;
-          }
-          break;
-      }
-
-      yield conceptSchemeStub;
-    }
   }
 }
 

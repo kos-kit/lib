@@ -33,41 +33,6 @@ export abstract class Kos<
     this.sparqlQueryClient = sparqlQueryClient;
   }
 
-  async concepts({
-    limit,
-    offset,
-    query,
-  }: {
-    limit: number | null;
-    offset: number;
-    query: ConceptsQuery;
-  }): Promise<StubSequence<ConceptT>> {
-    return new UnbatchedStubSequence(
-      mapBindingsToIdentifiers(
-        await this.sparqlQueryClient.queryBindings(`\
-SELECT DISTINCT ?concept
-WHERE {
-${this.conceptsQueryToWhereGraphPatterns(query).join("\n")}
-}
-${limit !== null && limit > 0 ? `LIMIT ${limit}` : ""}
-${offset > 0 ? `OFFSET ${offset}` : ""}
-`),
-        "concept",
-      ).map((identifier) => this.concept(identifier)),
-    );
-  }
-
-  async conceptsCount(query: ConceptsQuery): Promise<number> {
-    return mapBindingsToCount(
-      await this.sparqlQueryClient.queryBindings(`\
-SELECT (COUNT(DISTINCT ?concept) AS ?count)
-WHERE {
-${this.conceptsQueryToWhereGraphPatterns(query).join("\n")}
-}`),
-      "count",
-    );
-  }
-
   async conceptSchemes({
     limit,
     offset,
@@ -103,72 +68,39 @@ ${this.conceptSchemesQueryToWhereGraphPatterns(query).join("\n")}
     );
   }
 
-  private conceptsQueryToWhereGraphPatterns(
-    query: ConceptsQuery,
-  ): readonly string[] {
-    if (query.type === "All") {
-      return GraphPattern.toWhereIndentedStrings(
-        GraphPattern.rdfType({
-          rdfType: skos.Concept,
-          subject: {
-            termType: "Variable",
-            value: "concept",
-          },
-        }),
-        0,
-      ).map(IndentedString.toString);
-    }
+  async concepts({
+    limit,
+    offset,
+    query,
+  }: {
+    limit: number | null;
+    offset: number;
+    query: ConceptsQuery;
+  }): Promise<StubSequence<ConceptT>> {
+    return new UnbatchedStubSequence(
+      mapBindingsToIdentifiers(
+        await this.sparqlQueryClient.queryBindings(`\
+SELECT DISTINCT ?concept
+WHERE {
+${this.conceptsQueryToWhereGraphPatterns(query).join("\n")}
+}
+${limit !== null && limit > 0 ? `LIMIT ${limit}` : ""}
+${offset > 0 ? `OFFSET ${offset}` : ""}
+`),
+        "concept",
+      ).map((identifier) => this.concept(identifier)),
+    );
+  }
 
-    if (query.type === "InScheme" || query.type === "TopConceptOf") {
-      const whereGraphPatterns: string[] = [];
-
-      const conceptSchemeIdentifierString = Identifier.toString(
-        query.conceptSchemeIdentifier,
-      );
-
-      if (query.type === "InScheme") {
-        if (query.conceptIdentifier) {
-          whereGraphPatterns.push(
-            // Put the VALUES pattern first
-            `VALUES ?concept { ${Identifier.toString(query.conceptIdentifier)} }`,
-            `{ ?concept <${skos.inScheme.value}> ${conceptSchemeIdentifierString} }`,
-            "UNION",
-          );
-        } else {
-          whereGraphPatterns.push(
-            // skos:inScheme has an open domain, so we have to check the concept's rdf:type
-            `{ ?concept <${skos.inScheme.value}> ${conceptSchemeIdentifierString} . ${GraphPattern.toWhereString(GraphPattern.rdfType({ rdfType: skos.Concept, subject: { termType: "Variable", value: "concept" } }))} }`,
-            "UNION",
-          );
-        }
-      }
-
-      whereGraphPatterns.push(
-        // skos:topConceptOf's domain is skos:Concept, so we don't have to check the rdf:type
-        `{ ?concept <${skos.topConceptOf.value}> ${conceptSchemeIdentifierString} }`,
-        "UNION",
-        // skos:hasTopConcept's range is skos:Concept, so we don't have to check the rdf:type
-        `{ ${conceptSchemeIdentifierString} <${skos.hasTopConcept.value}> ?concept }`,
-      );
-
-      return whereGraphPatterns;
-    }
-
-    if (query.type === "ObjectsOfSemanticRelation") {
-      return [
-        // The semantic relations have a range of skos:Concept, so no need to check the rdf:type
-        `${Identifier.toString(query.subjectConceptIdentifier)} <${query.semanticRelationProperty.identifier.value}> ?concept`,
-      ];
-    }
-
-    if (query.type === "SubjectsOfSemanticRelation") {
-      return [
-        // The semantic relations have a domain of skos:Concept, so no need to check the rdf:type
-        `?concept <${query.semanticRelationProperty.identifier.value}> ${Identifier.toString(query.objectConceptIdentifier)}`,
-      ];
-    }
-
-    throw new RangeError();
+  async conceptsCount(query: ConceptsQuery): Promise<number> {
+    return mapBindingsToCount(
+      await this.sparqlQueryClient.queryBindings(`\
+SELECT (COUNT(DISTINCT ?concept) AS ?count)
+WHERE {
+${this.conceptsQueryToWhereGraphPatterns(query).join("\n")}
+}`),
+      "count",
+    );
   }
 
   private conceptSchemesQueryToWhereGraphPatterns(
@@ -203,5 +135,86 @@ ${this.conceptSchemesQueryToWhereGraphPatterns(query).join("\n")}
     }
 
     return whereGraphPatterns;
+  }
+
+  private conceptsQueryToWhereGraphPatterns(
+    query: ConceptsQuery,
+  ): readonly string[] {
+    if (query.type === "All") {
+      return GraphPattern.toWhereIndentedStrings(
+        GraphPattern.rdfType({
+          rdfType: skos.Concept,
+          subject: {
+            termType: "Variable",
+            value: "concept",
+          },
+        }),
+        0,
+      ).map(IndentedString.toString);
+    }
+
+    if (query.type === "InScheme" || query.type === "TopConceptOf") {
+      const whereGraphPatterns: string[] = [];
+
+      const conceptSchemeIdentifierString = Identifier.toString(
+        query.conceptSchemeIdentifier,
+      );
+
+      if (query.type === "InScheme") {
+        if (query.conceptIdentifier) {
+          whereGraphPatterns.push(
+            // Put the VALUES pattern first
+            `VALUES ?concept { ${Identifier.toString(
+              query.conceptIdentifier,
+            )} }`,
+            `{ ?concept <${skos.inScheme.value}> ${conceptSchemeIdentifierString} }`,
+            "UNION",
+          );
+        } else {
+          whereGraphPatterns.push(
+            // skos:inScheme has an open domain, so we have to check the concept's rdf:type
+            `{ ?concept <${
+              skos.inScheme.value
+            }> ${conceptSchemeIdentifierString} . ${GraphPattern.toWhereString(
+              GraphPattern.rdfType({
+                rdfType: skos.Concept,
+                subject: { termType: "Variable", value: "concept" },
+              }),
+            )} }`,
+            "UNION",
+          );
+        }
+      }
+
+      whereGraphPatterns.push(
+        // skos:topConceptOf's domain is skos:Concept, so we don't have to check the rdf:type
+        `{ ?concept <${skos.topConceptOf.value}> ${conceptSchemeIdentifierString} }`,
+        "UNION",
+        // skos:hasTopConcept's range is skos:Concept, so we don't have to check the rdf:type
+        `{ ${conceptSchemeIdentifierString} <${skos.hasTopConcept.value}> ?concept }`,
+      );
+
+      return whereGraphPatterns;
+    }
+
+    if (query.type === "ObjectsOfSemanticRelation") {
+      return [
+        // The semantic relations have a range of skos:Concept, so no need to check the rdf:type
+        `${Identifier.toString(query.subjectConceptIdentifier)} <${
+          query.semanticRelationProperty.identifier.value
+        }> ?concept`,
+      ];
+    }
+
+    if (query.type === "SubjectsOfSemanticRelation") {
+      return [
+        // The semantic relations have a domain of skos:Concept, so no need to check the rdf:type
+        `?concept <${
+          query.semanticRelationProperty.identifier.value
+        }> ${Identifier.toString(query.objectConceptIdentifier)}`,
+      ];
+    }
+
+    throw new RangeError();
   }
 }

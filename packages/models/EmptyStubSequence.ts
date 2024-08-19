@@ -9,6 +9,10 @@ export class EmptyStubSequence<ModelT extends NamedModel>
 {
   readonly length = 0;
 
+  [Symbol.iterator](): Iterator<Stub<ModelT>> {
+    return [][Symbol.iterator]();
+  }
+
   at(_index: number): Stub<ModelT> | undefined {
     return undefined;
   }
@@ -19,10 +23,6 @@ export class EmptyStubSequence<ModelT extends NamedModel>
 
   async flatResolve(): Promise<readonly ModelT[]> {
     return [];
-  }
-
-  [Symbol.iterator](): Iterator<Stub<ModelT>> {
-    return [][Symbol.iterator]();
   }
 
   async resolve(): Promise<readonly Maybe<ModelT>[]> {

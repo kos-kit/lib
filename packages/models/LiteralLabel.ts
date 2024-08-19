@@ -12,7 +12,10 @@ export class LiteralLabel implements Label {
   constructor({
     literalForm,
     type,
-  }: { literalForm: Literal; type: Label.Type }) {
+  }: {
+    literalForm: Literal;
+    type: Label.Type;
+  }) {
     this.literalForm = literalForm;
     this.type = type;
   }
