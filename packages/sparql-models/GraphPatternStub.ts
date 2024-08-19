@@ -8,6 +8,8 @@ import { GraphPattern, GraphPatternVariable } from "./GraphPattern.js";
 export class GraphPatternStub<
   ModelT extends NamedModel,
 > extends abc.Stub<ModelT> {
+  readonly identifier: Identifier;
+
   private readonly graphPatterns: readonly GraphPattern[];
   private readonly includeLanguageTags: LanguageTagSet;
   private readonly modelFactory: (
@@ -18,6 +20,7 @@ export class GraphPatternStub<
 
   constructor({
     graphPatterns,
+    identifier,
     includeLanguageTags,
     modelFactory,
     modelVariable,
@@ -25,6 +28,7 @@ export class GraphPatternStub<
     ...superParameters
   }: {
     graphPatterns: readonly GraphPattern[];
+    identifier: Identifier;
     includeLanguageTags: LanguageTagSet;
     modelFactory: (resource: Resource<Identifier>) => Maybe<ModelT>;
     modelVariable: GraphPatternVariable;
@@ -32,6 +36,7 @@ export class GraphPatternStub<
   } & abc.Stub.Parameters) {
     super(superParameters);
     this.graphPatterns = graphPatterns;
+    this.identifier = identifier;
     this.includeLanguageTags = includeLanguageTags;
     this.modelFactory = modelFactory;
     this.modelVariable = modelVariable;

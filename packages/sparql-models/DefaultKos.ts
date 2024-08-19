@@ -120,11 +120,10 @@ export class DefaultKos extends Kos<
     if (resource.isInstanceOf(skos.Concept)) {
       return Maybe.of(
         new DefaultConcept({
-          dataset: resource.dataset,
-          identifier: resource.identifier,
           kos: this,
           labelConstructor: Label,
           logger: this.logger,
+          resource,
         }),
       );
     }
@@ -137,11 +136,10 @@ export class DefaultKos extends Kos<
     if (resource.isInstanceOf(skos.ConceptScheme)) {
       return Maybe.of(
         new DefaultConceptScheme({
-          dataset: resource.dataset,
-          identifier: resource.identifier,
           kos: this,
           labelConstructor: Label,
           logger: this.logger,
+          resource,
         }),
       );
     }
