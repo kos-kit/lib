@@ -12,7 +12,7 @@ import { Maybe } from "purify-ts";
 import { ConstructQueryBuilder } from "./ConstructQueryBuilder.js";
 import { GraphPattern, GraphPatternVariable } from "./GraphPattern.js";
 
-export class StubSequence<
+export class GraphPatternStubSequence<
   ModelT extends NamedModel,
 > extends abc.StubSequence<ModelT> {
   private readonly graphPatterns: readonly GraphPattern[];

@@ -5,7 +5,9 @@ import { Maybe } from "purify-ts";
 import { ConstructQueryBuilder } from "./ConstructQueryBuilder.js";
 import { GraphPattern, GraphPatternVariable } from "./GraphPattern.js";
 
-export class Stub<ModelT extends NamedModel> extends abc.Stub<ModelT> {
+export class GraphPatternStub<
+  ModelT extends NamedModel,
+> extends abc.Stub<ModelT> {
   private readonly graphPatterns: readonly GraphPattern[];
   private readonly includeLanguageTags: LanguageTagSet;
   private readonly modelFactory: (

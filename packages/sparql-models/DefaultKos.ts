@@ -4,9 +4,9 @@ import { Concept, ConceptScheme, Label } from "@kos-kit/rdfjs-dataset-models";
 import { skos } from "@tpluscode/rdf-ns-builders";
 import { Maybe } from "purify-ts";
 import { GraphPatternVariable } from "./GraphPattern.js";
+import { GraphPatternStub } from "./GraphPatternStub.js";
+import { GraphPatternStubSequence } from "./GraphPatternStubSequence.js";
 import { Kos } from "./Kos.js";
-import { Stub } from "./Stub.js";
-import { StubSequence } from "./StubSequence.js";
 import { conceptGraphPatterns } from "./conceptGraphPatterns.js";
 import { conceptSchemeGraphPatterns } from "./conceptSchemeGraphPatterns.js";
 
@@ -49,8 +49,8 @@ export class DefaultKos extends Kos<
   DefaultConceptScheme,
   DefaultLabel
 > {
-  concept(identifier: Identifier): Stub<DefaultConcept> {
-    return new Stub({
+  concept(identifier: Identifier): GraphPatternStub<DefaultConcept> {
+    return new GraphPatternStub({
       graphPatterns: conceptGraphPatterns_,
       identifier,
       includeLanguageTags: this.includeLanguageTags,
@@ -61,8 +61,10 @@ export class DefaultKos extends Kos<
     });
   }
 
-  conceptScheme(identifier: Identifier): Stub<DefaultConceptScheme> {
-    return new Stub({
+  conceptScheme(
+    identifier: Identifier,
+  ): GraphPatternStub<DefaultConceptScheme> {
+    return new GraphPatternStub({
       graphPatterns: conceptSchemeGraphPatterns_,
       identifier,
       includeLanguageTags: this.includeLanguageTags,
@@ -75,8 +77,8 @@ export class DefaultKos extends Kos<
 
   protected override conceptsStubSequence(
     identifiers: readonly Identifier[],
-  ): StubSequence<DefaultConcept> {
-    return new StubSequence({
+  ): GraphPatternStubSequence<DefaultConcept> {
+    return new GraphPatternStubSequence({
       graphPatterns: conceptGraphPatterns_,
       identifiers,
       includeLanguageTags: this.includeLanguageTags,
@@ -90,8 +92,8 @@ export class DefaultKos extends Kos<
 
   protected override conceptSchemesStubSequence(
     identifiers: readonly Identifier[],
-  ): StubSequence<DefaultConceptScheme> {
-    return new StubSequence({
+  ): GraphPatternStubSequence<DefaultConceptScheme> {
+    return new GraphPatternStubSequence({
       graphPatterns: conceptSchemeGraphPatterns_,
       identifiers,
       includeLanguageTags: this.includeLanguageTags,
