@@ -5,7 +5,6 @@ import {
   ConceptScheme as IConceptScheme,
   Label as ILabel,
   Identifier,
-  StubSequence,
   abc,
 } from "@kos-kit/models";
 import { SparqlQueryClient } from "@kos-kit/sparql-client";
@@ -32,30 +31,6 @@ export abstract class Kos<
     this.sparqlQueryClient = sparqlQueryClient;
   }
 
-  async conceptSchemes({
-    limit,
-    offset,
-    query,
-  }: {
-    limit: number | null;
-    offset: number;
-    query: ConceptSchemesQuery;
-  }): Promise<StubSequence<ConceptSchemeT>> {
-    return this.conceptSchemesStubSequence(
-      mapBindingsToIdentifiers(
-        await this.sparqlQueryClient.queryBindings(`\
-SELECT DISTINCT ?conceptScheme
-WHERE {
-${this.conceptSchemesQueryToWhereGraphPatterns(query).join("\n")}
-}
-${limit !== null && limit > 0 ? `LIMIT ${limit}` : ""}
-${offset > 0 ? `OFFSET ${offset}` : ""}
-`),
-        "conceptScheme",
-      ),
-    );
-  }
-
   async conceptSchemesCount(query: ConceptSchemesQuery): Promise<number> {
     return mapBindingsToCount(
       await this.sparqlQueryClient.queryBindings(`\
@@ -64,30 +39,6 @@ WHERE {
 ${this.conceptSchemesQueryToWhereGraphPatterns(query).join("\n")}
 }`),
       "count",
-    );
-  }
-
-  async concepts({
-    limit,
-    offset,
-    query,
-  }: {
-    limit: number | null;
-    offset: number;
-    query: ConceptsQuery;
-  }): Promise<StubSequence<ConceptT>> {
-    return this.conceptsStubSequence(
-      mapBindingsToIdentifiers(
-        await this.sparqlQueryClient.queryBindings(`\
-SELECT DISTINCT ?concept
-WHERE {
-${this.conceptsQueryToWhereGraphPatterns(query).join("\n")}
-}
-${limit !== null && limit > 0 ? `LIMIT ${limit}` : ""}
-${offset > 0 ? `OFFSET ${offset}` : ""}
-`),
-        "concept",
-      ),
     );
   }
 
@@ -102,13 +53,49 @@ ${this.conceptsQueryToWhereGraphPatterns(query).join("\n")}
     );
   }
 
-  protected abstract conceptsStubSequence(
-    identifiers: readonly Identifier[],
-  ): StubSequence<ConceptT>;
+  protected async queryConcepts({
+    limit,
+    offset,
+    query,
+  }: {
+    limit: number | null;
+    offset: number;
+    query: ConceptsQuery;
+  }): Promise<readonly Identifier[]> {
+    return mapBindingsToIdentifiers(
+      await this.sparqlQueryClient.queryBindings(`\
+SELECT DISTINCT ?concept
+WHERE {
+${this.conceptsQueryToWhereGraphPatterns(query).join("\n")}
+}
+${limit !== null && limit > 0 ? `LIMIT ${limit}` : ""}
+${offset > 0 ? `OFFSET ${offset}` : ""}
+`),
+      "concept",
+    );
+  }
 
-  protected abstract conceptSchemesStubSequence(
-    identifiers: readonly Identifier[],
-  ): StubSequence<ConceptSchemeT>;
+  protected async queryConceptSchemes({
+    limit,
+    offset,
+    query,
+  }: {
+    limit: number | null;
+    offset: number;
+    query: ConceptSchemesQuery;
+  }): Promise<readonly Identifier[]> {
+    return mapBindingsToIdentifiers(
+      await this.sparqlQueryClient.queryBindings(`\
+SELECT DISTINCT ?conceptScheme
+WHERE {
+${this.conceptSchemesQueryToWhereGraphPatterns(query).join("\n")}
+}
+${limit !== null && limit > 0 ? `LIMIT ${limit}` : ""}
+${offset > 0 ? `OFFSET ${offset}` : ""}
+`),
+      "conceptScheme",
+    );
+  }
 
   private conceptSchemesQueryToWhereGraphPatterns(
     query: ConceptSchemesQuery,

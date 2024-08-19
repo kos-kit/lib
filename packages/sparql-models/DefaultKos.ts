@@ -1,4 +1,9 @@
-import { Identifier } from "@kos-kit/models";
+import {
+  ConceptSchemesQuery,
+  ConceptsQuery,
+  Identifier,
+  StubSequence,
+} from "@kos-kit/models";
 import { Resource } from "@kos-kit/rdf-resource";
 import { Concept, ConceptScheme, Label } from "@kos-kit/rdfjs-dataset-models";
 import { skos } from "@tpluscode/rdf-ns-builders";
@@ -61,6 +66,23 @@ export class DefaultKos extends Kos<
     });
   }
 
+  async concepts(kwds: {
+    limit: number | null;
+    offset: number;
+    query: ConceptsQuery;
+  }): Promise<StubSequence<DefaultConcept>> {
+    return new GraphPatternStubSequence({
+      graphPatterns: conceptGraphPatterns_,
+      identifiers: await this.queryConcepts(kwds),
+      includeLanguageTags: this.includeLanguageTags,
+      modelFactory: (resource) => this.conceptModelFactory(resource),
+      modelVariable: conceptVariable,
+      logger: this.logger,
+      sparqlQueryClient: this.sparqlQueryClient,
+      stubFactory: (identifier) => this.concept(identifier),
+    });
+  }
+
   conceptScheme(
     identifier: Identifier,
   ): GraphPatternStub<DefaultConceptScheme> {
@@ -75,27 +97,14 @@ export class DefaultKos extends Kos<
     });
   }
 
-  protected override conceptsStubSequence(
-    identifiers: readonly Identifier[],
-  ): GraphPatternStubSequence<DefaultConcept> {
-    return new GraphPatternStubSequence({
-      graphPatterns: conceptGraphPatterns_,
-      identifiers,
-      includeLanguageTags: this.includeLanguageTags,
-      modelFactory: (resource) => this.conceptModelFactory(resource),
-      modelVariable: conceptVariable,
-      logger: this.logger,
-      sparqlQueryClient: this.sparqlQueryClient,
-      stubFactory: (identifier) => this.concept(identifier),
-    });
-  }
-
-  protected override conceptSchemesStubSequence(
-    identifiers: readonly Identifier[],
-  ): GraphPatternStubSequence<DefaultConceptScheme> {
+  async conceptSchemes(kwds: {
+    limit: number | null;
+    offset: number;
+    query: ConceptSchemesQuery;
+  }): Promise<StubSequence<DefaultConceptScheme>> {
     return new GraphPatternStubSequence({
       graphPatterns: conceptSchemeGraphPatterns_,
-      identifiers,
+      identifiers: await this.queryConceptSchemes(kwds),
       includeLanguageTags: this.includeLanguageTags,
       modelFactory: (resource) => this.conceptSchemeModelFactory(resource),
       modelVariable: conceptVariable,
