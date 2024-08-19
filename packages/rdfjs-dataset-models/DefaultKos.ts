@@ -25,9 +25,7 @@ export class DefaultKos extends Kos<
   DefaultConceptScheme,
   DefaultLabel
 > {
-  concept(
-    identifier: Identifier,
-  ): Stub<DefaultConcept, DefaultConceptScheme, DefaultLabel, DefaultConcept> {
+  concept(identifier: Identifier): Stub<DefaultConcept> {
     return new Stub({
       dataset: this.dataset,
       identifier,
@@ -41,18 +39,10 @@ export class DefaultKos extends Kos<
           logger: this.logger,
         }),
       modelRdfType: skos.Concept,
-      kos: this,
     });
   }
 
-  conceptScheme(
-    identifier: Identifier,
-  ): Stub<
-    DefaultConcept,
-    DefaultConceptScheme,
-    DefaultLabel,
-    DefaultConceptScheme
-  > {
+  conceptScheme(identifier: Identifier): Stub<DefaultConceptScheme> {
     return new Stub({
       dataset: this.dataset,
       identifier,
@@ -66,7 +56,6 @@ export class DefaultKos extends Kos<
           logger: this.logger,
         }),
       modelRdfType: skos.ConceptScheme,
-      kos: this,
     });
   }
 }

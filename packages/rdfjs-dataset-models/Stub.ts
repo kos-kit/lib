@@ -1,20 +1,9 @@
-import {
-  Concept as IConcept,
-  ConceptScheme as IConceptScheme,
-  Label as ILabel,
-  Identifier,
-  abc,
-} from "@kos-kit/models";
+import { Identifier, NamedModel, abc } from "@kos-kit/models";
 import { Resource } from "@kos-kit/rdf-resource";
 import { DatasetCore, NamedNode } from "@rdfjs/types";
 import { Maybe } from "purify-ts";
 
-export class Stub<
-  ConceptT extends IConcept<ConceptT, ConceptSchemeT, LabelT>,
-  ConceptSchemeT extends IConceptScheme<ConceptT, LabelT>,
-  LabelT extends ILabel,
-  ModelT extends ConceptT | ConceptSchemeT,
-> extends abc.Stub<ConceptT, ConceptSchemeT, LabelT, ModelT> {
+export class Stub<ModelT extends NamedModel> extends abc.Stub<ModelT> {
   protected readonly dataset: DatasetCore;
   private readonly modelFactory: (identifier: Identifier) => ModelT;
   private readonly modelRdfType: NamedNode;
@@ -28,7 +17,7 @@ export class Stub<
     dataset: DatasetCore;
     modelFactory: (identifier: Identifier) => ModelT;
     modelRdfType: NamedNode;
-  } & abc.Stub.Parameters<ConceptT, ConceptSchemeT, LabelT>) {
+  } & abc.Stub.Parameters) {
     super(superParameters);
     this.dataset = dataset;
     this.modelFactory = modelFactory;

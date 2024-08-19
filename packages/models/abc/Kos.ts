@@ -7,11 +7,10 @@ import {
   Label as ILabel,
   Identifier,
   LanguageTagSet,
+  Stub,
   StubSequence,
 } from "@kos-kit/models";
 import { Logger, pino } from "pino";
-import { ConceptSchemeStub } from "./ConceptSchemeStub.js";
-import { ConceptStub } from "./ConceptStub.js";
 
 export abstract class Kos<
   ConceptT extends IConcept<ConceptT, ConceptSchemeT, LabelT>,
@@ -31,9 +30,7 @@ export abstract class Kos<
       });
   }
 
-  abstract concept(
-    identifier: Identifier,
-  ): ConceptStub<ConceptT, ConceptSchemeT, LabelT>;
+  abstract concept(identifier: Identifier): Stub<ConceptT>;
 
   abstract concepts(kwds: {
     limit: number | null;
@@ -43,9 +40,7 @@ export abstract class Kos<
 
   abstract conceptsCount(query: ConceptsQuery): Promise<number>;
 
-  abstract conceptScheme(
-    identifier: Identifier,
-  ): ConceptSchemeStub<ConceptT, ConceptSchemeT, LabelT>;
+  abstract conceptScheme(identifier: Identifier): Stub<ConceptSchemeT>;
 
   abstract conceptSchemes(kwds: {
     limit: number | null;

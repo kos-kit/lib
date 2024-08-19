@@ -5,6 +5,7 @@ import {
   ConceptScheme as IConceptScheme,
   Label as ILabel,
   Identifier,
+  Stub,
   StubSequence,
   UnbatchedStubSequence,
   abc,
@@ -131,9 +132,7 @@ export abstract class Kos<
     return this.queryConcepts(query).count();
   }
 
-  private *allConceptSchemes(): Generator<
-    abc.ConceptSchemeStub<ConceptT, ConceptSchemeT, LabelT>
-  > {
+  private *allConceptSchemes(): Generator<Stub<ConceptSchemeT>> {
     for (const identifier of getRdfInstances({
       class_: skos.ConceptScheme,
       dataset: this.dataset,
@@ -146,7 +145,7 @@ export abstract class Kos<
 
   private *queryConceptSchemes(
     query: ConceptSchemesQuery,
-  ): Generator<abc.ConceptSchemeStub<ConceptT, ConceptSchemeT, LabelT>> {
+  ): Generator<Stub<ConceptSchemeT>> {
     if (query.type === "All") {
       yield* this.allConceptSchemes();
       return;
@@ -206,9 +205,7 @@ export abstract class Kos<
     }
   }
 
-  private *queryConcepts(
-    query: ConceptsQuery,
-  ): Generator<abc.ConceptStub<ConceptT, ConceptSchemeT, LabelT>> {
+  private *queryConcepts(query: ConceptsQuery): Generator<Stub<ConceptT>> {
     if (query.type === "All") {
       for (const identifier of getRdfInstances({
         class_: skos.Concept,
