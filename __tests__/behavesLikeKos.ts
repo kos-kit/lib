@@ -33,18 +33,18 @@ export const behavesLikeKos = (kos: Kos<any, any, any>) => {
   });
 
   it("should get a concept by its identifier", async () => {
-    for (const concept of await kos.concepts({
+    for (const expectedConcept of await kos.concepts({
       limit: 1,
       offset: 0,
       query: { type: "All" },
     })) {
-      expectConcept((await concept.resolve()).extractNullable());
-      const conceptByIdentifier = (
-        await kos.conceptByIdentifier(concept.identifier).resolve()
+      expectConcept((await expectedConcept.resolve()).extractNullable());
+      const actualConcept = (
+        await kos.concept(expectedConcept.identifier).resolve()
       ).extractNullable();
-      expectConcept(conceptByIdentifier);
+      expectConcept(actualConcept);
       expect(
-        concept.identifier.equals(conceptByIdentifier!.identifier),
+        expectedConcept.identifier.equals(actualConcept!.identifier),
       ).toStrictEqual(true);
       return;
     }
@@ -69,19 +69,23 @@ export const behavesLikeKos = (kos: Kos<any, any, any>) => {
   });
 
   it("should get a concept scheme by an identifier", async () => {
-    for (const conceptScheme of await kos.conceptSchemes({
+    for (const expectedConceptScheme of await kos.conceptSchemes({
       limit: null,
       offset: 0,
       query: { type: "All" },
     })) {
-      expectConceptScheme((await conceptScheme.resolve()).extractNullable());
-      const conceptSchemeByIdentifier = (
-        await kos.conceptSchemeByIdentifier(conceptScheme.identifier).resolve()
+      expectConceptScheme(
+        (await expectedConceptScheme.resolve()).extractNullable(),
+      );
+      const actualConceptScheme = (
+        await kos.conceptScheme(expectedConceptScheme.identifier).resolve()
       ).extractNullable();
-      expect(conceptSchemeByIdentifier).toBeTruthy();
-      expectConceptScheme(conceptSchemeByIdentifier!);
+      expect(actualConceptScheme).toBeTruthy();
+      expectConceptScheme(actualConceptScheme!);
       expect(
-        conceptScheme.identifier.equals(conceptSchemeByIdentifier!.identifier),
+        expectedConceptScheme.identifier.equals(
+          actualConceptScheme!.identifier,
+        ),
       ).toBeTruthy();
     }
   });

@@ -142,13 +142,17 @@ export namespace GraphPattern {
         // Don't include any rdfs:subClassOf
         constructIndentedStrings.push({
           indent,
-          string: `${termToString(graphPattern.subject)} <${rdf.type.value}> ${termToString(graphPattern.object)} .`,
+          string: `${termToString(graphPattern.subject)} <${
+            rdf.type.value
+          }> ${termToString(graphPattern.object)} .`,
         });
         break;
       default:
         constructIndentedStrings.push({
           indent,
-          string: `${termToString(graphPattern.subject)} ${termToString(graphPattern.predicate)} ${termToString(graphPattern.object)} .`,
+          string: `${termToString(graphPattern.subject)} ${termToString(
+            graphPattern.predicate,
+          )} ${termToString(graphPattern.object)} .`,
         });
         break;
     }
@@ -196,7 +200,9 @@ export namespace GraphPattern {
         whereIndentedStrings.push(
           {
             indent,
-            string: `${termToString(graphPattern.subject)} <${rdf.rest.value}>*/<${rdf.first.value}>? ?${graphPattern.object.value} .`,
+            string: `${termToString(graphPattern.subject)} <${
+              rdf.rest.value
+            }>*/<${rdf.first.value}>? ?${graphPattern.object.value} .`,
           },
           {
             indent,
@@ -210,13 +216,17 @@ export namespace GraphPattern {
         }
         whereIndentedStrings.push({
           indent,
-          string: `${termToString(graphPattern.subject)} <${rdf.type.value}>/<${rdfs.subClassOf.value}>* ${termToString(graphPattern.object)} .`,
+          string: `${termToString(graphPattern.subject)} <${rdf.type.value}>/<${
+            rdfs.subClassOf.value
+          }>* ${termToString(graphPattern.object)} .`,
         });
         break;
       default:
         whereIndentedStrings.push({
           indent,
-          string: `${termToString(graphPattern.subject)} ${termToString(graphPattern.predicate)} ${termToString(graphPattern.object)} .`,
+          string: `${termToString(graphPattern.subject)} ${termToString(
+            graphPattern.predicate,
+          )} ${termToString(graphPattern.object)} .`,
         });
         break;
     }
@@ -233,7 +243,9 @@ export namespace GraphPattern {
 
       whereIndentedStrings.push({
         indent,
-        string: `FILTER (!BOUND(?${graphPattern.object.value}) || ${languageTagTests.join(" || ")} )`,
+        string: `FILTER (!BOUND(?${
+          graphPattern.object.value
+        }) || ${languageTagTests.join(" || ")} )`,
       });
     }
 

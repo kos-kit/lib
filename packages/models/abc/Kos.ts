@@ -31,7 +31,7 @@ export abstract class Kos<
       });
   }
 
-  abstract conceptByIdentifier(
+  abstract concept(
     identifier: Identifier,
   ): ConceptStub<ConceptT, ConceptSchemeT, LabelT>;
 
@@ -43,7 +43,7 @@ export abstract class Kos<
 
   abstract conceptsCount(query: ConceptsQuery): Promise<number>;
 
-  abstract conceptSchemeByIdentifier(
+  abstract conceptScheme(
     identifier: Identifier,
   ): ConceptSchemeStub<ConceptT, ConceptSchemeT, LabelT>;
 

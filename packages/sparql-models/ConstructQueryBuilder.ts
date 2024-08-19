@@ -5,8 +5,9 @@ import { TAB_SPACES } from "./IndentedString.js";
 import { termToString } from "./termToString.js";
 
 export class ConstructQueryBuilder {
-  private graphPatterns: GraphPattern[] = [];
   private readonly includeLanguageTags: LanguageTagSet;
+
+  private graphPatterns: GraphPattern[] = [];
   private values: [
     GraphPatternVariable,
     (Literal | BlankNode | NamedNode)[],
@@ -50,10 +51,11 @@ export class ConstructQueryBuilder {
 CONSTRUCT {
 ${GraphPattern.Array.toConstructString(sortedGraphPatterns)}
 } WHERE {
-${valuesString.length > 0 ? `${" ".repeat(TAB_SPACES) + valuesString}\n` : ""}${GraphPattern.Array.toWhereString(
-  sortedGraphPatterns,
-  { includeLanguageTags: this.includeLanguageTags },
-)}
+${
+  valuesString.length > 0 ? `${" ".repeat(TAB_SPACES) + valuesString}\n` : ""
+}${GraphPattern.Array.toWhereString(sortedGraphPatterns, {
+  includeLanguageTags: this.includeLanguageTags,
+})}
 }`;
   }
 
@@ -68,6 +70,8 @@ ${valuesString.length > 0 ? `${" ".repeat(TAB_SPACES) + valuesString}\n` : ""}${
     const variableValues = this.values[0];
     const [variable, values] = variableValues;
 
-    return `VALUES ?${variable.value} { ${values.map((value) => termToString(value)).join(" ")} }`;
+    return `VALUES ?${variable.value} { ${values
+      .map((value) => termToString(value))
+      .join(" ")} }`;
   }
 }

@@ -18,13 +18,11 @@ export const behavesLikeConceptScheme = (
     expect(firstConcepts).toHaveLength(1);
     const firstConcept = firstConcepts[0];
 
-    const conceptByIdentifier = (
-      await conceptScheme.conceptByIdentifier(firstConcept.identifier)
+    const concept = (
+      await conceptScheme.concept(firstConcept.identifier)
     ).extractNullable();
-    expect(conceptByIdentifier).not.toBeNull();
-    expect(
-      conceptByIdentifier?.identifier.equals(firstConcept.identifier),
-    ).toBe(true);
+    expect(concept).not.toBeNull();
+    expect(concept?.identifier.equals(firstConcept.identifier)).toBe(true);
   });
 
   it("should get concept pages", async () => {

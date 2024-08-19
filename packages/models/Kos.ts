@@ -15,7 +15,7 @@ export interface Kos<
 > {
   readonly includeLanguageTags: LanguageTagSet;
 
-  conceptByIdentifier(identifier: Identifier): Stub<ConceptT>;
+  concept(identifier: Identifier): Stub<ConceptT>;
   concepts(kwds: {
     limit: number | null;
     offset: number;
@@ -23,7 +23,7 @@ export interface Kos<
   }): Promise<StubSequence<ConceptT>>;
   conceptsCount(query: ConceptsQuery): Promise<number>;
 
-  conceptSchemeByIdentifier(identifier: Identifier): Stub<ConceptSchemeT>;
+  conceptScheme(identifier: Identifier): Stub<ConceptSchemeT>;
   conceptSchemes(kwds: {
     limit: number | null;
     offset: number;
