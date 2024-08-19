@@ -1,9 +1,19 @@
-import { Identifier } from "@kos-kit/models";
+import {
+  ConceptSchemesQuery,
+  ConceptsQuery,
+  Identifier,
+  StubSequence,
+} from "@kos-kit/models";
+import { Resource } from "@kos-kit/rdf-resource";
 import { Concept, ConceptScheme, Label } from "@kos-kit/rdfjs-dataset-models";
-import { ConceptSchemeStub } from "./ConceptSchemeStub.js";
-import { ConceptStub } from "./ConceptStub.js";
+import { skos } from "@tpluscode/rdf-ns-builders";
+import { Maybe } from "purify-ts";
+import { GraphPatternVariable } from "./GraphPattern.js";
+import { GraphPatternStub } from "./GraphPatternStub.js";
+import { GraphPatternStubSequence } from "./GraphPatternStubSequence.js";
 import { Kos } from "./Kos.js";
-import { Stub } from "./Stub.js";
+import { conceptGraphPatterns } from "./conceptGraphPatterns.js";
+import { conceptSchemeGraphPatterns } from "./conceptSchemeGraphPatterns.js";
 
 class DefaultConcept extends Concept<
   DefaultConcept,
@@ -19,51 +29,120 @@ class DefaultConceptScheme extends ConceptScheme<
 
 type DefaultLabel = Label;
 
+const conceptVariable: GraphPatternVariable = {
+  termType: "Variable",
+  value: "concept",
+};
+
+const conceptGraphPatterns_ = conceptGraphPatterns({
+  subject: conceptVariable,
+  variablePrefix: conceptVariable.value,
+});
+
+const conceptSchemeVariable: GraphPatternVariable = {
+  termType: "Variable",
+  value: "conceptScheme",
+};
+
+const conceptSchemeGraphPatterns_ = conceptSchemeGraphPatterns({
+  subject: conceptSchemeVariable,
+  variablePrefix: conceptSchemeVariable.value,
+});
+
 export class DefaultKos extends Kos<
   DefaultConcept,
   DefaultConceptScheme,
   DefaultLabel
 > {
-  concept(
-    identifier: Identifier,
-  ): Stub<DefaultConcept, DefaultConceptScheme, DefaultLabel, DefaultConcept> {
-    return new ConceptStub({
+  concept(identifier: Identifier): GraphPatternStub<DefaultConcept> {
+    return new GraphPatternStub({
+      graphPatterns: conceptGraphPatterns_,
       identifier,
-      kos: this,
+      includeLanguageTags: this.includeLanguageTags,
       logger: this.logger,
-      modelFactory: ({ dataset, identifier }) =>
-        new DefaultConcept({
-          dataset,
-          identifier,
-          kos: this,
-          labelConstructor: Label,
-          logger: this.logger,
-        }),
+      modelFactory: (resource) => this.conceptModelFactory(resource),
+      modelVariable: conceptVariable,
       sparqlQueryClient: this.sparqlQueryClient,
+    });
+  }
+
+  async concepts(kwds: {
+    limit: number | null;
+    offset: number;
+    query: ConceptsQuery;
+  }): Promise<StubSequence<DefaultConcept>> {
+    return new GraphPatternStubSequence({
+      graphPatterns: conceptGraphPatterns_,
+      identifiers: await this.queryConcepts(kwds),
+      includeLanguageTags: this.includeLanguageTags,
+      modelFactory: (resource) => this.conceptModelFactory(resource),
+      modelVariable: conceptVariable,
+      logger: this.logger,
+      sparqlQueryClient: this.sparqlQueryClient,
+      stubFactory: (identifier) => this.concept(identifier),
     });
   }
 
   conceptScheme(
     identifier: Identifier,
-  ): Stub<
-    DefaultConcept,
-    DefaultConceptScheme,
-    DefaultLabel,
-    DefaultConceptScheme
-  > {
-    return new ConceptSchemeStub({
+  ): GraphPatternStub<DefaultConceptScheme> {
+    return new GraphPatternStub({
+      graphPatterns: conceptSchemeGraphPatterns_,
       identifier,
-      kos: this,
+      includeLanguageTags: this.includeLanguageTags,
       logger: this.logger,
-      modelFactory: ({ dataset, identifier }) =>
-        new DefaultConceptScheme({
-          dataset,
-          identifier,
+      modelFactory: (resource) => this.conceptSchemeModelFactory(resource),
+      modelVariable: conceptSchemeVariable,
+      sparqlQueryClient: this.sparqlQueryClient,
+    });
+  }
+
+  async conceptSchemes(kwds: {
+    limit: number | null;
+    offset: number;
+    query: ConceptSchemesQuery;
+  }): Promise<StubSequence<DefaultConceptScheme>> {
+    return new GraphPatternStubSequence({
+      graphPatterns: conceptSchemeGraphPatterns_,
+      identifiers: await this.queryConceptSchemes(kwds),
+      includeLanguageTags: this.includeLanguageTags,
+      modelFactory: (resource) => this.conceptSchemeModelFactory(resource),
+      modelVariable: conceptVariable,
+      logger: this.logger,
+      sparqlQueryClient: this.sparqlQueryClient,
+      stubFactory: (identifier) => this.conceptScheme(identifier),
+    });
+  }
+
+  private conceptModelFactory(
+    resource: Resource<Identifier>,
+  ): Maybe<DefaultConcept> {
+    if (resource.isInstanceOf(skos.Concept)) {
+      return Maybe.of(
+        new DefaultConcept({
           kos: this,
           labelConstructor: Label,
           logger: this.logger,
+          resource,
         }),
-      sparqlQueryClient: this.sparqlQueryClient,
-    });
+      );
+    }
+    return Maybe.empty();
+  }
+
+  private conceptSchemeModelFactory(
+    resource: Resource<Identifier>,
+  ): Maybe<DefaultConceptScheme> {
+    if (resource.isInstanceOf(skos.ConceptScheme)) {
+      return Maybe.of(
+        new DefaultConceptScheme({
+          kos: this,
+          labelConstructor: Label,
+          logger: this.logger,
+          resource,
+        }),
+      );
+    }
+    return Maybe.empty();
   }
 }

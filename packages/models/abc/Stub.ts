@@ -1,34 +1,12 @@
 import { Logger } from "pino";
 import { Maybe } from "purify-ts";
-import {
-  Concept as IConcept,
-  ConceptScheme as IConceptScheme,
-  Label as ILabel,
-  Stub as IStub,
-  Identifier,
-  Kos,
-} from "../index.js";
-import { NamedModel } from "./NamedModel.js";
+import { Stub as IStub, Identifier, NamedModel } from "../index.js";
 
-export abstract class Stub<
-    ConceptT extends IConcept<ConceptT, ConceptSchemeT, LabelT>,
-    ConceptSchemeT extends IConceptScheme<ConceptT, LabelT>,
-    LabelT extends ILabel,
-    ModelT extends ConceptT | ConceptSchemeT,
-  >
-  extends NamedModel
-  implements IStub<ModelT>
-{
-  protected readonly kos: Kos<ConceptT, ConceptSchemeT, LabelT>;
+export abstract class Stub<ModelT extends NamedModel> implements IStub<ModelT> {
+  abstract readonly identifier: Identifier;
   protected readonly logger: Logger;
 
-  protected constructor({
-    kos,
-    logger,
-    ...superParameters
-  }: Stub.Parameters<ConceptT, ConceptSchemeT, LabelT>) {
-    super(superParameters);
-    this.kos = kos;
+  protected constructor({ logger }: Stub.Parameters) {
     this.logger = logger;
   }
 
@@ -63,12 +41,7 @@ export namespace Stub {
     return left.identifier.equals(right.identifier);
   }
 
-  export interface Parameters<
-    ConceptT extends IConcept<ConceptT, ConceptSchemeT, LabelT>,
-    ConceptSchemeT extends IConceptScheme<ConceptT, LabelT>,
-    LabelT extends ILabel,
-  > extends NamedModel.Parameters {
-    kos: Kos<ConceptT, ConceptSchemeT, LabelT>;
+  export interface Parameters {
     logger: Logger;
   }
 }

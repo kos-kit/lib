@@ -5,23 +5,21 @@ import { Identifier } from "../Identifier.js";
 import { Kos } from "../Kos.js";
 import { Label as ILabel } from "../Label.js";
 import { LiteralLabel } from "../LiteralLabel.js";
-import { NamedModel } from "./NamedModel.js";
 import { matchLiteral } from "./matchLiteral.js";
 
 export abstract class LabeledModel<
   ConceptT extends IConcept<ConceptT, ConceptSchemeT, LabelT>,
   ConceptSchemeT extends IConceptScheme<ConceptT, LabelT>,
   LabelT extends ILabel,
-> extends NamedModel {
+> {
+  abstract readonly identifier: Identifier;
   kos: Kos<ConceptT, ConceptSchemeT, LabelT>; // Intentionally mutable
   protected readonly logger: Logger;
 
   constructor({
     kos,
     logger,
-    ...superParameters
   }: LabeledModel.Parameters<ConceptT, ConceptSchemeT, LabelT>) {
-    super(superParameters);
     this.kos = kos;
     this.logger = logger;
   }
@@ -64,7 +62,7 @@ export namespace LabeledModel {
     ConceptT extends IConcept<ConceptT, ConceptSchemeT, LabelT>,
     ConceptSchemeT extends IConceptScheme<ConceptT, LabelT>,
     LabelT extends ILabel,
-  > extends NamedModel.Parameters {
+  > {
     kos: Kos<ConceptT, ConceptSchemeT, LabelT>;
     logger: Logger;
   }

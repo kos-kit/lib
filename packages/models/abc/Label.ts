@@ -1,13 +1,13 @@
 import { Literal } from "@rdfjs/types";
-import { Label as ILabel } from "../Label.js";
-import { NamedModel } from "./NamedModel.js";
+import { Label as ILabel, Identifier } from "../index.js";
 
-export abstract class Label extends NamedModel implements ILabel {
+export abstract class Label implements ILabel {
+  readonly identifier: Identifier;
   readonly literalForm: Literal;
   readonly type: ILabel.Type;
 
-  constructor({ literalForm, type, ...superParameters }: Label.Parameters) {
-    super(superParameters);
+  constructor({ identifier, literalForm, type }: Label.Parameters) {
+    this.identifier = identifier;
     this.literalForm = literalForm;
     this.type = type;
   }
@@ -34,7 +34,8 @@ export namespace Label {
     return true;
   }
 
-  export interface Parameters extends NamedModel.Parameters {
+  export interface Parameters {
+    identifier: Identifier;
     literalForm: Literal;
     type: ILabel.Type;
   }

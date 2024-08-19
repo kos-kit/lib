@@ -5,8 +5,6 @@ import {
   ConceptScheme as IConceptScheme,
   Label as ILabel,
   Identifier,
-  StubSequence,
-  UnbatchedStubSequence,
   abc,
 } from "@kos-kit/models";
 import { SparqlQueryClient } from "@kos-kit/sparql-client";
@@ -33,30 +31,6 @@ export abstract class Kos<
     this.sparqlQueryClient = sparqlQueryClient;
   }
 
-  async conceptSchemes({
-    limit,
-    offset,
-    query,
-  }: {
-    limit: number | null;
-    offset: number;
-    query: ConceptSchemesQuery;
-  }): Promise<StubSequence<ConceptSchemeT>> {
-    return new UnbatchedStubSequence(
-      mapBindingsToIdentifiers(
-        await this.sparqlQueryClient.queryBindings(`\
-SELECT DISTINCT ?conceptScheme
-WHERE {
-${this.conceptSchemesQueryToWhereGraphPatterns(query).join("\n")}
-}
-${limit !== null && limit > 0 ? `LIMIT ${limit}` : ""}
-${offset > 0 ? `OFFSET ${offset}` : ""}
-`),
-        "conceptScheme",
-      ).map((identifier) => this.conceptScheme(identifier)),
-    );
-  }
-
   async conceptSchemesCount(query: ConceptSchemesQuery): Promise<number> {
     return mapBindingsToCount(
       await this.sparqlQueryClient.queryBindings(`\
@@ -68,30 +42,6 @@ ${this.conceptSchemesQueryToWhereGraphPatterns(query).join("\n")}
     );
   }
 
-  async concepts({
-    limit,
-    offset,
-    query,
-  }: {
-    limit: number | null;
-    offset: number;
-    query: ConceptsQuery;
-  }): Promise<StubSequence<ConceptT>> {
-    return new UnbatchedStubSequence(
-      mapBindingsToIdentifiers(
-        await this.sparqlQueryClient.queryBindings(`\
-SELECT DISTINCT ?concept
-WHERE {
-${this.conceptsQueryToWhereGraphPatterns(query).join("\n")}
-}
-${limit !== null && limit > 0 ? `LIMIT ${limit}` : ""}
-${offset > 0 ? `OFFSET ${offset}` : ""}
-`),
-        "concept",
-      ).map((identifier) => this.concept(identifier)),
-    );
-  }
-
   async conceptsCount(query: ConceptsQuery): Promise<number> {
     return mapBindingsToCount(
       await this.sparqlQueryClient.queryBindings(`\
@@ -100,6 +50,50 @@ WHERE {
 ${this.conceptsQueryToWhereGraphPatterns(query).join("\n")}
 }`),
       "count",
+    );
+  }
+
+  protected async queryConcepts({
+    limit,
+    offset,
+    query,
+  }: {
+    limit: number | null;
+    offset: number;
+    query: ConceptsQuery;
+  }): Promise<readonly Identifier[]> {
+    return mapBindingsToIdentifiers(
+      await this.sparqlQueryClient.queryBindings(`\
+SELECT DISTINCT ?concept
+WHERE {
+${this.conceptsQueryToWhereGraphPatterns(query).join("\n")}
+}
+${limit !== null && limit > 0 ? `LIMIT ${limit}` : ""}
+${offset > 0 ? `OFFSET ${offset}` : ""}
+`),
+      "concept",
+    );
+  }
+
+  protected async queryConceptSchemes({
+    limit,
+    offset,
+    query,
+  }: {
+    limit: number | null;
+    offset: number;
+    query: ConceptSchemesQuery;
+  }): Promise<readonly Identifier[]> {
+    return mapBindingsToIdentifiers(
+      await this.sparqlQueryClient.queryBindings(`\
+SELECT DISTINCT ?conceptScheme
+WHERE {
+${this.conceptSchemesQueryToWhereGraphPatterns(query).join("\n")}
+}
+${limit !== null && limit > 0 ? `LIMIT ${limit}` : ""}
+${offset > 0 ? `OFFSET ${offset}` : ""}
+`),
+      "conceptScheme",
     );
   }
 
