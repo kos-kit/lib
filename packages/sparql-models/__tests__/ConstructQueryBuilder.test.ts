@@ -74,21 +74,4 @@ CONSTRUCT {
   FILTER (!BOUND(?${object.value}) || LANG(?${object.value}) = "en" || LANG(?${object.value}) = "" )
 }`);
   });
-
-  // it("should translate a conceptByIdentifier query", () => {
-  //   const subject: GraphPatternSubject = {
-  //     termType: "NamedNode",
-  //     value: "http://example.com/concept",
-  //   };
-  //   const actual = new ConstructQueryBuilder()
-  //     .addGraphPatterns(
-  //       ...Concept.propertyGraphPatterns({
-  //         subject,
-  //         variablePrefix: "concept",
-  //       }),
-  //     )
-  //     .build();
-  //   // console.log("\n", actual);
-  //   expect(actual).not.toHaveLength(0);
-  // });
 });
