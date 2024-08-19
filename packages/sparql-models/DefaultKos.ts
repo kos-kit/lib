@@ -27,9 +27,7 @@ export class DefaultKos extends Kos<
   DefaultConceptScheme,
   DefaultLabel
 > {
-  concept(
-    identifier: Identifier,
-  ): Stub<DefaultConcept, DefaultConceptScheme, DefaultLabel, DefaultConcept> {
+  concept(identifier: Identifier): Stub<DefaultConcept> {
     const conceptVariable: GraphPatternVariable = {
       termType: "Variable",
       value: "concept",
@@ -40,7 +38,7 @@ export class DefaultKos extends Kos<
         variablePrefix: conceptVariable.value,
       }),
       identifier,
-      kos: this,
+      includeLanguageTags: this.includeLanguageTags,
       logger: this.logger,
       modelFactory: (resource) => {
         if (resource.isInstanceOf(skos.Concept)) {
@@ -61,14 +59,7 @@ export class DefaultKos extends Kos<
     });
   }
 
-  conceptScheme(
-    identifier: Identifier,
-  ): Stub<
-    DefaultConcept,
-    DefaultConceptScheme,
-    DefaultLabel,
-    DefaultConceptScheme
-  > {
+  conceptScheme(identifier: Identifier): Stub<DefaultConceptScheme> {
     const conceptSchemeVariable: GraphPatternVariable = {
       termType: "Variable",
       value: "conceptScheme",
@@ -80,7 +71,7 @@ export class DefaultKos extends Kos<
         variablePrefix: conceptSchemeVariable.value,
       }),
       identifier,
-      kos: this,
+      includeLanguageTags: this.includeLanguageTags,
       logger: this.logger,
       modelFactory: (resource) => {
         if (resource.isInstanceOf(skos.ConceptScheme)) {

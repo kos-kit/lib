@@ -1,23 +1,13 @@
-import {
-  Concept as IConcept,
-  ConceptScheme as IConceptScheme,
-  Label as ILabel,
-  Identifier,
-  abc,
-} from "@kos-kit/models";
+import { Identifier, LanguageTagSet, NamedModel, abc } from "@kos-kit/models";
 import { Resource } from "@kos-kit/rdf-resource";
 import { SparqlQueryClient } from "@kos-kit/sparql-client";
 import { Maybe } from "purify-ts";
 import { ConstructQueryBuilder } from "./ConstructQueryBuilder.js";
 import { GraphPattern, GraphPatternVariable } from "./GraphPattern.js";
 
-export class Stub<
-  ConceptT extends IConcept<ConceptT, ConceptSchemeT, LabelT>,
-  ConceptSchemeT extends IConceptScheme<ConceptT, LabelT>,
-  LabelT extends ILabel,
-  ModelT extends ConceptT | ConceptSchemeT,
-> extends abc.Stub<ConceptT, ConceptSchemeT, LabelT, ModelT> {
+export class Stub<ModelT extends NamedModel> extends abc.Stub<ModelT> {
   private readonly graphPatterns: readonly GraphPattern[];
+  private readonly includeLanguageTags: LanguageTagSet;
   private readonly modelFactory: (
     resource: Resource<Identifier>,
   ) => Maybe<ModelT>;
@@ -26,18 +16,21 @@ export class Stub<
 
   constructor({
     graphPatterns,
+    includeLanguageTags,
     modelFactory,
     modelVariable,
     sparqlQueryClient,
     ...superParameters
   }: {
     graphPatterns: readonly GraphPattern[];
+    includeLanguageTags: LanguageTagSet;
     modelFactory: (resource: Resource<Identifier>) => Maybe<ModelT>;
     modelVariable: GraphPatternVariable;
     sparqlQueryClient: SparqlQueryClient;
-  } & abc.Stub.Parameters<ConceptT, ConceptSchemeT, LabelT>) {
+  } & abc.Stub.Parameters) {
     super(superParameters);
     this.graphPatterns = graphPatterns;
+    this.includeLanguageTags = includeLanguageTags;
     this.modelFactory = modelFactory;
     this.modelVariable = modelVariable;
     this.sparqlQueryClient = sparqlQueryClient;
@@ -46,7 +39,7 @@ export class Stub<
   async resolve(): Promise<Maybe<ModelT>> {
     const dataset = await this.sparqlQueryClient.queryDataset(
       new ConstructQueryBuilder({
-        includeLanguageTags: this.kos.includeLanguageTags,
+        includeLanguageTags: this.includeLanguageTags,
       })
         .addGraphPatterns(...this.graphPatterns)
         .addValues(this.modelVariable, this.identifier)
