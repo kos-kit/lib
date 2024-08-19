@@ -6,7 +6,7 @@ import {
   abc,
 } from "@kos-kit/models";
 import { Resource } from "@kos-kit/rdf-resource";
-import { DatasetCore, Literal, NamedNode } from "@rdfjs/types";
+import { Literal, NamedNode } from "@rdfjs/types";
 import { dc11, dcterms } from "@tpluscode/rdf-ns-builders";
 import { Maybe } from "purify-ts";
 import { Concept } from "./Concept.js";
@@ -20,19 +20,19 @@ export class ConceptScheme<
   ConceptSchemeT extends IConceptScheme<ConceptT, LabelT>,
   LabelT extends ILabel,
 > extends abc.ConceptScheme<ConceptT, ConceptSchemeT, LabelT> {
-  protected resource: Resource<Identifier>;
+  protected readonly resource: Resource<Identifier>;
   private readonly labelConstructor: new (
     _: Label.Parameters,
   ) => LabelT;
 
   constructor({
-    dataset,
     labelConstructor,
+    resource,
     ...superParameters
   }: Concept.Parameters<ConceptT, ConceptSchemeT, LabelT>) {
     super(superParameters);
     this.labelConstructor = labelConstructor;
-    this.resource = new Resource({ dataset, identifier: this.identifier });
+    this.resource = resource;
   }
 
   protected labelsByType(type: ILabel.Type): readonly ILabel[] {
@@ -42,6 +42,10 @@ export class ConceptScheme<
       resource: this.resource,
       type,
     });
+  }
+
+  get identifier(): Identifier {
+    return this.resource.identifier;
   }
 
   get license(): Maybe<Literal | NamedNode> {
@@ -117,7 +121,7 @@ export namespace ConceptScheme {
     ConceptSchemeT extends IConceptScheme<ConceptT, LabelT>,
     LabelT extends ILabel,
   > extends abc.ConceptScheme.Parameters<ConceptT, ConceptSchemeT, LabelT> {
-    dataset: DatasetCore;
     labelConstructor: new (parameters: Label.Parameters) => LabelT;
+    resource: Resource<Identifier>;
   }
 }

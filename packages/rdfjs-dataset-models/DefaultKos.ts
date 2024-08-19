@@ -1,5 +1,7 @@
 import { Identifier } from "@kos-kit/models";
+import { Resource } from "@kos-kit/rdf-resource";
 import { skos } from "@tpluscode/rdf-ns-builders";
+import { Maybe } from "purify-ts";
 import { Concept } from "./Concept.js";
 import { ConceptScheme } from "./ConceptScheme.js";
 import { Kos } from "./Kos.js";
@@ -27,35 +29,37 @@ export class DefaultKos extends Kos<
 > {
   concept(identifier: Identifier): Stub<DefaultConcept> {
     return new Stub({
-      dataset: this.dataset,
-      identifier,
       logger: this.logger,
-      modelFactory: (identifier) =>
-        new DefaultConcept({
-          dataset: this.dataset,
-          identifier,
-          kos: this,
-          labelConstructor: Label,
-          logger: this.logger,
-        }),
-      modelRdfType: skos.Concept,
+      modelFactory: (resource) =>
+        resource.isInstanceOf(skos.Concept)
+          ? Maybe.of(
+              new DefaultConcept({
+                kos: this,
+                labelConstructor: Label,
+                logger: this.logger,
+                resource,
+              }),
+            )
+          : Maybe.empty(),
+      resource: new Resource<Identifier>({ dataset: this.dataset, identifier }),
     });
   }
 
   conceptScheme(identifier: Identifier): Stub<DefaultConceptScheme> {
     return new Stub({
-      dataset: this.dataset,
-      identifier,
       logger: this.logger,
-      modelFactory: (identifier) =>
-        new DefaultConceptScheme({
-          dataset: this.dataset,
-          identifier,
-          kos: this,
-          labelConstructor: Label,
-          logger: this.logger,
-        }),
-      modelRdfType: skos.ConceptScheme,
+      modelFactory: (resource) =>
+        resource.isInstanceOf(skos.ConceptScheme)
+          ? Maybe.of(
+              new DefaultConceptScheme({
+                kos: this,
+                labelConstructor: Label,
+                logger: this.logger,
+                resource,
+              }),
+            )
+          : Maybe.empty(),
+      resource: new Resource<Identifier>({ dataset: this.dataset, identifier }),
     });
   }
 }

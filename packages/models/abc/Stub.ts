@@ -1,20 +1,12 @@
 import { Logger } from "pino";
 import { Maybe } from "purify-ts";
-import {
-  NamedModel as INamedModel,
-  Stub as IStub,
-  Identifier,
-} from "../index.js";
-import { NamedModel } from "./NamedModel.js";
+import { Stub as IStub, Identifier, NamedModel } from "../index.js";
 
-export abstract class Stub<ModelT extends INamedModel>
-  extends NamedModel
-  implements IStub<ModelT>
-{
+export abstract class Stub<ModelT extends NamedModel> implements IStub<ModelT> {
+  abstract readonly identifier: Identifier;
   protected readonly logger: Logger;
 
-  protected constructor({ logger, ...superParameters }: Stub.Parameters) {
-    super(superParameters);
+  protected constructor({ logger }: Stub.Parameters) {
     this.logger = logger;
   }
 
@@ -49,7 +41,7 @@ export namespace Stub {
     return left.identifier.equals(right.identifier);
   }
 
-  export interface Parameters extends NamedModel.Parameters {
+  export interface Parameters {
     logger: Logger;
   }
 }
