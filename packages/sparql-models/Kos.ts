@@ -6,7 +6,6 @@ import {
   Label as ILabel,
   Identifier,
   StubSequence,
-  UnbatchedStubSequence,
   abc,
 } from "@kos-kit/models";
 import { SparqlQueryClient } from "@kos-kit/sparql-client";
@@ -42,7 +41,7 @@ export abstract class Kos<
     offset: number;
     query: ConceptSchemesQuery;
   }): Promise<StubSequence<ConceptSchemeT>> {
-    return new UnbatchedStubSequence(
+    return this.conceptSchemesStubSequence(
       mapBindingsToIdentifiers(
         await this.sparqlQueryClient.queryBindings(`\
 SELECT DISTINCT ?conceptScheme
@@ -53,7 +52,7 @@ ${limit !== null && limit > 0 ? `LIMIT ${limit}` : ""}
 ${offset > 0 ? `OFFSET ${offset}` : ""}
 `),
         "conceptScheme",
-      ).map((identifier) => this.conceptScheme(identifier)),
+      ),
     );
   }
 
@@ -77,7 +76,7 @@ ${this.conceptSchemesQueryToWhereGraphPatterns(query).join("\n")}
     offset: number;
     query: ConceptsQuery;
   }): Promise<StubSequence<ConceptT>> {
-    return new UnbatchedStubSequence(
+    return this.conceptsStubSequence(
       mapBindingsToIdentifiers(
         await this.sparqlQueryClient.queryBindings(`\
 SELECT DISTINCT ?concept
@@ -88,7 +87,7 @@ ${limit !== null && limit > 0 ? `LIMIT ${limit}` : ""}
 ${offset > 0 ? `OFFSET ${offset}` : ""}
 `),
         "concept",
-      ).map((identifier) => this.concept(identifier)),
+      ),
     );
   }
 
@@ -102,6 +101,14 @@ ${this.conceptsQueryToWhereGraphPatterns(query).join("\n")}
       "count",
     );
   }
+
+  protected abstract conceptsStubSequence(
+    identifiers: readonly Identifier[],
+  ): StubSequence<ConceptT>;
+
+  protected abstract conceptSchemesStubSequence(
+    identifiers: readonly Identifier[],
+  ): StubSequence<ConceptSchemeT>;
 
   private conceptSchemesQueryToWhereGraphPatterns(
     query: ConceptSchemesQuery,
