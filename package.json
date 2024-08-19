@@ -15,6 +15,7 @@
   "scripts": {
     "build": "npm run build --workspaces",
     "check": "npm run check --workspaces",
+    "check:write": "npm run check:write --workspaces",
     "clean": "npm run clean --workspaces",
     "generate-project-files": "tsx generate-project-files.ts",
     "link": "npm link --workspaces",
