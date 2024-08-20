@@ -8,7 +8,6 @@ import {
   Stub,
   StubSequence,
   UnbatchedStubSequence,
-  inverseSemanticRelationProperty,
 } from "@kos-kit/models";
 import TermSet from "@rdfjs/term-set";
 import { Literal } from "@rdfjs/types";
@@ -65,8 +64,7 @@ export abstract class Concept<
     }
 
     if (options?.includeInverse) {
-      const inverseProperty =
-        inverseSemanticRelationProperty(property).extractNullable();
+      const inverseProperty = property.inverse.extractNullable();
       if (inverseProperty !== null) {
         for (const conceptStub of await this.kos.concepts({
           limit: null,
@@ -86,16 +84,6 @@ export abstract class Concept<
     }
 
     return new UnbatchedStubSequence(conceptStubs);
-  }
-
-  async semanticRelationsCount(
-    property: SemanticRelationProperty,
-  ): Promise<number> {
-    return this.kos.conceptsCount({
-      semanticRelationProperty: property,
-      subjectConceptIdentifier: this.identifier,
-      type: "ObjectsOfSemanticRelation",
-    });
   }
 
   topConceptOf(): Promise<StubSequence<ConceptSchemeT>> {

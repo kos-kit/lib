@@ -101,9 +101,6 @@ export function behavesLikeUnescoThesaurusConcept10<
         conceptNumbers: [9, 556, 557, 1519, 5052],
       },
     ]) {
-      expect(
-        await concept.semanticRelationsCount(semanticRelationProperty),
-      ).toStrictEqual(conceptNumbers.length);
       const semanticRelations = [
         ...(await concept.semanticRelations(semanticRelationProperty)),
       ];
@@ -138,9 +135,6 @@ export function behavesLikeUnescoThesaurusConcept10<
           includeInverse: true,
         })),
       ];
-      expect(
-        await concept.semanticRelationsCount(semanticRelationProperty),
-      ).toStrictEqual(conceptNumbers.length);
       expect(semanticRelations).toHaveLength(conceptNumbers.length);
       for (const conceptNumber of conceptNumbers) {
         const conceptIdentifier = DataFactory.namedNode(

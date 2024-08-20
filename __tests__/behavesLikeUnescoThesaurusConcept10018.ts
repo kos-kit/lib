@@ -115,9 +115,6 @@ export function behavesLikeUnescoThesaurusConcept10018<
         conceptNumbers: [207, 3317, 7775, 6317, 4533],
       },
     ]) {
-      expect(
-        await concept.semanticRelationsCount(semanticRelationProperty),
-      ).toStrictEqual(conceptNumbers.length);
       const semanticRelations = [
         ...(await concept.semanticRelations(semanticRelationProperty)),
       ];

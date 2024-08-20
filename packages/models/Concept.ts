@@ -22,6 +22,5 @@ export interface Concept<
     property: SemanticRelationProperty,
     options?: { includeInverse?: boolean },
   ): Promise<StubSequence<ConceptT>>;
-  semanticRelationsCount(property: SemanticRelationProperty): Promise<number>;
   topConceptOf(): Promise<StubSequence<ConceptSchemeT>>;
 }
