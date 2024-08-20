@@ -88,16 +88,6 @@ export abstract class Concept<
     return new UnbatchedStubSequence(conceptStubs);
   }
 
-  async semanticRelationsCount(
-    property: SemanticRelationProperty,
-  ): Promise<number> {
-    return this.kos.conceptsCount({
-      semanticRelationProperty: property,
-      subjectConceptIdentifier: this.identifier,
-      type: "ObjectsOfSemanticRelation",
-    });
-  }
-
   topConceptOf(): Promise<StubSequence<ConceptSchemeT>> {
     return this.kos.conceptSchemes({
       limit: null,
