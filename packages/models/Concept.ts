@@ -17,18 +17,10 @@ export interface Concept<
 
   equals(other: Concept<any, any, any>): boolean;
   inSchemes(): Promise<StubSequence<ConceptSchemeT>>;
-  notes(properties: readonly NoteProperty[]): readonly {
-    readonly property: NoteProperty;
-    readonly notes: readonly Literal[];
-  }[];
+  notes(property: NoteProperty): readonly Literal[];
   semanticRelations(
-    properties: readonly SemanticRelationProperty[],
+    property: SemanticRelationProperty,
     options?: { includeInverse?: boolean },
-  ): Promise<
-    {
-      readonly property: SemanticRelationProperty;
-      readonly semanticRelations: StubSequence<ConceptT>;
-    }[]
-  >;
+  ): Promise<StubSequence<ConceptT>>;
   topConceptOf(): Promise<StubSequence<ConceptSchemeT>>;
 }
