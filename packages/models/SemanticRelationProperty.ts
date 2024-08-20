@@ -79,8 +79,8 @@ export class SemanticRelationProperty {
     return this.inverseIdentifier.map(
       (inverseIdentifier) =>
         semanticRelationProperties.find((semanticRelationProperty) =>
-          semanticRelationProperty.identifier.equals(inverseIdentifier)
-        )!
+          semanticRelationProperty.identifier.equals(inverseIdentifier),
+        )!,
     );
   }
 }
