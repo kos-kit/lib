@@ -209,6 +209,6 @@ ${offset > 0 ? `OFFSET ${offset}` : ""}
       ];
     }
 
-    throw new RangeError();
+    throw new RangeError("should never reach this code");
   }
 }

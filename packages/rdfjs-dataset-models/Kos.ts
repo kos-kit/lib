@@ -322,7 +322,7 @@ export abstract class Kos<
       return;
     }
 
-    throw new RangeError();
+    throw new RangeError("should never reach this code");
   }
 }
 
