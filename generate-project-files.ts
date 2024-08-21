@@ -308,6 +308,7 @@ fs.writeFileSync(
                 if: "always()",
                 uses: "davelosert/vitest-coverage-report-action@v2",
                 with: {
+                  "file-coverage-mode": "all",
                   name: project.name,
                   "json-final-path": `./packages/${project.name}/coverage/coverage-final.json`,
                   "json-summary-path": `./packages/${project.name}/coverage/coverage-summary.json`,
