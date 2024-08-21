@@ -64,24 +64,20 @@ export const behavesLikeUnescoThesaurusKos = <
     { timeout: 30000 },
   );
 
-  it(
-    "should get all concept schemes",
-    async () => {
-      const conceptSchemes = await (
-        await testKos.conceptSchemes({
-          limit: null,
-          offset: 0,
-          query: { type: "All" },
-        })
-      ).flatResolve();
-      expect(conceptSchemes).toHaveLength(1);
-      const conceptScheme = conceptSchemes[0];
-      expect(conceptScheme.identifier.value).toStrictEqual(
-        "http://vocabularies.unesco.org/thesaurus",
-      );
-    },
-    { timeout: 10000 },
-  );
+  it("should get all concept schemes", async () => {
+    const conceptSchemes = await (
+      await testKos.conceptSchemes({
+        limit: null,
+        offset: 0,
+        query: { type: "All" },
+      })
+    ).flatResolve();
+    expect(conceptSchemes).toHaveLength(1);
+    const conceptScheme = conceptSchemes[0];
+    expect(conceptScheme.identifier.value).toStrictEqual(
+      "http://vocabularies.unesco.org/thesaurus",
+    );
+  });
 
   it("should get a count of concepts", async () => {
     expect(await testKos.conceptsCount({ type: "All" })).toStrictEqual(4482);
