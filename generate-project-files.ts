@@ -182,6 +182,7 @@ for (const project of projects) {
           "lint:write": "biome lint --write",
           "lint:write:unsafe": "biome lint --write --unsafe",
           test: "biome check && vitest run",
+          "test:coverage": "biome check && vitest run --coverage",
           "test:watch": "vitest watch",
           unlink: `npm unlink -g @kos-kit/${project.name}`,
           watch: "tsc -w --preserveWatchOutput",
@@ -218,6 +219,7 @@ fs.writeFileSync(
         "@biomejs/biome": "1.8.3",
         "@tsconfig/strictest": "^2.0.5",
         "@types/node": "^20",
+        "@vitest/coverage-v8": "^2.0.5",
         eslint: "^8",
         "npm-run-all": "^4.1.5",
         rimraf: "^6.0.1",
@@ -236,6 +238,7 @@ fs.writeFileSync(
         lint: "npm run lint --workspaces",
         rebuild: "npm run rebuild --workspaces",
         test: "npm run test --if-present --workspaces",
+        "test:coverage": "npm run test:coverage --if-present --workspaces",
         unlink: "npm run unlink --workspaces",
         watch: "run-p watch:*",
         ...projects.reduce(
