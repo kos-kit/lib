@@ -2,8 +2,8 @@ name: Continuous Integration
 on:
   push:
     branches-ignore:
-      - "main"
-  workflow_dispatch:
+      - main
+  workflow_dispatch: null
 jobs:
   build:
     name: Build and test
@@ -12,11 +12,60 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          cache: "npm"
+          cache: npm
           node-version: 20
       - name: Install dependencies
         run: npm install
       - name: Build
         run: npm run build
       - name: Test
-        run: npm run test
+        run: npm run test:coverage
+      - if: always()
+        uses: davelosert/vitest-coverage-report-action@v2
+        with:
+          file-coverage-mode: all
+          name: next-utils
+          json-final-path: ./packages/next-utils/coverage/coverage-final.json
+          json-summary-path: ./packages/next-utils/coverage/coverage-summary.json
+      - if: always()
+        uses: davelosert/vitest-coverage-report-action@v2
+        with:
+          file-coverage-mode: all
+          name: rdf-resource
+          json-final-path: ./packages/rdf-resource/coverage/coverage-final.json
+          json-summary-path: ./packages/rdf-resource/coverage/coverage-summary.json
+      - if: always()
+        uses: davelosert/vitest-coverage-report-action@v2
+        with:
+          file-coverage-mode: all
+          name: rdf-utils
+          json-final-path: ./packages/rdf-utils/coverage/coverage-final.json
+          json-summary-path: ./packages/rdf-utils/coverage/coverage-summary.json
+      - if: always()
+        uses: davelosert/vitest-coverage-report-action@v2
+        with:
+          file-coverage-mode: all
+          name: rdfjs-dataset-models
+          json-final-path: ./packages/rdfjs-dataset-models/coverage/coverage-final.json
+          json-summary-path: ./packages/rdfjs-dataset-models/coverage/coverage-summary.json
+      - if: always()
+        uses: davelosert/vitest-coverage-report-action@v2
+        with:
+          file-coverage-mode: all
+          name: search
+          json-final-path: ./packages/search/coverage/coverage-final.json
+          json-summary-path: ./packages/search/coverage/coverage-summary.json
+      - if: always()
+        uses: davelosert/vitest-coverage-report-action@v2
+        with:
+          file-coverage-mode: all
+          name: sparql-client
+          json-final-path: ./packages/sparql-client/coverage/coverage-final.json
+          json-summary-path: ./packages/sparql-client/coverage/coverage-summary.json
+      - if: always()
+        uses: davelosert/vitest-coverage-report-action@v2
+        with:
+          file-coverage-mode: all
+          name: sparql-models
+          json-final-path: ./packages/sparql-models/coverage/coverage-final.json
+          json-summary-path: ./packages/sparql-models/coverage/coverage-summary.json

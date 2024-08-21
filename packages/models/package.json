@@ -32,6 +32,7 @@
     "lint:write": "biome lint --write",
     "lint:write:unsafe": "biome lint --write --unsafe",
     "test": "biome check && vitest run",
+    "test:coverage": "biome check && vitest run --coverage",
     "test:watch": "vitest watch",
     "unlink": "npm unlink -g @kos-kit/models",
     "watch": "tsc -w --preserveWatchOutput"

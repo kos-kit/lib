@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import { stringify as stringifyYaml } from "yaml";
 
 const VERSION = "2.0.59";
 
@@ -182,6 +183,7 @@ for (const project of projects) {
           "lint:write": "biome lint --write",
           "lint:write:unsafe": "biome lint --write --unsafe",
           test: "biome check && vitest run",
+          "test:coverage": "biome check && vitest run --coverage",
           "test:watch": "vitest watch",
           unlink: `npm unlink -g @kos-kit/${project.name}`,
           watch: "tsc -w --preserveWatchOutput",
@@ -218,12 +220,14 @@ fs.writeFileSync(
         "@biomejs/biome": "1.8.3",
         "@tsconfig/strictest": "^2.0.5",
         "@types/node": "^20",
+        "@vitest/coverage-v8": "^2.0.5",
         eslint: "^8",
         "npm-run-all": "^4.1.5",
         rimraf: "^6.0.1",
         tsx: "^4.16.2",
         typescript: "~5.5",
         vitest: "^2.0.5",
+        yaml: "^2.5.0",
       },
       name: "@kos-kit/lib",
       private: true,
@@ -236,6 +240,7 @@ fs.writeFileSync(
         lint: "npm run lint --workspaces",
         rebuild: "npm run rebuild --workspaces",
         test: "npm run test --if-present --workspaces",
+        "test:coverage": "npm run test:coverage --if-present --workspaces",
         unlink: "npm run unlink --workspaces",
         watch: "run-p watch:*",
         ...projects.reduce(
@@ -252,4 +257,66 @@ fs.writeFileSync(
     undefined,
     2,
   )}\n`,
+);
+
+// Continuous Integration workflow file
+fs.writeFileSync(
+  path.join(__dirname, ".github", "workflows", "continuous-integration.yml"),
+  stringifyYaml({
+    name: "Continuous Integration",
+    on: {
+      push: {
+        "branches-ignore": ["main"],
+      },
+      workflow_dispatch: null,
+    },
+    jobs: {
+      build: {
+        name: "Build and test",
+        "runs-on": "ubuntu-latest",
+        steps: [
+          {
+            uses: "actions/checkout@v4",
+          },
+          {
+            uses: "actions/setup-node@v4",
+            with: {
+              cache: "npm",
+              "node-version": 20,
+            },
+          },
+          {
+            name: "Install dependencies",
+            run: "npm install",
+          },
+          {
+            name: "Build",
+            run: "npm run build",
+          },
+          {
+            name: "Test",
+            run: "npm run test:coverage",
+          },
+          ...projects
+            .filter((project) =>
+              fs.existsSync(
+                path.join(__dirname, "packages", project.name, "__tests__"),
+              ),
+            )
+            .map((project) => {
+              return {
+                if: "always()",
+                uses: "davelosert/vitest-coverage-report-action@v2",
+                with: {
+                  "file-coverage-mode": "all",
+                  name: project.name,
+                  "json-final-path": `./packages/${project.name}/coverage/coverage-final.json`,
+                  "json-summary-path": `./packages/${project.name}/coverage/coverage-summary.json`,
+                },
+              };
+            }),
+        ],
+      },
+    },
+  }),
 );
