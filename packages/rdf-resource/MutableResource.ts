@@ -1,4 +1,3 @@
-import { createRdfList } from "@kos-kit/rdf-utils";
 import {
   BlankNode,
   DataFactory,
@@ -11,6 +10,7 @@ import {
 import { rdf } from "@tpluscode/rdf-ns-builders";
 import { Maybe } from "purify-ts";
 import { Resource } from "./Resource.js";
+import { createRdfList } from "./createRdfList.js";
 
 type Value = Exclude<Quad_Object, Quad | Variable>;
 

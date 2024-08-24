@@ -10,8 +10,7 @@ import {
   UnbatchedStubSequence,
   abc,
 } from "@kos-kit/models";
-import { Resource } from "@kos-kit/rdf-resource";
-import { getRdfInstances } from "@kos-kit/rdf-utils";
+import { Resource, ResourceSet } from "@kos-kit/rdf-resource";
 import TermSet from "@rdfjs/term-set";
 import { DatasetCore } from "@rdfjs/types";
 import { skos } from "@tpluscode/rdf-ns-builders";
@@ -81,11 +80,15 @@ export abstract class Kos<
   ConceptSchemeT extends IConceptScheme<ConceptT, LabelT>,
   LabelT extends ILabel,
 > extends abc.Kos<ConceptT, ConceptSchemeT, LabelT> {
-  readonly dataset: DatasetCore;
+  private readonly resourceSet: ResourceSet;
 
   constructor({ dataset, ...otherParameters }: Kos.Parameters) {
     super(otherParameters);
-    this.dataset = dataset;
+    this.resourceSet = new ResourceSet({ dataset });
+  }
+
+  get dataset(): DatasetCore {
+    return this.resourceSet.dataset;
   }
 
   async conceptSchemes({
@@ -133,13 +136,10 @@ export abstract class Kos<
   }
 
   private *allConceptSchemes(): Generator<Stub<ConceptSchemeT>> {
-    for (const identifier of getRdfInstances({
-      class_: skos.ConceptScheme,
-      dataset: this.dataset,
-    })) {
-      if (identifier.termType === "NamedNode") {
-        yield this.conceptScheme(identifier);
-      }
+    for (const resource of this.resourceSet.namedInstancesOf(
+      skos.ConceptScheme,
+    )) {
+      yield this.conceptScheme(resource.identifier);
     }
   }
 
@@ -207,13 +207,8 @@ export abstract class Kos<
 
   private *queryConcepts(query: ConceptsQuery): Generator<Stub<ConceptT>> {
     if (query.type === "All") {
-      for (const identifier of getRdfInstances({
-        class_: skos.Concept,
-        dataset: this.dataset,
-      })) {
-        if (identifier.termType === "NamedNode") {
-          yield this.concept(identifier);
-        }
+      for (const resource of this.resourceSet.namedInstancesOf(skos.Concept)) {
+        yield this.concept(resource.identifier);
       }
       return;
     }

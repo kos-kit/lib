@@ -1,9 +1,7 @@
-import {
-  GetRdfInstanceQuadsParameters,
-  getRdfInstances,
-} from "@kos-kit/rdf-utils";
 import { DatasetCore, NamedNode } from "@rdfjs/types";
 import { Resource } from "./Resource.js";
+import { GetRdfInstanceQuadsParameters } from "./getRdfInstanceQuads.js";
+import { getRdfInstances } from "./getRdfInstances.js";
 
 /**
  * A ResourceSet wraps an RDF/JS dataset with convenient resource factory methods.

@@ -1,4 +1,3 @@
-import { getRdfList, isRdfInstanceOf } from "@kos-kit/rdf-utils";
 import {
   BlankNode,
   DataFactory,
@@ -12,6 +11,8 @@ import {
 } from "@rdfjs/types";
 import { Either, Just, Left, Maybe, Nothing } from "purify-ts";
 import { fromRdf } from "rdf-literal";
+import { getRdfList } from "./getRdfList.js";
+import { isRdfInstanceOf } from "./isRdfInstanceOf.js";
 
 function defaultValueOfFilter(_valueOf: Resource.ValueOf): boolean {
   return true;
