@@ -9,7 +9,6 @@ type ProjectName =
   | "models"
   | "next-utils"
   | "rdf-resource"
-  | "rdf-utils"
   | "search"
   | "sparql-client"
   | "sparql-models";
@@ -65,23 +64,16 @@ const projects: readonly Project[] = [
   },
   {
     externalDependencies: {
+      "@rdfjs/term-set": "^1.1.0",
       "@rdfjs/types": externalDependencyVersions["@rdfjs/types"],
+      "@tpluscode/rdf-ns-builders":
+        externalDependencyVersions["@tpluscode/rdf-ns-builders"],
+      "@types/rdfjs__term-set": "^1.0.2",
       "purify-ts": externalDependencyVersions["purify-ts"],
       "rdf-literal": "^1.3.2",
     },
-    internalDependencies: ["rdf-utils"],
-    name: "rdf-resource",
-  },
-  {
-    externalDependencies: {
-      "@tpluscode/rdf-ns-builders":
-        externalDependencyVersions["@tpluscode/rdf-ns-builders"],
-      "@rdfjs/term-set": "^1.1.0",
-      "@rdfjs/types": externalDependencyVersions["@rdfjs/types"],
-      "@types/rdfjs__term-set": "^1.0.2",
-    },
     internalDependencies: [],
-    name: "rdf-utils",
+    name: "rdf-resource",
   },
   {
     devDependencies: {
@@ -95,7 +87,7 @@ const projects: readonly Project[] = [
       pino: externalDependencyVersions["pino"],
       "purify-ts": externalDependencyVersions["purify-ts"],
     },
-    internalDependencies: ["rdf-resource", "rdf-utils"],
+    internalDependencies: ["rdf-resource"],
     name: "rdfjs-dataset-models",
   },
   {

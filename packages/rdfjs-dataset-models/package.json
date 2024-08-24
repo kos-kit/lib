@@ -1,7 +1,6 @@
 {
   "dependencies": {
     "@kos-kit/rdf-resource": "2.0.59",
-    "@kos-kit/rdf-utils": "2.0.59",
     "@rdfjs/types": "^1.1.0",
     "iterator-helpers-polyfill": "^3.0.1",
     "pino": "^9.1.0",
