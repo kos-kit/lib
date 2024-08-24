@@ -1,7 +1,7 @@
 import { Identifier } from "@kos-kit/models";
-import { Resource } from "@kos-kit/rdf-resource";
 import { skos } from "@tpluscode/rdf-ns-builders";
 import { Maybe } from "purify-ts";
+import { Resource } from "rdfjs-resource";
 import { Concept } from "./Concept.js";
 import { ConceptScheme } from "./ConceptScheme.js";
 import { Kos } from "./Kos.js";

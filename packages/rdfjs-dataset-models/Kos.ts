@@ -10,10 +10,10 @@ import {
   UnbatchedStubSequence,
   abc,
 } from "@kos-kit/models";
-import { Resource, ResourceSet } from "@kos-kit/rdf-resource";
 import TermSet from "@rdfjs/term-set";
 import { DatasetCore } from "@rdfjs/types";
 import { skos } from "@tpluscode/rdf-ns-builders";
+import { Resource, ResourceSet } from "rdfjs-resource";
 import { limitGenerator } from "./limitGenerator.js";
 import { offsetGenerator } from "./offsetGenerator.js";
 

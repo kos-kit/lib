@@ -1,6 +1,6 @@
 import { Kos, Label, LabeledModel, LanguageTag } from "@kos-kit/models";
-import { Resource } from "@kos-kit/rdf-resource";
 import lunr, { Index } from "lunr";
+import { Resource } from "rdfjs-resource";
 import { LunrIndexCompactor } from "./LunrIndexCompactor.js";
 import { SearchEngine } from "./SearchEngine.js";
 import { SearchEngineJson } from "./SearchEngineJson.js";

@@ -4,9 +4,9 @@ import {
   LiteralLabel,
   abc,
 } from "@kos-kit/models";
-import { Resource } from "@kos-kit/rdf-resource";
 import { skosxl } from "@tpluscode/rdf-ns-builders";
 import { Maybe } from "purify-ts";
+import { Resource } from "rdfjs-resource";
 import "iterator-helpers-polyfill";
 import { Label } from "./Label.js";
 

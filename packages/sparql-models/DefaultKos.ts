@@ -4,10 +4,10 @@ import {
   Identifier,
   StubSequence,
 } from "@kos-kit/models";
-import { Resource } from "@kos-kit/rdf-resource";
 import { Concept, ConceptScheme, Label } from "@kos-kit/rdfjs-dataset-models";
 import { skos } from "@tpluscode/rdf-ns-builders";
 import { Maybe } from "purify-ts";
+import { Resource } from "rdfjs-resource";
 import { GraphPatternVariable } from "./GraphPattern.js";
 import { GraphPatternStub } from "./GraphPatternStub.js";
 import { GraphPatternStubSequence } from "./GraphPatternStubSequence.js";

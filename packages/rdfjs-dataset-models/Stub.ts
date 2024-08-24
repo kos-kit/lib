@@ -1,6 +1,6 @@
 import { Identifier, NamedModel, abc } from "@kos-kit/models";
-import { Resource } from "@kos-kit/rdf-resource";
 import { Maybe } from "purify-ts";
+import { Resource } from "rdfjs-resource";
 
 export class Stub<ModelT extends NamedModel> extends abc.Stub<ModelT> {
   private readonly modelFactory: (

@@ -8,7 +8,6 @@ type ProjectName =
   | "rdfjs-dataset-models"
   | "models"
   | "next-utils"
-  | "rdf-resource"
   | "search"
   | "sparql-client"
   | "sparql-models";
@@ -30,6 +29,7 @@ const externalDependencyVersions = {
   pino: "^9.1.0",
   "purify-ts": "~2.1.0",
   "purify-ts-helpers": "1.0.4",
+  "rdfjs-resource": "1.0.0",
 };
 
 const projects: readonly Project[] = [
@@ -63,19 +63,6 @@ const projects: readonly Project[] = [
     name: "next-utils",
   },
   {
-    externalDependencies: {
-      "@rdfjs/term-set": "^1.1.0",
-      "@rdfjs/types": externalDependencyVersions["@rdfjs/types"],
-      "@tpluscode/rdf-ns-builders":
-        externalDependencyVersions["@tpluscode/rdf-ns-builders"],
-      "@types/rdfjs__term-set": "^1.0.2",
-      "purify-ts": externalDependencyVersions["purify-ts"],
-      "rdf-literal": "^1.3.2",
-    },
-    internalDependencies: [],
-    name: "rdf-resource",
-  },
-  {
     devDependencies: {
       "@types/n3": externalDependencyVersions["@types/n3"],
       n3: externalDependencyVersions.n3,
@@ -86,8 +73,9 @@ const projects: readonly Project[] = [
         externalDependencyVersions["iterator-helpers-polyfill"],
       pino: externalDependencyVersions["pino"],
       "purify-ts": externalDependencyVersions["purify-ts"],
+      "rdfjs-resource": externalDependencyVersions["rdfjs-resource"],
     },
-    internalDependencies: ["rdf-resource"],
+    internalDependencies: [],
     name: "rdfjs-dataset-models",
   },
   {
@@ -95,8 +83,9 @@ const projects: readonly Project[] = [
       "@rdfjs/types": externalDependencyVersions["@rdfjs/types"],
       "@types/lunr": "^2.3.7",
       lunr: "^2.3.9",
+      "rdfjs-resource": externalDependencyVersions["rdfjs-resource"],
     },
-    internalDependencies: ["rdfjs-dataset-models", "models", "rdf-resource"],
+    internalDependencies: ["rdfjs-dataset-models", "models"],
     name: "search",
   },
   {
@@ -123,13 +112,9 @@ const projects: readonly Project[] = [
         externalDependencyVersions["@tpluscode/rdf-ns-builders"],
       pino: externalDependencyVersions["pino"],
       "purify-ts": externalDependencyVersions["purify-ts"],
+      "rdfjs-resource": externalDependencyVersions["rdfjs-resource"],
     },
-    internalDependencies: [
-      "models",
-      "rdf-resource",
-      "rdfjs-dataset-models",
-      "sparql-client",
-    ],
+    internalDependencies: ["models", "rdfjs-dataset-models", "sparql-client"],
     name: "sparql-models",
   },
 ];

@@ -5,10 +5,10 @@ import {
   Stub,
   abc,
 } from "@kos-kit/models";
-import { Resource } from "@kos-kit/rdf-resource";
 import { SparqlQueryClient } from "@kos-kit/sparql-client";
 import { Logger } from "pino";
 import { Maybe } from "purify-ts";
+import { Resource } from "rdfjs-resource";
 import { ConstructQueryBuilder } from "./ConstructQueryBuilder.js";
 import { GraphPattern, GraphPatternVariable } from "./GraphPattern.js";
 

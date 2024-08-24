@@ -1,10 +1,10 @@
 {
   "dependencies": {
-    "@kos-kit/rdf-resource": "2.0.59",
     "@rdfjs/types": "^1.1.0",
     "iterator-helpers-polyfill": "^3.0.1",
     "pino": "^9.1.0",
-    "purify-ts": "~2.1.0"
+    "purify-ts": "~2.1.0",
+    "rdfjs-resource": "1.0.0"
   },
   "devDependencies": {
     "@types/n3": "^1.16.4",

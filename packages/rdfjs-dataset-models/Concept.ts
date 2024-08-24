@@ -6,10 +6,10 @@ import {
   NoteProperty,
   abc,
 } from "@kos-kit/models";
-import { Resource } from "@kos-kit/rdf-resource";
 import { Literal } from "@rdfjs/types";
 import { dcterms, skos } from "@tpluscode/rdf-ns-builders";
 import { Maybe } from "purify-ts";
+import { Resource } from "rdfjs-resource";
 import { Label } from "./Label.js";
 import { labelsByType } from "./labelsByType.js";
 
