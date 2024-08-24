@@ -1,7 +1,7 @@
 import { Identifier, LanguageTagSet, NamedModel, abc } from "@kos-kit/models";
-import { Resource } from "@kos-kit/rdf-resource";
 import { SparqlQueryClient } from "@kos-kit/sparql-client";
 import { Maybe } from "purify-ts";
+import { Resource } from "rdfjs-resource";
 import { ConstructQueryBuilder } from "./ConstructQueryBuilder.js";
 import { GraphPattern, GraphPatternVariable } from "./GraphPattern.js";
 

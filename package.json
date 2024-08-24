@@ -28,8 +28,6 @@
     "watch": "run-p watch:*",
     "watch:models": "npm run watch -w @kos-kit/models",
     "watch:next-utils": "npm run watch -w @kos-kit/next-utils",
-    "watch:rdf-resource": "npm run watch -w @kos-kit/rdf-resource",
-    "watch:rdf-utils": "npm run watch -w @kos-kit/rdf-utils",
     "watch:rdfjs-dataset-models": "npm run watch -w @kos-kit/rdfjs-dataset-models",
     "watch:search": "npm run watch -w @kos-kit/search",
     "watch:sparql-client": "npm run watch -w @kos-kit/sparql-client",
@@ -38,8 +36,6 @@
   "workspaces": [
     "packages/models",
     "packages/next-utils",
-    "packages/rdf-resource",
-    "packages/rdf-utils",
     "packages/rdfjs-dataset-models",
     "packages/search",
     "packages/sparql-client",

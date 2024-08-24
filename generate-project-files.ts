@@ -2,14 +2,12 @@ import fs from "node:fs";
 import path from "node:path";
 import { stringify as stringifyYaml } from "yaml";
 
-const VERSION = "2.0.59";
+const VERSION = "2.0.60";
 
 type ProjectName =
   | "rdfjs-dataset-models"
   | "models"
   | "next-utils"
-  | "rdf-resource"
-  | "rdf-utils"
   | "search"
   | "sparql-client"
   | "sparql-models";
@@ -31,6 +29,7 @@ const externalDependencyVersions = {
   pino: "^9.1.0",
   "purify-ts": "~2.1.0",
   "purify-ts-helpers": "1.0.4",
+  "rdfjs-resource": "1.0.0",
 };
 
 const projects: readonly Project[] = [
@@ -64,26 +63,6 @@ const projects: readonly Project[] = [
     name: "next-utils",
   },
   {
-    externalDependencies: {
-      "@rdfjs/types": externalDependencyVersions["@rdfjs/types"],
-      "purify-ts": externalDependencyVersions["purify-ts"],
-      "rdf-literal": "^1.3.2",
-    },
-    internalDependencies: ["rdf-utils"],
-    name: "rdf-resource",
-  },
-  {
-    externalDependencies: {
-      "@tpluscode/rdf-ns-builders":
-        externalDependencyVersions["@tpluscode/rdf-ns-builders"],
-      "@rdfjs/term-set": "^1.1.0",
-      "@rdfjs/types": externalDependencyVersions["@rdfjs/types"],
-      "@types/rdfjs__term-set": "^1.0.2",
-    },
-    internalDependencies: [],
-    name: "rdf-utils",
-  },
-  {
     devDependencies: {
       "@types/n3": externalDependencyVersions["@types/n3"],
       n3: externalDependencyVersions.n3,
@@ -94,8 +73,9 @@ const projects: readonly Project[] = [
         externalDependencyVersions["iterator-helpers-polyfill"],
       pino: externalDependencyVersions["pino"],
       "purify-ts": externalDependencyVersions["purify-ts"],
+      "rdfjs-resource": externalDependencyVersions["rdfjs-resource"],
     },
-    internalDependencies: ["rdf-resource", "rdf-utils"],
+    internalDependencies: [],
     name: "rdfjs-dataset-models",
   },
   {
@@ -103,8 +83,9 @@ const projects: readonly Project[] = [
       "@rdfjs/types": externalDependencyVersions["@rdfjs/types"],
       "@types/lunr": "^2.3.7",
       lunr: "^2.3.9",
+      "rdfjs-resource": externalDependencyVersions["rdfjs-resource"],
     },
-    internalDependencies: ["rdfjs-dataset-models", "models", "rdf-resource"],
+    internalDependencies: ["rdfjs-dataset-models", "models"],
     name: "search",
   },
   {
@@ -131,13 +112,9 @@ const projects: readonly Project[] = [
         externalDependencyVersions["@tpluscode/rdf-ns-builders"],
       pino: externalDependencyVersions["pino"],
       "purify-ts": externalDependencyVersions["purify-ts"],
+      "rdfjs-resource": externalDependencyVersions["rdfjs-resource"],
     },
-    internalDependencies: [
-      "models",
-      "rdf-resource",
-      "rdfjs-dataset-models",
-      "sparql-client",
-    ],
+    internalDependencies: ["models", "rdfjs-dataset-models", "sparql-client"],
     name: "sparql-models",
   },
 ];
@@ -194,7 +171,7 @@ for (const project of projects) {
         },
         type: "module",
         types: "index.d.ts",
-        version: "2.0.59",
+        version: "2.0.60",
       },
       undefined,
       2,

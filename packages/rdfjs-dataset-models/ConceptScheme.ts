@@ -5,10 +5,10 @@ import {
   Identifier,
   abc,
 } from "@kos-kit/models";
-import { Resource } from "@kos-kit/rdf-resource";
 import { Literal, NamedNode } from "@rdfjs/types";
 import { dc11, dcterms } from "@tpluscode/rdf-ns-builders";
 import { Maybe } from "purify-ts";
+import { Resource } from "rdfjs-resource";
 import { Concept } from "./Concept.js";
 import { Label } from "./Label.js";
 import { labelsByType } from "./labelsByType.js";
