@@ -80,7 +80,7 @@ export abstract class Kos<
   ConceptSchemeT extends IConceptScheme<ConceptT, LabelT>,
   LabelT extends ILabel,
 > extends abc.Kos<ConceptT, ConceptSchemeT, LabelT> {
-  private readonly resourceSet: ResourceSet;
+  readonly resourceSet: ResourceSet;
 
   constructor({ dataset, ...otherParameters }: Kos.Parameters) {
     super(otherParameters);
