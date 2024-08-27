@@ -1,4 +1,4 @@
-import { Maybe } from "purify-ts";
+import { Either } from "purify-ts";
 import { NamedModel } from "./NamedModel.js";
 import { Stub } from "./Stub.js";
 import { StubSequence } from "./abc/StubSequence.js";
@@ -26,7 +26,7 @@ export class UnbatchedStubSequence<
     return this.delegate[Symbol.iterator]();
   }
 
-  async resolve(): Promise<readonly Maybe<ModelT>[]> {
-    return await Promise.all(this.delegate.map((model) => model.resolve()));
+  async resolve(): Promise<readonly Either<Stub<ModelT>, ModelT>[]> {
+    return await Promise.all(this.delegate.map((stub) => stub.resolve()));
   }
 }

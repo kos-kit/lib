@@ -1,4 +1,4 @@
-import { Maybe } from "purify-ts";
+import { Either } from "purify-ts";
 import { NamedModel } from "./NamedModel.js";
 import { Stub } from "./Stub.js";
 import { StubSequence } from "./StubSequence.js";
@@ -25,11 +25,7 @@ export class EmptyStubSequence<ModelT extends NamedModel>
     return [];
   }
 
-  async resolve(): Promise<readonly Maybe<ModelT>[]> {
-    return [];
-  }
-
-  async resolveOrStub(): Promise<readonly NamedModel[]> {
+  async resolve(): Promise<readonly Either<Stub<ModelT>, ModelT>[]> {
     return [];
   }
 }
