@@ -1,5 +1,5 @@
 import { Identifier, NamedModel, abc } from "@kos-kit/models";
-import { Maybe } from "purify-ts";
+import { Either, Maybe } from "purify-ts";
 import { Resource } from "rdfjs-resource";
 
 export class Stub<ModelT extends NamedModel> extends abc.Stub<ModelT> {
@@ -25,15 +25,14 @@ export class Stub<ModelT extends NamedModel> extends abc.Stub<ModelT> {
     return this.resource.identifier;
   }
 
-  async resolve(): Promise<Maybe<ModelT>> {
-    const modelMaybe = this.modelFactory(this.resource);
-    if (modelMaybe.isJust()) {
-      return modelMaybe;
-    }
-    this.logger.warn(
-      "%s is missing, unable to resolve",
-      Identifier.toString(this.identifier),
-    );
-    return Maybe.empty();
+  async resolve(): Promise<Either<this, ModelT>> {
+    return this.modelFactory(this.resource)
+      .toEither(this)
+      .ifLeft(() => {
+        this.logger.warn(
+          "%s is missing, unable to resolve",
+          Identifier.toString(this.identifier),
+        );
+      });
   }
 }

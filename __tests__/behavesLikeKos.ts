@@ -10,7 +10,7 @@ export const behavesLikeKos = (kos: Kos<any, any, any>) => {
     ];
     expect(firstConcepts).toHaveLength(10);
     for (const firstConcept of firstConcepts) {
-      expectConcept((await firstConcept.resolve()).extractNullable());
+      expectConcept((await firstConcept.resolve()).toMaybe().extractNullable());
     }
 
     const nextConcepts = [
@@ -22,7 +22,7 @@ export const behavesLikeKos = (kos: Kos<any, any, any>) => {
     ];
     expect(nextConcepts).toHaveLength(10);
     for (const nextConcept of nextConcepts) {
-      expectConcept((await nextConcept.resolve()).extractNullable());
+      expectConcept((await nextConcept.resolve()).toMaybe().extractNullable());
       expect(
         firstConcepts.every(
           (firstConcept) =>
@@ -38,10 +38,14 @@ export const behavesLikeKos = (kos: Kos<any, any, any>) => {
       offset: 0,
       query: { type: "All" },
     })) {
-      expectConcept((await expectedConcept.resolve()).extractNullable());
+      expectConcept(
+        (await expectedConcept.resolve()).toMaybe().extractNullable(),
+      );
       const actualConcept = (
         await kos.concept(expectedConcept.identifier).resolve()
-      ).extractNullable();
+      )
+        .toMaybe()
+        .extractNullable();
       expectConcept(actualConcept);
       expect(
         expectedConcept.identifier.equals(actualConcept!.identifier),
@@ -65,7 +69,9 @@ export const behavesLikeKos = (kos: Kos<any, any, any>) => {
       conceptSchemes.push(conceptScheme);
     }
     expect(conceptSchemes).not.toHaveLength(0);
-    expectConceptScheme((await conceptSchemes[0].resolve()).extractNullable());
+    expectConceptScheme(
+      (await conceptSchemes[0].resolve()).toMaybe().extractNullable(),
+    );
   });
 
   it("should get a concept scheme by an identifier", async () => {
@@ -75,11 +81,13 @@ export const behavesLikeKos = (kos: Kos<any, any, any>) => {
       query: { type: "All" },
     })) {
       expectConceptScheme(
-        (await expectedConceptScheme.resolve()).extractNullable(),
+        (await expectedConceptScheme.resolve()).toMaybe().extractNullable(),
       );
       const actualConceptScheme = (
         await kos.conceptScheme(expectedConceptScheme.identifier).resolve()
-      ).extractNullable();
+      )
+        .toMaybe()
+        .extractNullable();
       expect(actualConceptScheme).toBeTruthy();
       expectConceptScheme(actualConceptScheme!);
       expect(

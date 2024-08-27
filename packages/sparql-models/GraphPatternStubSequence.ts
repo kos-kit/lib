@@ -7,7 +7,7 @@ import {
 } from "@kos-kit/models";
 import { SparqlQueryClient } from "@kos-kit/sparql-client";
 import { Logger } from "pino";
-import { Maybe } from "purify-ts";
+import { Either, Maybe } from "purify-ts";
 import { Resource } from "rdfjs-resource";
 import { ConstructQueryBuilder } from "./ConstructQueryBuilder.js";
 import { GraphPattern, GraphPatternVariable } from "./GraphPattern.js";
@@ -68,7 +68,7 @@ export class GraphPatternStubSequence<
     return this.stubFactory(identifier);
   }
 
-  async resolve(): Promise<readonly Maybe<ModelT>[]> {
+  async resolve(): Promise<readonly Either<Stub<ModelT>, ModelT>[]> {
     const dataset = await this.sparqlQueryClient.queryDataset(
       new ConstructQueryBuilder({
         includeLanguageTags: this.includeLanguageTags,
@@ -78,19 +78,19 @@ export class GraphPatternStubSequence<
         .build(),
     );
 
-    const modelMaybes: Maybe<ModelT>[] = [];
-    for (const identifier of this.identifiers) {
-      const resource = new Resource({ dataset, identifier });
-      const modelMaybe = this.modelFactory(resource);
-      if (modelMaybe.isNothing()) {
-        this.logger.warn(
-          "%s is missing, unable to resolve",
-          Identifier.toString(identifier),
-        );
-      }
-      modelMaybes.push(modelMaybe);
-    }
-    return modelMaybes;
+    return this.identifiers.map((identifier, identifierI) =>
+      this.modelFactory(new Resource({ dataset, identifier }))
+        .toEither(null)
+        .mapLeft(() => {
+          // Avoid constructing the Stub if the resolution succeeded, the common case.
+          // There's no toEitherLazy.
+          this.logger.warn(
+            "%s is missing, unable to resolve",
+            Identifier.toString(identifier),
+          );
+          return this.at(identifierI)!;
+        }),
+    );
   }
 
   [Symbol.iterator](): Iterator<Stub<ModelT>> {
