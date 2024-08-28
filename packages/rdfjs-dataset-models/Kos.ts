@@ -14,8 +14,6 @@ import TermSet from "@rdfjs/term-set";
 import { DatasetCore } from "@rdfjs/types";
 import { skos } from "@tpluscode/rdf-ns-builders";
 import { Resource, ResourceSet } from "rdfjs-resource";
-import { limitGenerator } from "./limitGenerator.js";
-import { offsetGenerator } from "./offsetGenerator.js";
 
 function isConceptInScheme({
   conceptIdentifier,
@@ -100,12 +98,12 @@ export abstract class Kos<
     offset: number;
     query: ConceptSchemesQuery;
   }): Promise<StubSequence<ConceptSchemeT>> {
-    return new UnbatchedStubSequence([
-      ...limitGenerator(
-        offsetGenerator(this.queryConceptSchemes(query), offset),
-        limit,
+    return new UnbatchedStubSequence(
+      this.sortConceptSchemes(this.queryConceptSchemes(query)).slice(
+        offset,
+        limit !== null ? offset + limit : undefined,
       ),
-    ]);
+    );
   }
 
   override async conceptSchemesCount(
@@ -123,12 +121,12 @@ export abstract class Kos<
     offset: number;
     query: ConceptsQuery;
   }): Promise<StubSequence<ConceptT>> {
-    return new UnbatchedStubSequence([
-      ...limitGenerator(
-        offsetGenerator(this.queryConcepts(query), offset),
-        limit,
+    return new UnbatchedStubSequence(
+      this.sortConcepts(this.queryConcepts(query)).slice(
+        offset,
+        limit !== null ? offset + limit : undefined,
       ),
-    ]);
+    );
   }
 
   override async conceptsCount(query: ConceptsQuery): Promise<number> {
@@ -318,6 +316,26 @@ export abstract class Kos<
     }
 
     throw new RangeError("should never reach this code");
+  }
+
+  private sortConcepts(
+    conceptStubs: Iterable<Stub<ConceptT>>,
+  ): readonly Stub<ConceptT>[] {
+    const sortedConceptStubs = [...conceptStubs];
+    sortedConceptStubs.sort((left, right) =>
+      left.identifier.value.localeCompare(right.identifier.value),
+    );
+    return sortedConceptStubs;
+  }
+
+  private sortConceptSchemes(
+    conceptSchemeStubs: Iterable<Stub<ConceptSchemeT>>,
+  ): readonly Stub<ConceptSchemeT>[] {
+    const sortedConceptSchemeStubs = [...conceptSchemeStubs];
+    sortedConceptSchemeStubs.sort((left, right) =>
+      left.identifier.value.localeCompare(right.identifier.value),
+    );
+    return sortedConceptSchemeStubs;
   }
 }
 
