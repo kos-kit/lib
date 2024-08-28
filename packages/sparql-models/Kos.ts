@@ -68,6 +68,7 @@ SELECT DISTINCT ?concept
 WHERE {
 ${this.conceptsQueryToWhereGraphPatterns(query).join("\n")}
 }
+ORDER BY ?concept
 ${limit !== null && limit > 0 ? `LIMIT ${limit}` : ""}
 ${offset > 0 ? `OFFSET ${offset}` : ""}
 `),
@@ -90,6 +91,7 @@ SELECT DISTINCT ?conceptScheme
 WHERE {
 ${this.conceptSchemesQueryToWhereGraphPatterns(query).join("\n")}
 }
+ORDER BY ?conceptScheme
 ${limit !== null && limit > 0 ? `LIMIT ${limit}` : ""}
 ${offset > 0 ? `OFFSET ${offset}` : ""}
 `),
