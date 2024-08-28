@@ -19,7 +19,7 @@ export abstract class Kos<
   ConceptSchemeT extends IConceptScheme<ConceptT, LabelT>,
   LabelT extends ILabel,
 > extends abc.Kos<ConceptT, ConceptSchemeT, LabelT> {
-  protected readonly sparqlQueryClient: SparqlQueryClient;
+  readonly sparqlQueryClient: SparqlQueryClient;
 
   constructor({
     sparqlQueryClient,
