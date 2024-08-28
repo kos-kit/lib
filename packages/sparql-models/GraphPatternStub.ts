@@ -1,6 +1,6 @@
 import { Identifier, LanguageTagSet, NamedModel, abc } from "@kos-kit/models";
 import { SparqlQueryClient } from "@kos-kit/sparql-client";
-import { Maybe } from "purify-ts";
+import { Either, Maybe } from "purify-ts";
 import { Resource } from "rdfjs-resource";
 import { ConstructQueryBuilder } from "./ConstructQueryBuilder.js";
 import { GraphPattern, GraphPatternVariable } from "./GraphPattern.js";
@@ -43,7 +43,7 @@ export class GraphPatternStub<
     this.sparqlQueryClient = sparqlQueryClient;
   }
 
-  async resolve(): Promise<Maybe<ModelT>> {
+  async resolve(): Promise<Either<this, ModelT>> {
     const dataset = await this.sparqlQueryClient.queryDataset(
       new ConstructQueryBuilder({
         includeLanguageTags: this.includeLanguageTags,
@@ -53,14 +53,15 @@ export class GraphPatternStub<
         .build(),
     );
 
-    const resource = new Resource({ dataset, identifier: this.identifier });
-    const model = this.modelFactory(resource);
-    if (model.isNothing()) {
-      this.logger.warn(
-        "%s is missing, unable to resolve",
-        Identifier.toString(this.identifier),
-      );
-    }
-    return model;
+    return this.modelFactory(
+      new Resource({ dataset, identifier: this.identifier }),
+    )
+      .toEither(this)
+      .ifLeft(() => {
+        this.logger.warn(
+          "%s is missing, unable to resolve",
+          Identifier.toString(this.identifier),
+        );
+      });
   }
 }

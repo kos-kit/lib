@@ -1,5 +1,5 @@
 import { Logger } from "pino";
-import { Maybe } from "purify-ts";
+import { Either } from "purify-ts";
 import { Stub as IStub, Identifier, NamedModel } from "../index.js";
 
 export abstract class Stub<ModelT extends NamedModel> implements IStub<ModelT> {
@@ -18,19 +18,7 @@ export abstract class Stub<ModelT extends NamedModel> implements IStub<ModelT> {
     return Stub.equals(this, other);
   }
 
-  abstract resolve(): Promise<Maybe<ModelT>>;
-
-  async resolveOrStub() {
-    const model = (await this.resolve()).extractNullable();
-    if (model !== null) {
-      return model;
-    }
-    this.logger.info(
-      "%s did not resolve, returning the stub",
-      Identifier.toString(this.identifier),
-    );
-    return this;
-  }
+  abstract resolve(): Promise<Either<this, ModelT>>;
 }
 
 export namespace Stub {

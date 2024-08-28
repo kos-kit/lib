@@ -57,7 +57,7 @@ export const behavesLikeConceptScheme = (
     const conceptScheme = await lazyConceptScheme("en");
     for (const concept of await conceptScheme.concepts()) {
       expect(
-        (await concept.resolve()).extractNullable()?.displayLabel,
+        (await concept.resolve()).toMaybe().extractNullable().displayLabel,
       ).toBeDefined();
       return;
     }
@@ -108,7 +108,7 @@ export const behavesLikeConceptScheme = (
     const conceptScheme = await lazyConceptScheme("en");
     for (const topConcept of await conceptScheme.topConcepts()) {
       expect(
-        (await topConcept.resolve()).extractNullable()?.displayLabel,
+        (await topConcept.resolve()).toMaybe().extractNullable()?.displayLabel,
       ).toBeTruthy();
       return;
     }

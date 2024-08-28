@@ -1,4 +1,4 @@
-import { Maybe } from "purify-ts";
+import { Either } from "purify-ts";
 import { NamedModel } from "./NamedModel.js";
 import { Stub } from "./Stub.js";
 
@@ -12,7 +12,16 @@ export interface StubSequence<ModelT extends NamedModel>
 
   at(index: number): Stub<ModelT> | undefined;
   equals(other: StubSequence<ModelT>): boolean;
+
+  /**
+   * Try to resolve the stubs in the sequence, only returning the successful (Right) resolutions.
+   */
   flatResolve(): Promise<readonly ModelT[]>;
-  resolve(): Promise<readonly Maybe<ModelT>[]>;
-  resolveOrStub(): Promise<readonly NamedModel[]>;
+
+  /**
+   * Try to resolve the stubs in the sequence.
+   *
+   * Returns the equivalent of Stub.resolve for each stub. See the documentation for that method.
+   */
+  resolve(): Promise<readonly Either<Stub<ModelT>, ModelT>[]>;
 }

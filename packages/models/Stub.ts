@@ -1,4 +1,4 @@
-import { Maybe } from "purify-ts";
+import { Either } from "purify-ts";
 import { NamedModel } from "./NamedModel.js";
 
 /**
@@ -13,10 +13,9 @@ import { NamedModel } from "./NamedModel.js";
 export interface Stub<ModelT extends NamedModel> extends NamedModel {
   equals(other: Stub<ModelT>): boolean;
 
-  resolve(): Promise<Maybe<ModelT>>;
-
   /**
-   * Resolve a stub, returning the model if successfully resolved, else the stub.
+   * Try to resolve the stub. If the resolution succeeds, return the model as Right. Otherwise return this as Left
+   * to support chaining.
    */
-  resolveOrStub(): Promise<NamedModel>;
+  resolve(): Promise<Either<this, ModelT>>;
 }

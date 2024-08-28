@@ -1,4 +1,4 @@
-import { Maybe } from "purify-ts";
+import { Either } from "purify-ts";
 import { NamedModel } from "../NamedModel.js";
 import { Stub } from "../Stub";
 import { StubSequence as IStubSequence } from "../StubSequence.js";
@@ -29,23 +29,12 @@ export abstract class StubSequence<ModelT extends NamedModel>
   }
 
   async flatResolve(): Promise<readonly ModelT[]> {
-    return (await this.resolve()).flatMap((modelMaybe) => modelMaybe.toList());
+    return (await this.resolve()).flatMap((modelEither) =>
+      modelEither.map((model) => [model]).orDefault([]),
+    );
   }
 
   abstract [Symbol.iterator](): Iterator<Stub<ModelT>>;
 
-  abstract resolve(): Promise<readonly Maybe<ModelT>[]>;
-
-  async resolveOrStub(): Promise<readonly NamedModel[]> {
-    const models: NamedModel[] = [];
-    (await this.resolve()).forEach((model, modelI) => {
-      const modelNullable = model.extractNullable();
-      if (modelNullable !== null) {
-        models.push(modelNullable);
-      } else {
-        models.push(this.at(modelI)!);
-      }
-    });
-    return models;
-  }
+  abstract resolve(): Promise<readonly Either<Stub<ModelT>, ModelT>[]>;
 }
