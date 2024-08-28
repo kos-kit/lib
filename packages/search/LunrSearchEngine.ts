@@ -64,7 +64,7 @@ export class LunrSearchEngine implements SearchEngine {
         offset: 0,
         query: { type: "All" },
       })) {
-        (await concept.resolve()).ifJust((concept) =>
+        (await concept.resolve()).ifRight((concept) =>
           indexDocuments.push(toIndexDocument(concept, "Concept")),
         );
       }
@@ -75,7 +75,7 @@ export class LunrSearchEngine implements SearchEngine {
         offset: 0,
         query: { type: "All" },
       })) {
-        (await concept.resolve()).ifJust((concept) =>
+        (await concept.resolve()).ifRight((concept) =>
           indexDocuments.push(toIndexDocument(concept, "Concept")),
         );
       }
@@ -87,7 +87,7 @@ export class LunrSearchEngine implements SearchEngine {
       offset: 0,
       query: { type: "All" },
     })) {
-      (await conceptScheme.resolve()).ifJust((conceptScheme) =>
+      (await conceptScheme.resolve()).ifRight((conceptScheme) =>
         indexDocuments.push(toIndexDocument(conceptScheme, "ConceptScheme")),
       );
     }

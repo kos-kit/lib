@@ -47,7 +47,7 @@ export class ServerSearchEngine implements SearchEngine {
       offset: 0,
       query: { type: "All" },
     })) {
-      (await concept.resolve()).ifJust((concept) => {
+      (await concept.resolve()).ifRight((concept) => {
         const prefLabels = concept.labels(Label.Type.PREFERRED);
         if (prefLabels.length === 0) {
           return;
@@ -65,7 +65,7 @@ export class ServerSearchEngine implements SearchEngine {
       offset: 0,
       query: { type: "All" },
     })) {
-      (await conceptScheme.resolve()).ifJust((conceptScheme) => {
+      (await conceptScheme.resolve()).ifRight((conceptScheme) => {
         const prefLabels = conceptScheme.labels(Label.Type.PREFERRED);
         if (prefLabels.length === 0) {
           return;
