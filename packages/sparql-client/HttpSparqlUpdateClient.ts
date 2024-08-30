@@ -26,11 +26,13 @@ export class HttpSparqlUpdateClient
 
         this.requestOptionsToUrlSearchParams(url.searchParams, options);
 
-        await this.fetch(url, {
-          body: update,
-          headers,
-          method: "POST",
-        });
+        await this.ensureOkResponse(
+          await this.fetch(url, {
+            body: update,
+            headers,
+            method: "POST",
+          }),
+        );
         return;
       }
       case "POSTWithUrlEncodedParameters": {
@@ -45,11 +47,13 @@ export class HttpSparqlUpdateClient
         this.requestOptionsToUrlSearchParams(urlEncodedParameters, options);
         urlEncodedParameters.set("update", update);
 
-        await this.fetch(url, {
-          body: urlEncodedParameters,
-          headers,
-          method: "POST",
-        });
+        await this.ensureOkResponse(
+          await this.fetch(url, {
+            body: urlEncodedParameters,
+            headers,
+            method: "POST",
+          }),
+        );
       }
     }
   }

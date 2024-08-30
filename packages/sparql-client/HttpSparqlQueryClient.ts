@@ -130,10 +130,12 @@ export class HttpSparqlQueryClient
         url.searchParams.set("query", query);
         this.requestOptionsToUrlSearchParams(url.searchParams, options);
 
-        return this.fetch(url, {
-          headers,
-          method: "GET",
-        });
+        return await this.ensureOkResponse(
+          await this.fetch(url, {
+            headers,
+            method: "GET",
+          }),
+        );
       }
       case "POSTDirectly": {
         const headers = this.requestHeaders(
@@ -146,11 +148,13 @@ export class HttpSparqlQueryClient
 
         this.requestOptionsToUrlSearchParams(url.searchParams, options);
 
-        return this.fetch(url, {
-          body: query,
-          headers,
-          method: "POST",
-        });
+        return await this.ensureOkResponse(
+          await this.fetch(url, {
+            body: query,
+            headers,
+            method: "POST",
+          }),
+        );
       }
       case "POSTWithUrlEncodedParameters": {
         const headers = this.requestHeaders(
@@ -165,11 +169,13 @@ export class HttpSparqlQueryClient
         this.requestOptionsToUrlSearchParams(urlEncodedParameters, options);
         urlEncodedParameters.set("query", query);
 
-        return this.fetch(url, {
-          body: urlEncodedParameters,
-          headers,
-          method: "POST",
-        });
+        return await this.ensureOkResponse(
+          await this.fetch(url, {
+            body: urlEncodedParameters,
+            headers,
+            method: "POST",
+          }),
+        );
       }
     }
   }

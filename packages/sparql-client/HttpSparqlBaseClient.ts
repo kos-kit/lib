@@ -42,8 +42,10 @@ export abstract class HttpSparqlBaseClient<
       }
     }
 
-    const response = await fetch(input, init);
+    return await fetch(input, init);
+  }
 
+  protected async ensureOkResponse(response: Response): Promise<Response> {
     if (response.ok) {
       return response;
     }
