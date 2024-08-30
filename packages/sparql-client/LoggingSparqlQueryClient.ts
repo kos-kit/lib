@@ -1,4 +1,4 @@
-import { BlankNode, DatasetCore, Literal, NamedNode } from "@rdfjs/types";
+import { BlankNode, Literal, NamedNode, Quad } from "@rdfjs/types";
 import { Logger } from "pino";
 import { SparqlQueryClient } from "./SparqlQueryClient.js";
 
@@ -36,10 +36,10 @@ export class LoggingSparqlQueryClient implements SparqlQueryClient {
     return result;
   }
 
-  async queryDataset(query: string): Promise<DatasetCore> {
+  async queryQuads(query: string): Promise<readonly Quad[]> {
     this.logger.trace("queryQuads:\n%s", query);
-    const result = await this.delegate.queryDataset(query);
-    this.logger.trace("queryQuads result: %d quads", result.size);
+    const result = await this.delegate.queryQuads(query);
+    this.logger.trace("queryQuads result: %d quads", result.length);
     return result;
   }
 }
