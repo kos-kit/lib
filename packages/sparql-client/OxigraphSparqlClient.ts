@@ -1,48 +1,83 @@
 import {
   BlankNode,
+  DataFactory,
   DefaultGraph,
   Literal,
   NamedNode,
   Quad,
   Term,
 } from "@rdfjs/types";
-import * as oxigraph from "oxigraph";
 import { SparqlGraphStoreClient } from "./SparqlGraphStoreClient.js";
 import { SparqlQueryClient } from "./SparqlQueryClient.js";
 import { SparqlUpdateClient } from "./SparqlUpdateClient.js";
 
+// Re-declare the parts of oxigraph.Store we need in order to avoid an explicit dependency on oxigraph.
+interface Store {
+  add(quad: Quad): void;
+
+  match(
+    subject?: Term | null,
+    predicate?: Term | null,
+    object?: Term | null,
+    graph?: Term | null,
+  ): Quad[];
+
+  query(
+    query: string,
+    options?: {
+      base_iri?: NamedNode | string;
+      results_format?: string;
+      use_default_graph_as_union?: boolean;
+    },
+  ): boolean | Map<string, Term>[] | Quad[] | string;
+
+  update(
+    update: string,
+    options?: {
+      base_iri?: NamedNode | string;
+    },
+  ): void;
+}
+
 export class OxigraphSparqlClient
   implements SparqlGraphStoreClient, SparqlQueryClient, SparqlUpdateClient
 {
+  private readonly dataFactory: Pick<DataFactory, "quad">;
+  private readonly store: Store;
   private readonly useDefaultGraphAsUnion: boolean;
 
-  constructor(
-    private readonly delegate: oxigraph.Store,
-    options?: {
-      useDefaultGraphAsUnion?: boolean;
-    },
-  ) {
-    this.useDefaultGraphAsUnion = !!options?.useDefaultGraphAsUnion;
+  constructor({
+    dataFactory,
+    store,
+    useDefaultGraphAsUnion,
+  }: {
+    dataFactory: Pick<DataFactory, "quad">;
+    store: Store;
+    useDefaultGraphAsUnion?: boolean;
+  }) {
+    this.dataFactory = dataFactory;
+    this.store = store;
+    this.useDefaultGraphAsUnion = !!useDefaultGraphAsUnion;
   }
 
   async deleteGraph(graph: DefaultGraph | NamedNode): Promise<void> {
     // https://www.w3.org/TR/2013/REC-sparql11-http-rdf-update-20130321/#http-put
     if (graph.termType === "DefaultGraph") {
-      this.delegate.update("DROP SILENT DEFAULT;");
+      this.store.update("DROP SILENT DEFAULT;");
     } else {
-      this.delegate.update(`DROP SILENT GRAPH <${graph.value}>;`);
+      this.store.update(`DROP SILENT GRAPH <${graph.value}>;`);
     }
   }
 
   async getGraph(graph: DefaultGraph | NamedNode): Promise<readonly Quad[]> {
-    return [...this.delegate.match(null, null, null, graph)];
+    return [...this.store.match(null, null, null, graph)];
   }
 
   async queryBindings(
     query: string,
   ): Promise<readonly Record<string, BlankNode | Literal | NamedNode>[]> {
     const bindings: Record<string, BlankNode | Literal | NamedNode>[] = [];
-    for (const map of this.delegate.query(query, {
+    for (const map of this.store.query(query, {
       use_default_graph_as_union: this.useDefaultGraphAsUnion,
     }) as Map<string, Term>[]) {
       const mapBindings: Record<string, BlankNode | Literal | NamedNode> = {};
@@ -63,13 +98,13 @@ export class OxigraphSparqlClient
   }
 
   async queryBoolean(query: string): Promise<boolean> {
-    return this.delegate.query(query, {
+    return this.store.query(query, {
       use_default_graph_as_union: this.useDefaultGraphAsUnion,
     }) as boolean;
   }
 
   async queryQuads(query: string): Promise<readonly Quad[]> {
-    return this.delegate.query(query, {
+    return this.store.query(query, {
       use_default_graph_as_union: this.useDefaultGraphAsUnion,
     }) as Quad[];
   }
@@ -79,8 +114,8 @@ export class OxigraphSparqlClient
     payload: Iterable<Quad>,
   ): Promise<void> {
     for (const quad of payload) {
-      this.delegate.add(
-        oxigraph.quad(quad.subject, quad.predicate, quad.object, graph),
+      this.store.add(
+        this.dataFactory.quad(quad.subject, quad.predicate, quad.object, graph),
       );
     }
   }
@@ -94,6 +129,6 @@ export class OxigraphSparqlClient
   }
 
   async update(update: string) {
-    this.delegate.update(update, {});
+    this.store.update(update, {});
   }
 }

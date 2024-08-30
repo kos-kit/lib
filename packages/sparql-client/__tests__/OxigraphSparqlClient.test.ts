@@ -15,7 +15,7 @@ describe("OxigraphSparqlClient", () => {
     predicate = oxigraph.namedNode("http://example.com/predicate");
     object = oxigraph.literal("object");
     store.add(oxigraph.quad(subject, predicate, object));
-    sut = new OxigraphSparqlClient(store);
+    sut = new OxigraphSparqlClient({ dataFactory: oxigraph, store });
   });
 
   it("should delete a graph", async ({ expect }) => {
