@@ -1,12 +1,5 @@
-import { datasetCoreFactory } from "@/lib/datasetCoreFactory";
-import {
-  SparqlGraphStoreClient,
-  SparqlQueryClient,
-  SparqlUpdateClient,
-} from "@kos-kit/sparql-client";
 import {
   BlankNode,
-  DatasetCore,
   DefaultGraph,
   Literal,
   NamedNode,
@@ -14,6 +7,9 @@ import {
   Term,
 } from "@rdfjs/types";
 import * as oxigraph from "oxigraph";
+import { SparqlGraphStoreClient } from "./SparqlGraphStoreClient.js";
+import { SparqlQueryClient } from "./SparqlQueryClient.js";
+import { SparqlUpdateClient } from "./SparqlUpdateClient.js";
 
 export class OxigraphSparqlClient
   implements SparqlGraphStoreClient, SparqlQueryClient, SparqlUpdateClient
@@ -22,7 +18,9 @@ export class OxigraphSparqlClient
 
   constructor(
     private readonly delegate: oxigraph.Store,
-    options?: { useDefaultGraphAsUnion?: boolean },
+    options?: {
+      useDefaultGraphAsUnion?: boolean;
+    },
   ) {
     this.useDefaultGraphAsUnion = !!options?.useDefaultGraphAsUnion;
   }
@@ -36,12 +34,8 @@ export class OxigraphSparqlClient
     }
   }
 
-  async getGraph(graph: DefaultGraph | NamedNode): Promise<DatasetCore> {
-    const dataset = datasetCoreFactory.dataset();
-    for (const quad of this.delegate.match(null, null, null, graph)) {
-      dataset.add(quad);
-    }
-    return dataset;
+  async getGraph(graph: DefaultGraph | NamedNode): Promise<readonly Quad[]> {
+    return [...this.delegate.match(null, null, null, graph)];
   }
 
   async queryBindings(
@@ -74,12 +68,10 @@ export class OxigraphSparqlClient
     }) as boolean;
   }
 
-  async queryDataset(query: string): Promise<DatasetCore> {
-    return datasetCoreFactory.dataset(
-      this.delegate.query(query, {
-        use_default_graph_as_union: this.useDefaultGraphAsUnion,
-      }) as Quad[],
-    );
+  async queryQuads(query: string): Promise<readonly Quad[]> {
+    return this.delegate.query(query, {
+      use_default_graph_as_union: this.useDefaultGraphAsUnion,
+    }) as Quad[];
   }
 
   async postGraph(
