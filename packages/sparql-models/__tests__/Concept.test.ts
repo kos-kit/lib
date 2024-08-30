@@ -3,7 +3,7 @@ import { behavesLikeUnescoThesaurusConcept10 } from "../../../__tests__/behavesL
 import { behavesLikeUnescoThesaurusConcept10018 } from "../../../__tests__/behavesLikeUnescoThesaurusConcept10018.js";
 import { testKosFactory } from "./testKosFactory.js";
 
-(process.env["CI"] ? describe.skip : describe)("sparql.Concept", () => {
+describe("sparql.Concept", () => {
   behavesLikeUnescoThesaurusConcept10(testKosFactory);
   behavesLikeUnescoThesaurusConcept10018(testKosFactory);
 });
