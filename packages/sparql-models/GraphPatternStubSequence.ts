@@ -6,6 +6,7 @@ import {
   abc,
 } from "@kos-kit/models";
 import { SparqlQueryClient } from "@kos-kit/sparql-client";
+import { DatasetCoreFactory } from "@rdfjs/types";
 import { Logger } from "pino";
 import { Either, Maybe } from "purify-ts";
 import { Resource } from "rdfjs-resource";
@@ -15,6 +16,7 @@ import { GraphPattern, GraphPatternVariable } from "./GraphPattern.js";
 export class GraphPatternStubSequence<
   ModelT extends NamedModel,
 > extends abc.StubSequence<ModelT> {
+  private readonly datasetCoreFactory: DatasetCoreFactory;
   private readonly graphPatterns: readonly GraphPattern[];
   private readonly identifiers: readonly Identifier[];
   private readonly includeLanguageTags: LanguageTagSet;
@@ -27,6 +29,7 @@ export class GraphPatternStubSequence<
   private readonly sparqlQueryClient: SparqlQueryClient;
 
   constructor({
+    datasetCoreFactory,
     graphPatterns,
     includeLanguageTags,
     identifiers,
@@ -36,6 +39,7 @@ export class GraphPatternStubSequence<
     sparqlQueryClient,
     stubFactory,
   }: {
+    datasetCoreFactory: DatasetCoreFactory;
     graphPatterns: readonly GraphPattern[];
     identifiers: readonly Identifier[];
     includeLanguageTags: LanguageTagSet;
@@ -46,6 +50,7 @@ export class GraphPatternStubSequence<
     stubFactory: (identifier: Identifier) => Stub<ModelT>;
   }) {
     super();
+    this.datasetCoreFactory = datasetCoreFactory;
     this.graphPatterns = graphPatterns;
     this.identifiers = identifiers;
     this.includeLanguageTags = includeLanguageTags;
@@ -69,7 +74,7 @@ export class GraphPatternStubSequence<
   }
 
   async resolve(): Promise<readonly Either<Stub<ModelT>, ModelT>[]> {
-    const dataset = await this.sparqlQueryClient.queryDataset(
+    const quads = await this.sparqlQueryClient.queryQuads(
       new ConstructQueryBuilder({
         includeLanguageTags: this.includeLanguageTags,
       })
@@ -79,7 +84,12 @@ export class GraphPatternStubSequence<
     );
 
     return this.identifiers.map((identifier, identifierI) =>
-      this.modelFactory(new Resource({ dataset, identifier }))
+      this.modelFactory(
+        new Resource({
+          dataset: this.datasetCoreFactory.dataset(quads.concat()),
+          identifier,
+        }),
+      )
         .toEither(null)
         .mapLeft(() => {
           // Avoid constructing the Stub if the resolution succeeded, the common case.

@@ -7,9 +7,6 @@ export const testKosFactory = (includeLanguageTag: LanguageTag) => {
   const includeLanguageTags = new LanguageTagSet(includeLanguageTag, "");
   const sparqlQueryClient = new HttpSparqlQueryClient({
     dataFactory: N3.DataFactory,
-    datasetCoreFactory: {
-      dataset: (quads) => new N3.Store(quads),
-    },
     endpointUrl: "http://localhost:7878/sparql",
     defaultRequestOptions: {
       method: "POSTDirectly",
@@ -34,6 +31,9 @@ export const testKosFactory = (includeLanguageTag: LanguageTag) => {
   // );
   // const sparqlQueryClient = new OxigraphSparqlClient(store);
   return new DefaultKos({
+    datasetCoreFactory: {
+      dataset: (quads) => new N3.Store(quads),
+    },
     includeLanguageTags,
     sparqlQueryClient,
   });
