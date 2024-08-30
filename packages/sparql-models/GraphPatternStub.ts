@@ -1,5 +1,6 @@
 import { Identifier, LanguageTagSet, NamedModel, abc } from "@kos-kit/models";
 import { SparqlQueryClient } from "@kos-kit/sparql-client";
+import { DatasetCoreFactory } from "@rdfjs/types";
 import { Either, Maybe } from "purify-ts";
 import { Resource } from "rdfjs-resource";
 import { ConstructQueryBuilder } from "./ConstructQueryBuilder.js";
@@ -10,6 +11,7 @@ export class GraphPatternStub<
 > extends abc.Stub<ModelT> {
   readonly identifier: Identifier;
 
+  private readonly datasetCoreFactory: DatasetCoreFactory;
   private readonly graphPatterns: readonly GraphPattern[];
   private readonly includeLanguageTags: LanguageTagSet;
   private readonly modelFactory: (
@@ -19,6 +21,7 @@ export class GraphPatternStub<
   private readonly sparqlQueryClient: SparqlQueryClient;
 
   constructor({
+    datasetCoreFactory,
     graphPatterns,
     identifier,
     includeLanguageTags,
@@ -27,6 +30,7 @@ export class GraphPatternStub<
     sparqlQueryClient,
     ...superParameters
   }: {
+    datasetCoreFactory: DatasetCoreFactory;
     graphPatterns: readonly GraphPattern[];
     identifier: Identifier;
     includeLanguageTags: LanguageTagSet;
@@ -35,6 +39,7 @@ export class GraphPatternStub<
     sparqlQueryClient: SparqlQueryClient;
   } & abc.Stub.Parameters) {
     super(superParameters);
+    this.datasetCoreFactory = datasetCoreFactory;
     this.graphPatterns = graphPatterns;
     this.identifier = identifier;
     this.includeLanguageTags = includeLanguageTags;
@@ -44,7 +49,7 @@ export class GraphPatternStub<
   }
 
   async resolve(): Promise<Either<this, ModelT>> {
-    const dataset = await this.sparqlQueryClient.queryDataset(
+    const quads = await this.sparqlQueryClient.queryQuads(
       new ConstructQueryBuilder({
         includeLanguageTags: this.includeLanguageTags,
       })
@@ -54,7 +59,10 @@ export class GraphPatternStub<
     );
 
     return this.modelFactory(
-      new Resource({ dataset, identifier: this.identifier }),
+      new Resource({
+        dataset: this.datasetCoreFactory.dataset(quads.concat()),
+        identifier: this.identifier,
+      }),
     )
       .toEither(this)
       .ifLeft(() => {

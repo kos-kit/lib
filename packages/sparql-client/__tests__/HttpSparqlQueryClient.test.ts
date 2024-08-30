@@ -11,9 +11,6 @@ import { HttpSparqlQueryClient } from "../HttpSparqlQueryClient.js";
 describe("HttpSparqlQueryClient", () => {
   const sut = new HttpSparqlQueryClient({
     dataFactory: N3.DataFactory,
-    datasetCoreFactory: {
-      dataset: (quads) => new N3.Store(quads),
-    },
     endpointUrl: "http://example.com",
   });
 
@@ -30,8 +27,8 @@ describe("HttpSparqlQueryClient", () => {
     fetchMocker.mockResponseOnce(
       '<http://example.org/book/book1> <http://purl.org/dc/elements/1.1/title> "SPARQL Tutorial" .\n',
     );
-    const quads = await sut.queryDataset("CONSTRUCT");
-    expect(quads.size).toStrictEqual(1);
+    const quads = await sut.queryQuads("CONSTRUCT");
+    expect(quads).toHaveLength(1);
   });
 
   it("should make a SELECT query", async ({ expect }) => {
@@ -144,9 +141,6 @@ describe("HttpSparqlQueryClient", () => {
     fetchMocker.mockResponseOnce(JSON.stringify({ boolean: true }));
     await new HttpSparqlQueryClient({
       dataFactory: N3.DataFactory,
-      datasetCoreFactory: {
-        dataset: (quads) => new N3.Store(quads),
-      },
       defaultRequestOptions: {
         namedGraphUris: [N3.DataFactory.namedNode("http://test.com")],
       },

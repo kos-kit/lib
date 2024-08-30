@@ -1,9 +1,9 @@
-import { DatasetCore, DefaultGraph, NamedNode, Quad } from "@rdfjs/types";
+import { DefaultGraph, NamedNode, Quad } from "@rdfjs/types";
 
 export interface SparqlGraphStoreClient {
   deleteGraph(graph: DefaultGraph | NamedNode): Promise<void>;
 
-  getGraph(graph: DefaultGraph | NamedNode): Promise<DatasetCore>;
+  getGraph(graph: DefaultGraph | NamedNode): Promise<readonly Quad[]>;
 
   postGraph(
     graph: DefaultGraph | NamedNode,

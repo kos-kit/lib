@@ -56,6 +56,7 @@ export class DefaultKos extends Kos<
 > {
   concept(identifier: Identifier): GraphPatternStub<DefaultConcept> {
     return new GraphPatternStub({
+      datasetCoreFactory: this.datasetCoreFactory,
       graphPatterns: conceptGraphPatterns_,
       identifier,
       includeLanguageTags: this.includeLanguageTags,
@@ -72,6 +73,7 @@ export class DefaultKos extends Kos<
     query: ConceptsQuery;
   }): Promise<StubSequence<DefaultConcept>> {
     return new GraphPatternStubSequence({
+      datasetCoreFactory: this.datasetCoreFactory,
       graphPatterns: conceptGraphPatterns_,
       identifiers: await this.queryConcepts(kwds),
       includeLanguageTags: this.includeLanguageTags,
@@ -87,6 +89,7 @@ export class DefaultKos extends Kos<
     identifier: Identifier,
   ): GraphPatternStub<DefaultConceptScheme> {
     return new GraphPatternStub({
+      datasetCoreFactory: this.datasetCoreFactory,
       graphPatterns: conceptSchemeGraphPatterns_,
       identifier,
       includeLanguageTags: this.includeLanguageTags,
@@ -103,6 +106,7 @@ export class DefaultKos extends Kos<
     query: ConceptSchemesQuery;
   }): Promise<StubSequence<DefaultConceptScheme>> {
     return new GraphPatternStubSequence({
+      datasetCoreFactory: this.datasetCoreFactory,
       graphPatterns: conceptSchemeGraphPatterns_,
       identifiers: await this.queryConceptSchemes(kwds),
       includeLanguageTags: this.includeLanguageTags,

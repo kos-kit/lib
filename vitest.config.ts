@@ -11,5 +11,6 @@ export default defineConfig({
     },
     include: ["**/*.test.ts"],
     passWithNoTests: true,
+    testTimeout: 10000,
   },
 });

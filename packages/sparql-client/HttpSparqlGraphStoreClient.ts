@@ -1,11 +1,4 @@
-import {
-  DataFactory,
-  DatasetCore,
-  DatasetCoreFactory,
-  DefaultGraph,
-  NamedNode,
-  Quad,
-} from "@rdfjs/types";
+import { DataFactory, DefaultGraph, NamedNode, Quad } from "@rdfjs/types";
 import N3 from "n3";
 import { HttpSparqlBaseClient } from "./HttpSparqlBaseClient.js";
 import { SparqlGraphStoreClient } from "./SparqlGraphStoreClient.js";
@@ -15,16 +8,13 @@ export class HttpSparqlGraphStoreClient
   implements SparqlGraphStoreClient
 {
   private readonly dataFactory: DataFactory;
-  private readonly datasetCoreFactory: DatasetCoreFactory;
 
   constructor({
     dataFactory,
-    datasetCoreFactory,
     ...superParameters
   }: HttpSparqlGraphStoreClient.Parameters) {
     super(superParameters);
     this.dataFactory = dataFactory;
-    this.datasetCoreFactory = datasetCoreFactory;
   }
 
   async deleteGraph(
@@ -40,7 +30,7 @@ export class HttpSparqlGraphStoreClient
   async getGraph(
     graph: DefaultGraph | NamedNode,
     options?: HttpSparqlGraphStoreClient.RequestOptions,
-  ): Promise<DatasetCore> {
+  ): Promise<readonly Quad[]> {
     const response = await this.fetch(this.graphUrl(graph), {
       headers: this.requestHeaders(
         {
@@ -50,12 +40,10 @@ export class HttpSparqlGraphStoreClient
       ),
       method: "GET",
     });
-    return this.datasetCoreFactory.dataset(
-      new N3.Parser({
-        factory: this.dataFactory,
-        format: "application/n-triples",
-      }).parse(await response.text()),
-    );
+    return new N3.Parser({
+      factory: this.dataFactory,
+      format: "application/n-triples",
+    }).parse(await response.text());
   }
 
   async postGraph(
@@ -126,7 +114,6 @@ export namespace HttpSparqlGraphStoreClient {
   export interface Parameters
     extends HttpSparqlBaseClient.Parameters<RequestOptions> {
     dataFactory: DataFactory;
-    datasetCoreFactory: DatasetCoreFactory;
   }
 
   export type RequestOptions = HttpSparqlBaseClient.RequestOptions;

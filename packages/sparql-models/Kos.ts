@@ -8,6 +8,7 @@ import {
   abc,
 } from "@kos-kit/models";
 import { SparqlQueryClient } from "@kos-kit/sparql-client";
+import { DatasetCoreFactory } from "@rdfjs/types";
 import { skos } from "@tpluscode/rdf-ns-builders";
 import { GraphPattern } from "./GraphPattern.js";
 import { IndentedString } from "./IndentedString.js";
@@ -20,14 +21,18 @@ export abstract class Kos<
   LabelT extends ILabel,
 > extends abc.Kos<ConceptT, ConceptSchemeT, LabelT> {
   readonly sparqlQueryClient: SparqlQueryClient;
+  protected readonly datasetCoreFactory: DatasetCoreFactory;
 
   constructor({
+    datasetCoreFactory,
     sparqlQueryClient,
     ...superParameters
   }: {
+    datasetCoreFactory: DatasetCoreFactory;
     sparqlQueryClient: SparqlQueryClient;
   } & abc.Kos.Parameters) {
     super(superParameters);
+    this.datasetCoreFactory = datasetCoreFactory;
     this.sparqlQueryClient = sparqlQueryClient;
   }
 

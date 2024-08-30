@@ -1,12 +1,5 @@
 import { URLSearchParams } from "node:url";
-import {
-  BlankNode,
-  DataFactory,
-  DatasetCore,
-  DatasetCoreFactory,
-  Literal,
-  NamedNode,
-} from "@rdfjs/types";
+import { BlankNode, DataFactory, Literal, NamedNode, Quad } from "@rdfjs/types";
 import N3 from "n3";
 import { HttpSparqlBaseClient } from "./HttpSparqlBaseClient.js";
 import { SparqlQueryClient } from "./SparqlQueryClient.js";
@@ -16,16 +9,13 @@ export class HttpSparqlQueryClient
   implements SparqlQueryClient
 {
   private readonly dataFactory: DataFactory;
-  private readonly datasetCoreFactory: DatasetCoreFactory;
 
   constructor({
     dataFactory,
-    datasetCoreFactory,
     ...superParameters
   }: HttpSparqlQueryClient.Parameters) {
     super(superParameters);
     this.dataFactory = dataFactory;
-    this.datasetCoreFactory = datasetCoreFactory;
   }
 
   async queryBindings(
@@ -107,10 +97,10 @@ export class HttpSparqlQueryClient
     return (await response.json()).boolean;
   }
 
-  async queryDataset(
+  async queryQuads(
     query: string,
     options?: HttpSparqlQueryClient.RequestOptions,
-  ): Promise<DatasetCore> {
+  ): Promise<readonly Quad[]> {
     const response = await this.request(
       query,
       {
@@ -118,12 +108,10 @@ export class HttpSparqlQueryClient
       },
       options,
     );
-    return this.datasetCoreFactory.dataset(
-      new N3.Parser({
-        factory: this.dataFactory,
-        format: "application/n-triples",
-      }).parse(await response.text()),
-    );
+    return new N3.Parser({
+      factory: this.dataFactory,
+      format: "application/n-triples",
+    }).parse(await response.text());
   }
 
   private async request(
@@ -216,7 +204,6 @@ export namespace HttpSparqlQueryClient {
   export interface Parameters
     extends HttpSparqlBaseClient.Parameters<RequestOptions> {
     dataFactory: DataFactory;
-    datasetCoreFactory: DatasetCoreFactory;
   }
 
   export interface RequestOptions extends HttpSparqlBaseClient.RequestOptions {

@@ -1,4 +1,4 @@
-import { DatasetCore, DefaultGraph, NamedNode } from "@rdfjs/types";
+import { DatasetCore, DefaultGraph, NamedNode, Quad } from "@rdfjs/types";
 import { Logger } from "pino";
 import { SparqlGraphStoreClient } from "./SparqlGraphStoreClient.js";
 
@@ -20,12 +20,12 @@ export class LoggingSparqlGraphStoreClient implements SparqlGraphStoreClient {
     this.logger.trace("deleted graph %s", this.loggableGraph(graph));
   }
 
-  async getGraph(graph: DefaultGraph | NamedNode): Promise<DatasetCore> {
+  async getGraph(graph: DefaultGraph | NamedNode): Promise<readonly Quad[]> {
     this.logger.trace("getting dataset from %s", this.loggableGraph(graph));
     const result = await this.delegate.getGraph(graph);
     this.logger.trace(
-      "got %d-quad dataset from %s",
-      result.size,
+      "got %d quads from %s",
+      result.length,
       this.loggableGraph(graph),
     );
     return result;
