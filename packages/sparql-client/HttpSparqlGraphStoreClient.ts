@@ -21,9 +21,12 @@ export class HttpSparqlGraphStoreClient
     graph: DefaultGraph | NamedNode,
     options?: HttpSparqlGraphStoreClient.RequestOptions,
   ): Promise<void> {
-    const response = await this.fetch(this.graphUrl(graph), {
-      headers: this.requestHeaders({}, options),
+    const response = await this.fetch({
+      body: null,
+      hardCodedHeaders: null,
       method: "DELETE",
+      options: options ?? null,
+      url: this.graphUrl(graph),
     });
     if (response.ok || response.status === 404) {
       return;
@@ -35,14 +38,15 @@ export class HttpSparqlGraphStoreClient
     graph: DefaultGraph | NamedNode,
     options?: HttpSparqlGraphStoreClient.RequestOptions,
   ): Promise<readonly Quad[]> {
-    const response = await this.fetch(this.graphUrl(graph), {
-      headers: this.requestHeaders(
-        {
-          accept: "application/n-triples; charset=utf-8",
-        },
-        options,
-      ),
+    const response = await this.fetch({
+      body: null,
+      hardCodedHeaders: {
+        accept: "application/n-triples; charset=utf-8",
+        contentType: null,
+      },
       method: "GET",
+      options: options ?? null,
+      url: this.graphUrl(graph),
     });
     if (response.ok) {
       return new N3.Parser({
@@ -105,19 +109,19 @@ export class HttpSparqlGraphStoreClient
     }
 
     await this.ensureOkResponse(
-      await this.fetch(this.graphUrl(graph), {
+      await this.fetch({
         body: new N3.Writer({
           format: "application/n-triples",
         })
           .quadsToString(quads)
           .trimEnd(),
-        headers: this.requestHeaders(
-          {
-            contentType: "application/n-triples; charset=utf-8",
-          },
-          options,
-        ),
+        hardCodedHeaders: {
+          accept: null,
+          contentType: "application/n-triples; charset=utf-8",
+        },
         method,
+        options: options ?? null,
+        url: this.graphUrl(graph),
       }),
     );
   }

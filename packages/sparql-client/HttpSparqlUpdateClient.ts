@@ -17,41 +17,37 @@ export class HttpSparqlUpdateClient
     const url = new URL(this.endpointUrl);
     switch (method) {
       case "POSTDirectly": {
-        const headers = this.requestHeaders(
-          {
-            contentType: "application/sparql-update; charset=utf-8",
-          },
-          options,
-        );
-
         this.requestOptionsToUrlSearchParams(url.searchParams, options);
 
         await this.ensureOkResponse(
-          await this.fetch(url, {
+          await this.fetch({
             body: update,
-            headers,
+            hardCodedHeaders: {
+              accept: null,
+              contentType: "application/sparql-update; charset=utf-8",
+            },
             method: "POST",
+            options: options ?? null,
+            url,
           }),
         );
         return;
       }
       case "POSTWithUrlEncodedParameters": {
-        const headers = this.requestHeaders(
-          {
-            contentType: "application/x-www-form-urlencoded",
-          },
-          options,
-        );
-
         const urlEncodedParameters = new URLSearchParams();
         this.requestOptionsToUrlSearchParams(urlEncodedParameters, options);
         urlEncodedParameters.set("update", update);
 
         await this.ensureOkResponse(
-          await this.fetch(url, {
+          await this.fetch({
             body: urlEncodedParameters,
-            headers,
+            hardCodedHeaders: {
+              accept: null,
+              contentType: "application/x-www-form-urlencoded",
+            },
             method: "POST",
+            options: options ?? null,
+            url,
           }),
         );
       }

@@ -125,55 +125,50 @@ export class HttpSparqlQueryClient
     const url = new URL(this.endpointUrl);
     switch (method) {
       case "GET": {
-        const headers = this.requestHeaders({ accept }, options);
-
         url.searchParams.set("query", query);
         this.requestOptionsToUrlSearchParams(url.searchParams, options);
 
         return await this.ensureOkResponse(
-          await this.fetch(url, {
-            headers,
+          await this.fetch({
+            body: null,
+            hardCodedHeaders: { accept, contentType: null },
             method: "GET",
+            options: options ?? null,
+            url,
           }),
         );
       }
       case "POSTDirectly": {
-        const headers = this.requestHeaders(
-          {
-            accept,
-            contentType: "application/sparql-query; charset=utf-8",
-          },
-          options,
-        );
-
         this.requestOptionsToUrlSearchParams(url.searchParams, options);
 
         return await this.ensureOkResponse(
-          await this.fetch(url, {
+          await this.fetch({
             body: query,
-            headers,
+            hardCodedHeaders: {
+              accept,
+              contentType: "application/sparql-query; charset=utf-8",
+            },
             method: "POST",
+            options: options ?? null,
+            url,
           }),
         );
       }
       case "POSTWithUrlEncodedParameters": {
-        const headers = this.requestHeaders(
-          {
-            accept,
-            contentType: "application/x-www-form-urlencoded",
-          },
-          options,
-        );
-
         const urlEncodedParameters = new URLSearchParams();
         this.requestOptionsToUrlSearchParams(urlEncodedParameters, options);
         urlEncodedParameters.set("query", query);
 
         return await this.ensureOkResponse(
-          await this.fetch(url, {
+          await this.fetch({
             body: urlEncodedParameters,
-            headers,
+            hardCodedHeaders: {
+              accept,
+              contentType: "application/x-www-form-urlencoded",
+            },
             method: "POST",
+            options: options ?? null,
+            url,
           }),
         );
       }
