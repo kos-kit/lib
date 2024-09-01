@@ -1,23 +1,15 @@
 import { BlankNode, Literal, NamedNode, Quad } from "@rdfjs/types";
 import N3 from "n3";
-import { Logger } from "pino";
+import { LoggingSparqlBaseClient } from "./LoggingSparqlBaseClient.js";
 import { SparqlQueryClient } from "./SparqlQueryClient.js";
 
 /**
  * SparqlClient implementation that logs queries and delegates actual work to another SparqlClient implementation.
  */
-export class LoggingSparqlQueryClient implements SparqlQueryClient {
-  private delegate: SparqlQueryClient;
-  private logger: Logger;
-
-  constructor({
-    delegate,
-    logger,
-  }: { delegate: SparqlQueryClient; logger: Logger }) {
-    this.delegate = delegate;
-    this.logger = logger;
-  }
-
+export class LoggingSparqlQueryClient
+  extends LoggingSparqlBaseClient<SparqlQueryClient>
+  implements SparqlQueryClient
+{
   async queryBindings(
     query: string,
   ): Promise<readonly Record<string, BlankNode | Literal | NamedNode>[]> {

@@ -1,19 +1,11 @@
 import { DatasetCore, DefaultGraph, NamedNode, Quad } from "@rdfjs/types";
-import { Logger } from "pino";
+import { LoggingSparqlBaseClient } from "./LoggingSparqlBaseClient.js";
 import { SparqlGraphStoreClient } from "./SparqlGraphStoreClient.js";
 
-export class LoggingSparqlGraphStoreClient implements SparqlGraphStoreClient {
-  private delegate: SparqlGraphStoreClient;
-  private logger: Logger;
-
-  constructor({
-    delegate,
-    logger,
-  }: { delegate: SparqlGraphStoreClient; logger: Logger }) {
-    this.delegate = delegate;
-    this.logger = logger;
-  }
-
+export class LoggingSparqlGraphStoreClient
+  extends LoggingSparqlBaseClient<SparqlGraphStoreClient>
+  implements SparqlGraphStoreClient
+{
   async deleteGraph(graph: DefaultGraph | NamedNode): Promise<void> {
     this.logger.trace("deleting graph %s", this.loggableGraph(graph));
     await this.delegate.deleteGraph(graph);
