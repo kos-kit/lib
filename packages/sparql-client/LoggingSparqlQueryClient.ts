@@ -1,4 +1,5 @@
 import { BlankNode, Literal, NamedNode, Quad } from "@rdfjs/types";
+import N3 from "n3";
 import { Logger } from "pino";
 import { SparqlQueryClient } from "./SparqlQueryClient.js";
 
@@ -40,6 +41,16 @@ export class LoggingSparqlQueryClient implements SparqlQueryClient {
     this.logger.trace("queryQuads:\n%s", query);
     const result = await this.delegate.queryQuads(query);
     this.logger.trace("queryQuads result: %d quads", result.length);
+    if (this.logger.isLevelEnabled("trace")) {
+      const writer = new N3.Writer({ format: "application/N-Quads" });
+      for (const quad of result) {
+        this.logger.trace(
+          writer
+            .quadToString(quad.subject, quad.predicate, quad.object, quad.graph)
+            .trimEnd(),
+        );
+      }
+    }
     return result;
   }
 }
