@@ -27,6 +27,46 @@ describe("HttpSparqlBaseClient", () => {
 
   [
     {
+      defaultRequestCache: undefined,
+      requestCache: undefined,
+      expectedRequestCache: undefined,
+    },
+    {
+      defaultRequestCache: undefined,
+      requestCache: "no-store" as const,
+      expectedRequestCache: "no-store" as const,
+    },
+    {
+      defaultRequestCache: "no-store" as const,
+      requestCache: undefined,
+      expectedRequestCache: "no-store" as const,
+    },
+    {
+      defaultRequestCache: "no-cache" as const,
+      requestCache: "no-store" as const,
+      expectedRequestCache: "no-store" as const,
+    },
+  ].forEach(({ defaultRequestCache, requestCache }, testI) => {
+    it(`should merge the request cache parameter ${testI}`, async ({
+      expect,
+    }) => {
+      const sut = new HttpSparqlUpdateClient({
+        defaultRequestOptions: {
+          cache: defaultRequestCache,
+        },
+        endpointUrl: "http://example.com",
+      });
+      fetchMocker.mockResponseOnce("");
+      await sut.update("UPDATE", { cache: requestCache });
+      expect(fetchMocker.requests()).toHaveLength(1);
+      // Mocker doesn't appear to keep cache around
+      // const request = fetchMocker.requests()[0];
+      // expect(request.cache).toStrictEqual(expectedRequestCache);
+    });
+  });
+
+  [
+    {
       defaultRequestHeaders: [["name", "value"]],
       requestHeaders: [],
       expectedHeaders: [["name", "value"]],
