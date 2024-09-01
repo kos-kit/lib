@@ -13,7 +13,7 @@ export class LoggingSparqlQueryClient
   async queryBindings(
     query: string,
   ): Promise<readonly Record<string, BlankNode | Literal | NamedNode>[]> {
-    this.logger.trace("queryBindings:\n%s", query);
+    this.logger.trace(this.loggableQuery(query));
     const result = await this.delegate.queryBindings(query);
     this.logger.trace(
       "queryBindings results:\n%s",
@@ -23,14 +23,14 @@ export class LoggingSparqlQueryClient
   }
 
   async queryBoolean(query: string): Promise<boolean> {
-    this.logger.trace("queryBoolean:\n%s", query);
+    this.logger.trace(this.loggableQuery(query));
     const result = await this.delegate.queryBoolean(query);
     this.logger.trace("queryBoolean result: %s", result);
     return result;
   }
 
   async queryQuads(query: string): Promise<readonly Quad[]> {
-    this.logger.trace("queryQuads:\n%s", query);
+    this.logger.trace(this.loggableQuery(query));
     const result = await this.delegate.queryQuads(query);
     this.logger.trace("queryQuads result: %d quads", result.length);
     if (this.logger.isLevelEnabled("trace")) {

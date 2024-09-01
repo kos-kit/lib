@@ -16,4 +16,8 @@ export class LoggingSparqlBaseClient<
     this.delegate = delegate;
     this.logger = logger;
   }
+
+  protected loggableQuery(query: string): string {
+    return query.replace(/\s+/g, " ").trim();
+  }
 }

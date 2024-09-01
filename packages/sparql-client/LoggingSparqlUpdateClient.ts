@@ -9,7 +9,7 @@ export class LoggingSparqlUpdateClient
   implements SparqlUpdateClient
 {
   async update(update: string): Promise<void> {
-    this.logger.trace("SPARQL update:\n%s", update);
+    this.logger.trace(this.loggableQuery(update));
     await this.delegate.update(update);
     this.logger.trace("SPARQL update executed successfully");
   }
