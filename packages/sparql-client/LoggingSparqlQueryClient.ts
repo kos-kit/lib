@@ -1,27 +1,19 @@
 import { BlankNode, Literal, NamedNode, Quad } from "@rdfjs/types";
 import N3 from "n3";
-import { Logger } from "pino";
+import { LoggingSparqlBaseClient } from "./LoggingSparqlBaseClient.js";
 import { SparqlQueryClient } from "./SparqlQueryClient.js";
 
 /**
  * SparqlClient implementation that logs queries and delegates actual work to another SparqlClient implementation.
  */
-export class LoggingSparqlQueryClient implements SparqlQueryClient {
-  private delegate: SparqlQueryClient;
-  private logger: Logger;
-
-  constructor({
-    delegate,
-    logger,
-  }: { delegate: SparqlQueryClient; logger: Logger }) {
-    this.delegate = delegate;
-    this.logger = logger;
-  }
-
+export class LoggingSparqlQueryClient
+  extends LoggingSparqlBaseClient<SparqlQueryClient>
+  implements SparqlQueryClient
+{
   async queryBindings(
     query: string,
   ): Promise<readonly Record<string, BlankNode | Literal | NamedNode>[]> {
-    this.logger.trace("queryBindings:\n%s", query);
+    this.logger.trace(this.loggableQuery(query));
     const result = await this.delegate.queryBindings(query);
     this.logger.trace(
       "queryBindings results:\n%s",
@@ -31,14 +23,14 @@ export class LoggingSparqlQueryClient implements SparqlQueryClient {
   }
 
   async queryBoolean(query: string): Promise<boolean> {
-    this.logger.trace("queryBoolean:\n%s", query);
+    this.logger.trace(this.loggableQuery(query));
     const result = await this.delegate.queryBoolean(query);
     this.logger.trace("queryBoolean result: %s", result);
     return result;
   }
 
   async queryQuads(query: string): Promise<readonly Quad[]> {
-    this.logger.trace("queryQuads:\n%s", query);
+    this.logger.trace(this.loggableQuery(query));
     const result = await this.delegate.queryQuads(query);
     this.logger.trace("queryQuads result: %d quads", result.length);
     if (this.logger.isLevelEnabled("trace")) {

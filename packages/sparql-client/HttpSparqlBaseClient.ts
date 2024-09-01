@@ -24,52 +24,22 @@ export abstract class HttpSparqlBaseClient<
       });
   }
 
-  protected async fetch(input: URL, init?: RequestInit): Promise<Response> {
-    if (this.logger.isLevelEnabled("trace")) {
-      this.logger.trace("request URL: %s", input);
-      this.logger.trace("request method: %s", init?.method ?? "GET");
-      if (init?.headers && init.headers instanceof Headers) {
-        for (const [name, value] of init.headers.entries()) {
-          this.logger.trace("request header: %s: %s", name, value);
-        }
-      }
-      if (init?.body && typeof init.body === "string") {
-        this.logger.trace(
-          "request body (length=%s):\n%s",
-          init.body.length,
-          init.body,
-        );
-      }
-    }
-
-    return await fetch(input, init);
-  }
-
-  protected async ensureOkResponse(response: Response): Promise<Response> {
-    if (response.ok) {
-      return response;
-    }
-
-    throw new Error(
-      `${response.status} ${response.statusText}: ${await response.text()}`,
-    );
-  }
-
-  /**
-   * Merge headers from requestOptions and defaultRequestOptions.
-   *
-   * Does a defensive copy as necessary, so the return value can be mutated.
-   */
-  protected requestHeaders(
-    {
-      accept,
-      contentType,
-    }: {
-      accept?: string;
-      contentType?: string;
-    },
-    requestOptions?: RequestOptionsT,
-  ) {
+  protected async fetch({
+    body,
+    hardCodedHeaders,
+    method,
+    options,
+    url,
+  }: {
+    body: RequestInit["body"] | null;
+    hardCodedHeaders: {
+      accept: string | null;
+      contentType: string | null;
+    } | null;
+    method: RequestInit["method"];
+    options: RequestOptionsT | null;
+    url: URL;
+  }): Promise<Response> {
     const mergedHeaders = new Headers();
 
     // Keep track of which headers should be set vs. appended
@@ -87,8 +57,8 @@ export abstract class HttpSparqlBaseClient<
       }
     }
 
-    if (requestOptions?.headers) {
-      for (const [name, value] of requestOptions.headers.entries()) {
+    if (options?.headers) {
+      for (const [name, value] of options.headers.entries()) {
         if (setHeaderNames.has(name)) {
           mergedHeaders.set(name, value);
           setHeaderNames.delete(name); // Append if we see another header with that name.
@@ -98,18 +68,52 @@ export abstract class HttpSparqlBaseClient<
       }
     }
 
-    if (accept) {
+    if (hardCodedHeaders?.accept) {
       // Enforce our preference on accept
-      mergedHeaders.set("accept", accept);
+      mergedHeaders.set("accept", hardCodedHeaders.accept);
     }
 
-    if (contentType) {
-      mergedHeaders.append("content-type", contentType);
+    if (hardCodedHeaders?.contentType) {
+      mergedHeaders.append("content-type", hardCodedHeaders.contentType);
     } else {
       mergedHeaders.delete("content-type");
     }
 
-    return mergedHeaders;
+    if (this.logger.isLevelEnabled("trace")) {
+      this.logger.trace("request URL: %s", url);
+      this.logger.trace("request method: %s", method);
+      for (const [name, value] of mergedHeaders.entries()) {
+        this.logger.trace("request header: %s: %s", name, value);
+      }
+      if (body && typeof body === "string") {
+        this.logger.trace("request body (length=%s):\n%s", body.length, body);
+      }
+    }
+
+    return await fetch(url, {
+      body,
+      cache: options?.cache ?? this.defaultRequestOptions?.cache,
+      headers: mergedHeaders,
+      method,
+    });
+  }
+
+  protected async ensureOkResponse(response: Response): Promise<Response> {
+    if (response.ok) {
+      return response;
+    }
+
+    throw new Error(
+      `${response.status} ${response.statusText}: ${await response.text()}`,
+    );
+  }
+
+  protected requestCache(
+    requestOptions?: RequestOptionsT,
+  ): RequestCache | undefined {
+    return (
+      requestOptions?.cache ?? this.defaultRequestOptions?.cache ?? undefined
+    );
   }
 }
 
@@ -121,6 +125,7 @@ export namespace HttpSparqlBaseClient {
   }
 
   export interface RequestOptions {
+    cache?: RequestCache;
     headers?: Headers;
   }
 }
