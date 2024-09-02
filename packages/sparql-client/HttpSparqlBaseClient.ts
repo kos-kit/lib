@@ -103,16 +103,12 @@ export abstract class HttpSparqlBaseClient<
       return response;
     }
 
-    throw new Error(
-      `${response.status} ${response.statusText}: ${await response.text()}`,
-    );
+    throw await this.responseToError(response);
   }
 
-  protected requestCache(
-    requestOptions?: RequestOptionsT,
-  ): RequestCache | undefined {
-    return (
-      requestOptions?.cache ?? this.defaultRequestOptions?.cache ?? undefined
+  protected async responseToError(response: Response): Promise<Error> {
+    return new Error(
+      `${response.status} ${response.statusText}: ${await response.text()}`,
     );
   }
 }

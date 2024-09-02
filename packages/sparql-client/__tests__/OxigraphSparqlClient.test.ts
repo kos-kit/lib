@@ -18,9 +18,27 @@ describe("OxigraphSparqlClient", () => {
     sut = new OxigraphSparqlClient({ dataFactory: oxigraph, store });
   });
 
-  it("should delete a graph", async ({ expect }) => {
+  it("should delete the default graph", async ({ expect }) => {
     expect(store.size).toStrictEqual(1);
-    await sut.deleteGraph(oxigraph.defaultGraph());
+    expect(await sut.deleteGraph(oxigraph.defaultGraph())).toStrictEqual(true);
+    expect(store.size).toStrictEqual(0);
+  });
+
+  it("should delete a named graph", async ({ expect }) => {
+    const graph = oxigraph.namedNode("http://example.com/graph");
+    const store = new oxigraph.Store();
+    const sut = new OxigraphSparqlClient({
+      dataFactory: oxigraph,
+      store,
+    });
+    expect(store.size).toStrictEqual(0);
+    expect(await sut.deleteGraph(graph)).toStrictEqual(false);
+    store.add(oxigraph.quad(subject, predicate, object, graph));
+    expect(store.size).toStrictEqual(1);
+    const quads = [...store.match(null, null, null, graph)];
+    expect(quads).toHaveLength(1);
+    expect(quads[0].graph.equals(graph));
+    expect(await sut.deleteGraph(graph)).toStrictEqual(true);
     expect(store.size).toStrictEqual(0);
   });
 

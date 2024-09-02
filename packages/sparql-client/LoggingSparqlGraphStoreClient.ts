@@ -6,10 +6,15 @@ export class LoggingSparqlGraphStoreClient
   extends LoggingSparqlBaseClient<SparqlGraphStoreClient>
   implements SparqlGraphStoreClient
 {
-  async deleteGraph(graph: DefaultGraph | NamedNode): Promise<void> {
+  async deleteGraph(graph: DefaultGraph | NamedNode): Promise<boolean> {
     this.logger.trace("deleting graph %s", this.loggableGraph(graph));
-    await this.delegate.deleteGraph(graph);
-    this.logger.trace("deleted graph %s", this.loggableGraph(graph));
+    const result = await this.delegate.deleteGraph(graph);
+    this.logger.trace(
+      "deleted graph %s: %s",
+      this.loggableGraph(graph),
+      result,
+    );
+    return result;
   }
 
   async getGraph(graph: DefaultGraph | NamedNode): Promise<readonly Quad[]> {

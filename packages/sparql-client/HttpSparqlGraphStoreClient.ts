@@ -20,7 +20,7 @@ export class HttpSparqlGraphStoreClient
   async deleteGraph(
     graph: DefaultGraph | NamedNode,
     options?: HttpSparqlGraphStoreClient.RequestOptions,
-  ): Promise<void> {
+  ): Promise<boolean> {
     const response = await this.fetch({
       body: null,
       hardCodedHeaders: null,
@@ -28,10 +28,13 @@ export class HttpSparqlGraphStoreClient
       options: options ?? null,
       url: this.graphUrl(graph),
     });
-    if (response.ok || response.status === 404) {
-      return;
+    if (response.ok) {
+      return true;
     }
-    await this.ensureOkResponse(response);
+    if (response.status === 404) {
+      return false;
+    }
+    throw await this.responseToError(response);
   }
 
   async getGraph(
@@ -57,8 +60,7 @@ export class HttpSparqlGraphStoreClient
     if (response.status === 404) {
       return [];
     }
-    await this.ensureOkResponse(response);
-    return [];
+    throw await this.responseToError(response);
   }
 
   async postGraph(

@@ -60,12 +60,21 @@ export class OxigraphSparqlClient
     this.useDefaultGraphAsUnion = !!useDefaultGraphAsUnion;
   }
 
-  async deleteGraph(graph: DefaultGraph | NamedNode): Promise<void> {
+  async deleteGraph(graph: DefaultGraph | NamedNode): Promise<boolean> {
     // https://www.w3.org/TR/2013/REC-sparql11-http-rdf-update-20130321/#http-put
     if (graph.termType === "DefaultGraph") {
-      this.store.update("DROP SILENT DEFAULT;");
-    } else {
-      this.store.update(`DROP SILENT GRAPH <${graph.value}>;`);
+      this.store.update("DROP SILENT DEFAULT");
+      return true;
+    }
+
+    try {
+      this.store.update(`DROP GRAPH <${graph.value}>`);
+      return true;
+    } catch (e) {
+      if (e instanceof Error && e.message.endsWith("does not exist")) {
+        return false;
+      }
+      throw e;
     }
   }
 
