@@ -30,6 +30,7 @@ const externalDependencyVersions = {
   "purify-ts": "~2.1.0",
   "purify-ts-helpers": "1.0.4",
   "rdfjs-resource": "1.0.2",
+  "ts-invariant": "^0.10.3",
 };
 
 const projects: readonly Project[] = [
@@ -55,8 +56,10 @@ const projects: readonly Project[] = [
       envalid: "^8.0.0",
       "jsonld-streaming-parser": "^3.4.0",
       mime: "^4.0.4",
+      pino: externalDependencyVersions["pino"],
       n3: "^1.17.3",
       "purify-ts": externalDependencyVersions["purify-ts"],
+      "ts-invariant": externalDependencyVersions["ts-invariant"],
       "unbzip2-stream": "^1.4.3",
     },
     internalDependencies: [],
@@ -90,6 +93,7 @@ const projects: readonly Project[] = [
   },
   {
     devDependencies: {
+      oxigraph: "^0.4.0-rc.1",
       "vitest-fetch-mock": "^0.3.0",
     },
     externalDependencies: {
