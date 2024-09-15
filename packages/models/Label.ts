@@ -13,33 +13,33 @@ export interface Label extends Model {
 export namespace Label {
   export interface Type {
     readonly literalPredicate: NamedNode;
+    readonly name: "alternative" | "hidden" | "other" | "preferred";
     readonly skosXlPredicate: Maybe<NamedNode>;
-    readonly type: "alternative" | "hidden" | "other" | "preferred";
   }
 
   export namespace Type {
     export const ALTERNATIVE: Type = {
       literalPredicate: skos.altLabel,
+      name: "alternative",
       skosXlPredicate: Maybe.of(skosxl.altLabel),
-      type: "alternative",
     };
 
     export const HIDDEN: Type = {
       literalPredicate: skos.hiddenLabel,
+      name: "hidden",
       skosXlPredicate: Maybe.of(skosxl.hiddenLabel),
-      type: "hidden",
     };
 
     export const OTHER: Type = {
       literalPredicate: rdfs.label,
+      name: "hidden",
       skosXlPredicate: Maybe.empty(),
-      type: "hidden",
     };
 
     export const PREFERRED: Type = {
       literalPredicate: skos.prefLabel,
+      name: "preferred",
       skosXlPredicate: Maybe.of(skosxl.prefLabel),
-      type: "preferred",
     };
   }
 
