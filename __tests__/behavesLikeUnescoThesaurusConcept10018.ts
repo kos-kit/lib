@@ -4,8 +4,7 @@ import {
   Kos,
   Label,
   LanguageTag,
-  NoteProperty,
-  SemanticRelationProperty,
+  Note,
 } from "@kos-kit/models";
 import { DataFactory } from "n3";
 import { expect, it } from "vitest";
@@ -62,13 +61,13 @@ export function behavesLikeUnescoThesaurusConcept10018<
     const conceptAr = await testConcept("ar");
     const conceptEs = await testConcept("es");
 
-    const arAltLabels = conceptAr.labels(Label.Type.ALTERNATIVE);
+    const arAltLabels = conceptAr.labels({ types: [Label.Type.ALTERNATIVE] });
     expect(arAltLabels).toHaveLength(1);
     expect(arAltLabels[0].literalForm.value).toStrictEqual(
       "تقييم التأثير على البيئة",
     );
 
-    const esAltLabels = conceptEs.labels(Label.Type.ALTERNATIVE);
+    const esAltLabels = conceptEs.labels({ types: [Label.Type.ALTERNATIVE] });
     expect(esAltLabels).toHaveLength(1);
     expect(esAltLabels[0].literalForm.value).toStrictEqual(
       "Valoración del impacto ambiental",
@@ -90,13 +89,13 @@ export function behavesLikeUnescoThesaurusConcept10018<
     const conceptEn = await testConcept("en");
     const conceptFr = await testConcept("fr");
 
-    const enPrefLabels = conceptEn.labels(Label.Type.PREFERRED);
+    const enPrefLabels = conceptEn.labels({ types: [Label.Type.PREFERRED] });
     expect(enPrefLabels).toHaveLength(1);
     expect(enPrefLabels[0].literalForm.value).toStrictEqual(
       "Environmental impact assessment",
     );
 
-    const frPrefLabels = conceptFr.labels(Label.Type.PREFERRED);
+    const frPrefLabels = conceptFr.labels({ types: [Label.Type.PREFERRED] });
     expect(frPrefLabels).toHaveLength(1);
     expect(frPrefLabels[0].literalForm.value).toStrictEqual(
       "Évaluation de l'impact sur l'environnement",
@@ -107,11 +106,11 @@ export function behavesLikeUnescoThesaurusConcept10018<
     const concept = await testConcept("en");
     for (const { semanticRelationProperty, conceptNumbers } of [
       {
-        semanticRelationProperty: SemanticRelationProperty.BROADER,
+        semanticRelationProperty: Concept.SemanticRelation.Type.BROADER,
         conceptNumbers: [197],
       },
       {
-        semanticRelationProperty: SemanticRelationProperty.RELATED,
+        semanticRelationProperty: Concept.SemanticRelation.Type.RELATED,
         conceptNumbers: [207, 3317, 7775, 6317, 4533],
       },
     ]) {
@@ -136,15 +135,15 @@ export function behavesLikeUnescoThesaurusConcept10018<
     const conceptEn = await testConcept("en");
     const conceptFr = await testConcept("fr");
 
-    const notesEn = await conceptEn.notes(NoteProperty.SCOPE_NOTE);
+    const notesEn = conceptEn.notes({ types: [Note.Type.SCOPE_NOTE] });
     expect(notesEn).toHaveLength(1);
-    expect(notesEn[0].value).toStrictEqual(
+    expect(notesEn[0].literalForm.value).toStrictEqual(
       "An activity designed to identify, predict, interpret and communicate information concerning the environmental consequences of policies, projects etc.",
     );
 
-    const notesFr = await conceptFr.notes(NoteProperty.SCOPE_NOTE);
+    const notesFr = conceptFr.notes({ types: [Note.Type.SCOPE_NOTE] });
     expect(notesFr).toHaveLength(1);
-    expect(notesFr[0].value).toStrictEqual(
+    expect(notesFr[0].literalForm.value).toStrictEqual(
       "Activité destinée à identifier, prévoir, interpréter et communiquer l'information ayant trait aux conséquences de politiques, de projets, etc., sur l'environnement.",
     );
   });

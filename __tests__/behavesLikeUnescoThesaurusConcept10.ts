@@ -4,7 +4,6 @@ import {
   Kos,
   Label,
   LanguageTag,
-  SemanticRelationProperty,
 } from "@kos-kit/models";
 import { DataFactory } from "n3";
 import { expect, it } from "vitest";
@@ -65,13 +64,13 @@ export function behavesLikeUnescoThesaurusConcept10<
     const conceptEn = await testConcept("en");
     const conceptFr = await testConcept("fr");
 
-    const enPrefLabels = conceptEn.labels(Label.Type.PREFERRED);
+    const enPrefLabels = conceptEn.labels({ types: [Label.Type.PREFERRED] });
     expect(enPrefLabels).toHaveLength(1);
     expect(enPrefLabels[0].literalForm.value).toStrictEqual(
       "Right to education",
     );
 
-    const frPrefLabels = conceptFr.labels(Label.Type.PREFERRED);
+    const frPrefLabels = conceptFr.labels({ types: [Label.Type.PREFERRED] });
     expect(frPrefLabels).toHaveLength(1);
     expect(frPrefLabels[0].literalForm.value).toStrictEqual(
       "Droit à l'éducation",
@@ -93,11 +92,11 @@ export function behavesLikeUnescoThesaurusConcept10<
     const concept = await testConcept("en");
     for (const { semanticRelationProperty, conceptNumbers } of [
       {
-        semanticRelationProperty: SemanticRelationProperty.NARROWER,
+        semanticRelationProperty: Concept.SemanticRelation.Type.NARROWER,
         conceptNumbers: [4938, 7597],
       },
       {
-        semanticRelationProperty: SemanticRelationProperty.RELATED,
+        semanticRelationProperty: Concept.SemanticRelation.Type.RELATED,
         conceptNumbers: [9, 556, 557, 1519, 5052],
       },
     ]) {
@@ -122,11 +121,11 @@ export function behavesLikeUnescoThesaurusConcept10<
     const concept = await testConcept("en");
     for (const { semanticRelationProperty, conceptNumbers } of [
       {
-        semanticRelationProperty: SemanticRelationProperty.NARROWER,
+        semanticRelationProperty: Concept.SemanticRelation.Type.NARROWER,
         conceptNumbers: [4938, 7597],
       },
       {
-        semanticRelationProperty: SemanticRelationProperty.RELATED,
+        semanticRelationProperty: Concept.SemanticRelation.Type.RELATED,
         conceptNumbers: [9, 556, 557, 1519, 5052],
       },
     ]) {

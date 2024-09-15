@@ -1,4 +1,5 @@
-import { skos, skosxl } from "@tpluscode/rdf-ns-builders";
+import { Label } from "@kos-kit/models";
+import { skosxl } from "@tpluscode/rdf-ns-builders";
 import {
   GraphPattern,
   GraphPatternSubject,
@@ -14,58 +15,44 @@ export function labeledModelGraphPatterns({
   variablePrefix: string;
 }): readonly GraphPattern[] {
   const graphPatterns: GraphPattern[] = [];
-  for (const { skosPredicate, skosxlPredicate, variableName } of [
-    {
-      skosPredicate: skos.altLabel,
-      skosxlPredicate: skosxl.altLabel,
-      variableName: "AltLabel",
-    },
-    {
-      skosPredicate: skos.hiddenLabel,
-      skosxlPredicate: skosxl.hiddenLabel,
-      variableName: "HiddenLabel",
-    },
-    {
-      skosPredicate: skos.prefLabel,
-      skosxlPredicate: skosxl.prefLabel,
-      variableName: "PrefLabel",
-    },
-  ]) {
+  Label.Types.forEach((labelType, labelTypeI) => {
     graphPatterns.push({
       subject,
-      predicate: skosPredicate,
+      predicate: labelType.literalProperty,
       object: {
         plainLiteral: true,
         termType: "Variable",
-        value: variablePrefix + variableName,
+        value: `${variablePrefix}LabelType${labelTypeI}Literal`,
       },
       optional: true,
     });
 
-    const skosxlLabelVariable: GraphPatternVariable = {
-      termType: "Variable",
-      value: `${variablePrefix + variableName}Resource`,
-    };
-    graphPatterns.push({
-      subject,
-      predicate: skosxlPredicate,
-      object: skosxlLabelVariable,
-      optional: true,
-      subGraphPatterns: modelGraphPatterns({
-        subject: skosxlLabelVariable,
-        variablePrefix: skosxlLabelVariable.value,
-      }).concat([
-        {
-          subject: skosxlLabelVariable,
-          predicate: skosxl.literalForm,
-          object: {
-            termType: "Variable",
-            value: `${variablePrefix + variableName}LiteralForm`,
+    labelType.skosXlProperty.ifJust((skosXlProperty) => {
+      const skosXlLabelVariable: GraphPatternVariable = {
+        termType: "Variable",
+        value: `${variablePrefix}LabelType${labelTypeI}Resource`,
+      };
+      graphPatterns.push({
+        subject,
+        predicate: skosXlProperty,
+        object: skosXlLabelVariable,
+        optional: true,
+        subGraphPatterns: modelGraphPatterns({
+          subject: skosXlLabelVariable,
+          variablePrefix: skosXlLabelVariable.value,
+        }).concat([
+          {
+            subject: skosXlLabelVariable,
+            predicate: skosxl.literalForm,
+            object: {
+              termType: "Variable",
+              value: `${skosXlLabelVariable.value}LiteralForm`,
+            },
           },
-        },
-      ]),
+        ]),
+      });
     });
-  }
+  });
 
   return modelGraphPatterns({ subject, variablePrefix }).concat(graphPatterns);
 }

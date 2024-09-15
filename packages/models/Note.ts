@@ -2,8 +2,8 @@ import { Literal, NamedNode } from "@rdfjs/types";
 import { skos } from "@tpluscode/rdf-ns-builders";
 
 export interface Note {
+  readonly literalForm: Literal;
   readonly type: Note.Type;
-  readonly value: Literal;
 
   equals(other: Note): boolean;
 }

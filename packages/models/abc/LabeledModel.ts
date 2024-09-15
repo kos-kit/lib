@@ -25,7 +25,7 @@ export abstract class LabeledModel<
   }
 
   get displayLabel(): string {
-    const prefLabels = this.labels({ type: ILabel.Type.PREFERRED });
+    const prefLabels = this.labels({ types: [ILabel.Type.PREFERRED] });
     if (prefLabels.length > 0) {
       for (const prefLabel of prefLabels) {
         if (
@@ -41,15 +41,13 @@ export abstract class LabeledModel<
     return Identifier.toString(this.identifier);
   }
 
-  labels(options?: { type?: ILabel.Type }): readonly (LiteralLabel | LabelT)[] {
-    if (options?.type) {
-      return this.labelsByType(options?.type);
-    }
-    const labels: (LiteralLabel | LabelT)[] = [];
-    for (const type_ of ILabel.Types) {
-      labels.push(...this.labelsByType(type_));
-    }
-    return labels;
+  labels(options?: { types?: readonly ILabel.Type[] }): readonly (
+    | LiteralLabel
+    | LabelT
+  )[] {
+    return (options?.types ?? ILabel.Types).flatMap((type) =>
+      this.labelsByType(type),
+    );
   }
 
   protected abstract labelsByType(

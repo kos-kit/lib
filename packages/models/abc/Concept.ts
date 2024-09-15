@@ -38,7 +38,7 @@ export abstract class Concept<
 
   abstract readonly notations: readonly Literal[];
 
-  abstract notes(options?: { type?: Note.Type }): readonly Note[];
+  abstract notes(options?: { types?: readonly Note.Type[] }): readonly Note[];
 
   async semanticRelations(
     type: IConcept.SemanticRelation.Type,

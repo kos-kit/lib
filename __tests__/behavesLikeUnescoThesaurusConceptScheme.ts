@@ -57,11 +57,15 @@ export const behavesLikeUnescoThesaurusConceptScheme = <
     const conceptSchemeEn = await testConceptScheme("en");
     const conceptSchemeFr = await testConceptScheme("fr");
 
-    const enPrefLabels = conceptSchemeEn.labels(Label.Type.PREFERRED);
+    const enPrefLabels = conceptSchemeEn.labels({
+      types: [Label.Type.PREFERRED],
+    });
     expect(enPrefLabels).toHaveLength(1);
     expect(enPrefLabels[0].literalForm.value).toStrictEqual("UNESCO Thesaurus");
 
-    const frPrefLabels = conceptSchemeFr.labels(Label.Type.PREFERRED);
+    const frPrefLabels = conceptSchemeFr.labels({
+      types: [Label.Type.PREFERRED],
+    });
     expect(frPrefLabels).toHaveLength(1);
     expect(frPrefLabels[0].literalForm.value).toStrictEqual(
       "Thésaurus de l'UNESCO",

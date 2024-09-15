@@ -18,7 +18,7 @@ export interface Concept<
 
   equals(other: Concept<any, any, any>): boolean;
   inSchemes(): Promise<StubSequence<ConceptSchemeT>>;
-  notes(options?: { type?: Note.Type }): readonly Note[];
+  notes(options?: { types?: readonly Note.Type[] }): readonly Note[];
   semanticRelations(
     type: Concept.SemanticRelation.Type,
     options?: {
