@@ -48,7 +48,7 @@ export class ServerSearchEngine implements SearchEngine {
       query: { type: "All" },
     })) {
       (await concept.resolve()).ifRight((concept) => {
-        const prefLabels = concept.labels(Label.Type.PREFERRED);
+        const prefLabels = concept.labels({ types: [Label.Type.PREFERRED] });
         if (prefLabels.length === 0) {
           return;
         }
@@ -66,7 +66,9 @@ export class ServerSearchEngine implements SearchEngine {
       query: { type: "All" },
     })) {
       (await conceptScheme.resolve()).ifRight((conceptScheme) => {
-        const prefLabels = conceptScheme.labels(Label.Type.PREFERRED);
+        const prefLabels = conceptScheme.labels({
+          types: [Label.Type.PREFERRED],
+        });
         if (prefLabels.length === 0) {
           return;
         }
