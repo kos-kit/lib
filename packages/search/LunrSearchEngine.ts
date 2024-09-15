@@ -37,7 +37,7 @@ export class LunrSearchEngine implements SearchEngine {
       model: LabeledModel<any>,
       type: SearchResult["type"],
     ): IndexDocument | null => {
-      const prefLabels = model.labels(Label.Type.PREFERRED);
+      const prefLabels = model.labels({ types: [Label.Type.PREFERRED] });
       if (prefLabels.length === 0) {
         return null;
       }

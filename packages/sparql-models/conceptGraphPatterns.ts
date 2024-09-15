@@ -1,4 +1,4 @@
-import { noteProperties } from "@kos-kit/models";
+import { Note } from "@kos-kit/models";
 import { skos } from "@tpluscode/rdf-ns-builders";
 import { GraphPattern, GraphPatternSubject } from "./GraphPattern.js";
 import { labeledModelGraphPatterns } from "./labeledModelGraphPatterns.js";
@@ -22,21 +22,18 @@ export function conceptGraphPatterns({
     optional: true,
   });
 
-  for (const noteProperty of noteProperties) {
+  Note.Types.forEach((noteType, noteTypeI) => {
     graphPatterns.push({
       subject,
-      predicate: noteProperty.identifier,
+      predicate: noteType.skosProperty,
       object: {
         plainLiteral: true,
         termType: "Variable",
-        value:
-          variablePrefix +
-          noteProperty.name[0].toUpperCase() +
-          noteProperty.name.substring(1),
+        value: `${variablePrefix}NoteType${noteTypeI}`,
       },
       optional: true,
     });
-  }
+  });
 
   return labeledModelGraphPatterns({
     subject,

@@ -3,8 +3,7 @@ import {
   ConceptScheme as IConceptScheme,
   Label as ILabel,
   Identifier,
-  NoteProperty,
-  SemanticRelationProperty,
+  Note,
   Stub,
   StubSequence,
   UnbatchedStubSequence,
@@ -39,10 +38,10 @@ export abstract class Concept<
 
   abstract readonly notations: readonly Literal[];
 
-  abstract notes(property: NoteProperty): readonly Literal[];
+  abstract notes(options?: { types?: readonly Note.Type[] }): readonly Note[];
 
   async semanticRelations(
-    property: SemanticRelationProperty,
+    type: IConcept.SemanticRelation.Type,
     options?: { includeInverse?: false },
   ): Promise<StubSequence<ConceptT>> {
     const conceptIdentifiers = new TermSet<Identifier>();
@@ -52,7 +51,7 @@ export abstract class Concept<
       limit: null,
       offset: 0,
       query: {
-        semanticRelationProperty: property,
+        semanticRelationType: type,
         subjectConceptIdentifier: this.identifier,
         type: "ObjectsOfSemanticRelation",
       },
@@ -64,14 +63,14 @@ export abstract class Concept<
     }
 
     if (options?.includeInverse) {
-      const inverseProperty = property.inverse.extractNullable();
+      const inverseProperty = type.inverse.extractNullable();
       if (inverseProperty !== null) {
         for (const conceptStub of await this.kos.concepts({
           limit: null,
           offset: 0,
           query: {
             objectConceptIdentifier: this.identifier,
-            semanticRelationProperty: inverseProperty,
+            semanticRelationType: inverseProperty,
             type: "SubjectsOfSemanticRelation",
           },
         })) {

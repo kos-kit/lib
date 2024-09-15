@@ -3,7 +3,7 @@ import {
   ConceptScheme as IConceptScheme,
   Label as ILabel,
   Identifier,
-  NoteProperty,
+  Note,
   abc,
 } from "@kos-kit/models";
 import { Literal } from "@rdfjs/types";
@@ -60,9 +60,9 @@ export class Concept<
     ];
   }
 
-  notes(property: NoteProperty): readonly Literal[] {
-    return [
-      ...this.resource.values(property.identifier).flatMap((value) =>
+  notes(options?: { types?: readonly Note.Type[] }): readonly Note[] {
+    return (options?.types ?? Note.Types).flatMap((type) => [
+      ...this.resource.values(type.skosProperty).flatMap((value) =>
         value
           .toLiteral()
           .filter((literal) =>
@@ -70,9 +70,10 @@ export class Concept<
               includeLanguageTags: this.kos.includeLanguageTags,
             }),
           )
+          .map((literalForm) => new abc.Note({ literalForm, type }))
           .toList(),
       ),
-    ];
+    ]);
   }
 }
 

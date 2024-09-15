@@ -4,7 +4,6 @@ import {
   Kos,
   Label,
   LanguageTag,
-  SemanticRelationProperty,
 } from "@kos-kit/models";
 import { DataFactory } from "n3";
 import { expect, it } from "vitest";
@@ -32,7 +31,7 @@ export const behavesLikeUnescoThesaurusKos = <
           objectConceptIdentifier: DataFactory.namedNode(
             "http://vocabularies.unesco.org/thesaurus/concept10018",
           ),
-          semanticRelationProperty: SemanticRelationProperty.NARROWER,
+          semanticRelationType: Concept.SemanticRelation.Type.NARROWER,
           type: "SubjectsOfSemanticRelation",
         },
       })),

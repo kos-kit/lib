@@ -23,7 +23,7 @@ export abstract class Label implements ILabel {
 
 export namespace Label {
   export function equals(left: ILabel, right: ILabel): boolean {
-    if (left.type.type !== right.type.type) {
+    if (left.type.equals(right.type)) {
       return false;
     }
 

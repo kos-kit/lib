@@ -202,7 +202,7 @@ ${offset > 0 ? `OFFSET ${offset}` : ""}
       return [
         // The semantic relations have a range of skos:Concept, so no need to check the rdf:type
         `${Identifier.toString(query.subjectConceptIdentifier)} <${
-          query.semanticRelationProperty.identifier.value
+          query.semanticRelationType.property.value
         }> ?concept`,
       ];
     }
@@ -211,7 +211,7 @@ ${offset > 0 ? `OFFSET ${offset}` : ""}
       return [
         // The semantic relations have a domain of skos:Concept, so no need to check the rdf:type
         `?concept <${
-          query.semanticRelationProperty.identifier.value
+          query.semanticRelationType.property.value
         }> ${Identifier.toString(query.objectConceptIdentifier)}`,
       ];
     }

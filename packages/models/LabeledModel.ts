@@ -3,5 +3,8 @@ import { LiteralLabel } from "./LiteralLabel.js";
 import { NamedModel } from "./NamedModel.js";
 
 export interface LabeledModel<LabelT extends Label> extends NamedModel {
-  labels(type?: Label.Type): readonly (LiteralLabel | LabelT)[];
+  labels(options?: { types?: readonly Label.Type[] }): readonly (
+    | LiteralLabel
+    | LabelT
+  )[];
 }

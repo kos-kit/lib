@@ -290,7 +290,7 @@ export abstract class Kos<
     if (query.type === "ObjectsOfSemanticRelation") {
       for (const quad of this.dataset.match(
         query.subjectConceptIdentifier,
-        query.semanticRelationProperty.identifier,
+        query.semanticRelationType.property,
         null,
       )) {
         // The semantic relation properties have a range of skos:Concept
@@ -304,7 +304,7 @@ export abstract class Kos<
     if (query.type === "SubjectsOfSemanticRelation") {
       for (const quad of this.dataset.match(
         null,
-        query.semanticRelationProperty.identifier,
+        query.semanticRelationType.property,
         query.objectConceptIdentifier,
       )) {
         // The semantic relation properties have a domain of skos:Concept

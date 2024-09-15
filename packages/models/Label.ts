@@ -12,34 +12,38 @@ export interface Label extends Model {
 
 export namespace Label {
   export interface Type {
-    readonly literalPredicate: NamedNode;
-    readonly skosXlPredicate: Maybe<NamedNode>;
-    readonly type: "alternative" | "hidden" | "other" | "preferred";
+    equals(other: Label.Type): boolean;
+    readonly literalProperty: NamedNode;
+    readonly skosXlProperty: Maybe<NamedNode>;
   }
 
   export namespace Type {
+    function equals(this: Label.Type, other: Label.Type): boolean {
+      return this.literalProperty.equals(other.literalProperty);
+    }
+
     export const ALTERNATIVE: Type = {
-      literalPredicate: skos.altLabel,
-      skosXlPredicate: Maybe.of(skosxl.altLabel),
-      type: "alternative",
+      equals,
+      literalProperty: skos.altLabel,
+      skosXlProperty: Maybe.of(skosxl.altLabel),
     };
 
     export const HIDDEN: Type = {
-      literalPredicate: skos.hiddenLabel,
-      skosXlPredicate: Maybe.of(skosxl.hiddenLabel),
-      type: "hidden",
+      equals,
+      literalProperty: skos.hiddenLabel,
+      skosXlProperty: Maybe.of(skosxl.hiddenLabel),
     };
 
     export const OTHER: Type = {
-      literalPredicate: rdfs.label,
-      skosXlPredicate: Maybe.empty(),
-      type: "hidden",
+      equals,
+      literalProperty: rdfs.label,
+      skosXlProperty: Maybe.empty(),
     };
 
     export const PREFERRED: Type = {
-      literalPredicate: skos.prefLabel,
-      skosXlPredicate: Maybe.of(skosxl.prefLabel),
-      type: "preferred",
+      equals,
+      literalProperty: skos.prefLabel,
+      skosXlProperty: Maybe.of(skosxl.prefLabel),
     };
   }
 
