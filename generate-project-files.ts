@@ -2,7 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { stringify as stringifyYaml } from "yaml";
 
-const VERSION = "2.0.74";
+const VERSION = "2.0.75";
 
 type ProjectName =
   | "rdfjs-dataset-models"
@@ -30,7 +30,6 @@ const externalDependencyVersions = {
   "purify-ts": "~2.1.0",
   "purify-ts-helpers": "1.0.4",
   "rdfjs-resource": "1.0.2",
-  "ts-invariant": "^0.10.3",
 };
 
 const projects: readonly Project[] = [
@@ -59,7 +58,6 @@ const projects: readonly Project[] = [
       pino: externalDependencyVersions["pino"],
       n3: "^1.17.3",
       "purify-ts": externalDependencyVersions["purify-ts"],
-      "ts-invariant": externalDependencyVersions["ts-invariant"],
       "unbzip2-stream": "^1.4.3",
     },
     files: ["server/*.d.ts", "server/*.js", "*.d.ts", "*.js"],
@@ -176,7 +174,7 @@ for (const project of projects) {
         },
         type: "module",
         types: "index.d.ts",
-        version: "2.0.74",
+        version: "2.0.75",
       },
       undefined,
       2,

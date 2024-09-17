@@ -10,7 +10,6 @@
     "pino": "^9.1.0",
     "n3": "^1.17.3",
     "purify-ts": "~2.1.0",
-    "ts-invariant": "^0.10.3",
     "unbzip2-stream": "^1.4.3"
   },
   "engines": {
@@ -50,5 +49,5 @@
   },
   "type": "module",
   "types": "index.d.ts",
-  "version": "2.0.74"
+  "version": "2.0.75"
 }
