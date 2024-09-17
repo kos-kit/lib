@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { getRdfFileFormat } from "../getRdfFileFormat.js";
+import { getRdfFileFormat } from "../../server/getRdfFileFormat.js";
 
 describe("isRdfFile", () => {
   for (const rdfFileName of ["test.jsonld", "test.nt", "test.nt.br"]) {
