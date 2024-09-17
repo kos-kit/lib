@@ -12,6 +12,7 @@ describe("parseRdfFile", () => {
     "..",
     "..",
     "..",
+    "..",
     "__tests__",
     "data",
   );
