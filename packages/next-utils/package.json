@@ -18,6 +18,8 @@
   },
   "main": "index.js",
   "files": [
+    "server/*.d.ts",
+    "server/*.js",
     "*.d.ts",
     "*.js"
   ],
@@ -48,5 +50,5 @@
   },
   "type": "module",
   "types": "index.d.ts",
-  "version": "2.0.73"
+  "version": "2.0.74"
 }
