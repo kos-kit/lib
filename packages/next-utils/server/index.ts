@@ -1,6 +1,6 @@
 export * from "./CompressionMethod.js";
 export * from "./envalidValidators.js";
-export * from "./fsEither.js";
+export * as fsEither from "./fsEither.js";
 export * from "./getRdfFileFormat.js";
 export * from "./GlobalRef.js";
 export * from "./parseJsonLdStream.js";

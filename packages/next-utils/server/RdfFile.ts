@@ -1,7 +1,7 @@
-import { RdfFileFormat } from "@kos-kit/next-utils";
-import { parseRdfFile } from "@kos-kit/next-utils/parseRdfFile";
 import { DataFactory, DatasetCore } from "@rdfjs/types";
 import { Logger } from "pino";
+import { RdfFileFormat } from "./RdfFileFormat.js";
+import { parseRdfFile } from "./parseRdfFile.js";
 
 export class RdfFile {
   readonly format: RdfFileFormat;
