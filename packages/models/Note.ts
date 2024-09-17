@@ -9,10 +9,6 @@ export interface Note {
 }
 
 export namespace Note {
-  function equals(this: Note.Type, other: Note.Type): boolean {
-    return this.skosProperty.equals(other.skosProperty);
-  }
-
   export interface Type {
     readonly skosProperty: NamedNode;
 
@@ -20,6 +16,10 @@ export namespace Note {
   }
 
   export namespace Type {
+    function equals(this: Note.Type, other: Note.Type): boolean {
+      return this.skosProperty.equals(other.skosProperty);
+    }
+
     export const CHANGE_NOTE: Type = {
       equals,
       skosProperty: skos.changeNote,

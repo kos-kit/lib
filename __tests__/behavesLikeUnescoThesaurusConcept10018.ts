@@ -5,6 +5,7 @@ import {
   Label,
   LanguageTag,
   Note,
+  SemanticRelation,
 } from "@kos-kit/models";
 import { DataFactory } from "n3";
 import { expect, it } from "vitest";
@@ -106,11 +107,11 @@ export function behavesLikeUnescoThesaurusConcept10018<
     const concept = await testConcept("en");
     for (const { semanticRelationProperty, conceptNumbers } of [
       {
-        semanticRelationProperty: Concept.SemanticRelation.Type.BROADER,
+        semanticRelationProperty: SemanticRelation.Type.BROADER,
         conceptNumbers: [197],
       },
       {
-        semanticRelationProperty: Concept.SemanticRelation.Type.RELATED,
+        semanticRelationProperty: SemanticRelation.Type.RELATED,
         conceptNumbers: [207, 3317, 7775, 6317, 4533],
       },
     ]) {

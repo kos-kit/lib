@@ -1,9 +1,9 @@
 import fs from "node:fs/promises";
 import path from "node:path";
-import { getRdfFileFormat } from "@kos-kit/next-utils/getRdfFileFormat";
 import { Logger } from "pino";
 import { RdfFile } from "./RdfFile.js";
-import * as fsEither from "./fsEither";
+import * as fsEither from "./fsEither.js";
+import { getRdfFileFormat } from "./getRdfFileFormat.js";
 
 /**
  * Abstraction for iterating over a directory of files with RDF data in them.

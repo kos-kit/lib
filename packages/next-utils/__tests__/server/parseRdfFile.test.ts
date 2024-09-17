@@ -3,8 +3,8 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { DataFactory, Store } from "n3";
 import { describe, expect, it } from "vitest";
-import { getRdfFileFormat } from "../getRdfFileFormat";
-import { parseRdfFile } from "../parseRdfFile.js";
+import { getRdfFileFormat } from "../../server/getRdfFileFormat.js";
+import { parseRdfFile } from "../../server/parseRdfFile.js";
 
 describe("parseRdfFile", () => {
   const testDataDirPath = path.resolve(

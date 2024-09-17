@@ -4,6 +4,7 @@ import {
   Label as ILabel,
   Identifier,
   Note,
+  SemanticRelation,
   Stub,
   StubSequence,
   UnbatchedStubSequence,
@@ -41,7 +42,7 @@ export abstract class Concept<
   abstract notes(options?: { types?: readonly Note.Type[] }): readonly Note[];
 
   async semanticRelations(
-    type: IConcept.SemanticRelation.Type,
+    type: SemanticRelation.Type,
     options?: { includeInverse?: false },
   ): Promise<StubSequence<ConceptT>> {
     const conceptIdentifiers = new TermSet<Identifier>();
