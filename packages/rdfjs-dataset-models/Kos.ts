@@ -318,16 +318,6 @@ export abstract class Kos<
     throw new RangeError("should never reach this code");
   }
 
-  private sortConcepts(
-    conceptStubs: Iterable<Stub<ConceptT>>,
-  ): readonly Stub<ConceptT>[] {
-    const sortedConceptStubs = [...conceptStubs];
-    sortedConceptStubs.sort((left, right) =>
-      left.identifier.value.localeCompare(right.identifier.value),
-    );
-    return sortedConceptStubs;
-  }
-
   private sortConceptSchemes(
     conceptSchemeStubs: Iterable<Stub<ConceptSchemeT>>,
   ): readonly Stub<ConceptSchemeT>[] {
@@ -336,6 +326,16 @@ export abstract class Kos<
       left.identifier.value.localeCompare(right.identifier.value),
     );
     return sortedConceptSchemeStubs;
+  }
+
+  private sortConcepts(
+    conceptStubs: Iterable<Stub<ConceptT>>,
+  ): readonly Stub<ConceptT>[] {
+    const sortedConceptStubs = [...conceptStubs];
+    sortedConceptStubs.sort((left, right) =>
+      left.identifier.value.localeCompare(right.identifier.value),
+    );
+    return sortedConceptStubs;
   }
 }
 

@@ -33,15 +33,6 @@ export class Concept<
     this.resource = resource;
   }
 
-  protected labelsByType(type: ILabel.Type): readonly ILabel[] {
-    return labelsByType({
-      includeLanguageTags: this.kos.includeLanguageTags,
-      labelConstructor: this.labelConstructor,
-      resource: this.resource,
-      type,
-    });
-  }
-
   get identifier(): Identifier {
     return this.resource.identifier;
   }
@@ -74,6 +65,15 @@ export class Concept<
           .toList(),
       ),
     ]);
+  }
+
+  protected labelsByType(type: ILabel.Type): readonly ILabel[] {
+    return labelsByType({
+      includeLanguageTags: this.kos.includeLanguageTags,
+      labelConstructor: this.labelConstructor,
+      resource: this.resource,
+      type,
+    });
   }
 }
 

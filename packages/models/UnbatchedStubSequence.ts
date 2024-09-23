@@ -14,16 +14,16 @@ export class UnbatchedStubSequence<
     super();
   }
 
-  at(index: number): Stub<ModelT> | undefined {
-    return this.delegate.at(index);
-  }
-
   get length() {
     return this.delegate.length;
   }
 
   [Symbol.iterator](): Iterator<Stub<ModelT>> {
     return this.delegate[Symbol.iterator]();
+  }
+
+  at(index: number): Stub<ModelT> | undefined {
+    return this.delegate.at(index);
   }
 
   async resolve(): Promise<readonly Either<Stub<ModelT>, ModelT>[]> {

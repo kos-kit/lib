@@ -9,8 +9,8 @@ import { getRdfFileFormat } from "./getRdfFileFormat.js";
  * Abstraction for iterating over a directory of files with RDF data in them.
  */
 export class RdfDirectory {
-  private readonly logger: Logger;
   readonly path: string;
+  private readonly logger: Logger;
 
   constructor({ logger, path }: { logger: Logger; path: string }) {
     this.logger = logger;

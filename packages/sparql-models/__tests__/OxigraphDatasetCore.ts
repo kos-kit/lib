@@ -6,6 +6,16 @@ type Quad = oxigraph.Quad;
 export class OxigraphDatasetCore implements rdfjs.DatasetCore<Quad, Quad> {
   constructor(private readonly delegate: oxigraph.Store) {}
 
+  get size() {
+    return this.delegate.size;
+  }
+
+  *[Symbol.iterator](): Iterator<Quad> {
+    for (const quad of this.delegate.match(null, null, null, null)) {
+      yield quad as Quad;
+    }
+  }
+
   add(quad: Quad): this {
     this.delegate.add(quad);
     return this;
@@ -31,15 +41,5 @@ export class OxigraphDatasetCore implements rdfjs.DatasetCore<Quad, Quad> {
         this.delegate.match(subject, predicate, object, graph),
       ),
     );
-  }
-
-  *[Symbol.iterator](): Iterator<Quad> {
-    for (const quad of this.delegate.match(null, null, null, null)) {
-      yield quad as Quad;
-    }
-  }
-
-  get size() {
-    return this.delegate.size;
   }
 }

@@ -58,29 +58,6 @@ ${this.conceptsQueryToWhereGraphPatterns(query).join("\n")}
     );
   }
 
-  protected async queryConcepts({
-    limit,
-    offset,
-    query,
-  }: {
-    limit: number | null;
-    offset: number;
-    query: ConceptsQuery;
-  }): Promise<readonly Identifier[]> {
-    return mapBindingsToIdentifiers(
-      await this.sparqlQueryClient.queryBindings(`\
-SELECT DISTINCT ?concept
-WHERE {
-${this.conceptsQueryToWhereGraphPatterns(query).join("\n")}
-}
-ORDER BY ?concept
-${limit !== null && limit > 0 ? `LIMIT ${limit}` : ""}
-${offset > 0 ? `OFFSET ${offset}` : ""}
-`),
-      "concept",
-    );
-  }
-
   protected async queryConceptSchemes({
     limit,
     offset,
@@ -101,6 +78,29 @@ ${limit !== null && limit > 0 ? `LIMIT ${limit}` : ""}
 ${offset > 0 ? `OFFSET ${offset}` : ""}
 `),
       "conceptScheme",
+    );
+  }
+
+  protected async queryConcepts({
+    limit,
+    offset,
+    query,
+  }: {
+    limit: number | null;
+    offset: number;
+    query: ConceptsQuery;
+  }): Promise<readonly Identifier[]> {
+    return mapBindingsToIdentifiers(
+      await this.sparqlQueryClient.queryBindings(`\
+SELECT DISTINCT ?concept
+WHERE {
+${this.conceptsQueryToWhereGraphPatterns(query).join("\n")}
+}
+ORDER BY ?concept
+${limit !== null && limit > 0 ? `LIMIT ${limit}` : ""}
+${offset > 0 ? `OFFSET ${offset}` : ""}
+`),
+      "concept",
     );
   }
 

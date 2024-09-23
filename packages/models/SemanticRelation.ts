@@ -4,8 +4,6 @@ import { Maybe } from "purify-ts";
 
 export namespace SemanticRelation {
   export class Type {
-    private readonly inverseIdentifier: Maybe<NamedNode>;
-
     static readonly BROADER = new Type({
       inverseIdentifier: Maybe.of(skos.narrower),
       mapping: false,
@@ -56,9 +54,9 @@ export namespace SemanticRelation {
       mapping: true,
       skosProperty: skos.relatedMatch,
     });
-
-    readonly property: NamedNode;
     readonly mapping: boolean;
+    readonly property: NamedNode;
+    private readonly inverseIdentifier: Maybe<NamedNode>;
 
     private constructor({
       inverseIdentifier,
@@ -74,15 +72,15 @@ export namespace SemanticRelation {
       this.mapping = mapping;
     }
 
-    equals(other: SemanticRelation.Type): boolean {
-      return this.property.equals(other.property);
-    }
-
     get inverse(): Maybe<Type> {
       return this.inverseIdentifier.map(
         (inverseIdentifier) =>
           Types.find((type) => type.property.equals(inverseIdentifier))!,
       );
+    }
+
+    equals(other: SemanticRelation.Type): boolean {
+      return this.property.equals(other.property);
     }
   }
 

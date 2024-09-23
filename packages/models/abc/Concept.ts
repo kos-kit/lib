@@ -24,6 +24,7 @@ export abstract class Concept<
   implements IConcept<ConceptT, ConceptSchemeT, LabelT>
 {
   abstract readonly modified: Maybe<Literal>;
+  abstract readonly notations: readonly Literal[];
 
   equals(other: IConcept<any, any, any>): boolean {
     return Concept.equals(this, other);
@@ -36,8 +37,6 @@ export abstract class Concept<
       query: { conceptIdentifier: this.identifier, type: "HasConcept" },
     });
   }
-
-  abstract readonly notations: readonly Literal[];
 
   abstract notes(options?: { types?: readonly Note.Type[] }): readonly Note[];
 

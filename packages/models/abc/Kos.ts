@@ -32,14 +32,6 @@ export abstract class Kos<
 
   abstract concept(identifier: Identifier): Stub<ConceptT>;
 
-  abstract concepts(kwds: {
-    limit: number | null;
-    offset: number;
-    query: ConceptsQuery;
-  }): Promise<StubSequence<ConceptT>>;
-
-  abstract conceptsCount(query: ConceptsQuery): Promise<number>;
-
   abstract conceptScheme(identifier: Identifier): Stub<ConceptSchemeT>;
 
   abstract conceptSchemes(kwds: {
@@ -49,6 +41,14 @@ export abstract class Kos<
   }): Promise<StubSequence<ConceptSchemeT>>;
 
   abstract conceptSchemesCount(query: ConceptSchemesQuery): Promise<number>;
+
+  abstract concepts(kwds: {
+    limit: number | null;
+    offset: number;
+    query: ConceptsQuery;
+  }): Promise<StubSequence<ConceptT>>;
+
+  abstract conceptsCount(query: ConceptsQuery): Promise<number>;
 }
 
 export namespace Kos {

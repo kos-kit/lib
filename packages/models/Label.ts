@@ -12,9 +12,10 @@ export interface Label extends Model {
 
 export namespace Label {
   export interface Type {
-    equals(other: Label.Type): boolean;
     readonly literalProperty: NamedNode;
     readonly skosXlProperty: Maybe<NamedNode>;
+
+    equals(other: Label.Type): boolean;
   }
 
   export namespace Type {

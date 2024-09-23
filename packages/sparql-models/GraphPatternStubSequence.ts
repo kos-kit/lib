@@ -20,13 +20,13 @@ export class GraphPatternStubSequence<
   private readonly graphPatterns: readonly GraphPattern[];
   private readonly identifiers: readonly Identifier[];
   private readonly includeLanguageTags: LanguageTagSet;
+  private readonly logger: Logger;
   private readonly modelFactory: (
     resource: Resource<Identifier>,
   ) => Maybe<ModelT>;
-  private readonly logger: Logger;
-  private readonly stubFactory: (identifier: Identifier) => Stub<ModelT>;
   private readonly modelVariable: GraphPatternVariable;
   private readonly sparqlQueryClient: SparqlQueryClient;
+  private readonly stubFactory: (identifier: Identifier) => Stub<ModelT>;
 
   constructor({
     datasetCoreFactory,
@@ -65,6 +65,12 @@ export class GraphPatternStubSequence<
     return this.identifiers.length;
   }
 
+  [Symbol.iterator](): Iterator<Stub<ModelT>> {
+    return this.identifiers
+      .map((identifier) => this.stubFactory(identifier))
+      [Symbol.iterator]();
+  }
+
   override at(index: number): Stub<ModelT> | undefined {
     const identifier = this.identifiers[index];
     if (typeof identifier === "undefined") {
@@ -101,11 +107,5 @@ export class GraphPatternStubSequence<
           return this.at(identifierI)!;
         }),
     );
-  }
-
-  [Symbol.iterator](): Iterator<Stub<ModelT>> {
-    return this.identifiers
-      .map((identifier) => this.stubFactory(identifier))
-      [Symbol.iterator]();
   }
 }

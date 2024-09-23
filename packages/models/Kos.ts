@@ -16,18 +16,22 @@ export interface Kos<
   readonly includeLanguageTags: LanguageTagSet;
 
   concept(identifier: Identifier): Stub<ConceptT>;
-  concepts(kwds: {
-    limit: number | null;
-    offset: number;
-    query: ConceptsQuery;
-  }): Promise<StubSequence<ConceptT>>;
-  conceptsCount(query: ConceptsQuery): Promise<number>;
 
   conceptScheme(identifier: Identifier): Stub<ConceptSchemeT>;
+
   conceptSchemes(kwds: {
     limit: number | null;
     offset: number;
     query: ConceptSchemesQuery;
   }): Promise<StubSequence<ConceptSchemeT>>;
+
   conceptSchemesCount(query: ConceptSchemesQuery): Promise<number>;
+
+  concepts(kwds: {
+    limit: number | null;
+    offset: number;
+    query: ConceptsQuery;
+  }): Promise<StubSequence<ConceptT>>;
+
+  conceptsCount(query: ConceptsQuery): Promise<number>;
 }

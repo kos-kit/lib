@@ -82,6 +82,25 @@ export class OxigraphSparqlClient
     return [...this.store.match(null, null, null, graph)];
   }
 
+  async postGraph(
+    graph: DefaultGraph | NamedNode,
+    payload: Iterable<Quad>,
+  ): Promise<void> {
+    for (const quad of payload) {
+      this.store.add(
+        this.dataFactory.quad(quad.subject, quad.predicate, quad.object, graph),
+      );
+    }
+  }
+
+  async putGraph(
+    graph: DefaultGraph | NamedNode,
+    payload: Iterable<Quad>,
+  ): Promise<void> {
+    await this.deleteGraph(graph);
+    await this.postGraph(graph, payload);
+  }
+
   async queryBindings(
     query: string,
   ): Promise<readonly Record<string, BlankNode | Literal | NamedNode>[]> {
@@ -116,25 +135,6 @@ export class OxigraphSparqlClient
     return this.store.query(query, {
       use_default_graph_as_union: this.useDefaultGraphAsUnion,
     }) as Quad[];
-  }
-
-  async postGraph(
-    graph: DefaultGraph | NamedNode,
-    payload: Iterable<Quad>,
-  ): Promise<void> {
-    for (const quad of payload) {
-      this.store.add(
-        this.dataFactory.quad(quad.subject, quad.predicate, quad.object, graph),
-      );
-    }
-  }
-
-  async putGraph(
-    graph: DefaultGraph | NamedNode,
-    payload: Iterable<Quad>,
-  ): Promise<void> {
-    await this.deleteGraph(graph);
-    await this.postGraph(graph, payload);
   }
 
   async update(update: string) {

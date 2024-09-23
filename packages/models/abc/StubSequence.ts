@@ -8,6 +8,8 @@ export abstract class StubSequence<ModelT extends NamedModel>
 {
   abstract readonly length: number;
 
+  abstract [Symbol.iterator](): Iterator<Stub<ModelT>>;
+
   abstract at(index: number): Stub<ModelT> | undefined;
 
   equals(other: StubSequence<ModelT>): boolean {
@@ -33,8 +35,6 @@ export abstract class StubSequence<ModelT extends NamedModel>
       modelEither.map((model) => [model]).orDefault([]),
     );
   }
-
-  abstract [Symbol.iterator](): Iterator<Stub<ModelT>>;
 
   abstract resolve(): Promise<readonly Either<Stub<ModelT>, ModelT>[]>;
 }

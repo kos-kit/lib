@@ -67,24 +67,6 @@ export class DefaultKos extends Kos<
     });
   }
 
-  async concepts(kwds: {
-    limit: number | null;
-    offset: number;
-    query: ConceptsQuery;
-  }): Promise<StubSequence<DefaultConcept>> {
-    return new GraphPatternStubSequence({
-      datasetCoreFactory: this.datasetCoreFactory,
-      graphPatterns: conceptGraphPatterns_,
-      identifiers: await this.queryConcepts(kwds),
-      includeLanguageTags: this.includeLanguageTags,
-      modelFactory: (resource) => this.conceptModelFactory(resource),
-      modelVariable: conceptVariable,
-      logger: this.logger,
-      sparqlQueryClient: this.sparqlQueryClient,
-      stubFactory: (identifier) => this.concept(identifier),
-    });
-  }
-
   conceptScheme(
     identifier: Identifier,
   ): GraphPatternStub<DefaultConceptScheme> {
@@ -115,6 +97,24 @@ export class DefaultKos extends Kos<
       logger: this.logger,
       sparqlQueryClient: this.sparqlQueryClient,
       stubFactory: (identifier) => this.conceptScheme(identifier),
+    });
+  }
+
+  async concepts(kwds: {
+    limit: number | null;
+    offset: number;
+    query: ConceptsQuery;
+  }): Promise<StubSequence<DefaultConcept>> {
+    return new GraphPatternStubSequence({
+      datasetCoreFactory: this.datasetCoreFactory,
+      graphPatterns: conceptGraphPatterns_,
+      identifiers: await this.queryConcepts(kwds),
+      includeLanguageTags: this.includeLanguageTags,
+      modelFactory: (resource) => this.conceptModelFactory(resource),
+      modelVariable: conceptVariable,
+      logger: this.logger,
+      sparqlQueryClient: this.sparqlQueryClient,
+      stubFactory: (identifier) => this.concept(identifier),
     });
   }
 

@@ -67,10 +67,6 @@ export abstract class ConceptScheme<
     return ConceptScheme.equals(this, other);
   }
 
-  protected abstract override labelsByType(
-    type: ILabel.Type,
-  ): readonly ILabel[];
-
   topConcepts(kwds?: {
     limit?: number;
     offset?: number;
@@ -89,6 +85,10 @@ export abstract class ConceptScheme<
       type: "TopConceptOf",
     });
   }
+
+  protected abstract override labelsByType(
+    type: ILabel.Type,
+  ): readonly ILabel[];
 }
 
 export namespace ConceptScheme {

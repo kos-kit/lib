@@ -24,6 +24,14 @@ export abstract class HttpSparqlBaseClient<
       });
   }
 
+  protected async ensureOkResponse(response: Response): Promise<Response> {
+    if (response.ok) {
+      return response;
+    }
+
+    throw await this.responseToError(response);
+  }
+
   protected async fetch({
     body,
     hardCodedHeaders,
@@ -96,14 +104,6 @@ export abstract class HttpSparqlBaseClient<
       headers: mergedHeaders,
       method,
     });
-  }
-
-  protected async ensureOkResponse(response: Response): Promise<Response> {
-    if (response.ok) {
-      return response;
-    }
-
-    throw await this.responseToError(response);
   }
 
   protected async responseToError(response: Response): Promise<Error> {

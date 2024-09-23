@@ -5,9 +5,8 @@ import { TAB_SPACES } from "./IndentedString.js";
 import { termToString } from "./termToString.js";
 
 export class ConstructQueryBuilder {
-  private readonly includeLanguageTags: LanguageTagSet;
-
   private graphPatterns: GraphPattern[] = [];
+  private readonly includeLanguageTags: LanguageTagSet;
   private values: [
     GraphPatternVariable,
     (Literal | BlankNode | NamedNode)[],

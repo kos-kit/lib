@@ -5,8 +5,8 @@ import { parseRdfFile } from "./parseRdfFile.js";
 
 export class RdfFile {
   readonly format: RdfFileFormat;
-  private readonly logger: Logger;
   readonly path: string;
+  private readonly logger: Logger;
 
   constructor({
     format,

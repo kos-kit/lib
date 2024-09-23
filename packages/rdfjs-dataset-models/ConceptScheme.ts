@@ -35,15 +35,6 @@ export class ConceptScheme<
     this.resource = resource;
   }
 
-  protected labelsByType(type: ILabel.Type): readonly ILabel[] {
-    return labelsByType({
-      includeLanguageTags: this.kos.includeLanguageTags,
-      labelConstructor: this.labelConstructor,
-      resource: this.resource,
-      type,
-    });
-  }
-
   get identifier(): Identifier {
     return this.resource.identifier;
   }
@@ -92,6 +83,15 @@ export class ConceptScheme<
 
   get rightsHolder(): Maybe<Literal> {
     return this.literalObject(dcterms.rightsHolder);
+  }
+
+  protected labelsByType(type: ILabel.Type): readonly ILabel[] {
+    return labelsByType({
+      includeLanguageTags: this.kos.includeLanguageTags,
+      labelConstructor: this.labelConstructor,
+      resource: this.resource,
+      type,
+    });
   }
 
   private literalObject(predicate: NamedNode): Maybe<Literal> {
