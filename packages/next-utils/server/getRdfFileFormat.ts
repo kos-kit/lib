@@ -3,9 +3,9 @@ import { Mime } from "mime";
 import otherMimeTypes from "mime/types/other.js";
 import standardMimeTypes from "mime/types/standard.js";
 import { Either, Just, Left, Nothing, Right } from "purify-ts";
+import { rdfFormats } from "../RdfFormat.js";
 import { compressionMethods } from "./CompressionMethod.js";
 import { RdfFileFormat } from "./RdfFileFormat.js";
-import { rdfFormats } from "./RdfFormat.js";
 
 const mime = new Mime(standardMimeTypes, otherMimeTypes, {
   "application/x-brotli": ["br"],
