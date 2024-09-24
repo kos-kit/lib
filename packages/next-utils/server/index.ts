@@ -9,4 +9,3 @@ export * from "./parseRdfFile.js";
 export * from "./RdfDirectory.js";
 export * from "./RdfFile.js";
 export * from "./RdfFileFormat.js";
-export * from "./RdfFormat.js";
