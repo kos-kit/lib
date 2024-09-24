@@ -10,10 +10,8 @@ export class OxigraphDatasetCore implements rdfjs.DatasetCore<Quad, Quad> {
     return this.delegate.size;
   }
 
-  *[Symbol.iterator](): Iterator<Quad> {
-    for (const quad of this.delegate.match(null, null, null, null)) {
-      yield quad as Quad;
-    }
+  [Symbol.iterator](): Iterator<Quad> {
+    return this.delegate.match(null, null, null, null)[Symbol.iterator]();
   }
 
   add(quad: Quad): this {
