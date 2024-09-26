@@ -1,5 +1,5 @@
 import { Either } from "purify-ts";
-import { NamedModel } from "./NamedModel.js";
+import { Model } from "./Model.js";
 
 /**
  * A stub is a placeholder for a model in situations where it's unclear whether the other model is resolvable at all
@@ -10,7 +10,7 @@ import { NamedModel } from "./NamedModel.js";
  * but we may know nothing else about it. In those situations we return a stub model (i.e., ConceptStub) with the identifier and
  * let the caller resolve() the actual model as necessary.
  */
-export interface Stub<ModelT extends NamedModel> extends NamedModel {
+export interface Stub<ModelT extends Model> extends Model {
   equals(other: Stub<ModelT>): boolean;
 
   /**

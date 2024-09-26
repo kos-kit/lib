@@ -12,10 +12,6 @@ export abstract class Label implements ILabel {
     this.type = type;
   }
 
-  get displayLabel(): string {
-    return this.literalForm.value;
-  }
-
   equals(other: ILabel): boolean {
     return Label.equals(this, other);
   }

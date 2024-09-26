@@ -12,7 +12,7 @@ export * from "./LanguageTag.js";
 export * from "./LanguageTagSet.js";
 export * from "./LiteralLabel.js";
 export * from "./Model.js";
-export * from "./NamedModel.js";
+export * from "./Model.js";
 export * from "./Note.js";
 export * from "./NotImplementedKos.js";
 export * from "./SemanticRelation.js";

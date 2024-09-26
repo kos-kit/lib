@@ -1,10 +1,4 @@
-import {
-  Identifier,
-  LanguageTagSet,
-  NamedModel,
-  Stub,
-  abc,
-} from "@kos-kit/models";
+import { Identifier, LanguageTagSet, Model, Stub, abc } from "@kos-kit/models";
 import { SparqlQueryClient } from "@kos-kit/sparql-client";
 import { DatasetCoreFactory } from "@rdfjs/types";
 import { Logger } from "pino";
@@ -14,7 +8,7 @@ import { ConstructQueryBuilder } from "./ConstructQueryBuilder.js";
 import { GraphPattern, GraphPatternVariable } from "./GraphPattern.js";
 
 export class GraphPatternStubSequence<
-  ModelT extends NamedModel,
+  ModelT extends Model,
 > extends abc.StubSequence<ModelT> {
   private readonly datasetCoreFactory: DatasetCoreFactory;
   private readonly graphPatterns: readonly GraphPattern[];

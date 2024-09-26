@@ -1,5 +1,5 @@
 import { Either } from "purify-ts";
-import { NamedModel } from "./NamedModel.js";
+import { Model } from "./Model.js";
 import { Stub } from "./Stub.js";
 import { StubSequence } from "./abc/StubSequence.js";
 import "iterator-helpers-polyfill";
@@ -8,7 +8,7 @@ import "iterator-helpers-polyfill";
  * An inefficient implementation of StubSequence that takes an array of Stubs and resolves them individually.
  */
 export class UnbatchedStubSequence<
-  ModelT extends NamedModel,
+  ModelT extends Model,
 > extends StubSequence<ModelT> {
   constructor(private readonly delegate: readonly Stub<ModelT>[]) {
     super();

@@ -1,10 +1,10 @@
 import { Either } from "purify-ts";
-import { NamedModel } from "./NamedModel.js";
+import { Model } from "./Model.js";
 import { Stub } from "./Stub.js";
 import { StubSequence } from "./StubSequence.js";
 import "iterator-helpers-polyfill";
 
-export class EmptyStubSequence<ModelT extends NamedModel>
+export class EmptyStubSequence<ModelT extends Model>
   implements StubSequence<ModelT>
 {
   readonly length = 0;

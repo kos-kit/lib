@@ -10,10 +10,6 @@ export class Note implements INote {
     this.type = type;
   }
 
-  get displayLabel(): string {
-    return this.literalForm.value;
-  }
-
   equals(other: INote): boolean {
     return Note.equals(this, other);
   }

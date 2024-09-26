@@ -20,10 +20,6 @@ export class LiteralLabel implements Label {
     this.type = type;
   }
 
-  get displayLabel(): string {
-    return this.literalForm.value;
-  }
-
   equals(other: Label): boolean {
     return abc.Label.equals(this, other);
   }

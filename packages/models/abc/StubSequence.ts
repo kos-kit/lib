@@ -1,9 +1,9 @@
 import { Either } from "purify-ts";
-import { NamedModel } from "../NamedModel.js";
+import { Model } from "../Model.js";
 import { Stub } from "../Stub";
 import { StubSequence as IStubSequence } from "../StubSequence.js";
 
-export abstract class StubSequence<ModelT extends NamedModel>
+export abstract class StubSequence<ModelT extends Model>
   implements IStubSequence<ModelT>
 {
   abstract readonly length: number;

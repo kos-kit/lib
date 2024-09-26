@@ -1,9 +1,8 @@
 import { Literal, NamedNode } from "@rdfjs/types";
 import { rdfs, skos, skosxl } from "@tpluscode/rdf-ns-builders";
 import { Maybe } from "purify-ts";
-import { Model } from "./Model.js";
 
-export interface Label extends Model {
+export interface Label {
   readonly literalForm: Literal;
   readonly type: Label.Type;
 

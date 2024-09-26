@@ -1,12 +1,12 @@
 import { Either } from "purify-ts";
-import { NamedModel } from "./NamedModel.js";
+import { Model } from "./Model.js";
 import { Stub } from "./Stub.js";
 
 /**
  * An immutable sequence of stubs returned by methods such as Kos.concepts. Its use is preferred over Stub<ModelT>[]
  * in order to support batching implementations of resolve().
  */
-export interface StubSequence<ModelT extends NamedModel>
+export interface StubSequence<ModelT extends Model>
   extends Iterable<Stub<ModelT>> {
   readonly length: number;
 
