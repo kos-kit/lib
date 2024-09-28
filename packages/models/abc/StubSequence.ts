@@ -1,4 +1,5 @@
 import { Either } from "purify-ts";
+import { Equatable } from "purify-ts-helpers";
 import { Model } from "../Model.js";
 import { Stub } from "../Stub";
 import { StubSequence as IStubSequence } from "../StubSequence.js";
@@ -12,22 +13,32 @@ export abstract class StubSequence<ModelT extends Model>
 
   abstract at(index: number): Stub<ModelT> | undefined;
 
-  equals(other: StubSequence<ModelT>): boolean {
+  equals(other: StubSequence<ModelT>): Equatable.EqualsResult {
     if (this.length !== other.length) {
-      return false;
+      return Equatable.EqualsResult.Unequal({
+        leftLength: this.length,
+        rightLength: other.length,
+        type: "ArrayLength",
+      });
     }
 
+    let thisStubI = 0;
     for (const thisStub of this) {
       if (
         !other[Symbol.iterator]().some((otherStub) =>
           thisStub.equals(otherStub),
         )
       ) {
-        return false;
+        return Equatable.EqualsResult.Unequal({
+          leftIndex: thisStubI,
+          leftValue: thisStub,
+          type: "ArrayElement",
+        });
       }
+      thisStubI++;
     }
 
-    return true;
+    return Equatable.EqualsResult.Equal;
   }
 
   async flatResolve(): Promise<readonly ModelT[]> {

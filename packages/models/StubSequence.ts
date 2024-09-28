@@ -1,4 +1,5 @@
 import { Either } from "purify-ts";
+import { Equatable } from "purify-ts-helpers";
 import { Model } from "./Model.js";
 import { Stub } from "./Stub.js";
 
@@ -7,11 +8,11 @@ import { Stub } from "./Stub.js";
  * in order to support batching implementations of resolve().
  */
 export interface StubSequence<ModelT extends Model>
-  extends Iterable<Stub<ModelT>> {
+  extends Equatable<StubSequence<ModelT>>,
+    Iterable<Stub<ModelT>> {
   readonly length: number;
 
   at(index: number): Stub<ModelT> | undefined;
-  equals(other: StubSequence<ModelT>): boolean;
 
   /**
    * Try to resolve the stubs in the sequence, only returning the successful (Right) resolutions.

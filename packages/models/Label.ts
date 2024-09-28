@@ -1,25 +1,25 @@
 import { Literal, NamedNode } from "@rdfjs/types";
 import { rdfs, skos, skosxl } from "@tpluscode/rdf-ns-builders";
 import { Maybe } from "purify-ts";
+import { Equatable } from "purify-ts-helpers";
 
-export interface Label {
+export interface Label extends Equatable<Label> {
   readonly literalForm: Literal;
   readonly type: Label.Type;
-
-  equals(other: Label): boolean;
 }
 
 export namespace Label {
-  export interface Type {
+  export interface Type extends Equatable<Type> {
     readonly literalProperty: NamedNode;
     readonly skosXlProperty: Maybe<NamedNode>;
-
-    equals(other: Label.Type): boolean;
   }
 
   export namespace Type {
-    function equals(this: Label.Type, other: Label.Type): boolean {
-      return this.literalProperty.equals(other.literalProperty);
+    function equals(
+      this: Label.Type,
+      other: Label.Type,
+    ): Equatable.EqualsResult {
+      return Equatable.propertyEquals(this, other, "literalProperty");
     }
 
     export const ALTERNATIVE: Type = {

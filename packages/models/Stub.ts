@@ -1,4 +1,5 @@
 import { Either } from "purify-ts";
+import { Equatable } from "purify-ts-helpers";
 import { Model } from "./Model.js";
 
 /**
@@ -10,9 +11,9 @@ import { Model } from "./Model.js";
  * but we may know nothing else about it. In those situations we return a stub model (i.e., ConceptStub) with the identifier and
  * let the caller resolve() the actual model as necessary.
  */
-export interface Stub<ModelT extends Model> extends Model {
-  equals(other: Stub<ModelT>): boolean;
-
+export interface Stub<ModelT extends Model>
+  extends Equatable<Stub<ModelT>>,
+    Model {
   /**
    * Try to resolve the stub. If the resolution succeeds, return the model as Right. Otherwise return this as Left
    * to support chaining.

@@ -3,6 +3,7 @@ import { Model } from "./Model.js";
 import { Stub } from "./Stub.js";
 import { StubSequence } from "./StubSequence.js";
 import "iterator-helpers-polyfill";
+import { Equatable } from "purify-ts-helpers";
 
 export class EmptyStubSequence<ModelT extends Model>
   implements StubSequence<ModelT>
@@ -17,8 +18,15 @@ export class EmptyStubSequence<ModelT extends Model>
     return undefined;
   }
 
-  equals(other: StubSequence<ModelT>): boolean {
-    return this.length === other.length;
+  equals(other: StubSequence<ModelT>): Equatable.EqualsResult {
+    if (this.length === other.length) {
+      return Equatable.EqualsResult.Equal;
+    }
+    return Equatable.EqualsResult.Unequal({
+      leftLength: this.length,
+      rightLength: this.length,
+      type: "ArrayLength",
+    });
   }
 
   async flatResolve(): Promise<readonly ModelT[]> {

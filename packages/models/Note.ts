@@ -1,23 +1,20 @@
 import { Literal, NamedNode } from "@rdfjs/types";
 import { skos } from "@tpluscode/rdf-ns-builders";
+import { Equatable } from "purify-ts-helpers";
 
-export interface Note {
+export interface Note extends Equatable<Note> {
   readonly literalForm: Literal;
   readonly type: Note.Type;
-
-  equals(other: Note): boolean;
 }
 
 export namespace Note {
-  export interface Type {
+  export interface Type extends Equatable<Type> {
     readonly skosProperty: NamedNode;
-
-    equals(other: Note.Type): boolean;
   }
 
   export namespace Type {
-    function equals(this: Note.Type, other: Note.Type): boolean {
-      return this.skosProperty.equals(other.skosProperty);
+    function equals(this: Note.Type, other: Note.Type): Equatable.EqualsResult {
+      return Equatable.propertyEquals(this, other, "skosProperty");
     }
 
     export const CHANGE_NOTE: Type = {

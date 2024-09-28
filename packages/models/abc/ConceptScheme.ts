@@ -8,7 +8,7 @@ import {
 } from "@kos-kit/models";
 import { Literal, NamedNode } from "@rdfjs/types";
 import { Maybe } from "purify-ts";
-import { Arrays } from "purify-ts-helpers";
+import { Arrays, Equatable } from "purify-ts-helpers";
 import { LabeledModel } from "./LabeledModel.js";
 
 export abstract class ConceptScheme<
@@ -63,7 +63,7 @@ export abstract class ConceptScheme<
     });
   }
 
-  equals(other: IConceptScheme<any, any>): boolean {
+  equals(other: IConceptScheme<any, any>): Equatable.EqualsResult {
     return ConceptScheme.equals(this, other);
   }
 
@@ -95,20 +95,17 @@ export namespace ConceptScheme {
   export function equals(
     left: IConceptScheme<any, any>,
     right: IConceptScheme<any, any>,
-  ): boolean {
-    if (!left.identifier.equals(right.identifier)) {
-      return false;
-    }
-
-    if (
-      !Arrays.equals(left.labels(), right.labels(), (left, right) =>
-        left.equals(right),
-      )
-    ) {
-      return false;
-    }
-
-    return true;
+  ): Equatable.EqualsResult {
+    return Equatable.propertyEquals(left, right, "identifier").chain(() =>
+      Equatable.propertyEquals(
+        left,
+        right,
+        "labels",
+        Arrays.equals(left.labels(), right.labels(), (left, right) =>
+          left.equals(right),
+        ),
+      ),
+    );
   }
 
   export type Parameters<
