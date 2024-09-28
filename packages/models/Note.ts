@@ -14,7 +14,9 @@ export namespace Note {
 
   export namespace Type {
     function equals(this: Note.Type, other: Note.Type): Equatable.EqualsResult {
-      return Equatable.propertyEquals(this, other, "skosProperty");
+      return Equatable.objectEquals(this, other, {
+        skosProperty: Equatable.booleanEquals,
+      });
     }
 
     export const CHANGE_NOTE: Type = {

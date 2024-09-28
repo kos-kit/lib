@@ -19,7 +19,9 @@ export namespace Label {
       this: Label.Type,
       other: Label.Type,
     ): Equatable.EqualsResult {
-      return Equatable.propertyEquals(this, other, "literalProperty");
+      return Equatable.objectEquals(this, other, {
+        literalProperty: Equatable.booleanEquals,
+      });
     }
 
     export const ALTERNATIVE: Type = {

@@ -18,9 +18,10 @@ export class Note implements INote {
 
 export namespace Note {
   export function equals(left: INote, right: INote): Equatable.EqualsResult {
-    return Equatable.propertyEquals(left, right, "type").chain(() =>
-      Equatable.propertyEquals(left, right, "literalForm"),
-    );
+    return Equatable.objectEquals(left, right, {
+      literalForm: Equatable.booleanEquals,
+      type: Equatable.equals,
+    });
   }
 
   export interface Parameters {

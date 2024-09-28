@@ -99,25 +99,13 @@ export namespace Concept {
     left: IConcept<any, any, any>,
     right: IConcept<any, any, any>,
   ): Equatable.EqualsResult {
-    return Equatable.propertyEquals(left, right, "identifier")
-      .chain(() =>
-        Equatable.propertyEquals(
-          left,
-          right,
-          "labels",
-          Equatable.arrayEquals(left.labels(), right.labels()),
-        ),
-      )
-      .chain(() =>
-        Equatable.propertyEquals(
-          left,
-          right,
-          "notations",
-          Arrays.equals(left.notations, right.notations, (left, right) =>
-            left.equals(right),
-          ),
-        ),
-      );
+    return Equatable.objectEquals(left, right, {
+      identifier: Equatable.booleanEquals,
+      labels: (left, right) =>
+        Arrays.equals(left(), right(), (left, right) => left.equals(right)),
+      notations: (left, right) =>
+        Arrays.equals(left, right, (left, right) => left.equals(right)),
+    });
   }
 
   export type Parameters<

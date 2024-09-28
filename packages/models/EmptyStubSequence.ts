@@ -19,14 +19,7 @@ export class EmptyStubSequence<ModelT extends Model>
   }
 
   equals(other: StubSequence<ModelT>): Equatable.EqualsResult {
-    if (this.length === other.length) {
-      return Equatable.EqualsResult.Equal;
-    }
-    return Equatable.EqualsResult.Unequal({
-      leftLength: this.length,
-      rightLength: this.length,
-      type: "ArrayLength",
-    });
+    return Equatable.arrayEquals([], [...other]);
   }
 
   async flatResolve(): Promise<readonly ModelT[]> {

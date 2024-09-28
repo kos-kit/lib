@@ -23,7 +23,9 @@ export namespace Stub {
     left: IStub<ModelT>,
     right: IStub<ModelT>,
   ): Equatable.EqualsResult {
-    return Equatable.propertyEquals(left, right, "identifier");
+    return Equatable.objectEquals(left, right, {
+      identifier: Equatable.booleanEquals,
+    });
   }
 
   export interface Parameters {

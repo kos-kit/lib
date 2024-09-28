@@ -14,31 +14,7 @@ export abstract class StubSequence<ModelT extends Model>
   abstract at(index: number): Stub<ModelT> | undefined;
 
   equals(other: StubSequence<ModelT>): Equatable.EqualsResult {
-    if (this.length !== other.length) {
-      return Equatable.EqualsResult.Unequal({
-        leftLength: this.length,
-        rightLength: other.length,
-        type: "ArrayLength",
-      });
-    }
-
-    let thisStubI = 0;
-    for (const thisStub of this) {
-      if (
-        !other[Symbol.iterator]().some((otherStub) =>
-          thisStub.equals(otherStub),
-        )
-      ) {
-        return Equatable.EqualsResult.Unequal({
-          leftIndex: thisStubI,
-          leftValue: thisStub,
-          type: "ArrayElement",
-        });
-      }
-      thisStubI++;
-    }
-
-    return Equatable.EqualsResult.Equal;
+    return Equatable.arrayEquals([...this], [...other]);
   }
 
   async flatResolve(): Promise<readonly ModelT[]> {

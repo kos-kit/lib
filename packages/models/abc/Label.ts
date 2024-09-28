@@ -20,9 +20,10 @@ export abstract class Label implements ILabel {
 
 export namespace Label {
   export function equals(left: ILabel, right: ILabel): Equatable.EqualsResult {
-    return Equatable.propertyEquals(left, right, "type").chain(() =>
-      Equatable.propertyEquals(left, right, "literalForm"),
-    );
+    return Equatable.objectEquals(left, right, {
+      type: Equatable.equals,
+      literalForm: Equatable.booleanEquals,
+    });
   }
 
   export interface Parameters {

@@ -96,16 +96,11 @@ export namespace ConceptScheme {
     left: IConceptScheme<any, any>,
     right: IConceptScheme<any, any>,
   ): Equatable.EqualsResult {
-    return Equatable.propertyEquals(left, right, "identifier").chain(() =>
-      Equatable.propertyEquals(
-        left,
-        right,
-        "labels",
-        Arrays.equals(left.labels(), right.labels(), (left, right) =>
-          left.equals(right),
-        ),
-      ),
-    );
+    return Equatable.objectEquals(left, right, {
+      identifier: Equatable.booleanEquals,
+      labels: (left, right) =>
+        Arrays.equals(left(), right(), (left, right) => left.equals(right)),
+    });
   }
 
   export type Parameters<
