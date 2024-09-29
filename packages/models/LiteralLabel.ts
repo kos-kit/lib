@@ -1,4 +1,5 @@
 import { Literal } from "@rdfjs/types";
+import { Equatable } from "purify-ts-helpers";
 import { Label } from "./Label.js";
 import * as abc from "./abc/index.js";
 
@@ -20,11 +21,7 @@ export class LiteralLabel implements Label {
     this.type = type;
   }
 
-  get displayLabel(): string {
-    return this.literalForm.value;
-  }
-
-  equals(other: Label): boolean {
+  equals(other: Label): Equatable.EqualsResult {
     return abc.Label.equals(this, other);
   }
 }

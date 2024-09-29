@@ -1,9 +1,10 @@
 import { Either } from "purify-ts";
-import { NamedModel } from "../NamedModel.js";
+import { Equatable } from "purify-ts-helpers";
+import { Model } from "../Model.js";
 import { Stub } from "../Stub";
 import { StubSequence as IStubSequence } from "../StubSequence.js";
 
-export abstract class StubSequence<ModelT extends NamedModel>
+export abstract class StubSequence<ModelT extends Model>
   implements IStubSequence<ModelT>
 {
   abstract readonly length: number;
@@ -12,22 +13,8 @@ export abstract class StubSequence<ModelT extends NamedModel>
 
   abstract at(index: number): Stub<ModelT> | undefined;
 
-  equals(other: StubSequence<ModelT>): boolean {
-    if (this.length !== other.length) {
-      return false;
-    }
-
-    for (const thisStub of this) {
-      if (
-        !other[Symbol.iterator]().some((otherStub) =>
-          thisStub.equals(otherStub),
-        )
-      ) {
-        return false;
-      }
-    }
-
-    return true;
+  equals(other: StubSequence<ModelT>): Equatable.EqualsResult {
+    return Equatable.arrayEquals([...this], [...other]);
   }
 
   async flatResolve(): Promise<readonly ModelT[]> {

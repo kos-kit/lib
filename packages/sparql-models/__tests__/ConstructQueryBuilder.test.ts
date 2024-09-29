@@ -25,6 +25,7 @@ describe("ConstructQueryBuilder", () => {
           subject,
           predicate,
           object,
+          type: "Basic",
         })
         .build(),
     ).toStrictEqual(`\
@@ -39,10 +40,13 @@ CONSTRUCT {
     expect(
       new ConstructQueryBuilder()
         .addGraphPatterns({
-          subject,
-          predicate,
-          object,
-          optional: true,
+          graphPattern: {
+            subject,
+            predicate,
+            object,
+            type: "Basic",
+          },
+          type: "Optional",
         })
         .build(),
     ).toStrictEqual(`\
@@ -64,6 +68,7 @@ CONSTRUCT {
           subject,
           predicate,
           object: { ...object, plainLiteral: true },
+          type: "Basic",
         })
         .build(),
     ).toStrictEqual(`\

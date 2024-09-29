@@ -1,10 +1,11 @@
 import { Either } from "purify-ts";
-import { NamedModel } from "./NamedModel.js";
+import { Model } from "./Model.js";
 import { Stub } from "./Stub.js";
 import { StubSequence } from "./StubSequence.js";
 import "iterator-helpers-polyfill";
+import { Equatable } from "purify-ts-helpers";
 
-export class EmptyStubSequence<ModelT extends NamedModel>
+export class EmptyStubSequence<ModelT extends Model>
   implements StubSequence<ModelT>
 {
   readonly length = 0;
@@ -17,8 +18,8 @@ export class EmptyStubSequence<ModelT extends NamedModel>
     return undefined;
   }
 
-  equals(other: StubSequence<ModelT>): boolean {
-    return this.length === other.length;
+  equals(other: StubSequence<ModelT>): Equatable.EqualsResult {
+    return Equatable.arrayEquals([], [...other]);
   }
 
   async flatResolve(): Promise<readonly ModelT[]> {

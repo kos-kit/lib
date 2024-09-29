@@ -1,4 +1,4 @@
-import { Identifier, LanguageTagSet, NamedModel, abc } from "@kos-kit/models";
+import { Identifier, LanguageTagSet, Model, abc } from "@kos-kit/models";
 import { SparqlQueryClient } from "@kos-kit/sparql-client";
 import { DatasetCoreFactory } from "@rdfjs/types";
 import { Either, Maybe } from "purify-ts";
@@ -6,9 +6,7 @@ import { Resource } from "rdfjs-resource";
 import { ConstructQueryBuilder } from "./ConstructQueryBuilder.js";
 import { GraphPattern, GraphPatternVariable } from "./GraphPattern.js";
 
-export class GraphPatternStub<
-  ModelT extends NamedModel,
-> extends abc.Stub<ModelT> {
+export class GraphPatternStub<ModelT extends Model> extends abc.Stub<ModelT> {
   readonly identifier: Identifier;
 
   private readonly datasetCoreFactory: DatasetCoreFactory;

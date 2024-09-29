@@ -1,4 +1,5 @@
 import { Literal } from "@rdfjs/types";
+import { Equatable } from "purify-ts-helpers";
 import { Label as ILabel, Identifier } from "../index.js";
 
 export abstract class Label implements ILabel {
@@ -12,26 +13,17 @@ export abstract class Label implements ILabel {
     this.type = type;
   }
 
-  get displayLabel(): string {
-    return this.literalForm.value;
-  }
-
-  equals(other: ILabel): boolean {
+  equals(other: ILabel): Equatable.EqualsResult {
     return Label.equals(this, other);
   }
 }
 
 export namespace Label {
-  export function equals(left: ILabel, right: ILabel): boolean {
-    if (left.type.equals(right.type)) {
-      return false;
-    }
-
-    if (!left.literalForm.equals(right.literalForm)) {
-      return false;
-    }
-
-    return true;
+  export function equals(left: ILabel, right: ILabel): Equatable.EqualsResult {
+    return Equatable.objectEquals(left, right, {
+      type: Equatable.equals,
+      literalForm: Equatable.booleanEquals,
+    });
   }
 
   export interface Parameters {

@@ -1,8 +1,9 @@
 import { Logger } from "pino";
 import { Either } from "purify-ts";
-import { Stub as IStub, Identifier, NamedModel } from "../index.js";
+import { Equatable } from "purify-ts-helpers";
+import { Stub as IStub, Identifier, Model } from "../index.js";
 
-export abstract class Stub<ModelT extends NamedModel> implements IStub<ModelT> {
+export abstract class Stub<ModelT extends Model> implements IStub<ModelT> {
   abstract readonly identifier: Identifier;
   protected readonly logger: Logger;
 
@@ -10,11 +11,7 @@ export abstract class Stub<ModelT extends NamedModel> implements IStub<ModelT> {
     this.logger = logger;
   }
 
-  get displayLabel() {
-    return Identifier.toString(this.identifier);
-  }
-
-  equals(other: IStub<ModelT>): boolean {
+  equals(other: IStub<ModelT>): Equatable.EqualsResult {
     return Stub.equals(this, other);
   }
 
@@ -22,11 +19,13 @@ export abstract class Stub<ModelT extends NamedModel> implements IStub<ModelT> {
 }
 
 export namespace Stub {
-  export function equals<ModelT extends NamedModel>(
+  export function equals<ModelT extends Model>(
     left: IStub<ModelT>,
     right: IStub<ModelT>,
-  ): boolean {
-    return left.identifier.equals(right.identifier);
+  ): Equatable.EqualsResult {
+    return Equatable.objectEquals(left, right, {
+      identifier: Equatable.booleanEquals,
+    });
   }
 
   export interface Parameters {

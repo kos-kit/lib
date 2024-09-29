@@ -13,25 +13,31 @@ export function conceptGraphPatterns({
   const graphPatterns: GraphPattern[] = [];
 
   graphPatterns.push({
-    subject,
-    predicate: skos.notation,
-    object: {
-      termType: "Variable",
-      value: `${variablePrefix}Notation`,
+    graphPattern: {
+      subject,
+      predicate: skos.notation,
+      object: {
+        termType: "Variable",
+        value: `${variablePrefix}Notation`,
+      },
+      type: "Basic",
     },
-    optional: true,
+    type: "Optional",
   });
 
   Note.Types.forEach((noteType, noteTypeI) => {
     graphPatterns.push({
-      subject,
-      predicate: noteType.skosProperty,
-      object: {
-        plainLiteral: true,
-        termType: "Variable",
-        value: `${variablePrefix}NoteType${noteTypeI}`,
+      graphPattern: {
+        subject,
+        predicate: noteType.skosProperty,
+        object: {
+          plainLiteral: true,
+          termType: "Variable",
+          value: `${variablePrefix}NoteType${noteTypeI}`,
+        },
+        type: "Basic",
       },
-      optional: true,
+      type: "Optional",
     });
   });
 

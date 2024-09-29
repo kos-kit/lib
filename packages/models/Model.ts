@@ -1,3 +1,5 @@
+import { Identifier } from "./Identifier";
+
 /**
  * Models are implemented in the spirit of Labeled Property Graphs:
  * - "properties" such as labels (skos:prefLabel, et al.), rights, et al. should be available as instance members in memory / without asynchronous calls.
@@ -10,5 +12,5 @@
  * - Related RDF resources such as skosxl:Label instances can be retrieved as "properties".
  */
 export interface Model {
-  readonly displayLabel: string;
+  readonly identifier: Identifier;
 }

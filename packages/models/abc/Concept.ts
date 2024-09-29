@@ -12,7 +12,7 @@ import {
 import TermSet from "@rdfjs/term-set";
 import { Literal } from "@rdfjs/types";
 import { Maybe } from "purify-ts";
-import { Arrays } from "purify-ts-helpers";
+import { Arrays, Equatable } from "purify-ts-helpers";
 import { LabeledModel } from "./LabeledModel.js";
 
 export abstract class Concept<
@@ -26,7 +26,7 @@ export abstract class Concept<
   abstract readonly modified: Maybe<Literal>;
   abstract readonly notations: readonly Literal[];
 
-  equals(other: IConcept<any, any, any>): boolean {
+  equals(other: IConcept<any, any, any>): Equatable.EqualsResult {
     return Concept.equals(this, other);
   }
 
@@ -98,28 +98,14 @@ export namespace Concept {
   export function equals(
     left: IConcept<any, any, any>,
     right: IConcept<any, any, any>,
-  ): boolean {
-    if (!left.identifier.equals(right.identifier)) {
-      return false;
-    }
-
-    if (
-      !Arrays.equals(left.labels(), right.labels(), (left, right) =>
-        left.equals(right),
-      )
-    ) {
-      return false;
-    }
-
-    if (
-      !Arrays.equals(left.notations, right.notations, (left, right) =>
-        left.equals(right),
-      )
-    ) {
-      return false;
-    }
-
-    return true;
+  ): Equatable.EqualsResult {
+    return Equatable.objectEquals(left, right, {
+      identifier: Equatable.booleanEquals,
+      labels: (left, right) =>
+        Arrays.equals(left(), right(), (left, right) => left.equals(right)),
+      notations: (left, right) =>
+        Arrays.equals(left, right, (left, right) => left.equals(right)),
+    });
   }
 
   export type Parameters<

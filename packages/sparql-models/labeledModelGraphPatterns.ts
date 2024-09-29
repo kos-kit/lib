@@ -17,14 +17,17 @@ export function labeledModelGraphPatterns({
   const graphPatterns: GraphPattern[] = [];
   Label.Types.forEach((labelType, labelTypeI) => {
     graphPatterns.push({
-      subject,
-      predicate: labelType.literalProperty,
-      object: {
-        plainLiteral: true,
-        termType: "Variable",
-        value: `${variablePrefix}LabelType${labelTypeI}Literal`,
+      graphPattern: {
+        subject,
+        predicate: labelType.literalProperty,
+        object: {
+          plainLiteral: true,
+          termType: "Variable",
+          value: `${variablePrefix}LabelType${labelTypeI}Literal`,
+        },
+        type: "Basic",
       },
-      optional: true,
+      type: "Optional",
     });
 
     labelType.skosXlProperty.ifJust((skosXlProperty) => {
@@ -33,23 +36,33 @@ export function labeledModelGraphPatterns({
         value: `${variablePrefix}LabelType${labelTypeI}Resource`,
       };
       graphPatterns.push({
-        subject,
-        predicate: skosXlProperty,
-        object: skosXlLabelVariable,
-        optional: true,
-        subGraphPatterns: modelGraphPatterns({
-          subject: skosXlLabelVariable,
-          variablePrefix: skosXlLabelVariable.value,
-        }).concat([
-          {
-            subject: skosXlLabelVariable,
-            predicate: skosxl.literalForm,
-            object: {
-              termType: "Variable",
-              value: `${skosXlLabelVariable.value}LiteralForm`,
-            },
-          },
-        ]),
+        graphPattern: {
+          graphPatterns: [
+            {
+              subject,
+              predicate: skosXlProperty,
+              object: skosXlLabelVariable,
+              type: "Basic",
+            } as GraphPattern,
+          ].concat(
+            modelGraphPatterns({
+              subject: skosXlLabelVariable,
+              variablePrefix: skosXlLabelVariable.value,
+            }).concat([
+              {
+                subject: skosXlLabelVariable,
+                predicate: skosxl.literalForm,
+                object: {
+                  termType: "Variable",
+                  value: `${skosXlLabelVariable.value}LiteralForm`,
+                },
+                type: "Basic",
+              },
+            ]),
+          ),
+          type: "Group",
+        },
+        type: "Optional",
       });
     });
   });
