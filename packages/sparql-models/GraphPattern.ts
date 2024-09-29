@@ -22,27 +22,68 @@ export type GraphPatternVariable = Omit<rdfjs.Variable, "equals">;
 type Literal = Omit<rdfjs.Literal, "equals">;
 type NamedNode = Omit<rdfjs.NamedNode, "equals">;
 
-export interface GraphPattern {
-  object: GraphPatternObject;
-  optional?: boolean;
-  predicate: GraphPatternPredicate;
-  subGraphPatterns?: readonly GraphPattern[];
-  // For ?label ?license ...
-  subject: GraphPatternSubject;
-}
+export type GraphPattern =
+  | {
+      // https://www.w3.org/TR/sparql11-query/#BasicGraphPatterns
+      // ?s ?p ?o
+      readonly object: GraphPatternObject;
+      readonly predicate: GraphPatternPredicate;
+      readonly subject: GraphPatternSubject;
+      readonly type: "Basic";
+    }
+  | {
+      // FILTER EXISTS { ?s ?p ?o }
+      readonly graphPattern: GraphPattern;
+      readonly type: "FilterExists";
+    }
+  | {
+      // FILTER NOT EXISTS { ?s ?p ?o }
+      readonly graphPattern: GraphPattern;
+      readonly type: "FilterNotExists";
+    }
+  | {
+      // https://www.w3.org/TR/sparql11-query/#GroupPatterns
+      // { { ?s1 ?p1 ?o1 . ?s2 ?p2 ?o2 . }
+      readonly graphPatterns: readonly GraphPattern[];
+      readonly type: "Group";
+    }
+  | {
+      // https://www.w3.org/TR/sparql11-query/#OptionalMatching
+      // OPTIONAL { ?s ?p ?o }
+      readonly graphPattern: GraphPattern;
+      readonly type: "Optional";
+    }
+  | {
+      // https://www.w3.org/TR/sparql11-query/#alternatives
+      // { ?s1 ?p1 ?o1 } UNION { ?s2 ?p2 ?o2 }
+      readonly graphPatterns: readonly GraphPattern[];
+      readonly type: "Union";
+    };
 
 export namespace GraphPattern {
   export namespace Array {
     export function sort(
       graphPatterns: readonly GraphPattern[],
     ): readonly GraphPattern[] {
+      const graphPatternRank = (graphPattern: GraphPattern) => {
+        switch (graphPattern.type) {
+          case "Basic":
+            return 0;
+          case "FilterExists":
+          case "FilterNotExists":
+            return 2;
+          case "Group":
+            return 0;
+          case "Optional":
+            return 1;
+          case "Union":
+            return 0;
+        }
+      };
+
       const sortedGraphPatterns = graphPatterns.concat();
       sortedGraphPatterns.sort((left, right) => {
-        // Required then optional.
-        if (left.optional) {
-          return right.optional ? 0 : 1;
-        }
-        return right.optional ? -1 : 0;
+        return graphPatternRank(left) - graphPatternRank(right);
       });
       return sortedGraphPatterns;
     }
@@ -92,30 +133,27 @@ export namespace GraphPattern {
     subject: GraphPatternSubject,
     predicate: GraphPatternPredicate,
     object: GraphPatternObject,
-    options?: Omit<GraphPattern, "object" | "predicate" | "subject">,
   ): GraphPattern {
     return {
       object,
       predicate,
       subject,
-      ...options,
+      type: "Basic",
     };
   }
 
   export function rdfType({
-    optional,
     rdfType,
     subject,
   }: {
-    optional?: boolean;
     rdfType: NamedNode;
     subject: GraphPatternSubject;
   }): GraphPattern {
     return {
       predicate: { termType: "rdfType" },
       object: rdfType,
-      optional,
       subject,
+      type: "Basic",
     };
   }
 
@@ -123,50 +161,57 @@ export namespace GraphPattern {
     graphPattern: GraphPattern,
     indent: number,
   ): readonly IndentedString[] {
-    let constructIndentedStrings: IndentedString[] = [];
-
-    switch (graphPattern.predicate.termType) {
-      case "rdfList":
-        if (graphPattern.object.termType !== "Variable") {
-          throw new RangeError("expected rdfList object to be a variable");
+    switch (graphPattern.type) {
+      case "Basic": {
+        switch (graphPattern.predicate.termType) {
+          case "rdfList":
+            if (graphPattern.object.termType !== "Variable") {
+              throw new RangeError("expected rdfList object to be a variable");
+            }
+            return [
+              {
+                indent,
+                string: `?${graphPattern.object.value} ?${graphPattern.object.value}Predicate ?${graphPattern.object.value}Object .`,
+              },
+            ];
+          case "rdfType":
+            if (graphPattern.object.termType !== "NamedNode") {
+              throw new RangeError(
+                "expected rdfType object to be a named node",
+              );
+            }
+            // Don't include any rdfs:subClassOf
+            return [
+              {
+                indent,
+                string: `${termToString(graphPattern.subject)} <${
+                  rdf.type.value
+                }> ${termToString(graphPattern.object)} .`,
+              },
+            ];
+          default:
+            return [
+              {
+                indent,
+                string: `${termToString(graphPattern.subject)} ${termToString(
+                  graphPattern.predicate,
+                )} ${termToString(graphPattern.object)} .`,
+              },
+            ];
         }
-        constructIndentedStrings.push({
-          indent,
-          string: `?${graphPattern.object.value} ?${graphPattern.object.value}Predicate ?${graphPattern.object.value}Object .`,
-        });
-        break;
-      case "rdfType":
-        if (graphPattern.object.termType !== "NamedNode") {
-          throw new RangeError("expected rdfType object to be a named node");
-        }
-        // Don't include any rdfs:subClassOf
-        constructIndentedStrings.push({
-          indent,
-          string: `${termToString(graphPattern.subject)} <${
-            rdf.type.value
-          }> ${termToString(graphPattern.object)} .`,
-        });
-        break;
-      default:
-        constructIndentedStrings.push({
-          indent,
-          string: `${termToString(graphPattern.subject)} ${termToString(
-            graphPattern.predicate,
-          )} ${termToString(graphPattern.object)} .`,
-        });
-        break;
-    }
-
-    if (graphPattern.subGraphPatterns) {
-      for (const subGraphPattern of GraphPattern.Array.sort(
-        graphPattern.subGraphPatterns,
-      )) {
-        constructIndentedStrings = constructIndentedStrings.concat(
-          toConstructIndentedStrings(subGraphPattern, indent + TAB_SPACES),
+      }
+      case "FilterExists":
+      case "FilterNotExists":
+      case "Optional": {
+        return toConstructIndentedStrings(graphPattern.graphPattern, indent);
+      }
+      case "Group":
+      case "Union": {
+        return GraphPattern.Array.sort(graphPattern.graphPatterns).flatMap(
+          (graphPattern_) => toConstructIndentedStrings(graphPattern_, indent),
         );
       }
     }
-    return constructIndentedStrings;
   }
 
   export function toConstructString(graphPattern: GraphPattern): string {
@@ -190,86 +235,117 @@ export namespace GraphPattern {
     indent: number,
     options?: ToWhereOptions,
   ): readonly IndentedString[] {
-    let whereIndentedStrings: IndentedString[] = [];
-
-    switch (graphPattern.predicate.termType) {
-      case "rdfList":
-        if (graphPattern.object.termType !== "Variable") {
-          throw new RangeError("expected rdfList object to be a variable");
+    switch (graphPattern.type) {
+      case "Basic": {
+        const whereIndentedStrings: IndentedString[] = [];
+        switch (graphPattern.predicate.termType) {
+          case "rdfList":
+            if (graphPattern.object.termType !== "Variable") {
+              throw new RangeError("expected rdfList object to be a variable");
+            }
+            whereIndentedStrings.push(
+              {
+                indent,
+                string: `${termToString(graphPattern.subject)} <${
+                  rdf.rest.value
+                }>*/<${rdf.first.value}>? ?${graphPattern.object.value} .`,
+              },
+              {
+                indent,
+                string: `?${graphPattern.object.value} ?${graphPattern.object.value}Predicate ?${graphPattern.object.value}Object .`,
+              },
+            );
+            break;
+          case "rdfType":
+            if (graphPattern.object.termType !== "NamedNode") {
+              throw new RangeError(
+                "expected rdfType object to be a named node",
+              );
+            }
+            whereIndentedStrings.push({
+              indent,
+              string: `${termToString(graphPattern.subject)} <${rdf.type.value}>/<${
+                rdfs.subClassOf.value
+              }>* ${termToString(graphPattern.object)} .`,
+            });
+            break;
+          default:
+            whereIndentedStrings.push({
+              indent,
+              string: `${termToString(graphPattern.subject)} ${termToString(
+                graphPattern.predicate,
+              )} ${termToString(graphPattern.object)} .`,
+            });
+            break;
         }
-        whereIndentedStrings.push(
-          {
+
+        if (
+          options?.includeLanguageTags &&
+          graphPattern.object.termType === "Variable" &&
+          graphPattern.object.plainLiteral
+        ) {
+          const languageTagTests = [...options.includeLanguageTags].map(
+            (includeLanguageTag) =>
+              `LANG(?${graphPattern.object.value}) = "${includeLanguageTag}"`,
+          );
+
+          whereIndentedStrings.push({
             indent,
-            string: `${termToString(graphPattern.subject)} <${
-              rdf.rest.value
-            }>*/<${rdf.first.value}>? ?${graphPattern.object.value} .`,
-          },
-          {
-            indent,
-            string: `?${graphPattern.object.value} ?${graphPattern.object.value}Predicate ?${graphPattern.object.value}Object .`,
-          },
-        );
-        break;
-      case "rdfType":
-        if (graphPattern.object.termType !== "NamedNode") {
-          throw new RangeError("expected rdfType object to be a named node");
+            string: `FILTER (!BOUND(?${
+              graphPattern.object.value
+            }) || ${languageTagTests.join(" || ")} )`,
+          });
         }
-        whereIndentedStrings.push({
-          indent,
-          string: `${termToString(graphPattern.subject)} <${rdf.type.value}>/<${
-            rdfs.subClassOf.value
-          }>* ${termToString(graphPattern.object)} .`,
+
+        return whereIndentedStrings;
+      }
+      case "Group": {
+        let whereIndentedStrings: IndentedString[] = [{ string: "{", indent }];
+        for (const graphPattern_ of graphPattern.graphPatterns) {
+          whereIndentedStrings = whereIndentedStrings.concat(
+            toWhereIndentedStrings(graphPattern_, indent + TAB_SPACES),
+          );
+        }
+        whereIndentedStrings.push({ string: "}", indent });
+        return whereIndentedStrings;
+      }
+      case "FilterExists":
+      case "FilterNotExists":
+      case "Optional": {
+        const keyword = (): string => {
+          switch (graphPattern.type) {
+            case "FilterExists":
+              return "FILTER EXISTS";
+            case "FilterNotExists":
+              return "FILTER NOT EXISTS";
+            case "Optional":
+              return "OPTIONAL";
+          }
+        };
+        return [
+          { string: `${keyword()} {`, indent },
+          ...toWhereIndentedStrings(
+            graphPattern.graphPattern,
+            indent + TAB_SPACES,
+          ),
+          { string: "}", indent },
+        ];
+      }
+      case "Union": {
+        let whereIndentedStrings: IndentedString[] = [];
+        graphPattern.graphPatterns.forEach((graphPattern_, graphPatternI) => {
+          if (graphPatternI > 0) {
+            whereIndentedStrings.push({ string: "UNION", indent });
+          }
+          whereIndentedStrings.push({ string: "{", indent });
+          whereIndentedStrings = whereIndentedStrings.concat(
+            toWhereIndentedStrings(graphPattern_, indent + TAB_SPACES),
+          );
+          whereIndentedStrings.push({ string: "}", indent });
         });
-        break;
-      default:
-        whereIndentedStrings.push({
-          indent,
-          string: `${termToString(graphPattern.subject)} ${termToString(
-            graphPattern.predicate,
-          )} ${termToString(graphPattern.object)} .`,
-        });
-        break;
-    }
-
-    if (
-      options?.includeLanguageTags &&
-      graphPattern.object.termType === "Variable" &&
-      graphPattern.object.plainLiteral
-    ) {
-      const languageTagTests = [...options.includeLanguageTags].map(
-        (includeLanguageTag) =>
-          `LANG(?${graphPattern.object.value}) = "${includeLanguageTag}"`,
-      );
-
-      whereIndentedStrings.push({
-        indent,
-        string: `FILTER (!BOUND(?${
-          graphPattern.object.value
-        }) || ${languageTagTests.join(" || ")} )`,
-      });
-    }
-
-    if (graphPattern.subGraphPatterns) {
-      for (const subGraphPattern of GraphPattern.Array.sort(
-        graphPattern.subGraphPatterns,
-      )) {
-        whereIndentedStrings = whereIndentedStrings.concat(
-          toWhereIndentedStrings(subGraphPattern, indent + TAB_SPACES),
-        );
+        return whereIndentedStrings;
       }
     }
-    if (!graphPattern.optional) {
-      return whereIndentedStrings;
-    }
-
-    return [{ indent, string: "OPTIONAL {" }]
-      .concat(
-        whereIndentedStrings.map((whereString) => ({
-          indent: whereString.indent + TAB_SPACES,
-          string: whereString.string,
-        })),
-      )
-      .concat([{ indent, string: "}" }]);
   }
 
   export function toWhereString(

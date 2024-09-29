@@ -10,58 +10,76 @@ export function modelGraphPatterns({
 }): readonly GraphPattern[] {
   return [
     {
-      subject,
-      predicate: rdf.type,
-      object: {
-        termType: "Variable",
-        value: `${variablePrefix}Type`,
+      graphPattern: {
+        subject,
+        predicate: rdf.type,
+        object: {
+          termType: "Variable",
+          value: `${variablePrefix}Type`,
+        },
+        type: "Basic",
       },
-      optional: true,
+      type: "Optional",
     },
     {
-      subject,
-      predicate: dcterms.license,
-      object: {
-        termType: "Variable",
-        value: `${variablePrefix}License`,
+      graphPattern: {
+        subject,
+        predicate: dcterms.license,
+        object: {
+          termType: "Variable",
+          value: `${variablePrefix}License`,
+        },
+        type: "Basic",
       },
-      optional: true,
+      type: "Optional",
     },
     {
-      subject,
-      predicate: dcterms.modified,
-      object: { termType: "Variable", value: `${variablePrefix}Modified` },
-      optional: true,
+      graphPattern: {
+        subject,
+        predicate: dcterms.modified,
+        object: { termType: "Variable", value: `${variablePrefix}Modified` },
+        type: "Basic",
+      },
+      type: "Optional",
     },
     {
-      subject,
-      predicate: dc11.rights,
-      object: {
-        termType: "Variable",
-        plainLiteral: true,
-        value: `${variablePrefix}DcRights`,
+      graphPattern: {
+        subject,
+        predicate: dc11.rights,
+        object: {
+          termType: "Variable",
+          plainLiteral: true,
+          value: `${variablePrefix}DcRights`,
+        },
+        type: "Basic",
       },
-      optional: true,
+      type: "Optional",
     },
     {
-      subject,
-      predicate: dcterms.rights,
-      object: {
-        termType: "Variable",
-        plainLiteral: true,
-        value: `${variablePrefix}DctermsRights`,
+      graphPattern: {
+        subject,
+        predicate: dcterms.rights,
+        object: {
+          termType: "Variable",
+          plainLiteral: true,
+          value: `${variablePrefix}DctermsRights`,
+        },
+        type: "Basic",
       },
-      optional: true,
+      type: "Optional",
     },
     {
-      subject,
-      predicate: dcterms.rightsHolder,
-      object: {
-        termType: "Variable",
-        plainLiteral: true,
-        value: `${variablePrefix}RightsHolder`,
+      graphPattern: {
+        subject,
+        predicate: dcterms.rightsHolder,
+        object: {
+          termType: "Variable",
+          plainLiteral: true,
+          value: `${variablePrefix}RightsHolder`,
+        },
+        type: "Basic",
       },
-      optional: true,
+      type: "Optional",
     },
   ];
 }
