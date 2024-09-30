@@ -129,7 +129,7 @@ export namespace GraphPattern {
     }
   }
 
-  export function fromTriple(
+  export function basic(
     subject: GraphPatternSubject,
     predicate: GraphPatternPredicate,
     object: GraphPatternObject,
@@ -139,6 +139,36 @@ export namespace GraphPattern {
       predicate,
       subject,
       type: "Basic",
+    };
+  }
+
+  export function filterExists(graphPattern: GraphPattern): GraphPattern {
+    return {
+      graphPattern,
+      type: "FilterExists",
+    };
+  }
+
+  export function filterNotExists(graphPattern: GraphPattern): GraphPattern {
+    return {
+      graphPattern,
+      type: "FilterNotExists",
+    };
+  }
+
+  export function group(
+    ...graphPatterns: readonly GraphPattern[]
+  ): GraphPattern {
+    return {
+      graphPatterns,
+      type: "Group",
+    };
+  }
+
+  export function optional(graphPattern: GraphPattern): GraphPattern {
+    return {
+      graphPattern,
+      type: "Optional",
     };
   }
 
@@ -362,5 +392,14 @@ export namespace GraphPattern {
     return toWhereIndentedStrings(graphPattern, 0, options).map(
       IndentedString.toString,
     );
+  }
+
+  export function union(
+    ...graphPatterns: readonly GraphPattern[]
+  ): GraphPattern {
+    return {
+      graphPatterns,
+      type: "Union",
+    };
   }
 }

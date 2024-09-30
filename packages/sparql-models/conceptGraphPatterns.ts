@@ -12,33 +12,25 @@ export function conceptGraphPatterns({
 }): readonly GraphPattern[] {
   const graphPatterns: GraphPattern[] = [];
 
-  graphPatterns.push({
-    graphPattern: {
-      subject,
-      predicate: skos.notation,
-      object: {
+  graphPatterns.push(
+    GraphPattern.optional(
+      GraphPattern.basic(subject, skos.notation, {
         termType: "Variable",
         value: `${variablePrefix}Notation`,
-      },
-      type: "Basic",
-    },
-    type: "Optional",
-  });
+      }),
+    ),
+  );
 
   Note.Types.forEach((noteType, noteTypeI) => {
-    graphPatterns.push({
-      graphPattern: {
-        subject,
-        predicate: noteType.skosProperty,
-        object: {
+    graphPatterns.push(
+      GraphPattern.optional(
+        GraphPattern.basic(subject, noteType.skosProperty, {
           plainLiteral: true,
           termType: "Variable",
           value: `${variablePrefix}NoteType${noteTypeI}`,
-        },
-        type: "Basic",
-      },
-      type: "Optional",
-    });
+        }),
+      ),
+    );
   });
 
   return labeledModelGraphPatterns({

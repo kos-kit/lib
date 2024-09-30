@@ -15,55 +15,38 @@ export function labeledModelGraphPatterns({
   variablePrefix: string;
 }): readonly GraphPattern[] {
   const graphPatterns: GraphPattern[] = [];
+
   Label.Types.forEach((labelType, labelTypeI) => {
-    graphPatterns.push({
-      graphPattern: {
-        subject,
-        predicate: labelType.literalProperty,
-        object: {
+    graphPatterns.push(
+      GraphPattern.optional(
+        GraphPattern.basic(subject, labelType.literalProperty, {
           plainLiteral: true,
           termType: "Variable",
           value: `${variablePrefix}LabelType${labelTypeI}Literal`,
-        },
-        type: "Basic",
-      },
-      type: "Optional",
-    });
+        }),
+      ),
+    );
 
     labelType.skosXlProperty.ifJust((skosXlProperty) => {
       const skosXlLabelVariable: GraphPatternVariable = {
         termType: "Variable",
         value: `${variablePrefix}LabelType${labelTypeI}Resource`,
       };
-      graphPatterns.push({
-        graphPattern: {
-          graphPatterns: [
-            {
-              subject,
-              predicate: skosXlProperty,
-              object: skosXlLabelVariable,
-              type: "Basic",
-            } as GraphPattern,
-          ].concat(
-            modelGraphPatterns({
+      graphPatterns.push(
+        GraphPattern.optional(
+          GraphPattern.group(
+            GraphPattern.basic(subject, skosXlProperty, skosXlLabelVariable),
+            ...modelGraphPatterns({
               subject: skosXlLabelVariable,
               variablePrefix: skosXlLabelVariable.value,
-            }).concat([
-              {
-                subject: skosXlLabelVariable,
-                predicate: skosxl.literalForm,
-                object: {
-                  termType: "Variable",
-                  value: `${skosXlLabelVariable.value}LiteralForm`,
-                },
-                type: "Basic",
-              },
-            ]),
+            }),
+            GraphPattern.basic(skosXlLabelVariable, skosxl.literalForm, {
+              termType: "Variable",
+              value: `${skosXlLabelVariable.value}LiteralForm`,
+            }),
           ),
-          type: "Group",
-        },
-        type: "Optional",
-      });
+        ),
+      );
     });
   });
 
