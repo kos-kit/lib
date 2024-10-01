@@ -88,7 +88,9 @@ export class RdfDirectory {
   }
 
   async gitClean(): Promise<void> {
+    this.logger.info("running git clean on %s", this.path);
     await promiseSpawn("git", ["clean", "-d", "-f"]);
+    this.logger.info("ran git clean on %s", this.path);
   }
 
   async *parse({
