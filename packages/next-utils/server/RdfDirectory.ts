@@ -1,5 +1,6 @@
 import fs from "node:fs/promises";
 import path from "node:path";
+import promiseSpawn from "@npmcli/promise-spawn";
 import { DataFactory, DatasetCore, DatasetCoreFactory } from "@rdfjs/types";
 import { Logger } from "pino";
 import { RdfFile } from "./RdfFile.js";
@@ -84,6 +85,10 @@ export class RdfDirectory {
     } else {
       this.logger.warn("%s is not an (RDF) directory", this.path);
     }
+  }
+
+  async gitClean(): Promise<void> {
+    await promiseSpawn("git", ["clean", "-d", "-f"]);
   }
 
   async *parse({
