@@ -87,7 +87,7 @@ export class DefaultKos extends Kos<
     offset: number;
     query: ConceptSchemesQuery;
   }): Promise<StubSequence<DefaultConceptScheme>> {
-    return new GraphPatternStubSequence({
+    return new GraphPatternStubSequence<DefaultConceptScheme>({
       datasetCoreFactory: this.datasetCoreFactory,
       graphPatterns: conceptSchemeGraphPatterns_,
       identifiers: await this.queryConceptSchemes(kwds),
@@ -105,7 +105,7 @@ export class DefaultKos extends Kos<
     offset: number;
     query: ConceptsQuery;
   }): Promise<StubSequence<DefaultConcept>> {
-    return new GraphPatternStubSequence({
+    return new GraphPatternStubSequence<DefaultConcept>({
       datasetCoreFactory: this.datasetCoreFactory,
       graphPatterns: conceptGraphPatterns_,
       identifiers: await this.queryConcepts(kwds),
