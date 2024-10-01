@@ -23,12 +23,9 @@ export abstract class Concept<
   extends LabeledModel<ConceptT, ConceptSchemeT, LabelT>
   implements IConcept<ConceptT, ConceptSchemeT, LabelT>
 {
+  equals = Concept.equals;
   abstract readonly modified: Maybe<Literal>;
   abstract readonly notations: readonly Literal[];
-
-  equals(other: IConcept<any, any, any>): Equatable.EqualsResult {
-    return Concept.equals(this, other);
-  }
 
   async inSchemes(): Promise<StubSequence<ConceptSchemeT>> {
     return this.kos.conceptSchemes({
@@ -96,10 +93,10 @@ export abstract class Concept<
 
 export namespace Concept {
   export function equals(
-    left: IConcept<any, any, any>,
-    right: IConcept<any, any, any>,
+    this: IConcept<any, any, any>,
+    other: IConcept<any, any, any>,
   ): Equatable.EqualsResult {
-    return Equatable.objectEquals(left, right, {
+    return Equatable.objectEquals(this, other, {
       identifier: Equatable.booleanEquals,
       labels: (left, right) =>
         Arrays.equals(left(), right(), (left, right) => left.equals(right)),

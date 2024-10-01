@@ -19,6 +19,7 @@ export abstract class ConceptScheme<
   extends LabeledModel<ConceptT, ConceptSchemeT, LabelT>
   implements IConceptScheme<ConceptT, LabelT>
 {
+  equals = ConceptScheme.equals;
   abstract readonly license: Maybe<Literal | NamedNode>;
   abstract readonly modified: Maybe<Literal>;
   abstract readonly rights: Maybe<Literal>;
@@ -63,10 +64,6 @@ export abstract class ConceptScheme<
     });
   }
 
-  equals(other: IConceptScheme<any, any>): Equatable.EqualsResult {
-    return ConceptScheme.equals(this, other);
-  }
-
   topConcepts(kwds?: {
     limit?: number;
     offset?: number;
@@ -93,10 +90,10 @@ export abstract class ConceptScheme<
 
 export namespace ConceptScheme {
   export function equals(
-    left: IConceptScheme<any, any>,
-    right: IConceptScheme<any, any>,
+    this: IConceptScheme<any, any>,
+    other: IConceptScheme<any, any>,
   ): Equatable.EqualsResult {
-    return Equatable.objectEquals(left, right, {
+    return Equatable.objectEquals(this, other, {
       identifier: Equatable.booleanEquals,
       labels: (left, right) =>
         Arrays.equals(left(), right(), (left, right) => left.equals(right)),

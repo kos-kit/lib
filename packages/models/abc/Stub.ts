@@ -4,6 +4,7 @@ import { Equatable } from "purify-ts-helpers";
 import { Stub as IStub, Identifier, Model } from "../index.js";
 
 export abstract class Stub<ModelT extends Model> implements IStub<ModelT> {
+  equals = Stub.equals;
   abstract readonly identifier: Identifier;
   protected readonly logger: Logger;
 
@@ -11,19 +12,15 @@ export abstract class Stub<ModelT extends Model> implements IStub<ModelT> {
     this.logger = logger;
   }
 
-  equals(other: IStub<ModelT>): Equatable.EqualsResult {
-    return Stub.equals(this, other);
-  }
-
   abstract resolve(): Promise<Either<this, ModelT>>;
 }
 
 export namespace Stub {
   export function equals<ModelT extends Model>(
-    left: IStub<ModelT>,
-    right: IStub<ModelT>,
+    this: IStub<ModelT>,
+    other: IStub<ModelT>,
   ): Equatable.EqualsResult {
-    return Equatable.objectEquals(left, right, {
+    return Equatable.objectEquals(this, other, {
       identifier: Equatable.booleanEquals,
     });
   }

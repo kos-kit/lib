@@ -3,6 +3,7 @@ import { Equatable } from "purify-ts-helpers";
 import { Note as INote } from "../index.js";
 
 export class Note implements INote {
+  equals = Note.equals;
   readonly literalForm: Literal;
   readonly type: INote.Type;
 
@@ -10,15 +11,11 @@ export class Note implements INote {
     this.literalForm = literalForm;
     this.type = type;
   }
-
-  equals(other: INote): Equatable.EqualsResult {
-    return Note.equals(this, other);
-  }
 }
 
 export namespace Note {
-  export function equals(left: INote, right: INote): Equatable.EqualsResult {
-    return Equatable.objectEquals(left, right, {
+  export function equals(this: INote, other: INote): Equatable.EqualsResult {
+    return Equatable.objectEquals(this, other, {
       literalForm: Equatable.booleanEquals,
       type: Equatable.equals,
     });
