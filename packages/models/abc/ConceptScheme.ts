@@ -19,7 +19,6 @@ export abstract class ConceptScheme<
   extends LabeledModel<ConceptT, ConceptSchemeT, LabelT>
   implements IConceptScheme<ConceptT, LabelT>
 {
-  equals = ConceptScheme.equals;
   abstract readonly license: Maybe<Literal | NamedNode>;
   abstract readonly modified: Maybe<Literal>;
   abstract readonly rights: Maybe<Literal>;
@@ -62,6 +61,11 @@ export abstract class ConceptScheme<
       conceptSchemeIdentifier: this.identifier,
       type: "InScheme",
     });
+  }
+
+  equals(other: ConceptSchemeT): Equatable.EqualsResult {
+    // This is a method and not an assignment to the function so it can be overridden in subclasses
+    return ConceptScheme.equals.bind(this)(other);
   }
 
   topConcepts(kwds?: {

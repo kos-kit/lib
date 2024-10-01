@@ -23,9 +23,13 @@ export abstract class Concept<
   extends LabeledModel<ConceptT, ConceptSchemeT, LabelT>
   implements IConcept<ConceptT, ConceptSchemeT, LabelT>
 {
-  equals = Concept.equals;
   abstract readonly modified: Maybe<Literal>;
   abstract readonly notations: readonly Literal[];
+
+  equals(other: ConceptT): Equatable.EqualsResult {
+    // This is a method and not an assignment to the function so it can be overridden in subclasses
+    return Concept.equals.bind(this)(other);
+  }
 
   async inSchemes(): Promise<StubSequence<ConceptSchemeT>> {
     return this.kos.conceptSchemes({
