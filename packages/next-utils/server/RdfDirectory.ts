@@ -1,5 +1,6 @@
 import fs from "node:fs/promises";
 import path from "node:path";
+import { DataFactory, DatasetCore, DatasetCoreFactory } from "@rdfjs/types";
 import { Logger } from "pino";
 import { RdfFile } from "./RdfFile.js";
 import * as fsEither from "./fsEither.js";
@@ -82,6 +83,18 @@ export class RdfDirectory {
       yield* visitDirectory(thisPath);
     } else {
       this.logger.warn("%s is not an (RDF) directory", this.path);
+    }
+  }
+
+  async *parse({
+    dataFactory,
+    datasetCoreFactory,
+  }: {
+    dataFactory: DataFactory;
+    datasetCoreFactory: DatasetCoreFactory;
+  }): AsyncGenerator<DatasetCore> {
+    for await (const file of this.files()) {
+      yield file.parse({ dataFactory, dataset: datasetCoreFactory.dataset() });
     }
   }
 }
