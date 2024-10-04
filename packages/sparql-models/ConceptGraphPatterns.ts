@@ -1,7 +1,7 @@
 import { Note } from "@kos-kit/models";
 import { skos } from "@tpluscode/rdf-ns-builders";
 import { GraphPattern } from "./GraphPattern.js";
-import { GraphPatterns } from "./GraphPatterns";
+import { GraphPatterns } from "./GraphPatterns.js";
 import { LabeledModelGraphPatterns } from "./LabeledModelGraphPatterns.js";
 
 export class ConceptGraphPatterns extends GraphPatterns {

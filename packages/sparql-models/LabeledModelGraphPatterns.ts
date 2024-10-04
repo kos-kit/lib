@@ -1,7 +1,7 @@
 import { Label } from "@kos-kit/models";
 import { skosxl } from "@tpluscode/rdf-ns-builders";
 import { BasicGraphPattern, GraphPattern } from "./GraphPattern.js";
-import { GraphPatterns } from "./GraphPatterns";
+import { GraphPatterns } from "./GraphPatterns.js";
 import { ModelGraphPatterns } from "./ModelGraphPatterns.js";
 
 export class LabeledModelGraphPatterns extends GraphPatterns {
