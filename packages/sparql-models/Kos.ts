@@ -110,10 +110,10 @@ ${offset > 0 ? `OFFSET ${offset}` : ""}
     if (query.type === "All") {
       return [
         GraphPattern.toWhereString(
-          GraphPattern.rdfType({
-            rdfType: skos.ConceptScheme,
-            subject: { termType: "Variable", value: "conceptScheme" },
-          }),
+          GraphPattern.rdfType(
+            { termType: "Variable", value: "conceptScheme" },
+            skos.ConceptScheme,
+          ),
         ),
       ];
     }
@@ -143,13 +143,13 @@ ${offset > 0 ? `OFFSET ${offset}` : ""}
   ): readonly string[] {
     if (query.type === "All") {
       return GraphPattern.toWhereIndentedStrings(
-        GraphPattern.rdfType({
-          rdfType: skos.Concept,
-          subject: {
+        GraphPattern.rdfType(
+          {
             termType: "Variable",
             value: "concept",
           },
-        }),
+          skos.Concept,
+        ),
         0,
       ).map(IndentedString.toString);
     }
@@ -177,10 +177,10 @@ ${offset > 0 ? `OFFSET ${offset}` : ""}
             `{ ?concept <${
               skos.inScheme.value
             }> ${conceptSchemeIdentifierString} . ${GraphPattern.toWhereString(
-              GraphPattern.rdfType({
-                rdfType: skos.Concept,
-                subject: { termType: "Variable", value: "concept" },
-              }),
+              GraphPattern.rdfType(
+                { termType: "Variable", value: "concept" },
+                skos.Concept,
+              ),
             )} }`,
             "UNION",
           );

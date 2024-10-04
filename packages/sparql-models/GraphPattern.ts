@@ -172,13 +172,10 @@ export namespace GraphPattern {
     };
   }
 
-  export function rdfType({
-    rdfType,
-    subject,
-  }: {
-    rdfType: NamedNode;
-    subject: GraphPatternSubject;
-  }): GraphPattern {
+  export function rdfType(
+    subject: GraphPatternSubject,
+    rdfType: NamedNode,
+  ): GraphPattern {
     return {
       predicate: { termType: "rdfType" },
       object: rdfType,
