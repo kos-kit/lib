@@ -22,43 +22,48 @@ export type GraphPatternVariable = Omit<rdfjs.Variable, "equals">;
 type Literal = Omit<rdfjs.Literal, "equals">;
 type NamedNode = Omit<rdfjs.NamedNode, "equals">;
 
+type GraphPatternOptions = {
+  excludeFromConstruct?: boolean;
+  excludeFromWhere?: boolean;
+};
+
 export type GraphPattern =
-  | {
+  | ({
       // https://www.w3.org/TR/sparql11-query/#BasicGraphPatterns
       // ?s ?p ?o
       readonly object: GraphPatternObject;
       readonly predicate: GraphPatternPredicate;
       readonly subject: GraphPatternSubject;
       readonly type: "Basic";
-    }
-  | {
+    } & GraphPatternOptions)
+  | ({
       // FILTER EXISTS { ?s ?p ?o }
       readonly graphPattern: GraphPattern;
       readonly type: "FilterExists";
-    }
-  | {
+    } & GraphPatternOptions)
+  | ({
       // FILTER NOT EXISTS { ?s ?p ?o }
       readonly graphPattern: GraphPattern;
       readonly type: "FilterNotExists";
-    }
-  | {
+    } & GraphPatternOptions)
+  | ({
       // https://www.w3.org/TR/sparql11-query/#GroupPatterns
       // { { ?s1 ?p1 ?o1 . ?s2 ?p2 ?o2 . }
       readonly graphPatterns: readonly GraphPattern[];
       readonly type: "Group";
-    }
-  | {
+    } & GraphPatternOptions)
+  | ({
       // https://www.w3.org/TR/sparql11-query/#OptionalMatching
       // OPTIONAL { ?s ?p ?o }
       readonly graphPattern: GraphPattern;
       readonly type: "Optional";
-    }
-  | {
+    } & GraphPatternOptions)
+  | ({
       // https://www.w3.org/TR/sparql11-query/#alternatives
       // { ?s1 ?p1 ?o1 } UNION { ?s2 ?p2 ?o2 }
       readonly graphPatterns: readonly GraphPattern[];
       readonly type: "Union";
-    };
+    } & GraphPatternOptions);
 
 export namespace GraphPattern {
   export namespace Array {
@@ -133,12 +138,14 @@ export namespace GraphPattern {
     subject: GraphPatternSubject,
     predicate: GraphPatternPredicate,
     object: GraphPatternObject,
+    options?: GraphPatternOptions,
   ): GraphPattern {
     return {
       object,
       predicate,
       subject,
       type: "Basic",
+      ...options,
     };
   }
 
@@ -175,12 +182,14 @@ export namespace GraphPattern {
   export function rdfType(
     subject: GraphPatternSubject,
     rdfType: NamedNode,
+    options?: GraphPatternOptions,
   ): GraphPattern {
     return {
       predicate: { termType: "rdfType" },
       object: rdfType,
       subject,
       type: "Basic",
+      ...options,
     };
   }
 
@@ -188,6 +197,10 @@ export namespace GraphPattern {
     graphPattern: GraphPattern,
     indent: number,
   ): readonly IndentedString[] {
+    if (graphPattern.excludeFromConstruct) {
+      return [];
+    }
+
     switch (graphPattern.type) {
       case "Basic": {
         switch (graphPattern.predicate.termType) {
@@ -262,6 +275,10 @@ export namespace GraphPattern {
     indent: number,
     options?: ToWhereOptions,
   ): readonly IndentedString[] {
+    if (graphPattern.excludeFromWhere) {
+      return [];
+    }
+
     switch (graphPattern.type) {
       case "Basic": {
         const whereIndentedStrings: IndentedString[] = [];
