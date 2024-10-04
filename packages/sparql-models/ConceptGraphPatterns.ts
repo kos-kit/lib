@@ -9,19 +9,19 @@ export class ConceptGraphPatterns extends GraphPatterns {
     yield* new LabeledModelGraphPatterns(this.subject);
 
     yield GraphPattern.optional(
-      GraphPattern.basic(this.subject, skos.notation, {
-        termType: "Variable",
-        value: `${this.variablePrefix}Notation`,
-      }),
+      GraphPattern.basic(
+        this.subject,
+        skos.notation,
+        this.variable("Notation"),
+      ),
     );
 
     for (let noteTypeI = 0; noteTypeI < Note.Types.length; noteTypeI++) {
       const noteType = Note.Types[noteTypeI];
       yield GraphPattern.optional(
         GraphPattern.basic(this.subject, noteType.skosProperty, {
+          ...this.variable(`NoteType${noteTypeI}`),
           plainLiteral: true,
-          termType: "Variable",
-          value: `${this.variablePrefix}NoteType${noteTypeI}`,
         }),
       );
     }

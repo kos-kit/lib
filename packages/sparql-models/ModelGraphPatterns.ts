@@ -5,47 +5,43 @@ import { GraphPatterns } from "./GraphPatterns.js";
 export class ModelGraphPatterns extends GraphPatterns {
   *[Symbol.iterator](): Iterator<GraphPattern> {
     yield GraphPattern.optional(
-      GraphPattern.basic(this.subject, rdf.type, {
-        termType: "Variable",
-        value: `${this.variablePrefix}Type`,
-      }),
+      GraphPattern.basic(this.subject, rdf.type, this.variable("Type")),
     );
 
     yield GraphPattern.optional(
-      GraphPattern.basic(this.subject, dcterms.license, {
-        termType: "Variable",
-        value: `${this.variablePrefix}License`,
-      }),
+      GraphPattern.basic(
+        this.subject,
+        dcterms.license,
+        this.variable("License"),
+      ),
     );
 
     yield GraphPattern.optional(
-      GraphPattern.basic(this.subject, dcterms.modified, {
-        termType: "Variable",
-        value: `${this.variablePrefix}Modified`,
-      }),
+      GraphPattern.basic(
+        this.subject,
+        dcterms.modified,
+        this.variable("Modified"),
+      ),
     );
 
     yield GraphPattern.optional(
       GraphPattern.basic(this.subject, dc11.rights, {
-        termType: "Variable",
+        ...this.variable("DcRights"),
         plainLiteral: true,
-        value: `${this.variablePrefix}DcRights`,
       }),
     );
 
     yield GraphPattern.optional(
       GraphPattern.basic(this.subject, dcterms.rights, {
-        termType: "Variable",
+        ...this.variable("DctermsRights"),
         plainLiteral: true,
-        value: `${this.variablePrefix}DctermsRights`,
       }),
     );
 
     yield GraphPattern.optional(
       GraphPattern.basic(this.subject, dcterms.rightsHolder, {
-        termType: "Variable",
+        ...this.variable("RightsHolder"),
         plainLiteral: true,
-        value: `${this.variablePrefix}RightsHolder`,
       }),
     );
   }

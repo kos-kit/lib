@@ -38,6 +38,13 @@ export namespace BasicGraphPattern {
     | Variable;
   export type Subject = BlankNode | NamedNode | Variable;
   export type Variable = Omit<rdfjs.Variable, "equals">;
+
+  export function variable(value: string): Variable {
+    return {
+      termType: "Variable",
+      value,
+    };
+  }
 }
 
 export type GraphPattern =

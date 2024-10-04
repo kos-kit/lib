@@ -12,18 +12,16 @@ export class LabeledModelGraphPatterns extends GraphPatterns {
       const labelType = Label.Types[labelTypeI];
       yield GraphPattern.optional(
         GraphPattern.basic(this.subject, labelType.literalProperty, {
+          ...this.variable(`LabelType${labelTypeI}Literal`),
           plainLiteral: true,
-          termType: "Variable",
-          value: `${this.variablePrefix}LabelType${labelTypeI}Literal`,
         }),
       );
 
       const skosXlProperty = labelType.skosXlProperty.extractNullable();
       if (skosXlProperty !== null) {
-        const skosXlLabelVariable: BasicGraphPattern.Variable = {
-          termType: "Variable",
-          value: `${this.variablePrefix}LabelType${labelTypeI}Resource`,
-        };
+        const skosXlLabelVariable: BasicGraphPattern.Variable = this.variable(
+          `LabelType${labelTypeI}Resource`,
+        );
         yield GraphPattern.optional(
           GraphPattern.group(
             GraphPattern.basic(
@@ -32,10 +30,13 @@ export class LabeledModelGraphPatterns extends GraphPatterns {
               skosXlLabelVariable,
             ),
             ...new ModelGraphPatterns(skosXlLabelVariable),
-            GraphPattern.basic(skosXlLabelVariable, skosxl.literalForm, {
-              termType: "Variable",
-              value: `${skosXlLabelVariable.value}LiteralForm`,
-            }),
+            GraphPattern.basic(
+              skosXlLabelVariable,
+              skosxl.literalForm,
+              BasicGraphPattern.variable(
+                `${skosXlLabelVariable.value}LiteralForm`,
+              ),
+            ),
           ),
         );
       }

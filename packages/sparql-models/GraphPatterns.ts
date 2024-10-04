@@ -14,6 +14,10 @@ export abstract class GraphPatterns implements Iterable<GraphPattern> {
   }
 
   abstract [Symbol.iterator](): Iterator<GraphPattern>;
+
+  protected variable(suffix: string): BasicGraphPattern.Variable {
+    return BasicGraphPattern.variable(this.variablePrefix + suffix);
+  }
 }
 
 export namespace GraphPatterns {
