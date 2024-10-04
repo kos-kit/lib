@@ -1,8 +1,8 @@
 import { dc11, dcterms, rdf } from "@tpluscode/rdf-ns-builders";
 import { GraphPattern } from "./GraphPattern.js";
-import { GraphPatterns } from "./GraphPatterns.js";
+import { ResourceGraphPatterns } from "./ResourceGraphPatterns.js";
 
-export class ModelGraphPatterns extends GraphPatterns {
+export class ModelGraphPatterns extends ResourceGraphPatterns {
   *[Symbol.iterator](): Iterator<GraphPattern> {
     yield GraphPattern.optional(
       GraphPattern.basic(this.subject, rdf.type, this.variable("Type")),

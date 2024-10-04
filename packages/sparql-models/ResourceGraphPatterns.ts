@@ -1,10 +1,10 @@
 import { BasicGraphPattern, GraphPattern } from "./GraphPattern.js";
 
-export abstract class GraphPatterns implements Iterable<GraphPattern> {
-  protected readonly subject: GraphPatterns.Subject;
+export abstract class ResourceGraphPatterns implements Iterable<GraphPattern> {
+  protected readonly subject: ResourceGraphPatterns.Subject;
   protected readonly variablePrefix: string;
 
-  constructor(subject: GraphPatterns.Subject) {
+  constructor(subject: ResourceGraphPatterns.Subject) {
     this.subject = subject;
     if (subject.termType === "Variable") {
       this.variablePrefix = subject.value;
@@ -20,7 +20,7 @@ export abstract class GraphPatterns implements Iterable<GraphPattern> {
   }
 }
 
-export namespace GraphPatterns {
+export namespace ResourceGraphPatterns {
   export type Subject =
     | BasicGraphPattern.Variable
     | ((BasicGraphPattern.BlankNode | BasicGraphPattern.NamedNode) & {

@@ -1,10 +1,10 @@
 import { Note } from "@kos-kit/models";
 import { skos } from "@tpluscode/rdf-ns-builders";
 import { GraphPattern } from "./GraphPattern.js";
-import { GraphPatterns } from "./GraphPatterns.js";
 import { LabeledModelGraphPatterns } from "./LabeledModelGraphPatterns.js";
+import { ResourceGraphPatterns } from "./ResourceGraphPatterns.js";
 
-export class ConceptGraphPatterns extends GraphPatterns {
+export class ConceptGraphPatterns extends ResourceGraphPatterns {
   override *[Symbol.iterator](): Iterator<GraphPattern> {
     yield* new LabeledModelGraphPatterns(this.subject);
 
