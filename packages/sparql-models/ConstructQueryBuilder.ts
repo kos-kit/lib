@@ -1,6 +1,6 @@
 import { LanguageTagSet } from "@kos-kit/models";
 import { BlankNode, Literal, NamedNode } from "@rdfjs/types";
-import { GraphPattern, GraphPatternVariable } from "./GraphPattern.js";
+import { BasicGraphPattern, GraphPattern } from "./GraphPattern.js";
 import { TAB_SPACES } from "./IndentedString.js";
 import { termToString } from "./termToString.js";
 
@@ -8,7 +8,7 @@ export class ConstructQueryBuilder {
   private graphPatterns: GraphPattern[] = [];
   private readonly includeLanguageTags: LanguageTagSet;
   private values: [
-    GraphPatternVariable,
+    BasicGraphPattern.Variable,
     (Literal | BlankNode | NamedNode)[],
   ][] = [];
 
@@ -23,7 +23,7 @@ export class ConstructQueryBuilder {
   }
 
   addValues(
-    variable: GraphPatternVariable,
+    variable: BasicGraphPattern.Variable,
     ...values: (Literal | BlankNode | NamedNode)[]
   ): this {
     for (const variableValues of this.values) {

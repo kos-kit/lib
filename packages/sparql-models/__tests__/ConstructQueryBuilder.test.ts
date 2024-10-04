@@ -1,19 +1,15 @@
 import { LanguageTagSet } from "@kos-kit/models";
 import { skos } from "@tpluscode/rdf-ns-builders";
 import { describe, expect, it } from "vitest";
-import {
-  ConstructQueryBuilder,
-  GraphPatternObject,
-  GraphPatternSubject,
-} from "..";
+import { BasicGraphPattern, ConstructQueryBuilder } from "..";
 
 describe("ConstructQueryBuilder", () => {
-  const subject: GraphPatternSubject = {
+  const subject: BasicGraphPattern.Subject = {
     termType: "NamedNode",
     value: "http://example.com/concept",
   };
   const predicate = skos.prefLabel;
-  const object: GraphPatternObject = {
+  const object: BasicGraphPattern.Object = {
     termType: "Variable",
     value: "prefLabel",
   };

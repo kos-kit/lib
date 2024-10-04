@@ -1,8 +1,8 @@
-import { GraphPattern, GraphPatternSubject } from "./GraphPattern.js";
+import { BasicGraphPattern, GraphPattern } from "./GraphPattern.js";
 import { labeledModelGraphPatterns } from "./labeledModelGraphPatterns.js";
 
 export function conceptSchemeGraphPatterns(kwds: {
-  subject: GraphPatternSubject;
+  subject: BasicGraphPattern.Subject;
   variablePrefix: string;
 }): readonly GraphPattern[] {
   return labeledModelGraphPatterns(kwds);

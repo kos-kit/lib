@@ -1,13 +1,13 @@
 import { Note } from "@kos-kit/models";
 import { skos } from "@tpluscode/rdf-ns-builders";
-import { GraphPattern, GraphPatternSubject } from "./GraphPattern.js";
+import { BasicGraphPattern, GraphPattern } from "./GraphPattern.js";
 import { labeledModelGraphPatterns } from "./labeledModelGraphPatterns.js";
 
 export function conceptGraphPatterns({
   subject,
   variablePrefix,
 }: {
-  subject: GraphPatternSubject;
+  subject: BasicGraphPattern.Subject;
   variablePrefix: string;
 }): readonly GraphPattern[] {
   const graphPatterns: GraphPattern[] = [];

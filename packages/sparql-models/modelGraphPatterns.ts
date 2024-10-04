@@ -1,11 +1,11 @@
 import { dc11, dcterms, rdf } from "@tpluscode/rdf-ns-builders";
-import { GraphPattern, GraphPatternSubject } from "./GraphPattern.js";
+import { BasicGraphPattern, GraphPattern } from "./GraphPattern.js";
 
 export function modelGraphPatterns({
   subject,
   variablePrefix,
 }: {
-  subject: GraphPatternSubject;
+  subject: BasicGraphPattern.Subject;
   variablePrefix: string;
 }): readonly GraphPattern[] {
   return [

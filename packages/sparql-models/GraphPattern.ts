@@ -4,21 +4,8 @@ import { rdf, rdfs } from "@tpluscode/rdf-ns-builders";
 import { IndentedString, TAB_SPACES } from "./IndentedString.js";
 import { termToString } from "./termToString.js";
 
+// Omit .equals from RDF/JS types for easier construction.
 type BlankNode = Omit<rdfjs.BlankNode, "equals">;
-export type GraphPatternObject =
-  | BlankNode
-  | Literal
-  | NamedNode
-  | (GraphPatternVariable & {
-      plainLiteral?: boolean;
-    });
-export type GraphPatternPredicate =
-  | NamedNode
-  | { termType: "rdfList" }
-  | { termType: "rdfType" }
-  | GraphPatternVariable;
-export type GraphPatternSubject = BlankNode | NamedNode | GraphPatternVariable;
-export type GraphPatternVariable = Omit<rdfjs.Variable, "equals">;
 type Literal = Omit<rdfjs.Literal, "equals">;
 type NamedNode = Omit<rdfjs.NamedNode, "equals">;
 
@@ -27,15 +14,34 @@ type GraphPatternOptions = {
   excludeFromWhere?: boolean;
 };
 
+export type BasicGraphPattern = {
+  // https://www.w3.org/TR/sparql11-query/#BasicGraphPatterns
+  // ?s ?p ?o
+  readonly object: BasicGraphPattern.Object;
+  readonly predicate: BasicGraphPattern.Predicate;
+  readonly subject: BasicGraphPattern.Subject;
+  readonly type: "Basic";
+} & GraphPatternOptions;
+
+export namespace BasicGraphPattern {
+  export type Object =
+    | BlankNode
+    | Literal
+    | NamedNode
+    | (Variable & {
+        plainLiteral?: boolean;
+      });
+  export type Predicate =
+    | NamedNode
+    | { termType: "rdfList" }
+    | { termType: "rdfType" }
+    | Variable;
+  export type Subject = BlankNode | NamedNode | Variable;
+  export type Variable = Omit<rdfjs.Variable, "equals">;
+}
+
 export type GraphPattern =
-  | ({
-      // https://www.w3.org/TR/sparql11-query/#BasicGraphPatterns
-      // ?s ?p ?o
-      readonly object: GraphPatternObject;
-      readonly predicate: GraphPatternPredicate;
-      readonly subject: GraphPatternSubject;
-      readonly type: "Basic";
-    } & GraphPatternOptions)
+  | BasicGraphPattern
   | ({
       // FILTER EXISTS { ?s ?p ?o }
       readonly graphPattern: GraphPattern;
@@ -135,9 +141,9 @@ export namespace GraphPattern {
   }
 
   export function basic(
-    subject: GraphPatternSubject,
-    predicate: GraphPatternPredicate,
-    object: GraphPatternObject,
+    subject: BasicGraphPattern.Subject,
+    predicate: BasicGraphPattern.Predicate,
+    object: BasicGraphPattern.Object,
     options?: GraphPatternOptions,
   ): GraphPattern {
     return {
@@ -180,7 +186,7 @@ export namespace GraphPattern {
   }
 
   export function rdfType(
-    subject: GraphPatternSubject,
+    subject: BasicGraphPattern.Subject,
     rdfType: NamedNode,
     options?: GraphPatternOptions,
   ): GraphPattern {

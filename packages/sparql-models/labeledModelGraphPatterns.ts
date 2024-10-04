@@ -1,17 +1,13 @@
 import { Label } from "@kos-kit/models";
 import { skosxl } from "@tpluscode/rdf-ns-builders";
-import {
-  GraphPattern,
-  GraphPatternSubject,
-  GraphPatternVariable,
-} from "./GraphPattern.js";
+import { BasicGraphPattern, GraphPattern } from "./GraphPattern.js";
 import { modelGraphPatterns } from "./modelGraphPatterns.js";
 
 export function labeledModelGraphPatterns({
   subject,
   variablePrefix,
 }: {
-  subject: GraphPatternSubject;
+  subject: BasicGraphPattern.Subject;
   variablePrefix: string;
 }): readonly GraphPattern[] {
   const graphPatterns: GraphPattern[] = [];
@@ -28,7 +24,7 @@ export function labeledModelGraphPatterns({
     );
 
     labelType.skosXlProperty.ifJust((skosXlProperty) => {
-      const skosXlLabelVariable: GraphPatternVariable = {
+      const skosXlLabelVariable: BasicGraphPattern.Variable = {
         termType: "Variable",
         value: `${variablePrefix}LabelType${labelTypeI}Resource`,
       };

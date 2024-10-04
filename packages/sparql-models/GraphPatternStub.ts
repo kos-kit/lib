@@ -4,7 +4,7 @@ import { DatasetCoreFactory } from "@rdfjs/types";
 import { Either, Maybe } from "purify-ts";
 import { Resource } from "rdfjs-resource";
 import { ConstructQueryBuilder } from "./ConstructQueryBuilder.js";
-import { GraphPattern, GraphPatternVariable } from "./GraphPattern.js";
+import { BasicGraphPattern, GraphPattern } from "./GraphPattern.js";
 
 export class GraphPatternStub<ModelT extends Model> extends abc.Stub<ModelT> {
   readonly identifier: Identifier;
@@ -15,7 +15,7 @@ export class GraphPatternStub<ModelT extends Model> extends abc.Stub<ModelT> {
   private readonly modelFactory: (
     resource: Resource<Identifier>,
   ) => Maybe<ModelT>;
-  private readonly modelVariable: GraphPatternVariable;
+  private readonly modelVariable: BasicGraphPattern.Variable;
   private readonly sparqlQueryClient: SparqlQueryClient;
 
   constructor({
@@ -33,7 +33,7 @@ export class GraphPatternStub<ModelT extends Model> extends abc.Stub<ModelT> {
     identifier: Identifier;
     includeLanguageTags: LanguageTagSet;
     modelFactory: (resource: Resource<Identifier>) => Maybe<ModelT>;
-    modelVariable: GraphPatternVariable;
+    modelVariable: BasicGraphPattern.Variable;
     sparqlQueryClient: SparqlQueryClient;
   } & abc.Stub.Parameters) {
     super(superParameters);

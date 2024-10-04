@@ -8,7 +8,7 @@ import { Concept, ConceptScheme, Label } from "@kos-kit/rdfjs-dataset-models";
 import { skos } from "@tpluscode/rdf-ns-builders";
 import { Maybe } from "purify-ts";
 import { Resource } from "rdfjs-resource";
-import { GraphPatternVariable } from "./GraphPattern.js";
+import { BasicGraphPattern } from "./GraphPattern.js";
 import { GraphPatternStub } from "./GraphPatternStub.js";
 import { GraphPatternStubSequence } from "./GraphPatternStubSequence.js";
 import { Kos } from "./Kos.js";
@@ -29,7 +29,7 @@ class DefaultConceptScheme extends ConceptScheme<
 
 type DefaultLabel = Label;
 
-const conceptVariable: GraphPatternVariable = {
+const conceptVariable: BasicGraphPattern.Variable = {
   termType: "Variable",
   value: "concept",
 };
@@ -39,7 +39,7 @@ const conceptGraphPatterns_ = conceptGraphPatterns({
   variablePrefix: conceptVariable.value,
 });
 
-const conceptSchemeVariable: GraphPatternVariable = {
+const conceptSchemeVariable: BasicGraphPattern.Variable = {
   termType: "Variable",
   value: "conceptScheme",
 };
