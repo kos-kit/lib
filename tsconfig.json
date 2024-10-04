@@ -4,6 +4,7 @@
     "declarationMap": true,
     "esModuleInterop": true,
     "exactOptionalPropertyTypes": false,
+    "experimentalDecorators": true,
     "forceConsistentCasingInFileNames": true,
     "noUncheckedIndexedAccess": false,
     "incremental": true,

@@ -4,11 +4,6 @@ import { rdf, rdfs } from "@tpluscode/rdf-ns-builders";
 import { IndentedString, TAB_SPACES } from "./IndentedString.js";
 import { termToString } from "./termToString.js";
 
-// Omit .equals from RDF/JS types for easier construction.
-type BlankNode = Omit<rdfjs.BlankNode, "equals">;
-type Literal = Omit<rdfjs.Literal, "equals">;
-type NamedNode = Omit<rdfjs.NamedNode, "equals">;
-
 type GraphPatternOptions = {
   excludeFromConstruct?: boolean;
   excludeFromWhere?: boolean;
@@ -24,6 +19,11 @@ export type BasicGraphPattern = {
 } & GraphPatternOptions;
 
 export namespace BasicGraphPattern {
+  // Omit .equals from RDF/JS types for easier construction.
+  export type BlankNode = Omit<rdfjs.BlankNode, "equals">;
+  export type Literal = Omit<rdfjs.Literal, "equals">;
+  export type NamedNode = Omit<rdfjs.NamedNode, "equals">;
+
   export type Object =
     | BlankNode
     | Literal
@@ -187,7 +187,7 @@ export namespace GraphPattern {
 
   export function rdfType(
     subject: BasicGraphPattern.Subject,
-    rdfType: NamedNode,
+    rdfType: BasicGraphPattern.NamedNode,
     options?: GraphPatternOptions,
   ): GraphPattern {
     return {

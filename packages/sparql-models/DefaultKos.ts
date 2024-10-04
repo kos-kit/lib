@@ -8,12 +8,12 @@ import { Concept, ConceptScheme, Label } from "@kos-kit/rdfjs-dataset-models";
 import { skos } from "@tpluscode/rdf-ns-builders";
 import { Maybe } from "purify-ts";
 import { Resource } from "rdfjs-resource";
+import { ConceptGraphPatterns } from "./ConceptGraphPatterns.js";
+import { ConceptSchemeGraphPatterns } from "./ConceptSchemeGraphPatterns.js";
 import { BasicGraphPattern } from "./GraphPattern.js";
 import { GraphPatternStub } from "./GraphPatternStub.js";
 import { GraphPatternStubSequence } from "./GraphPatternStubSequence.js";
 import { Kos } from "./Kos.js";
-import { conceptGraphPatterns } from "./conceptGraphPatterns.js";
-import { conceptSchemeGraphPatterns } from "./conceptSchemeGraphPatterns.js";
 
 class DefaultConcept extends Concept<
   DefaultConcept,
@@ -34,20 +34,16 @@ const conceptVariable: BasicGraphPattern.Variable = {
   value: "concept",
 };
 
-const conceptGraphPatterns_ = conceptGraphPatterns({
-  subject: conceptVariable,
-  variablePrefix: conceptVariable.value,
-});
+const conceptGraphPatterns_ = [...new ConceptGraphPatterns(conceptVariable)];
 
 const conceptSchemeVariable: BasicGraphPattern.Variable = {
   termType: "Variable",
   value: "conceptScheme",
 };
 
-const conceptSchemeGraphPatterns_ = conceptSchemeGraphPatterns({
-  subject: conceptSchemeVariable,
-  variablePrefix: conceptSchemeVariable.value,
-});
+const conceptSchemeGraphPatterns_ = [
+  ...new ConceptSchemeGraphPatterns(conceptSchemeVariable),
+];
 
 export class DefaultKos extends Kos<
   DefaultConcept,
