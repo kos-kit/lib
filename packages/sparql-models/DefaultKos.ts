@@ -4,37 +4,38 @@ import {
   Identifier,
   StubSequence,
 } from "@kos-kit/models";
-import { Concept, ConceptScheme, Label } from "@kos-kit/rdfjs-dataset-models";
+import * as rdfjsDataset from "@kos-kit/rdfjs-dataset-models";
 import { skos } from "@tpluscode/rdf-ns-builders";
 import { Maybe } from "purify-ts";
 import { Resource } from "rdfjs-resource";
-import { ConceptGraphPatterns } from "./ConceptGraphPatterns.js";
-import { ConceptSchemeGraphPatterns } from "./ConceptSchemeGraphPatterns.js";
+import { Concept } from "./Concept.js";
+import { ConceptScheme } from "./ConceptScheme.js";
 import { BasicGraphPattern } from "./GraphPattern.js";
 import { GraphPatternStub } from "./GraphPatternStub.js";
 import { GraphPatternStubSequence } from "./GraphPatternStubSequence.js";
 import { Kos } from "./Kos.js";
 
-class DefaultConcept extends Concept<
+class DefaultConcept extends rdfjsDataset.Concept<
   DefaultConcept,
   DefaultConceptScheme,
   DefaultLabel
 > {}
 
-class DefaultConceptScheme extends ConceptScheme<
+class DefaultConceptScheme extends rdfjsDataset.ConceptScheme<
   DefaultConcept,
   DefaultConceptScheme,
   DefaultLabel
 > {}
 
-type DefaultLabel = Label;
+const DefaultLabel = rdfjsDataset.Label;
+type DefaultLabel = rdfjsDataset.Label;
 
 const conceptVariable: BasicGraphPattern.Variable = {
   termType: "Variable",
   value: "concept",
 };
 
-const conceptGraphPatterns_ = [...new ConceptGraphPatterns(conceptVariable)];
+const conceptGraphPatterns_ = [...new Concept.GraphPatterns(conceptVariable)];
 
 const conceptSchemeVariable: BasicGraphPattern.Variable = {
   termType: "Variable",
@@ -42,7 +43,7 @@ const conceptSchemeVariable: BasicGraphPattern.Variable = {
 };
 
 const conceptSchemeGraphPatterns_ = [
-  ...new ConceptSchemeGraphPatterns(conceptSchemeVariable),
+  ...new ConceptScheme.GraphPatterns(conceptSchemeVariable),
 ];
 
 export class DefaultKos extends Kos<
@@ -121,7 +122,7 @@ export class DefaultKos extends Kos<
       return Maybe.of(
         new DefaultConcept({
           kos: this,
-          labelConstructor: Label,
+          labelConstructor: DefaultLabel,
           logger: this.logger,
           resource,
         }),
@@ -137,7 +138,7 @@ export class DefaultKos extends Kos<
       return Maybe.of(
         new DefaultConceptScheme({
           kos: this,
-          labelConstructor: Label,
+          labelConstructor: DefaultLabel,
           logger: this.logger,
           resource,
         }),
