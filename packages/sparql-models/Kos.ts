@@ -10,7 +10,7 @@ import {
 import { SparqlQueryClient } from "@kos-kit/sparql-client";
 import { DatasetCoreFactory } from "@rdfjs/types";
 import { skos } from "@tpluscode/rdf-ns-builders";
-import { GraphPattern } from "./GraphPattern.js";
+import { BasicGraphPattern, GraphPattern } from "./GraphPattern.js";
 import { IndentedString } from "./IndentedString.js";
 import { mapBindingsToCount } from "./mapBindingsToCount.js";
 import { mapBindingsToIdentifiers } from "./mapBindingsToIdentifiers.js";
@@ -110,8 +110,8 @@ ${offset > 0 ? `OFFSET ${offset}` : ""}
     if (query.type === "All") {
       return [
         GraphPattern.toWhereString(
-          GraphPattern.rdfType(
-            { termType: "Variable", value: "conceptScheme" },
+          GraphPattern.whereRdfType(
+            BasicGraphPattern.variable("conceptScheme"),
             skos.ConceptScheme,
           ),
         ),
@@ -143,11 +143,8 @@ ${offset > 0 ? `OFFSET ${offset}` : ""}
   ): readonly string[] {
     if (query.type === "All") {
       return GraphPattern.toWhereIndentedStrings(
-        GraphPattern.rdfType(
-          {
-            termType: "Variable",
-            value: "concept",
-          },
+        GraphPattern.whereRdfType(
+          BasicGraphPattern.variable("concept"),
           skos.Concept,
         ),
         0,
@@ -177,8 +174,8 @@ ${offset > 0 ? `OFFSET ${offset}` : ""}
             `{ ?concept <${
               skos.inScheme.value
             }> ${conceptSchemeIdentifierString} . ${GraphPattern.toWhereString(
-              GraphPattern.rdfType(
-                { termType: "Variable", value: "concept" },
+              GraphPattern.whereRdfType(
+                BasicGraphPattern.variable("concept"),
                 skos.Concept,
               ),
             )} }`,

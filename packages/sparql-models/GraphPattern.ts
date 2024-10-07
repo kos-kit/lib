@@ -23,6 +23,20 @@ export namespace BasicGraphPattern {
   export type BlankNode = Omit<rdfjs.BlankNode, "equals">;
   export type Literal = Omit<rdfjs.Literal, "equals">;
   export type NamedNode = Omit<rdfjs.NamedNode, "equals">;
+  export type PropertyPath = { termType: "PropertyPath" } & (
+    | {
+        readonly propertyPathType: "PredicatePath";
+        readonly value: NamedNode;
+      }
+    | {
+        readonly propertyPathType: "SequencePath";
+        readonly value: readonly PropertyPath[];
+      }
+    | {
+        readonly propertyPathType: "ZeroOrMorePath";
+        readonly value: PropertyPath;
+      }
+  );
 
   export type Object =
     | BlankNode
@@ -31,11 +45,7 @@ export namespace BasicGraphPattern {
     | (Variable & {
         plainLiteral?: boolean;
       });
-  export type Predicate =
-    | NamedNode
-    | { termType: "rdfList" }
-    | { termType: "rdfType" }
-    | Variable;
+  export type Predicate = NamedNode | PropertyPath | Variable;
   export type Subject = BlankNode | NamedNode | Variable;
   export type Variable = Omit<rdfjs.Variable, "equals">;
 
@@ -192,18 +202,51 @@ export namespace GraphPattern {
     };
   }
 
+  function propertyPathToWhereString(
+    propertyPath: BasicGraphPattern.PropertyPath,
+  ): string {
+    switch (propertyPath.propertyPathType) {
+      case "PredicatePath":
+        return termToString(propertyPath.value);
+      case "SequencePath":
+        return propertyPath.value
+          .map(
+            (subPropertyPath): string =>
+              `(${propertyPathToWhereString(subPropertyPath)})`,
+          )
+          .join("/");
+      case "ZeroOrMorePath":
+        return `(${propertyPathToWhereString(propertyPath.value)})*`;
+    }
+  }
+
+  /**
+   * CONSTRUCT ?subject rdf:type ?rdfType
+   * WHERE ?subject rdf:type/rdfs:subClassOf* ?rdfType
+   */
   export function rdfType(
     subject: BasicGraphPattern.Subject,
     rdfType: BasicGraphPattern.NamedNode,
     options?: GraphPatternOptions,
-  ): GraphPattern {
-    return {
-      predicate: { termType: "rdfType" },
-      object: rdfType,
-      subject,
-      type: "Basic",
-      ...options,
-    };
+  ): readonly GraphPattern[] {
+    // Two patterns, one for CONSTRUCT and one for WHERE
+    const graphPatterns: GraphPattern[] = [];
+
+    if (!options?.excludeFromConstruct) {
+      graphPatterns.push({
+        excludeFromWhere: true,
+        object: rdfType,
+        predicate: rdf.type,
+        subject,
+        type: "Basic",
+      });
+    }
+
+    if (!options?.excludeFromWhere) {
+      graphPatterns.push(GraphPattern.whereRdfType(subject, rdfType));
+    }
+
+    return graphPatterns;
   }
 
   export function toConstructIndentedStrings(
@@ -216,42 +259,20 @@ export namespace GraphPattern {
 
     switch (graphPattern.type) {
       case "Basic": {
-        switch (graphPattern.predicate.termType) {
-          case "rdfList":
-            if (graphPattern.object.termType !== "Variable") {
-              throw new RangeError("expected rdfList object to be a variable");
-            }
-            return [
-              {
-                indent,
-                string: `?${graphPattern.object.value} ?${graphPattern.object.value}Predicate ?${graphPattern.object.value}Object .`,
-              },
-            ];
-          case "rdfType":
-            if (graphPattern.object.termType !== "NamedNode") {
-              throw new RangeError(
-                "expected rdfType object to be a named node",
-              );
-            }
-            // Don't include any rdfs:subClassOf
-            return [
-              {
-                indent,
-                string: `${termToString(graphPattern.subject)} <${
-                  rdf.type.value
-                }> ${termToString(graphPattern.object)} .`,
-              },
-            ];
-          default:
-            return [
-              {
-                indent,
-                string: `${termToString(graphPattern.subject)} ${termToString(
-                  graphPattern.predicate,
-                )} ${termToString(graphPattern.object)} .`,
-              },
-            ];
+        if (graphPattern.predicate.termType === "PropertyPath") {
+          throw new RangeError(
+            "property paths are not supported in CONSTRUCT strings",
+          );
         }
+
+        return [
+          {
+            indent,
+            string: `${termToString(graphPattern.subject)} ${termToString(
+              graphPattern.predicate,
+            )} ${termToString(graphPattern.object)} .`,
+          },
+        ];
       }
       case "FilterExists":
       case "FilterNotExists":
@@ -295,46 +316,15 @@ export namespace GraphPattern {
     switch (graphPattern.type) {
       case "Basic": {
         const whereIndentedStrings: IndentedString[] = [];
-        switch (graphPattern.predicate.termType) {
-          case "rdfList":
-            if (graphPattern.object.termType !== "Variable") {
-              throw new RangeError("expected rdfList object to be a variable");
-            }
-            whereIndentedStrings.push(
-              {
-                indent,
-                string: `${termToString(graphPattern.subject)} <${
-                  rdf.rest.value
-                }>*/<${rdf.first.value}>? ?${graphPattern.object.value} .`,
-              },
-              {
-                indent,
-                string: `?${graphPattern.object.value} ?${graphPattern.object.value}Predicate ?${graphPattern.object.value}Object .`,
-              },
-            );
-            break;
-          case "rdfType":
-            if (graphPattern.object.termType !== "NamedNode") {
-              throw new RangeError(
-                "expected rdfType object to be a named node",
-              );
-            }
-            whereIndentedStrings.push({
-              indent,
-              string: `${termToString(graphPattern.subject)} <${rdf.type.value}>/<${
-                rdfs.subClassOf.value
-              }>* ${termToString(graphPattern.object)} .`,
-            });
-            break;
-          default:
-            whereIndentedStrings.push({
-              indent,
-              string: `${termToString(graphPattern.subject)} ${termToString(
-                graphPattern.predicate,
-              )} ${termToString(graphPattern.object)} .`,
-            });
-            break;
-        }
+
+        whereIndentedStrings.push({
+          indent,
+          string: `${termToString(graphPattern.subject)} ${
+            graphPattern.predicate.termType === "PropertyPath"
+              ? propertyPathToWhereString(graphPattern.predicate)
+              : termToString(graphPattern.predicate)
+          } ${termToString(graphPattern.object)} .`,
+        });
 
         if (
           options?.includeLanguageTags &&
@@ -427,6 +417,42 @@ export namespace GraphPattern {
     return {
       graphPatterns,
       type: "Union",
+    };
+  }
+
+  /**
+   * The WHERE-friendly ?subject rdf:type/rdfs:subClassOf* ?rdfType.
+   */
+  export function whereRdfType(
+    subject: BasicGraphPattern.Subject,
+    rdfType: BasicGraphPattern.NamedNode,
+  ): GraphPattern {
+    return {
+      excludeFromConstruct: true,
+      // ?subject rdf:type/rdf:subClassOf* ?rdfType .
+      predicate: {
+        propertyPathType: "SequencePath",
+        termType: "PropertyPath",
+        value: [
+          {
+            propertyPathType: "PredicatePath",
+            termType: "PropertyPath",
+            value: rdf.type,
+          },
+          {
+            propertyPathType: "ZeroOrMorePath",
+            termType: "PropertyPath",
+            value: {
+              propertyPathType: "PredicatePath",
+              termType: "PropertyPath",
+              value: rdfs.subClassOf,
+            },
+          },
+        ],
+      },
+      object: rdfType,
+      subject,
+      type: "Basic",
     };
   }
 }
