@@ -1,4 +1,3 @@
-import { LanguageTagSet } from "@kos-kit/models";
 import { skos } from "@tpluscode/rdf-ns-builders";
 import { describe, expect, it } from "vitest";
 import { BasicGraphPattern, ConstructQueryBuilder, GraphPattern } from "..";
@@ -47,7 +46,7 @@ CONSTRUCT {
   it("should translate a filter", () => {
     expect(
       new ConstructQueryBuilder({
-        includeLanguageTags: new LanguageTagSet("en", ""),
+        includeLanguageTags: ["en", ""],
       })
         .addGraphPatterns(
           GraphPattern.basic(subject, predicate, {

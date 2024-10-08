@@ -95,6 +95,8 @@ const projects: readonly Project[] = [
       "@rdfjs/types": externalDependencyVersions["@rdfjs/types"],
       "@tpluscode/rdf-ns-builders":
         externalDependencyVersions["@tpluscode/rdf-ns-builders"],
+      "iterator-helpers-polyfill":
+        externalDependencyVersions["iterator-helpers-polyfill"],
     },
     name: "sparql-builder",
   },

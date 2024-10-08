@@ -16,6 +16,27 @@ export type PropertyPath =
     };
 
 export namespace PropertyPath {
+  export function predicate(value: NamedNode): PropertyPath {
+    return {
+      type: "PredicatePath",
+      value,
+    };
+  }
+
+  export function sequence(...value: readonly PropertyPath[]): PropertyPath {
+    return {
+      type: "SequencePath",
+      value,
+    };
+  }
+
+  export function zeroOrMore(value: PropertyPath): PropertyPath {
+    return {
+      type: "ZeroOrMorePath",
+      value,
+    };
+  }
+
   export function toWhereString(propertyPath: PropertyPath): string {
     switch (propertyPath.type) {
       case "PredicatePath":

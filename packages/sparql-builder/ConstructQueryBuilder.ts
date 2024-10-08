@@ -1,20 +1,19 @@
-import { LanguageTagSet } from "@kos-kit/models";
 import { BlankNode, Literal, NamedNode } from "@rdfjs/types";
 import { BasicGraphPattern, GraphPattern } from "./GraphPattern.js";
+import { ArrayGraphPatterns } from "./GraphPatterns";
 import { TAB_SPACES } from "./IndentedString.js";
 import { termToString } from "./termToString.js";
 
 export class ConstructQueryBuilder {
   private graphPatterns: GraphPattern[] = [];
-  private readonly includeLanguageTags: LanguageTagSet;
+  private readonly includeLanguageTags: readonly string[];
   private values: [
     BasicGraphPattern.Variable,
     (Literal | BlankNode | NamedNode)[],
   ][] = [];
 
-  constructor(options?: { includeLanguageTags: LanguageTagSet }) {
-    this.includeLanguageTags =
-      options?.includeLanguageTags ?? new LanguageTagSet();
+  constructor(options?: { includeLanguageTags: readonly string[] }) {
+    this.includeLanguageTags = options?.includeLanguageTags ?? [];
   }
 
   addGraphPatterns(...graphPatterns: GraphPattern[]): this {
@@ -41,18 +40,20 @@ export class ConstructQueryBuilder {
       throw new RangeError("empty graph patterns");
     }
 
-    const sortedGraphPatterns = GraphPattern.Array.sort(this.graphPatterns);
+    const sortedGraphPatterns = new ArrayGraphPatterns(
+      this.graphPatterns,
+    ).sort();
 
     // Put the VALUES first to help Oxigraph's SPARQL query planner
     const valuesString = this.valuesString();
 
     return `\
 CONSTRUCT {
-${GraphPattern.Array.toConstructString(sortedGraphPatterns)}
+${sortedGraphPatterns.toConstructString()}
 } WHERE {
 ${
   valuesString.length > 0 ? `${" ".repeat(TAB_SPACES) + valuesString}\n` : ""
-}${GraphPattern.Array.toWhereString(sortedGraphPatterns, {
+}${sortedGraphPatterns.toWhereString({
   includeLanguageTags: this.includeLanguageTags,
 })}
 }`;
