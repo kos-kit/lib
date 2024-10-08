@@ -1,8 +1,11 @@
 import { Label } from "@kos-kit/models";
+import {
+  BasicGraphPattern,
+  GraphPattern,
+  ResourceGraphPatterns,
+} from "@kos-kit/sparql-builder";
 import { skosxl } from "@tpluscode/rdf-ns-builders";
-import { BasicGraphPattern, GraphPattern } from "./GraphPattern.js";
 import { Model } from "./Model.js";
-import { ResourceGraphPatterns } from "./ResourceGraphPatterns.js";
 
 export namespace LabeledModel {
   export class GraphPatterns extends ResourceGraphPatterns {

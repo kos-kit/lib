@@ -1,10 +1,13 @@
 import { Identifier, LanguageTagSet, Model, abc } from "@kos-kit/models";
+import {
+  BasicGraphPattern,
+  ConstructQueryBuilder,
+  GraphPattern,
+} from "@kos-kit/sparql-builder";
 import { SparqlQueryClient } from "@kos-kit/sparql-client";
 import { DatasetCoreFactory } from "@rdfjs/types";
 import { Either, Maybe } from "purify-ts";
 import { Resource } from "rdfjs-resource";
-import { ConstructQueryBuilder } from "./ConstructQueryBuilder.js";
-import { BasicGraphPattern, GraphPattern } from "./GraphPattern.js";
 
 export class GraphPatternStub<ModelT extends Model> extends abc.Stub<ModelT> {
   readonly identifier: Identifier;
@@ -49,7 +52,7 @@ export class GraphPatternStub<ModelT extends Model> extends abc.Stub<ModelT> {
   async resolve(): Promise<Either<this, ModelT>> {
     const quads = await this.sparqlQueryClient.queryQuads(
       new ConstructQueryBuilder({
-        includeLanguageTags: this.includeLanguageTags,
+        includeLanguageTags: [...this.includeLanguageTags],
       })
         .addGraphPatterns(...this.graphPatterns)
         .addValues(this.modelVariable, this.identifier)

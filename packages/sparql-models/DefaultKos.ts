@@ -5,12 +5,12 @@ import {
   StubSequence,
 } from "@kos-kit/models";
 import * as rdfjsDataset from "@kos-kit/rdfjs-dataset-models";
+import { BasicGraphPattern } from "@kos-kit/sparql-builder";
 import { skos } from "@tpluscode/rdf-ns-builders";
 import { Maybe } from "purify-ts";
 import { Resource } from "rdfjs-resource";
 import { Concept } from "./Concept.js";
 import { ConceptScheme } from "./ConceptScheme.js";
-import { BasicGraphPattern } from "./GraphPattern.js";
 import { GraphPatternStub } from "./GraphPatternStub.js";
 import { GraphPatternStubSequence } from "./GraphPatternStubSequence.js";
 import { Kos } from "./Kos.js";
@@ -30,17 +30,11 @@ class DefaultConceptScheme extends rdfjsDataset.ConceptScheme<
 const DefaultLabel = rdfjsDataset.Label;
 type DefaultLabel = rdfjsDataset.Label;
 
-const conceptVariable: BasicGraphPattern.Variable = {
-  termType: "Variable",
-  value: "concept",
-};
+const conceptVariable = BasicGraphPattern.variable("concept");
 
 const conceptGraphPatterns_ = [...new Concept.GraphPatterns(conceptVariable)];
 
-const conceptSchemeVariable: BasicGraphPattern.Variable = {
-  termType: "Variable",
-  value: "conceptScheme",
-};
+const conceptSchemeVariable = BasicGraphPattern.variable("conceptScheme");
 
 const conceptSchemeGraphPatterns_ = [
   ...new ConceptScheme.GraphPatterns(conceptSchemeVariable),
