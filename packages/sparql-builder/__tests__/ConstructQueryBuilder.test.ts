@@ -1,7 +1,7 @@
 import { LanguageTagSet } from "@kos-kit/models";
 import { skos } from "@tpluscode/rdf-ns-builders";
 import { describe, expect, it } from "vitest";
-import { BasicGraphPattern, ConstructQueryBuilder } from "..";
+import { BasicGraphPattern, ConstructQueryBuilder, GraphPattern } from "..";
 
 describe("ConstructQueryBuilder", () => {
   const subject: BasicGraphPattern.Subject = {
@@ -17,12 +17,7 @@ describe("ConstructQueryBuilder", () => {
   it("should translate a single required pattern", () => {
     expect(
       new ConstructQueryBuilder()
-        .addGraphPatterns({
-          subject,
-          predicate,
-          object,
-          type: "Basic",
-        })
+        .addGraphPatterns(GraphPattern.basic(subject, predicate, object))
         .build(),
     ).toStrictEqual(`\
 CONSTRUCT {
@@ -35,15 +30,9 @@ CONSTRUCT {
   it("should translate a single optional pattern", () => {
     expect(
       new ConstructQueryBuilder()
-        .addGraphPatterns({
-          graphPattern: {
-            subject,
-            predicate,
-            object,
-            type: "Basic",
-          },
-          type: "Optional",
-        })
+        .addGraphPatterns(
+          GraphPattern.optional(GraphPattern.basic(subject, predicate, object)),
+        )
         .build(),
     ).toStrictEqual(`\
 CONSTRUCT {
@@ -60,12 +49,12 @@ CONSTRUCT {
       new ConstructQueryBuilder({
         includeLanguageTags: new LanguageTagSet("en", ""),
       })
-        .addGraphPatterns({
-          subject,
-          predicate,
-          object: { ...object, plainLiteral: true },
-          type: "Basic",
-        })
+        .addGraphPatterns(
+          GraphPattern.basic(subject, predicate, {
+            ...object,
+            plainLiteral: true,
+          }),
+        )
         .build(),
     ).toStrictEqual(`\
 CONSTRUCT {
