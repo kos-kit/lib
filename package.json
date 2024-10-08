@@ -30,6 +30,7 @@
     "watch:next-utils": "npm run watch -w @kos-kit/next-utils",
     "watch:rdfjs-dataset-models": "npm run watch -w @kos-kit/rdfjs-dataset-models",
     "watch:search": "npm run watch -w @kos-kit/search",
+    "watch:sparql-builder": "npm run watch -w @kos-kit/sparql-builder",
     "watch:sparql-client": "npm run watch -w @kos-kit/sparql-client",
     "watch:sparql-models": "npm run watch -w @kos-kit/sparql-models"
   },
@@ -38,6 +39,7 @@
     "packages/next-utils",
     "packages/rdfjs-dataset-models",
     "packages/search",
+    "packages/sparql-builder",
     "packages/sparql-client",
     "packages/sparql-models"
   ]

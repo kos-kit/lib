@@ -9,14 +9,15 @@ type ProjectName =
   | "models"
   | "next-utils"
   | "search"
+  | "sparql-builder"
   | "sparql-client"
   | "sparql-models";
 
 interface Project {
   devDependencies?: Record<string, string>;
-  externalDependencies: Record<string, string>;
+  externalDependencies?: Record<string, string>;
   files?: readonly string[];
-  internalDependencies: readonly ProjectName[];
+  internalDependencies?: readonly ProjectName[];
   name: ProjectName;
 }
 
@@ -28,7 +29,7 @@ const externalDependencyVersions = {
   n3: "^1.17.3",
   pino: "^9.1.0",
   "purify-ts": "~2.1.0",
-  "purify-ts-helpers": "1.0.5",
+  "purify-ts-helpers": "1.0.6",
   "rdfjs-resource": "1.0.2",
 };
 
@@ -43,7 +44,6 @@ const projects: readonly Project[] = [
       "purify-ts-helpers": externalDependencyVersions["purify-ts-helpers"],
     },
     files: ["abc/*.d.ts", "abc/*.js", "*.d.ts", "*.js"],
-    internalDependencies: [],
     name: "models",
   },
   {
@@ -63,7 +63,6 @@ const projects: readonly Project[] = [
       "unbzip2-stream": "^1.4.3",
     },
     files: ["server/*.d.ts", "server/*.js", "*.d.ts", "*.js"],
-    internalDependencies: [],
     name: "next-utils",
   },
   {
@@ -79,7 +78,6 @@ const projects: readonly Project[] = [
       "purify-ts": externalDependencyVersions["purify-ts"],
       "rdfjs-resource": externalDependencyVersions["rdfjs-resource"],
     },
-    internalDependencies: [],
     name: "rdfjs-dataset-models",
   },
   {
@@ -93,6 +91,14 @@ const projects: readonly Project[] = [
     name: "search",
   },
   {
+    externalDependencies: {
+      "@rdfjs/types": externalDependencyVersions["@rdfjs/types"],
+      "@tpluscode/rdf-ns-builders":
+        externalDependencyVersions["@tpluscode/rdf-ns-builders"],
+    },
+    name: "sparql-builder",
+  },
+  {
     devDependencies: {
       oxigraph: "^0.4.0-rc.1",
       "vitest-fetch-mock": "^0.3.0",
@@ -103,7 +109,6 @@ const projects: readonly Project[] = [
       "@types/n3": "^1.16.4",
       n3: "^1.17.3",
     },
-    internalDependencies: [],
     name: "sparql-client",
   },
   {
@@ -119,14 +124,19 @@ const projects: readonly Project[] = [
       "purify-ts": externalDependencyVersions["purify-ts"],
       "rdfjs-resource": externalDependencyVersions["rdfjs-resource"],
     },
-    internalDependencies: ["models", "rdfjs-dataset-models", "sparql-client"],
+    internalDependencies: [
+      "models",
+      "rdfjs-dataset-models",
+      "sparql-builder",
+      "sparql-client",
+    ],
     name: "sparql-models",
   },
 ];
 
 for (const project of projects) {
   const internalDependencies: Record<string, string> = {};
-  for (const internalDependency of project.internalDependencies) {
+  for (const internalDependency of project.internalDependencies ?? []) {
     internalDependencies[`@kos-kit/${internalDependency}`] = VERSION;
   }
 
