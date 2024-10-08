@@ -6,8 +6,8 @@ import { testGraphPattern } from "./testGraphPattern";
 describe("BasicGraphPattern", () => {
   it("should match a single graph pattern", () => {
     testGraphPattern(
-      `<${schema.name.value}> <${rdf.type.value}> <${rdfs.Class.value}> .`,
-      GraphPattern.basic(schema.name, rdf.type, rdfs.Class),
+      `<${schema.name.value}> <${rdf.type.value}> <${rdf.Property.value}> .`,
+      GraphPattern.basic(schema.name, rdf.type, rdf.Property),
     );
   });
 
