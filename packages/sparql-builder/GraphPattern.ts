@@ -154,24 +154,6 @@ export namespace GraphPattern {
     };
   }
 
-  function propertyPathToWhereString(
-    propertyPath: BasicGraphPattern.PropertyPath,
-  ): string {
-    switch (propertyPath.propertyPathType) {
-      case "PredicatePath":
-        return termToString(propertyPath.value);
-      case "SequencePath":
-        return propertyPath.value
-          .map(
-            (subPropertyPath): string =>
-              `(${propertyPathToWhereString(subPropertyPath)})`,
-          )
-          .join("/");
-      case "ZeroOrMorePath":
-        return `(${propertyPathToWhereString(propertyPath.value)})*`;
-    }
-  }
-
   /**
    * CONSTRUCT ?subject rdf:type ?rdfType
    * WHERE ?subject rdf:type/rdfs:subClassOf* ?rdfType
