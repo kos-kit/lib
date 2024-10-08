@@ -3,6 +3,10 @@ import { termToString } from "./termToString";
 
 export type PropertyPath =
   | {
+      readonly type: "OneOrMorePath";
+      readonly value: PropertyPath;
+    }
+  | {
       readonly type: "PredicatePath";
       readonly value: NamedNode;
     }
@@ -16,6 +20,13 @@ export type PropertyPath =
     };
 
 export namespace PropertyPath {
+  export function oneOrMore(value: PropertyPath): PropertyPath {
+    return {
+      type: "OneOrMorePath",
+      value,
+    };
+  }
+
   export function predicate(value: NamedNode): PropertyPath {
     return {
       type: "PredicatePath",
@@ -39,6 +50,8 @@ export namespace PropertyPath {
 
   export function toWhereString(propertyPath: PropertyPath): string {
     switch (propertyPath.type) {
+      case "OneOrMorePath":
+        return `(${toWhereString(propertyPath.value)})+`;
       case "PredicatePath":
         return termToString(propertyPath.value);
       case "SequencePath":

@@ -35,29 +35,34 @@ export class RdfListGraphPatterns extends ResourceGraphPatterns {
     // ?list rdf:rest ?rest0
     yield GraphPattern.basic(this.subject, rdf.rest, this.variable("Rest0"));
 
-    // ?list rdf:rest* ?restN
+    const optionalGraphPatterns: GraphPattern[] = [];
+    // ?list rdf:rest+ ?restN
     const restNVariable = this.variable("RestN");
-    yield GraphPattern.basic(
-      this.subject,
-      {
-        termType: "PropertyPath",
-        value: PropertyPath.zeroOrMore(PropertyPath.predicate(rdf.rest)),
-      },
-      restNVariable,
-    ).scoped("WHERE");
+    optionalGraphPatterns.push(
+      GraphPattern.basic(
+        this.subject,
+        {
+          termType: "PropertyPath",
+          value: PropertyPath.oneOrMore(PropertyPath.predicate(rdf.rest)),
+        },
+        restNVariable,
+      ).scoped("WHERE"),
+    );
 
     // ?rest rdf:first ?itemN
     const itemNVariable = this.variable("ItemN");
-    yield GraphPattern.basic(restNVariable, rdf.first, itemNVariable);
+    optionalGraphPatterns.push(
+      GraphPattern.basic(restNVariable, rdf.first, itemNVariable),
+    );
     if (this.itemGraphPatterns) {
-      yield* this.itemGraphPatterns(itemNVariable);
+      optionalGraphPatterns.push(...this.itemGraphPatterns(itemNVariable));
     }
 
-    // ?restN ?p ?o to get the rdf:first and rdf:rest statements in CONSTRUCT
-    yield GraphPattern.basic(
-      restNVariable,
-      this.variable("RestP"),
-      this.variable("RestO"),
+    // ?restN rdf:rest ?restNBasic to get the rdf:rest statement in the CONSTRUCT
+    optionalGraphPatterns.push(
+      GraphPattern.basic(restNVariable, rdf.rest, this.variable("RestNBasic")),
     );
+
+    yield GraphPattern.optional(GraphPattern.group(...optionalGraphPatterns));
   }
 }

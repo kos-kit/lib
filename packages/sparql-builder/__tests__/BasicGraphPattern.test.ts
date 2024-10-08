@@ -1,4 +1,4 @@
-import { rdf, rdfs, schema } from "@tpluscode/rdf-ns-builders";
+import { rdf, schema } from "@tpluscode/rdf-ns-builders";
 import { describe, it } from "vitest";
 import { GraphPattern } from "../GraphPattern";
 import { testGraphPattern } from "./testGraphPattern";
