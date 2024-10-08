@@ -26,6 +26,7 @@ const externalDependencyVersions = {
   "@tpluscode/rdf-ns-builders": "^4.3.0",
   "@types/n3": "^1.16.4",
   "iterator-helpers-polyfill": "^3.0.1",
+  oxigraph: "^0.4.0",
   n3: "^1.17.3",
   pino: "^9.1.0",
   "purify-ts": "~2.1.0",
@@ -91,6 +92,10 @@ const projects: readonly Project[] = [
     name: "search",
   },
   {
+    devDependencies: {
+      "@kos-kit/sparql-client": VERSION,
+      oxigraph: externalDependencyVersions["oxigraph"],
+    },
     externalDependencies: {
       "@rdfjs/types": externalDependencyVersions["@rdfjs/types"],
       "@tpluscode/rdf-ns-builders":
@@ -102,7 +107,7 @@ const projects: readonly Project[] = [
   },
   {
     devDependencies: {
-      oxigraph: "^0.4.0-rc.1",
+      oxigraph: externalDependencyVersions["oxigraph"],
       "vitest-fetch-mock": "^0.3.0",
     },
     externalDependencies: {
