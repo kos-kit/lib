@@ -9,7 +9,7 @@ import { DatasetCoreFactory } from "@rdfjs/types";
 import { Either, Maybe } from "purify-ts";
 import { Resource } from "rdfjs-resource";
 
-export class GraphPatternStub<ModelT extends Model> extends abc.Stub<ModelT> {
+export class Stub<ModelT extends Model> extends abc.Stub<ModelT> {
   readonly identifier: Identifier;
 
   private readonly datasetCoreFactory: DatasetCoreFactory;

@@ -10,7 +10,7 @@ import { Logger } from "pino";
 import { Either, Maybe } from "purify-ts";
 import { Resource } from "rdfjs-resource";
 
-export class GraphPatternStubSequence<
+export class StubSequence<
   ModelT extends Model,
 > extends abc.StubSequence<ModelT> {
   private readonly datasetCoreFactory: DatasetCoreFactory;

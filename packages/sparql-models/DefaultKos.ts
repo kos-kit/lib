@@ -2,7 +2,6 @@ import {
   ConceptSchemesQuery,
   ConceptsQuery,
   Identifier,
-  StubSequence,
 } from "@kos-kit/models";
 import * as rdfjsDataset from "@kos-kit/rdfjs-dataset-models";
 import { BasicGraphPattern } from "@kos-kit/sparql-builder";
@@ -11,9 +10,9 @@ import { Maybe } from "purify-ts";
 import { Resource } from "rdfjs-resource";
 import { Concept } from "./Concept.js";
 import { ConceptScheme } from "./ConceptScheme.js";
-import { GraphPatternStub } from "./GraphPatternStub.js";
-import { GraphPatternStubSequence } from "./GraphPatternStubSequence.js";
 import { Kos } from "./Kos.js";
+import { Stub } from "./Stub.js";
+import { StubSequence } from "./StubSequence.js";
 
 class DefaultConcept extends rdfjsDataset.Concept<
   DefaultConcept,
@@ -45,8 +44,8 @@ export class DefaultKos extends Kos<
   DefaultConceptScheme,
   DefaultLabel
 > {
-  concept(identifier: Identifier): GraphPatternStub<DefaultConcept> {
-    return new GraphPatternStub({
+  concept(identifier: Identifier): Stub<DefaultConcept> {
+    return new Stub({
       datasetCoreFactory: this.datasetCoreFactory,
       graphPatterns: conceptGraphPatterns_,
       identifier,
@@ -58,10 +57,8 @@ export class DefaultKos extends Kos<
     });
   }
 
-  conceptScheme(
-    identifier: Identifier,
-  ): GraphPatternStub<DefaultConceptScheme> {
-    return new GraphPatternStub({
+  conceptScheme(identifier: Identifier): Stub<DefaultConceptScheme> {
+    return new Stub({
       datasetCoreFactory: this.datasetCoreFactory,
       graphPatterns: conceptSchemeGraphPatterns_,
       identifier,
@@ -78,7 +75,7 @@ export class DefaultKos extends Kos<
     offset: number;
     query: ConceptSchemesQuery;
   }): Promise<StubSequence<DefaultConceptScheme>> {
-    return new GraphPatternStubSequence<DefaultConceptScheme>({
+    return new StubSequence<DefaultConceptScheme>({
       datasetCoreFactory: this.datasetCoreFactory,
       graphPatterns: conceptSchemeGraphPatterns_,
       identifiers: await this.queryConceptSchemes(kwds),
@@ -96,7 +93,7 @@ export class DefaultKos extends Kos<
     offset: number;
     query: ConceptsQuery;
   }): Promise<StubSequence<DefaultConcept>> {
-    return new GraphPatternStubSequence<DefaultConcept>({
+    return new StubSequence<DefaultConcept>({
       datasetCoreFactory: this.datasetCoreFactory,
       graphPatterns: conceptGraphPatterns_,
       identifiers: await this.queryConcepts(kwds),
