@@ -37,7 +37,7 @@ export class RdfTypeGraphPatterns extends GraphPatterns {
         ),
       },
       this.rdfType,
-    );
+    ).scoped("WHERE");
   }
 
   override *[Symbol.iterator](): Iterator<GraphPattern> {
