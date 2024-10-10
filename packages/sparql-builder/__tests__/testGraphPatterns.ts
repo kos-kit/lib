@@ -1,11 +1,11 @@
 import * as oxigraph from "oxigraph";
 import { expect } from "vitest";
-import { ConstructQueryBuilder } from "../ConstructQueryBuilder";
-import { GraphPatterns } from "../GraphPatterns.js";
+import { ConstructQueryBuilder } from "../ConstructQueryBuilder.js";
+import { GraphPattern } from "../GraphPattern.js";
 
 export function testGraphPatterns(
   inputTtl: string,
-  graphPatterns: GraphPatterns,
+  graphPatterns: Iterable<GraphPattern>,
   options?: {
     expectedOutputTtl?: string;
   },
@@ -25,7 +25,7 @@ export function testGraphPatterns(
 
   // @ts-ignore
   const actualOutputQuads: oxigraph.Quad[] = inputStore.query(
-    new ConstructQueryBuilder().addGraphPatterns(...graphPatterns).build(),
+    new ConstructQueryBuilder().addGraphPatterns(graphPatterns).build(),
   );
   expect(actualOutputQuads).toHaveLength(expectedOutputStore.size);
   for (const expectedOutputQuad of expectedOutputStore.match()) {

@@ -2,7 +2,7 @@ import { BasicGraphPattern, GraphPattern } from "./GraphPattern.js";
 import { GraphPatterns } from "./GraphPatterns.js";
 
 export abstract class ResourceGraphPatterns extends GraphPatterns {
-  protected readonly subject: ResourceGraphPatterns.Subject;
+  readonly subject: ResourceGraphPatterns.Subject;
   protected readonly variablePrefix: string;
 
   constructor(subject: ResourceGraphPatterns.Subject) {

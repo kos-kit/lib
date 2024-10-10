@@ -48,11 +48,15 @@ export abstract class GraphPattern {
  *
  * https://www.w3.org/TR/sparql11-query/#BasicGraphPatterns
  */
-export class BasicGraphPattern extends GraphPattern {
+export class BasicGraphPattern<
+  ObjectT extends BasicGraphPattern.Object,
+  PredicateT extends BasicGraphPattern.Predicate,
+  SubjectT extends BasicGraphPattern.Subject,
+> extends GraphPattern {
   constructor(
-    readonly subject: BasicGraphPattern.Subject,
-    readonly predicate: BasicGraphPattern.Predicate,
-    readonly object: BasicGraphPattern.Object,
+    readonly subject: SubjectT,
+    readonly predicate: PredicateT,
+    readonly object: ObjectT,
   ) {
     super();
   }
@@ -62,6 +66,13 @@ export class BasicGraphPattern extends GraphPattern {
       termType: "Variable",
       value,
     };
+  }
+
+  *chainObject(
+    chain: (object: ObjectT) => Iterable<GraphPattern>,
+  ): Iterable<GraphPattern> {
+    yield this;
+    yield* chain(this.object);
   }
 
   override toConstructIndentedStrings(
@@ -328,11 +339,15 @@ export class UnionGraphPattern extends GraphPattern {
 }
 
 export namespace GraphPattern {
-  export function basic(
-    subject: BasicGraphPattern.Subject,
-    predicate: BasicGraphPattern.Predicate,
-    object: BasicGraphPattern.Object,
-  ): GraphPattern {
+  export function basic<
+    ObjectT extends BasicGraphPattern.Object,
+    PredicateT extends BasicGraphPattern.Predicate,
+    SubjectT extends BasicGraphPattern.Subject,
+  >(
+    subject: SubjectT,
+    predicate: PredicateT,
+    object: ObjectT,
+  ): BasicGraphPattern<ObjectT, PredicateT, SubjectT> {
     return new BasicGraphPattern(subject, predicate, object);
   }
 

@@ -16,14 +16,19 @@ export class ConstructQueryBuilder {
     this.includeLanguageTags = options?.includeLanguageTags ?? [];
   }
 
-  addGraphPatterns(...graphPatterns: GraphPattern[]): this {
+  addGraphPattern(graphPattern: GraphPattern): this {
+    this.graphPatterns.push(graphPattern);
+    return this;
+  }
+
+  addGraphPatterns(graphPatterns: Iterable<GraphPattern>): this {
     this.graphPatterns.push(...graphPatterns);
     return this;
   }
 
   addValues(
     variable: BasicGraphPattern.Variable,
-    ...values: (Literal | BlankNode | NamedNode)[]
+    values: Iterable<Literal | BlankNode | NamedNode>,
   ): this {
     for (const variableValues of this.values) {
       if (variableValues[0].value === variable.value) {
@@ -31,7 +36,7 @@ export class ConstructQueryBuilder {
         return this;
       }
     }
-    this.values.push([variable, values]);
+    this.values.push([variable, [...values]]);
     return this;
   }
 

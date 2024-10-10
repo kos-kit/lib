@@ -28,15 +28,19 @@ describe("RdfListGraphPatterns", () => {
     console.info("Input trig:\n", inputTrig);
     console.info();
 
-    const rdfListVariable = BasicGraphPattern.variable("rdfList");
-    const rdfListGraphPatterns = new RdfListGraphPatterns({
-      rdfList: rdfListVariable,
-      itemGraphPatterns: options?.itemGraphPatterns,
-    });
     const rdfListConstructQuery = new ConstructQueryBuilder()
       .addGraphPatterns(
-        GraphPattern.basic(dummySubject, dummyPredicate, rdfListVariable),
-        ...rdfListGraphPatterns,
+        GraphPattern.basic(
+          dummySubject,
+          dummyPredicate,
+          BasicGraphPattern.variable("rdfList"),
+        ).chainObject(
+          (rdfList) =>
+            new RdfListGraphPatterns({
+              rdfList,
+              itemGraphPatterns: options?.itemGraphPatterns,
+            }),
+        ),
       )
       .build();
     console.info("CONSTRUCT query:\n", rdfListConstructQuery);

@@ -16,7 +16,7 @@ describe("ConstructQueryBuilder", () => {
   it("should translate a single required pattern", () => {
     expect(
       new ConstructQueryBuilder()
-        .addGraphPatterns(GraphPattern.basic(subject, predicate, object))
+        .addGraphPattern(GraphPattern.basic(subject, predicate, object))
         .build(),
     ).toStrictEqual(`\
 CONSTRUCT {
@@ -29,7 +29,7 @@ CONSTRUCT {
   it("should translate a single optional pattern", () => {
     expect(
       new ConstructQueryBuilder()
-        .addGraphPatterns(
+        .addGraphPattern(
           GraphPattern.optional(GraphPattern.basic(subject, predicate, object)),
         )
         .build(),
@@ -48,7 +48,7 @@ CONSTRUCT {
       new ConstructQueryBuilder({
         includeLanguageTags: ["en", ""],
       })
-        .addGraphPatterns(
+        .addGraphPattern(
           GraphPattern.basic(subject, predicate, {
             ...object,
             plainLiteral: true,
