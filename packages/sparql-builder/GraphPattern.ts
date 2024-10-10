@@ -35,8 +35,8 @@ export abstract class GraphPattern {
     return new OptionalGraphPattern(graphPattern);
   }
 
-  static union(...graphPatterns: readonly GraphPattern[]): GraphPattern {
-    return new UnionGraphPattern(...graphPatterns);
+  static union(graphPatterns: Iterable<GraphPattern>): GraphPattern {
+    return new UnionGraphPattern(graphPatterns);
   }
 
   static variable(value: string): GraphPattern.Variable {
@@ -58,16 +58,6 @@ export abstract class GraphPattern {
 
   abstract toConstructIndentedStrings(indent: number): Iterable<IndentedString>;
 
-  // toConstructString(): string {
-  //   return this.toConstructStrings()[Symbol.iterator]().join("\n");
-  // }
-  //
-  // *toConstructStrings(): Iterable<string> {
-  //   for (const indentedString of this.toConstructIndentedStrings(0)) {
-  //     yield IndentedString.toString(indentedString);
-  //   }
-  // }
-  //
   abstract toWhereIndentedStrings(
     indent: number,
     options?: ToWhereOptions,
@@ -270,8 +260,12 @@ class FilterNotExistsGraphPattern extends GraphPattern {
  *  https://www.w3.org/TR/sparql11-query/#GroupPatterns
  */
 class GroupGraphPattern extends GraphPattern {
-  constructor(private readonly graphPatterns: Iterable<GraphPattern>) {
+  private readonly graphPatterns: GraphPattern[];
+
+  constructor(graphPatterns: Iterable<GraphPattern>) {
     super();
+    // Convert to an array so we can iterate over it multiple times
+    this.graphPatterns = [...graphPatterns];
   }
 
   override *toConstructIndentedStrings(
@@ -366,9 +360,10 @@ namespace ScopedGraphPattern {
 class UnionGraphPattern extends GraphPattern {
   readonly graphPatterns: readonly GraphPattern[];
 
-  constructor(...graphPatterns: readonly GraphPattern[]) {
+  constructor(graphPatterns: Iterable<GraphPattern>) {
     super();
-    this.graphPatterns = graphPatterns;
+    // Convert to an array so we can iterate over it multiple times
+    this.graphPatterns = [...graphPatterns];
   }
 
   override *toConstructIndentedStrings(
