@@ -35,7 +35,7 @@ export abstract class GraphPattern {
     return new OptionalGraphPattern(graphPattern);
   }
 
-  static union(graphPatterns: Iterable<GraphPattern>): GraphPattern {
+  static union(...graphPatterns: readonly GraphPattern[]): GraphPattern {
     return new UnionGraphPattern(graphPatterns);
   }
 
@@ -358,12 +358,8 @@ namespace ScopedGraphPattern {
  *  https://www.w3.org/TR/sparql11-query/#alternatives
  */
 class UnionGraphPattern extends GraphPattern {
-  readonly graphPatterns: readonly GraphPattern[];
-
-  constructor(graphPatterns: Iterable<GraphPattern>) {
+  constructor(private readonly graphPatterns: readonly GraphPattern[]) {
     super();
-    // Convert to an array so we can iterate over it multiple times
-    this.graphPatterns = [...graphPatterns];
   }
 
   override *toConstructIndentedStrings(
