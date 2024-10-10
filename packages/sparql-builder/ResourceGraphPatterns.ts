@@ -3,7 +3,7 @@ import { GraphPatterns } from "./GraphPatterns.js";
 
 export abstract class ResourceGraphPatterns extends GraphPatterns {
   readonly subject: ResourceGraphPatterns.Subject;
-  protected readonly variablePrefix: string;
+  private readonly variablePrefix: string;
 
   constructor(subject: ResourceGraphPatterns.Subject) {
     super();
@@ -17,14 +17,14 @@ export abstract class ResourceGraphPatterns extends GraphPatterns {
 
   abstract [Symbol.iterator](): Iterator<GraphPattern>;
 
-  protected variable(suffix: string): BasicGraphPattern.Variable {
-    return BasicGraphPattern.variable(this.variablePrefix + suffix);
+  protected variable(suffix: string): GraphPattern.Variable {
+    return GraphPattern.variable(this.variablePrefix + suffix);
   }
 }
 
 export namespace ResourceGraphPatterns {
   export type Subject =
-    | BasicGraphPattern.Variable
+    | GraphPattern.Variable
     | ((BasicGraphPattern.BlankNode | BasicGraphPattern.NamedNode) & {
         variablePrefix: string;
       });

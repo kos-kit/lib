@@ -1,6 +1,5 @@
 import { rdf } from "@tpluscode/rdf-ns-builders";
-import { BasicGraphPattern, GraphPattern } from "./GraphPattern";
-import { GraphPatterns } from "./GraphPatterns";
+import { GraphPattern } from "./GraphPattern";
 import { PropertyPath } from "./PropertyPath";
 import { ResourceGraphPatterns } from "./ResourceGraphPatterns";
 
@@ -10,8 +9,8 @@ import { ResourceGraphPatterns } from "./ResourceGraphPatterns";
  */
 export class RdfListGraphPatterns extends ResourceGraphPatterns {
   private readonly itemGraphPatterns?: (
-    itemVariable: BasicGraphPattern.Variable,
-  ) => GraphPatterns;
+    itemVariable: GraphPattern.Variable,
+  ) => Iterable<GraphPattern>;
 
   constructor({
     itemGraphPatterns,
@@ -63,6 +62,6 @@ export class RdfListGraphPatterns extends ResourceGraphPatterns {
       GraphPattern.basic(restNVariable, rdf.rest, this.variable("RestNBasic")),
     );
 
-    yield GraphPattern.optional(GraphPattern.group(...optionalGraphPatterns));
+    yield GraphPattern.optional(GraphPattern.group(optionalGraphPatterns));
   }
 }

@@ -1,5 +1,4 @@
 import { GraphPattern } from "../GraphPattern.js";
-import { ArrayGraphPatterns } from "../GraphPatterns";
 import { testGraphPatterns } from "./testGraphPatterns";
 
 export function testGraphPattern(
@@ -9,5 +8,5 @@ export function testGraphPattern(
     expectedOutputTtl?: string;
   },
 ): void {
-  testGraphPatterns(inputTtl, new ArrayGraphPatterns([graphPattern]), options);
+  testGraphPatterns(inputTtl, [graphPattern], options);
 }

@@ -4,6 +4,10 @@ import { ToWhereOptions } from "./ToWhereOptions.js";
 import "iterator-helpers-polyfill";
 
 export abstract class GraphPatterns implements Iterable<GraphPattern> {
+  static fromArray(array: readonly GraphPattern[]): GraphPatterns {
+    return new ArrayGraphPatterns(array);
+  }
+
   abstract [Symbol.iterator](): Iterator<GraphPattern>;
 
   sort(): GraphPatterns {
@@ -47,7 +51,7 @@ export abstract class GraphPatterns implements Iterable<GraphPattern> {
   }
 }
 
-export class ArrayGraphPatterns extends GraphPatterns {
+class ArrayGraphPatterns extends GraphPatterns {
   constructor(private readonly array: readonly GraphPattern[]) {
     super();
   }

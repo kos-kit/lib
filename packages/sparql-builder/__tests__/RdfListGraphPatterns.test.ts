@@ -2,8 +2,7 @@ import { schema } from "@tpluscode/rdf-ns-builders";
 import * as oxigraph from "oxigraph";
 import { describe, expect, it } from "vitest";
 import { ConstructQueryBuilder } from "../ConstructQueryBuilder.js";
-import { BasicGraphPattern, GraphPattern } from "../GraphPattern.js";
-import { ArrayGraphPatterns, GraphPatterns } from "../GraphPatterns.js";
+import { GraphPattern } from "../GraphPattern.js";
 import { RdfListGraphPatterns } from "../RdfListGraphPatterns.js";
 import { termToString } from "../termToString";
 
@@ -11,7 +10,9 @@ describe("RdfListGraphPatterns", () => {
   function testRdfListGraphPatterns(
     inputRdfListTtl: string,
     options?: {
-      itemGraphPatterns?: (item: BasicGraphPattern.Variable) => GraphPatterns;
+      itemGraphPatterns?: (
+        item: GraphPattern.Variable,
+      ) => Iterable<GraphPattern>;
       otherInputTtl?: string;
     },
   ): void {
@@ -33,7 +34,7 @@ describe("RdfListGraphPatterns", () => {
         GraphPattern.basic(
           dummySubject,
           dummyPredicate,
-          BasicGraphPattern.variable("rdfList"),
+          GraphPattern.variable("rdfList"),
         ).chainObject(
           (rdfList) =>
             new RdfListGraphPatterns({
@@ -85,14 +86,13 @@ describe("RdfListGraphPatterns", () => {
       "( <http://example.com/1> <http://example.com/2> )",
       {
         otherInputTtl: `<http://example.com/1> <${schema.name.value}> "test1" . <http://example.com/2> <${schema.name.value}> "test2" .`,
-        itemGraphPatterns: (item) =>
-          new ArrayGraphPatterns([
-            GraphPattern.basic(
-              item,
-              schema.name,
-              BasicGraphPattern.variable(`${item.value}Name`),
-            ),
-          ]),
+        itemGraphPatterns: (item) => [
+          GraphPattern.basic(
+            item,
+            schema.name,
+            GraphPattern.variable(`${item.value}Name`),
+          ),
+        ],
       },
     );
   });

@@ -1,6 +1,6 @@
 import { BlankNode, Literal, NamedNode } from "@rdfjs/types";
-import { BasicGraphPattern, GraphPattern } from "./GraphPattern.js";
-import { ArrayGraphPatterns } from "./GraphPatterns";
+import { GraphPattern } from "./GraphPattern.js";
+import { GraphPatterns } from "./GraphPatterns.js";
 import { TAB_SPACES } from "./IndentedString.js";
 import { termToString } from "./termToString.js";
 
@@ -8,7 +8,7 @@ export class ConstructQueryBuilder {
   private graphPatterns: GraphPattern[] = [];
   private readonly includeLanguageTags: readonly string[];
   private values: [
-    BasicGraphPattern.Variable,
+    GraphPattern.Variable,
     (Literal | BlankNode | NamedNode)[],
   ][] = [];
 
@@ -27,7 +27,7 @@ export class ConstructQueryBuilder {
   }
 
   addValues(
-    variable: BasicGraphPattern.Variable,
+    variable: GraphPattern.Variable,
     ...values: (Literal | BlankNode | NamedNode)[]
   ): this {
     for (const variableValues of this.values) {
@@ -45,7 +45,7 @@ export class ConstructQueryBuilder {
       throw new RangeError("empty graph patterns");
     }
 
-    const sortedGraphPatterns = new ArrayGraphPatterns(
+    const sortedGraphPatterns = GraphPatterns.fromArray(
       this.graphPatterns,
     ).sort();
 

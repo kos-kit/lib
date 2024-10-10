@@ -7,6 +7,45 @@ import { termToString } from "./termToString.js";
 export abstract class GraphPattern {
   readonly sortRank: number = 0;
 
+  static basic<
+    ObjectT extends BasicGraphPattern.Object,
+    PredicateT extends BasicGraphPattern.Predicate,
+    SubjectT extends BasicGraphPattern.Subject,
+  >(
+    subject: SubjectT,
+    predicate: PredicateT,
+    object: ObjectT,
+  ): BasicGraphPattern<ObjectT, PredicateT, SubjectT> {
+    return new BasicGraphPattern(subject, predicate, object);
+  }
+
+  static filterExists(graphPattern: GraphPattern): GraphPattern {
+    return new FilterExistsGraphPattern(graphPattern);
+  }
+
+  static filterNotExists(graphPattern: GraphPattern): GraphPattern {
+    return new FilterNotExistsGraphPattern(graphPattern);
+  }
+
+  static group(graphPatterns: Iterable<GraphPattern>): GraphPattern {
+    return new GroupGraphPattern(graphPatterns);
+  }
+
+  static optional(graphPattern: GraphPattern): GraphPattern {
+    return new OptionalGraphPattern(graphPattern);
+  }
+
+  static union(...graphPatterns: readonly GraphPattern[]): GraphPattern {
+    return new UnionGraphPattern(...graphPatterns);
+  }
+
+  static variable(value: string): GraphPattern.Variable {
+    return {
+      termType: "Variable",
+      value,
+    };
+  }
+
   /**
    * Limit a graph pattern to certain scope, such as CONSTRUCT or WHERE.
    */
@@ -17,30 +56,36 @@ export abstract class GraphPattern {
     );
   }
 
-  abstract toConstructIndentedStrings(
-    indent: number,
-  ): readonly IndentedString[];
+  abstract toConstructIndentedStrings(indent: number): Iterable<IndentedString>;
 
-  toConstructString(): string {
-    return this.toConstructStrings().join("\n");
-  }
-
-  toConstructStrings(): readonly string[] {
-    return this.toConstructIndentedStrings(0).map(IndentedString.toString);
-  }
-
+  // toConstructString(): string {
+  //   return this.toConstructStrings()[Symbol.iterator]().join("\n");
+  // }
+  //
+  // *toConstructStrings(): Iterable<string> {
+  //   for (const indentedString of this.toConstructIndentedStrings(0)) {
+  //     yield IndentedString.toString(indentedString);
+  //   }
+  // }
+  //
   abstract toWhereIndentedStrings(
     indent: number,
     options?: ToWhereOptions,
-  ): readonly IndentedString[];
+  ): Iterable<IndentedString>;
 
   toWhereString(options?: ToWhereOptions): string {
-    return this.toWhereStrings(options).join("\n");
+    return this.toWhereStrings(options)[Symbol.iterator]().join("\n");
   }
 
-  toWhereStrings(options?: ToWhereOptions): readonly string[] {
-    return this.toWhereIndentedStrings(0, options).map(IndentedString.toString);
+  *toWhereStrings(options?: ToWhereOptions): Iterable<string> {
+    for (const indentedString of this.toWhereIndentedStrings(0, options)) {
+      yield IndentedString.toString(indentedString);
+    }
   }
+}
+
+export namespace GraphPattern {
+  export type Variable = Omit<rdfjs.Variable, "equals">;
 }
 
 /**
@@ -48,7 +93,7 @@ export abstract class GraphPattern {
  *
  * https://www.w3.org/TR/sparql11-query/#BasicGraphPatterns
  */
-export class BasicGraphPattern<
+class BasicGraphPattern<
   ObjectT extends BasicGraphPattern.Object,
   PredicateT extends BasicGraphPattern.Predicate,
   SubjectT extends BasicGraphPattern.Subject,
@@ -59,13 +104,6 @@ export class BasicGraphPattern<
     readonly object: ObjectT,
   ) {
     super();
-  }
-
-  static variable(value: string): BasicGraphPattern.Variable {
-    return {
-      termType: "Variable",
-      value,
-    };
   }
 
   *chainObject(
@@ -141,21 +179,20 @@ export namespace BasicGraphPattern {
     | BlankNode
     | Literal
     | NamedNode
-    | (Variable & {
+    | (GraphPattern.Variable & {
         plainLiteral?: boolean;
       });
   export type Predicate =
     | NamedNode
     | { termType: "PropertyPath"; value: PropertyPath }
-    | Variable;
-  export type Subject = BlankNode | NamedNode | Variable;
-  export type Variable = Omit<rdfjs.Variable, "equals">;
+    | GraphPattern.Variable;
+  export type Subject = BlankNode | NamedNode | GraphPattern.Variable;
 }
 
 /**
  * FILTER EXISTS { ?s ?p ?o }
  */
-export class FilterExistsGraphPattern extends GraphPattern {
+class FilterExistsGraphPattern extends GraphPattern {
   override readonly sortRank: number = 1;
 
   constructor(readonly graphPattern: GraphPattern) {
@@ -180,7 +217,7 @@ export class FilterExistsGraphPattern extends GraphPattern {
 /**
  * FILTER NOT EXISTS { ?s ?p ?o }
  */
-export class FilterNotExistsGraphPattern extends GraphPattern {
+class FilterNotExistsGraphPattern extends GraphPattern {
   override readonly sortRank: number = 1;
 
   constructor(readonly graphPattern: GraphPattern) {
@@ -206,20 +243,17 @@ export class FilterNotExistsGraphPattern extends GraphPattern {
  *  { ?s1 ?p1 ?o1 . ?s2 ?p2 ?o2 . }
  *  https://www.w3.org/TR/sparql11-query/#GroupPatterns
  */
-export class GroupGraphPattern extends GraphPattern {
-  readonly graphPatterns: readonly GraphPattern[];
-
-  constructor(...graphPatterns: readonly GraphPattern[]) {
+class GroupGraphPattern extends GraphPattern {
+  constructor(private readonly graphPatterns: Iterable<GraphPattern>) {
     super();
-    this.graphPatterns = graphPatterns;
   }
 
-  override toConstructIndentedStrings(
+  override *toConstructIndentedStrings(
     indent: number,
-  ): readonly IndentedString[] {
-    return this.graphPatterns.flatMap((graphPattern) =>
-      graphPattern.toConstructIndentedStrings(indent),
-    );
+  ): Iterable<IndentedString> {
+    for (const graphPattern of this.graphPatterns) {
+      yield* graphPattern.toConstructIndentedStrings(indent);
+    }
   }
 
   override toWhereIndentedStrings(
@@ -229,7 +263,7 @@ export class GroupGraphPattern extends GraphPattern {
     let whereIndentedStrings: IndentedString[] = [{ string: "{", indent }];
     for (const graphPattern of this.graphPatterns) {
       whereIndentedStrings = whereIndentedStrings.concat(
-        graphPattern.toWhereIndentedStrings(indent + TAB_SPACES, options),
+        ...graphPattern.toWhereIndentedStrings(indent + TAB_SPACES, options),
       );
     }
     whereIndentedStrings.push({ string: "}", indent });
@@ -241,7 +275,7 @@ export class GroupGraphPattern extends GraphPattern {
  * OPTIONAL { ?s ?p ?o }
  * https://www.w3.org/TR/sparql11-query/#OptionalMatching
  */
-export class OptionalGraphPattern extends GraphPattern {
+class OptionalGraphPattern extends GraphPattern {
   override readonly sortRank: number = 1;
 
   constructor(readonly graphPattern: GraphPattern) {
@@ -250,7 +284,7 @@ export class OptionalGraphPattern extends GraphPattern {
 
   override toConstructIndentedStrings(
     indent: number,
-  ): readonly IndentedString[] {
+  ): Iterable<IndentedString> {
     return this.graphPattern.toConstructIndentedStrings(indent);
   }
 
@@ -269,7 +303,7 @@ export class OptionalGraphPattern extends GraphPattern {
 /**
  * A graph pattern that has limited scopes.
  */
-export class ScopedGraphPattern extends GraphPattern {
+class ScopedGraphPattern extends GraphPattern {
   constructor(
     readonly graphPattern: GraphPattern,
     readonly scopes: Set<ScopedGraphPattern.Scope>,
@@ -277,25 +311,25 @@ export class ScopedGraphPattern extends GraphPattern {
     super();
   }
 
-  override toConstructIndentedStrings(
+  override *toConstructIndentedStrings(
     indent: number,
-  ): readonly IndentedString[] {
-    return this.scopes.has("CONSTRUCT")
-      ? this.graphPattern.toConstructIndentedStrings(indent)
-      : [];
+  ): Iterable<IndentedString> {
+    if (this.scopes.has("CONSTRUCT")) {
+      yield* this.graphPattern.toConstructIndentedStrings(indent);
+    }
   }
 
-  override toWhereIndentedStrings(
+  override *toWhereIndentedStrings(
     indent: number,
     options?: ToWhereOptions,
-  ): readonly IndentedString[] {
-    return this.scopes.has("WHERE")
-      ? this.graphPattern.toWhereIndentedStrings(indent, options)
-      : [];
+  ): Iterable<IndentedString> {
+    if (this.scopes.has("WHERE")) {
+      yield* this.graphPattern.toWhereIndentedStrings(indent, options);
+    }
   }
 }
 
-export namespace ScopedGraphPattern {
+namespace ScopedGraphPattern {
   export type Scope = "CONSTRUCT" | "WHERE";
 }
 
@@ -303,7 +337,7 @@ export namespace ScopedGraphPattern {
  *  { ?s1 ?p1 ?o1 } UNION { ?s2 ?p2 ?o2 . }
  *  https://www.w3.org/TR/sparql11-query/#alternatives
  */
-export class UnionGraphPattern extends GraphPattern {
+class UnionGraphPattern extends GraphPattern {
   readonly graphPatterns: readonly GraphPattern[];
 
   constructor(...graphPatterns: readonly GraphPattern[]) {
@@ -311,12 +345,12 @@ export class UnionGraphPattern extends GraphPattern {
     this.graphPatterns = graphPatterns;
   }
 
-  override toConstructIndentedStrings(
+  override *toConstructIndentedStrings(
     indent: number,
-  ): readonly IndentedString[] {
-    return this.graphPatterns.flatMap((graphPattern) =>
-      graphPattern.toConstructIndentedStrings(indent),
-    );
+  ): Iterable<IndentedString> {
+    for (const graphPattern of this.graphPatterns) {
+      yield* graphPattern.toConstructIndentedStrings(indent);
+    }
   }
 
   override toWhereIndentedStrings(
@@ -330,48 +364,10 @@ export class UnionGraphPattern extends GraphPattern {
       }
       whereIndentedStrings.push({ string: "{", indent });
       whereIndentedStrings = whereIndentedStrings.concat(
-        graphPattern.toWhereIndentedStrings(indent + TAB_SPACES, options),
+        ...graphPattern.toWhereIndentedStrings(indent + TAB_SPACES, options),
       );
       whereIndentedStrings.push({ string: "}", indent });
     });
     return whereIndentedStrings;
-  }
-}
-
-export namespace GraphPattern {
-  export function basic<
-    ObjectT extends BasicGraphPattern.Object,
-    PredicateT extends BasicGraphPattern.Predicate,
-    SubjectT extends BasicGraphPattern.Subject,
-  >(
-    subject: SubjectT,
-    predicate: PredicateT,
-    object: ObjectT,
-  ): BasicGraphPattern<ObjectT, PredicateT, SubjectT> {
-    return new BasicGraphPattern(subject, predicate, object);
-  }
-
-  export function filterExists(graphPattern: GraphPattern): GraphPattern {
-    return new FilterExistsGraphPattern(graphPattern);
-  }
-
-  export function filterNotExists(graphPattern: GraphPattern): GraphPattern {
-    return new FilterNotExistsGraphPattern(graphPattern);
-  }
-
-  export function group(
-    ...graphPatterns: readonly GraphPattern[]
-  ): GraphPattern {
-    return new GroupGraphPattern(...graphPatterns);
-  }
-
-  export function optional(graphPattern: GraphPattern): GraphPattern {
-    return new OptionalGraphPattern(graphPattern);
-  }
-
-  export function union(
-    ...graphPatterns: readonly GraphPattern[]
-  ): GraphPattern {
-    return new UnionGraphPattern(...graphPatterns);
   }
 }

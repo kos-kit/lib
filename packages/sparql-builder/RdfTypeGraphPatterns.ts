@@ -1,3 +1,4 @@
+import { NamedNode } from "@rdfjs/types";
 import { rdf, rdfs } from "@tpluscode/rdf-ns-builders";
 import { BasicGraphPattern, GraphPattern } from "./GraphPattern";
 import { GraphPatterns } from "./GraphPatterns";
@@ -9,7 +10,7 @@ import { PropertyPath } from "./PropertyPath";
 export class RdfTypeGraphPatterns extends GraphPatterns {
   constructor(
     readonly subject: BasicGraphPattern.Subject,
-    readonly rdfType: BasicGraphPattern.NamedNode,
+    readonly rdfType: NamedNode,
   ) {
     super();
   }

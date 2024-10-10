@@ -1,17 +1,14 @@
 import { skos } from "@tpluscode/rdf-ns-builders";
 import { describe, expect, it } from "vitest";
-import { BasicGraphPattern, ConstructQueryBuilder, GraphPattern } from "..";
+import { ConstructQueryBuilder, GraphPattern } from "..";
 
 describe("ConstructQueryBuilder", () => {
-  const subject: BasicGraphPattern.Subject = {
-    termType: "NamedNode",
+  const subject = {
+    termType: "NamedNode" as const,
     value: "http://example.com/concept",
   };
   const predicate = skos.prefLabel;
-  const object: BasicGraphPattern.Object = {
-    termType: "Variable",
-    value: "prefLabel",
-  };
+  const object = GraphPattern.variable("prefLabel");
 
   it("should translate a single required pattern", () => {
     expect(
