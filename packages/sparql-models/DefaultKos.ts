@@ -4,7 +4,7 @@ import {
   Identifier,
 } from "@kos-kit/models";
 import * as rdfjsDataset from "@kos-kit/rdfjs-dataset-models";
-import { BasicGraphPattern } from "@kos-kit/sparql-builder";
+import { GraphPattern } from "@kos-kit/sparql-builder";
 import { skos } from "@tpluscode/rdf-ns-builders";
 import { Maybe } from "purify-ts";
 import { Resource } from "rdfjs-resource";
@@ -29,15 +29,13 @@ class DefaultConceptScheme extends rdfjsDataset.ConceptScheme<
 const DefaultLabel = rdfjsDataset.Label;
 type DefaultLabel = rdfjsDataset.Label;
 
-const conceptVariable = BasicGraphPattern.variable("concept");
+const conceptGraphPatterns_ = new Concept.GraphPatterns(
+  GraphPattern.variable("concept"),
+);
 
-const conceptGraphPatterns_ = [...new Concept.GraphPatterns(conceptVariable)];
-
-const conceptSchemeVariable = BasicGraphPattern.variable("conceptScheme");
-
-const conceptSchemeGraphPatterns_ = [
-  ...new ConceptScheme.GraphPatterns(conceptSchemeVariable),
-];
+const conceptSchemeGraphPatterns_ = new ConceptScheme.GraphPatterns(
+  GraphPattern.variable("conceptScheme"),
+);
 
 export class DefaultKos extends Kos<
   DefaultConcept,
@@ -52,7 +50,6 @@ export class DefaultKos extends Kos<
       includeLanguageTags: this.includeLanguageTags,
       logger: this.logger,
       modelFactory: (resource) => this.conceptModelFactory(resource),
-      modelVariable: conceptVariable,
       sparqlQueryClient: this.sparqlQueryClient,
     });
   }
@@ -65,7 +62,6 @@ export class DefaultKos extends Kos<
       includeLanguageTags: this.includeLanguageTags,
       logger: this.logger,
       modelFactory: (resource) => this.conceptSchemeModelFactory(resource),
-      modelVariable: conceptSchemeVariable,
       sparqlQueryClient: this.sparqlQueryClient,
     });
   }
@@ -81,7 +77,6 @@ export class DefaultKos extends Kos<
       identifiers: await this.queryConceptSchemes(kwds),
       includeLanguageTags: this.includeLanguageTags,
       modelFactory: (resource) => this.conceptSchemeModelFactory(resource),
-      modelVariable: conceptVariable,
       logger: this.logger,
       sparqlQueryClient: this.sparqlQueryClient,
       stubFactory: (identifier) => this.conceptScheme(identifier),
@@ -99,7 +94,6 @@ export class DefaultKos extends Kos<
       identifiers: await this.queryConcepts(kwds),
       includeLanguageTags: this.includeLanguageTags,
       modelFactory: (resource) => this.conceptModelFactory(resource),
-      modelVariable: conceptVariable,
       logger: this.logger,
       sparqlQueryClient: this.sparqlQueryClient,
       stubFactory: (identifier) => this.concept(identifier),

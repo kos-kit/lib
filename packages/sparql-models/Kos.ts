@@ -7,10 +7,7 @@ import {
   Identifier,
   abc,
 } from "@kos-kit/models";
-import {
-  BasicGraphPattern,
-  RdfTypeGraphPatterns,
-} from "@kos-kit/sparql-builder";
+import { GraphPattern, RdfTypeGraphPatterns } from "@kos-kit/sparql-builder";
 import { SparqlQueryClient } from "@kos-kit/sparql-client";
 import { DatasetCoreFactory } from "@rdfjs/types";
 import { skos } from "@tpluscode/rdf-ns-builders";
@@ -112,7 +109,7 @@ ${offset > 0 ? `OFFSET ${offset}` : ""}
     if (query.type === "All") {
       return [
         new RdfTypeGraphPatterns(
-          BasicGraphPattern.variable("conceptScheme"),
+          GraphPattern.variable("conceptScheme"),
           skos.ConceptScheme,
         ).toWhereString(),
       ];
@@ -143,7 +140,7 @@ ${offset > 0 ? `OFFSET ${offset}` : ""}
   ): readonly string[] {
     if (query.type === "All") {
       return new RdfTypeGraphPatterns(
-        BasicGraphPattern.variable("concept"),
+        GraphPattern.variable("concept"),
         skos.Concept,
       ).toWhereStrings();
     }
@@ -171,7 +168,7 @@ ${offset > 0 ? `OFFSET ${offset}` : ""}
             `{ ?concept <${
               skos.inScheme.value
             }> ${conceptSchemeIdentifierString} . ${new RdfTypeGraphPatterns(
-              BasicGraphPattern.variable("concept"),
+              GraphPattern.variable("concept"),
               skos.Concept,
             ).toWhereString()} }`,
             "UNION",

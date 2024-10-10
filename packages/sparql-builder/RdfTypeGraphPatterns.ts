@@ -1,8 +1,8 @@
 import { NamedNode } from "@rdfjs/types";
 import { rdf, rdfs } from "@tpluscode/rdf-ns-builders";
-import { BasicGraphPattern, GraphPattern } from "./GraphPattern";
-import { GraphPatterns } from "./GraphPatterns";
-import { PropertyPath } from "./PropertyPath";
+import { BasicGraphPattern, GraphPattern } from "./GraphPattern.js";
+import { GraphPatterns } from "./GraphPatterns.js";
+import { PropertyPath } from "./PropertyPath.js";
 
 /**
  * Graph patterns for the rdf:type of a subject resource.

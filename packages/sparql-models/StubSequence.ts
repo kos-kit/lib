@@ -1,6 +1,5 @@
 import { Identifier, LanguageTagSet, Model, Stub, abc } from "@kos-kit/models";
 import {
-  BasicGraphPattern,
   ConstructQueryBuilder,
   GraphPattern,
   ResourceGraphPatterns,
@@ -22,7 +21,7 @@ export class StubSequence<
   private readonly modelFactory: (
     resource: Resource<Identifier>,
   ) => Maybe<ModelT>;
-  private readonly modelVariable: BasicGraphPattern.Variable;
+  private readonly modelVariable: GraphPattern.Variable;
   private readonly sparqlQueryClient: SparqlQueryClient;
   private readonly stubFactory: (identifier: Identifier) => Stub<ModelT>;
 
@@ -43,7 +42,7 @@ export class StubSequence<
     includeLanguageTags: LanguageTagSet;
     logger: Logger;
     modelFactory: (resource: Resource<Identifier>) => Maybe<ModelT>;
-    modelVariable?: BasicGraphPattern.Variable;
+    modelVariable?: GraphPattern.Variable;
     sparqlQueryClient: SparqlQueryClient;
     stubFactory: (identifier: Identifier) => Stub<ModelT>;
   }) {

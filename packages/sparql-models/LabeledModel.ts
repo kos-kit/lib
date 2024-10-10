@@ -1,9 +1,5 @@
 import { Label } from "@kos-kit/models";
-import {
-  BasicGraphPattern,
-  GraphPattern,
-  ResourceGraphPatterns,
-} from "@kos-kit/sparql-builder";
+import { GraphPattern, ResourceGraphPatterns } from "@kos-kit/sparql-builder";
 import { skosxl } from "@tpluscode/rdf-ns-builders";
 import { Model } from "./Model.js";
 
@@ -23,11 +19,11 @@ export namespace LabeledModel {
 
         const skosXlProperty = labelType.skosXlProperty.extractNullable();
         if (skosXlProperty !== null) {
-          const skosXlLabelVariable: BasicGraphPattern.Variable = this.variable(
+          const skosXlLabelVariable = this.variable(
             `LabelType${labelTypeI}Resource`,
           );
           yield GraphPattern.optional(
-            GraphPattern.group(
+            GraphPattern.group([
               GraphPattern.basic(
                 this.subject,
                 skosXlProperty,
@@ -37,11 +33,11 @@ export namespace LabeledModel {
               GraphPattern.basic(
                 skosXlLabelVariable,
                 skosxl.literalForm,
-                BasicGraphPattern.variable(
+                GraphPattern.variable(
                   `${skosXlLabelVariable.value}LiteralForm`,
                 ),
               ),
-            ),
+            ]),
           );
         }
       }

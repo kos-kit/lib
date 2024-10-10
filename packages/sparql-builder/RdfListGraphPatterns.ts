@@ -1,7 +1,7 @@
 import { rdf } from "@tpluscode/rdf-ns-builders";
-import { GraphPattern } from "./GraphPattern";
-import { PropertyPath } from "./PropertyPath";
-import { ResourceGraphPatterns } from "./ResourceGraphPatterns";
+import { GraphPattern } from "./GraphPattern.js";
+import { PropertyPath } from "./PropertyPath.js";
+import { ResourceGraphPatterns } from "./ResourceGraphPatterns.js";
 
 /**
  * Graph patterns for an RDF list
