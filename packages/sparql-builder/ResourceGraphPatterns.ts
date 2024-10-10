@@ -5,13 +5,18 @@ export abstract class ResourceGraphPatterns extends GraphPatterns {
   readonly subject: ResourceGraphPatterns.Subject;
   private readonly variablePrefix: string;
 
-  constructor(subject: ResourceGraphPatterns.Subject) {
+  constructor(subject: ResourceGraphPatterns.Subject | string) {
     super();
-    this.subject = subject;
-    if (subject.termType === "Variable") {
-      this.variablePrefix = subject.value;
+    if (typeof subject === "string") {
+      this.subject = GraphPattern.variable(subject);
+      this.variablePrefix = subject;
     } else {
-      this.variablePrefix = subject.variablePrefix;
+      this.subject = subject;
+      if (subject.termType === "Variable") {
+        this.variablePrefix = subject.value;
+      } else {
+        this.variablePrefix = subject.variablePrefix;
+      }
     }
   }
 

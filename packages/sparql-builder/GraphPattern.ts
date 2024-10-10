@@ -106,11 +106,37 @@ class BasicGraphPattern<
     super();
   }
 
+  /**
+   * Chain additional graph patterns to this one on the object.
+   *
+   * This makes it easier to build graph patterns without explicitly declaring variables e.g.,
+   *
+   * Before:
+   * const variable = ...;
+   * yield GraphPattern.basic(s, p, variable);
+   * yield GraphPattern.basic(variable, p, o);
+   *
+   * After:
+   * yield GraphPattern.basic(s, p, variable).chainObject(variable => GraphPattern.basic(variable, p, o));
+   * @param chain
+   */
   *chainObject(
     chain: (object: ObjectT) => Iterable<GraphPattern>,
   ): Iterable<GraphPattern> {
     yield this;
     yield* chain(this.object);
+  }
+
+  /**
+   * Chain additional graph patterns to this one on the subject.
+   *
+   * See chainObject example above.
+   */
+  *chainSubject(
+    chain: (subject: SubjectT) => Iterable<GraphPattern>,
+  ): Iterable<GraphPattern> {
+    yield this;
+    yield* chain(this.subject);
   }
 
   override toConstructIndentedStrings(

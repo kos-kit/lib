@@ -36,6 +36,10 @@ export abstract class GraphPatterns implements Iterable<GraphPattern> {
     ];
   }
 
+  toGroupGraphPattern(): GraphPattern {
+    return GraphPattern.group(this);
+  }
+
   toWhereString(options?: ToWhereOptions): string {
     return this.toWhereStrings(options).join("\n");
   }
