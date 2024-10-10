@@ -3,6 +3,7 @@ import {
   BasicGraphPattern,
   ConstructQueryBuilder,
   GraphPattern,
+  ResourceGraphPatterns,
 } from "@kos-kit/sparql-builder";
 import { SparqlQueryClient } from "@kos-kit/sparql-client";
 import { DatasetCoreFactory } from "@rdfjs/types";
@@ -14,7 +15,7 @@ export class StubSequence<
   ModelT extends Model,
 > extends abc.StubSequence<ModelT> {
   private readonly datasetCoreFactory: DatasetCoreFactory;
-  private readonly graphPatterns: readonly GraphPattern[];
+  private readonly graphPatterns: Iterable<GraphPattern>;
   private readonly identifiers: readonly Identifier[];
   private readonly includeLanguageTags: LanguageTagSet;
   private readonly logger: Logger;
@@ -37,23 +38,32 @@ export class StubSequence<
     stubFactory,
   }: {
     datasetCoreFactory: DatasetCoreFactory;
-    graphPatterns: readonly GraphPattern[];
+    graphPatterns: Iterable<GraphPattern>;
     identifiers: readonly Identifier[];
     includeLanguageTags: LanguageTagSet;
     logger: Logger;
     modelFactory: (resource: Resource<Identifier>) => Maybe<ModelT>;
-    modelVariable: BasicGraphPattern.Variable;
+    modelVariable?: BasicGraphPattern.Variable;
     sparqlQueryClient: SparqlQueryClient;
     stubFactory: (identifier: Identifier) => Stub<ModelT>;
   }) {
     super();
     this.datasetCoreFactory = datasetCoreFactory;
-    this.graphPatterns = graphPatterns;
+    this.graphPatterns = [...graphPatterns];
     this.identifiers = identifiers;
     this.includeLanguageTags = includeLanguageTags;
     this.logger = logger;
     this.modelFactory = modelFactory;
-    this.modelVariable = modelVariable;
+    if (modelVariable) {
+      this.modelVariable = modelVariable;
+    } else if (
+      graphPatterns instanceof ResourceGraphPatterns &&
+      graphPatterns.subject.termType === "Variable"
+    ) {
+      this.modelVariable = graphPatterns.subject;
+    } else {
+      throw new Error("must specify a model variable");
+    }
     this.sparqlQueryClient = sparqlQueryClient;
     this.stubFactory = stubFactory;
   }
@@ -81,7 +91,7 @@ export class StubSequence<
       new ConstructQueryBuilder({
         includeLanguageTags: [...this.includeLanguageTags],
       })
-        .addGraphPatterns(...this.graphPatterns)
+        .addGraphPatterns(this.graphPatterns)
         .addValues(this.modelVariable, ...this.identifiers)
         .build(),
     );

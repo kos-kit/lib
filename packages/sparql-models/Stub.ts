@@ -3,6 +3,7 @@ import {
   BasicGraphPattern,
   ConstructQueryBuilder,
   GraphPattern,
+  ResourceGraphPatterns,
 } from "@kos-kit/sparql-builder";
 import { SparqlQueryClient } from "@kos-kit/sparql-client";
 import { DatasetCoreFactory } from "@rdfjs/types";
@@ -13,7 +14,7 @@ export class Stub<ModelT extends Model> extends abc.Stub<ModelT> {
   readonly identifier: Identifier;
 
   private readonly datasetCoreFactory: DatasetCoreFactory;
-  private readonly graphPatterns: readonly GraphPattern[];
+  private readonly graphPatterns: Iterable<GraphPattern>;
   private readonly includeLanguageTags: LanguageTagSet;
   private readonly modelFactory: (
     resource: Resource<Identifier>,
@@ -32,11 +33,11 @@ export class Stub<ModelT extends Model> extends abc.Stub<ModelT> {
     ...superParameters
   }: {
     datasetCoreFactory: DatasetCoreFactory;
-    graphPatterns: readonly GraphPattern[];
+    graphPatterns: Iterable<GraphPattern>;
     identifier: Identifier;
     includeLanguageTags: LanguageTagSet;
     modelFactory: (resource: Resource<Identifier>) => Maybe<ModelT>;
-    modelVariable: BasicGraphPattern.Variable;
+    modelVariable?: BasicGraphPattern.Variable;
     sparqlQueryClient: SparqlQueryClient;
   } & abc.Stub.Parameters) {
     super(superParameters);
@@ -45,7 +46,16 @@ export class Stub<ModelT extends Model> extends abc.Stub<ModelT> {
     this.identifier = identifier;
     this.includeLanguageTags = includeLanguageTags;
     this.modelFactory = modelFactory;
-    this.modelVariable = modelVariable;
+    if (modelVariable) {
+      this.modelVariable = modelVariable;
+    } else if (
+      graphPatterns instanceof ResourceGraphPatterns &&
+      graphPatterns.subject.termType === "Variable"
+    ) {
+      this.modelVariable = graphPatterns.subject;
+    } else {
+      throw new Error("must specify a model variable");
+    }
     this.sparqlQueryClient = sparqlQueryClient;
   }
 
@@ -54,7 +64,7 @@ export class Stub<ModelT extends Model> extends abc.Stub<ModelT> {
       new ConstructQueryBuilder({
         includeLanguageTags: [...this.includeLanguageTags],
       })
-        .addGraphPatterns(...this.graphPatterns)
+        .addGraphPatterns(this.graphPatterns)
         .addValues(this.modelVariable, this.identifier)
         .build(),
     );
