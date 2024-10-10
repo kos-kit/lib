@@ -28,7 +28,7 @@ export class ConstructQueryBuilder {
 
   addValues(
     variable: BasicGraphPattern.Variable,
-    values: Iterable<Literal | BlankNode | NamedNode>,
+    ...values: (Literal | BlankNode | NamedNode)[]
   ): this {
     for (const variableValues of this.values) {
       if (variableValues[0].value === variable.value) {
