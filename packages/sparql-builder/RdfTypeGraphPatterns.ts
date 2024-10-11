@@ -1,34 +1,42 @@
 import { NamedNode } from "@rdfjs/types";
 import { rdf, rdfs } from "@tpluscode/rdf-ns-builders";
-import { BasicGraphPattern, GraphPattern } from "./GraphPattern.js";
-import { GraphPatterns } from "./GraphPatterns.js";
+import { GraphPattern } from "./GraphPattern.js";
 import { PropertyPath } from "./PropertyPath.js";
+import { ResourceGraphPatterns } from "./ResourceGraphPatterns";
 
 /**
  * Graph patterns for the rdf:type of a subject resource.
  */
-export class RdfTypeGraphPatterns extends GraphPatterns {
+export class RdfTypeGraphPatterns extends ResourceGraphPatterns {
   constructor(
-    readonly subject: BasicGraphPattern.Subject,
+    subject: ResourceGraphPatterns.SubjectParameter,
     readonly rdfType: NamedNode,
   ) {
-    super();
+    super(subject);
+  }
+
+  override *[Symbol.iterator](): Iterator<GraphPattern> {
+    yield* this.constructGraphPatterns();
+    yield* this.whereGraphPatterns();
   }
 
   /**
    * CONSTRUCT ?subject rdf:type ?rdfType
    */
-  get constructGraphPattern(): GraphPattern {
-    return GraphPattern.basic(this.subject, rdf.type, this.rdfType).scoped(
-      "CONSTRUCT",
-    );
+  *constructGraphPatterns(): Iterable<GraphPattern> {
+    yield GraphPattern.basic(
+      this.subject,
+      rdf.type,
+      this.variable("RdfType"),
+    ).scoped("CONSTRUCT");
   }
 
   /**
    * WHERE ?subject rdf:type/rdfs:subClassOf* ?rdfType
    */
-  get whereGraphPattern(): GraphPattern {
-    return GraphPattern.basic(
+  *whereGraphPatterns(): Iterable<GraphPattern> {
+    // Match the expected rdf:type or a subClassOf it
+    yield GraphPattern.basic(
       this.subject,
       {
         termType: "PropertyPath",
@@ -39,10 +47,12 @@ export class RdfTypeGraphPatterns extends GraphPatterns {
       },
       this.rdfType,
     ).scoped("WHERE");
-  }
 
-  override *[Symbol.iterator](): Iterator<GraphPattern> {
-    yield this.constructGraphPattern;
-    yield this.whereGraphPattern;
+    // Get the rdf:type in a variable for CONSTRUCT
+    yield GraphPattern.basic(
+      this.subject,
+      rdf.type,
+      this.variable("RdfType"),
+    ).scoped("WHERE");
   }
 }

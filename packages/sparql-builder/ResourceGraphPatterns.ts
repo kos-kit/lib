@@ -5,7 +5,7 @@ export abstract class ResourceGraphPatterns extends GraphPatterns {
   readonly subject: ResourceGraphPatterns.Subject;
   private readonly variablePrefix: string;
 
-  constructor(subject: ResourceGraphPatterns.Subject | string) {
+  constructor(subject: ResourceGraphPatterns.SubjectParameter) {
     super();
     if (typeof subject === "string") {
       this.subject = GraphPattern.variable(subject);
@@ -33,4 +33,6 @@ export namespace ResourceGraphPatterns {
     | ((BasicGraphPattern.BlankNode | BasicGraphPattern.NamedNode) & {
         variablePrefix: string;
       });
+
+  export type SubjectParameter = Subject | string;
 }

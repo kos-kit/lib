@@ -9,7 +9,10 @@ describe("RdfTypeGraphPatterns", () => {
     testGraphPatterns(
       `<http://example.com> <${rdf.type.value}> <${rdfs.Class.value}> .`,
       new RdfTypeGraphPatterns(
-        oxigraph.namedNode("http://example.com"),
+        {
+          ...oxigraph.namedNode("http://example.com"),
+          variablePrefix: "example",
+        },
         rdfs.Class,
       ),
     );
@@ -19,7 +22,10 @@ describe("RdfTypeGraphPatterns", () => {
     testGraphPatterns(
       `<http://example.com> <${rdf.type.value}> <http://example.com/class> . <http://example.com/class> <${rdfs.subClassOf.value}> <${rdfs.Class.value}> .`,
       new RdfTypeGraphPatterns(
-        oxigraph.namedNode("http://example.com"),
+        {
+          ...oxigraph.namedNode("http://example.com"),
+          variablePrefix: "example",
+        },
         rdfs.Class,
       ),
       {
