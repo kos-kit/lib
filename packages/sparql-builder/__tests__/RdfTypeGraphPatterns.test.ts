@@ -1,5 +1,4 @@
 import { rdf, rdfs } from "@tpluscode/rdf-ns-builders";
-import * as oxigraph from "oxigraph";
 import { describe, it } from "vitest";
 import { RdfTypeGraphPatterns } from "../RdfTypeGraphPatterns";
 import { testGraphPatterns } from "./testGraphPatterns";
@@ -10,7 +9,8 @@ describe("RdfTypeGraphPatterns", () => {
       `<http://example.com> <${rdf.type.value}> <${rdfs.Class.value}> .`,
       new RdfTypeGraphPatterns(
         {
-          ...oxigraph.namedNode("http://example.com"),
+          termType: "NamedNode",
+          value: "http://example.com",
           variablePrefix: "example",
         },
         rdfs.Class,
@@ -23,13 +23,14 @@ describe("RdfTypeGraphPatterns", () => {
       `<http://example.com> <${rdf.type.value}> <http://example.com/class> . <http://example.com/class> <${rdfs.subClassOf.value}> <${rdfs.Class.value}> .`,
       new RdfTypeGraphPatterns(
         {
-          ...oxigraph.namedNode("http://example.com"),
+          termType: "NamedNode",
+          value: "http://example.com",
           variablePrefix: "example",
         },
         rdfs.Class,
       ),
       {
-        expectedOutputTtl: `<http://example.com> <${rdf.type.value}> <${rdfs.Class.value}> .`,
+        expectedOutputTtl: `<http://example.com> <${rdf.type.value}> <http://example.com/class> .`,
       },
     );
   });

@@ -23,10 +23,12 @@ export function testGraphPatterns(
     expectedOutputStore = inputStore;
   }
 
+  const query = new ConstructQueryBuilder()
+    .addGraphPatterns(graphPatterns)
+    .build();
+
   // @ts-ignore
-  const actualOutputQuads: oxigraph.Quad[] = inputStore.query(
-    new ConstructQueryBuilder().addGraphPatterns(graphPatterns).build(),
-  );
+  const actualOutputQuads: oxigraph.Quad[] = inputStore.query(query);
   expect(actualOutputQuads).toHaveLength(expectedOutputStore.size);
   for (const expectedOutputQuad of expectedOutputStore.match()) {
     expect(
