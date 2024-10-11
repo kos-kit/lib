@@ -2,7 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { stringify as stringifyYaml } from "yaml";
 
-const VERSION = "2.0.82";
+const VERSION = "2.0.83";
 
 type ProjectName =
   | "rdfjs-dataset-models"
@@ -193,7 +193,7 @@ for (const project of projects) {
         },
         type: "module",
         types: "index.d.ts",
-        version: "2.0.82",
+        version: "2.0.83",
       },
       undefined,
       2,
