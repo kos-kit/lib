@@ -5,7 +5,7 @@
     "iterator-helpers-polyfill": "^3.0.1"
   },
   "devDependencies": {
-    "@kos-kit/sparql-client": "2.0.83",
+    "@kos-kit/sparql-client": "2.0.84",
     "oxigraph": "^0.4.0"
   },
   "engines": {
@@ -43,5 +43,5 @@
   },
   "type": "module",
   "types": "index.d.ts",
-  "version": "2.0.83"
+  "version": "2.0.84"
 }
