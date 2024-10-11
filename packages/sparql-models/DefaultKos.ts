@@ -2,18 +2,17 @@ import {
   ConceptSchemesQuery,
   ConceptsQuery,
   Identifier,
-  StubSequence,
 } from "@kos-kit/models";
 import * as rdfjsDataset from "@kos-kit/rdfjs-dataset-models";
+import { GraphPattern } from "@kos-kit/sparql-builder";
 import { skos } from "@tpluscode/rdf-ns-builders";
 import { Maybe } from "purify-ts";
 import { Resource } from "rdfjs-resource";
 import { Concept } from "./Concept.js";
 import { ConceptScheme } from "./ConceptScheme.js";
-import { BasicGraphPattern } from "./GraphPattern.js";
-import { GraphPatternStub } from "./GraphPatternStub.js";
-import { GraphPatternStubSequence } from "./GraphPatternStubSequence.js";
 import { Kos } from "./Kos.js";
+import { Stub } from "./Stub.js";
+import { StubSequence } from "./StubSequence.js";
 
 class DefaultConcept extends rdfjsDataset.Concept<
   DefaultConcept,
@@ -30,51 +29,39 @@ class DefaultConceptScheme extends rdfjsDataset.ConceptScheme<
 const DefaultLabel = rdfjsDataset.Label;
 type DefaultLabel = rdfjsDataset.Label;
 
-const conceptVariable: BasicGraphPattern.Variable = {
-  termType: "Variable",
-  value: "concept",
-};
+const conceptGraphPatterns_ = new Concept.GraphPatterns(
+  GraphPattern.variable("concept"),
+);
 
-const conceptGraphPatterns_ = [...new Concept.GraphPatterns(conceptVariable)];
-
-const conceptSchemeVariable: BasicGraphPattern.Variable = {
-  termType: "Variable",
-  value: "conceptScheme",
-};
-
-const conceptSchemeGraphPatterns_ = [
-  ...new ConceptScheme.GraphPatterns(conceptSchemeVariable),
-];
+const conceptSchemeGraphPatterns_ = new ConceptScheme.GraphPatterns(
+  GraphPattern.variable("conceptScheme"),
+);
 
 export class DefaultKos extends Kos<
   DefaultConcept,
   DefaultConceptScheme,
   DefaultLabel
 > {
-  concept(identifier: Identifier): GraphPatternStub<DefaultConcept> {
-    return new GraphPatternStub({
+  concept(identifier: Identifier): Stub<DefaultConcept> {
+    return new Stub({
       datasetCoreFactory: this.datasetCoreFactory,
       graphPatterns: conceptGraphPatterns_,
       identifier,
       includeLanguageTags: this.includeLanguageTags,
       logger: this.logger,
       modelFactory: (resource) => this.conceptModelFactory(resource),
-      modelVariable: conceptVariable,
       sparqlQueryClient: this.sparqlQueryClient,
     });
   }
 
-  conceptScheme(
-    identifier: Identifier,
-  ): GraphPatternStub<DefaultConceptScheme> {
-    return new GraphPatternStub({
+  conceptScheme(identifier: Identifier): Stub<DefaultConceptScheme> {
+    return new Stub({
       datasetCoreFactory: this.datasetCoreFactory,
       graphPatterns: conceptSchemeGraphPatterns_,
       identifier,
       includeLanguageTags: this.includeLanguageTags,
       logger: this.logger,
       modelFactory: (resource) => this.conceptSchemeModelFactory(resource),
-      modelVariable: conceptSchemeVariable,
       sparqlQueryClient: this.sparqlQueryClient,
     });
   }
@@ -84,13 +71,12 @@ export class DefaultKos extends Kos<
     offset: number;
     query: ConceptSchemesQuery;
   }): Promise<StubSequence<DefaultConceptScheme>> {
-    return new GraphPatternStubSequence<DefaultConceptScheme>({
+    return new StubSequence<DefaultConceptScheme>({
       datasetCoreFactory: this.datasetCoreFactory,
       graphPatterns: conceptSchemeGraphPatterns_,
       identifiers: await this.queryConceptSchemes(kwds),
       includeLanguageTags: this.includeLanguageTags,
       modelFactory: (resource) => this.conceptSchemeModelFactory(resource),
-      modelVariable: conceptVariable,
       logger: this.logger,
       sparqlQueryClient: this.sparqlQueryClient,
       stubFactory: (identifier) => this.conceptScheme(identifier),
@@ -102,13 +88,12 @@ export class DefaultKos extends Kos<
     offset: number;
     query: ConceptsQuery;
   }): Promise<StubSequence<DefaultConcept>> {
-    return new GraphPatternStubSequence<DefaultConcept>({
+    return new StubSequence<DefaultConcept>({
       datasetCoreFactory: this.datasetCoreFactory,
       graphPatterns: conceptGraphPatterns_,
       identifiers: await this.queryConcepts(kwds),
       includeLanguageTags: this.includeLanguageTags,
       modelFactory: (resource) => this.conceptModelFactory(resource),
-      modelVariable: conceptVariable,
       logger: this.logger,
       sparqlQueryClient: this.sparqlQueryClient,
       stubFactory: (identifier) => this.concept(identifier),

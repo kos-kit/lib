@@ -1,6 +1,5 @@
+import { GraphPattern, ResourceGraphPatterns } from "@kos-kit/sparql-builder";
 import { dc11, dcterms, rdf } from "@tpluscode/rdf-ns-builders";
-import { GraphPattern } from "./GraphPattern.js";
-import { ResourceGraphPatterns } from "./ResourceGraphPatterns.js";
 
 export namespace Model {
   export class GraphPatterns extends ResourceGraphPatterns {

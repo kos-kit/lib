@@ -7,11 +7,10 @@ import {
   Identifier,
   abc,
 } from "@kos-kit/models";
+import { GraphPattern, RdfTypeGraphPatterns } from "@kos-kit/sparql-builder";
 import { SparqlQueryClient } from "@kos-kit/sparql-client";
 import { DatasetCoreFactory } from "@rdfjs/types";
 import { skos } from "@tpluscode/rdf-ns-builders";
-import { BasicGraphPattern, GraphPattern } from "./GraphPattern.js";
-import { IndentedString } from "./IndentedString.js";
 import { mapBindingsToCount } from "./mapBindingsToCount.js";
 import { mapBindingsToIdentifiers } from "./mapBindingsToIdentifiers.js";
 
@@ -109,12 +108,10 @@ ${offset > 0 ? `OFFSET ${offset}` : ""}
   ): string[] {
     if (query.type === "All") {
       return [
-        GraphPattern.toWhereString(
-          GraphPattern.whereRdfType(
-            BasicGraphPattern.variable("conceptScheme"),
-            skos.ConceptScheme,
-          ),
-        ),
+        new RdfTypeGraphPatterns(
+          GraphPattern.variable("conceptScheme"),
+          skos.ConceptScheme,
+        ).toWhereString(),
       ];
     }
 
@@ -142,13 +139,10 @@ ${offset > 0 ? `OFFSET ${offset}` : ""}
     query: ConceptsQuery,
   ): readonly string[] {
     if (query.type === "All") {
-      return GraphPattern.toWhereIndentedStrings(
-        GraphPattern.whereRdfType(
-          BasicGraphPattern.variable("concept"),
-          skos.Concept,
-        ),
-        0,
-      ).map(IndentedString.toString);
+      return new RdfTypeGraphPatterns(
+        GraphPattern.variable("concept"),
+        skos.Concept,
+      ).toWhereStrings();
     }
 
     if (query.type === "InScheme" || query.type === "TopConceptOf") {
@@ -173,12 +167,10 @@ ${offset > 0 ? `OFFSET ${offset}` : ""}
             // skos:inScheme has an open domain, so we have to check the concept's rdf:type
             `{ ?concept <${
               skos.inScheme.value
-            }> ${conceptSchemeIdentifierString} . ${GraphPattern.toWhereString(
-              GraphPattern.whereRdfType(
-                BasicGraphPattern.variable("concept"),
-                skos.Concept,
-              ),
-            )} }`,
+            }> ${conceptSchemeIdentifierString} . ${new RdfTypeGraphPatterns(
+              GraphPattern.variable("concept"),
+              skos.Concept,
+            ).toWhereString()} }`,
             "UNION",
           );
         }

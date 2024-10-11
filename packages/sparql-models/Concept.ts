@@ -1,8 +1,7 @@
 import { Note } from "@kos-kit/models";
+import { GraphPattern, ResourceGraphPatterns } from "@kos-kit/sparql-builder";
 import { skos } from "@tpluscode/rdf-ns-builders";
-import { GraphPattern } from "./GraphPattern.js";
 import { LabeledModel } from "./LabeledModel.js";
-import { ResourceGraphPatterns } from "./ResourceGraphPatterns.js";
 
 export namespace Concept {
   export class GraphPatterns extends ResourceGraphPatterns {
