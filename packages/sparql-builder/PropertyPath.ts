@@ -1,5 +1,5 @@
 import { NamedNode } from "@rdfjs/types";
-import { termToString } from "./termToString";
+import { termToString } from "./termToString.js";
 
 export type PropertyPath =
   | {
