@@ -4,7 +4,7 @@
     "iterator-helpers-polyfill": "^3.0.1",
     "pino": "^9.1.0",
     "purify-ts": "~2.1.0",
-    "rdfjs-resource": "1.0.3"
+    "rdfjs-resource": "1.0.4"
   },
   "devDependencies": {
     "@types/n3": "^1.16.4",
@@ -46,5 +46,5 @@
   },
   "type": "module",
   "types": "index.d.ts",
-  "version": "2.0.85"
+  "version": "2.0.86"
 }
