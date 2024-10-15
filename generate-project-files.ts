@@ -18,6 +18,7 @@ interface Project {
   externalDependencies?: Record<string, string>;
   files?: readonly string[];
   internalDependencies?: readonly ProjectName[];
+  linkableDependencies?: readonly string[];
   name: ProjectName;
 }
 
@@ -31,7 +32,7 @@ const externalDependencyVersions = {
   pino: "^9.1.0",
   "purify-ts": "~2.1.0",
   "purify-ts-helpers": "1.0.6",
-  "rdfjs-resource": "1.0.2",
+  "rdfjs-resource": "1.0.3",
 };
 
 const projects: readonly Project[] = [
@@ -178,6 +179,7 @@ for (const project of projects) {
           "format:write": "biome format --write",
           "format:write:unsafe": "biome format --write --unsafe",
           rebuild: "run-s clean build",
+          "link-dependencies": "npm link purify-ts-helpers rdfjs-resource",
           lint: "biome lint",
           "lint:write": "biome lint --write",
           "lint:write:unsafe": "biome lint --write --unsafe",
@@ -236,6 +238,7 @@ fs.writeFileSync(
         clean: "npm run clean --workspaces",
         "generate-project-files": "tsx generate-project-files.ts",
         link: "npm link --workspaces",
+        "link-dependencies": "npm run link-dependencies --workspaces",
         lint: "npm run lint --workspaces",
         rebuild: "npm run rebuild --workspaces",
         test: "npm run test --if-present --workspaces",

@@ -4,7 +4,7 @@
     "iterator-helpers-polyfill": "^3.0.1",
     "pino": "^9.1.0",
     "purify-ts": "~2.1.0",
-    "rdfjs-resource": "1.0.2"
+    "rdfjs-resource": "1.0.3"
   },
   "devDependencies": {
     "@types/n3": "^1.16.4",
@@ -30,6 +30,7 @@
     "format:write": "biome format --write",
     "format:write:unsafe": "biome format --write --unsafe",
     "rebuild": "run-s clean build",
+    "link-dependencies": "npm link purify-ts-helpers rdfjs-resource",
     "lint": "biome lint",
     "lint:write": "biome lint --write",
     "lint:write:unsafe": "biome lint --write --unsafe",
