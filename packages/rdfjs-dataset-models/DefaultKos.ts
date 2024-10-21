@@ -1,6 +1,6 @@
 import { Identifier } from "@kos-kit/models";
 import { skos } from "@tpluscode/rdf-ns-builders";
-import { Maybe } from "purify-ts";
+import { Left, Right } from "purify-ts";
 import { Resource } from "rdfjs-resource";
 import { Concept } from "./Concept.js";
 import { ConceptScheme } from "./ConceptScheme.js";
@@ -32,7 +32,7 @@ export class DefaultKos extends Kos<
       logger: this.logger,
       modelFactory: (resource) =>
         resource.isInstanceOf(skos.Concept)
-          ? Maybe.of(
+          ? Right(
               new DefaultConcept({
                 kos: this,
                 labelConstructor: Label,
@@ -40,7 +40,11 @@ export class DefaultKos extends Kos<
                 resource,
               }),
             )
-          : Maybe.empty(),
+          : Left(
+              new Error(
+                `${Resource.Identifier.toString(resource.identifier)} is not a skos:Concept`,
+              ),
+            ),
       resource: new Resource<Identifier>({ dataset: this.dataset, identifier }),
     });
   }
@@ -50,7 +54,7 @@ export class DefaultKos extends Kos<
       logger: this.logger,
       modelFactory: (resource) =>
         resource.isInstanceOf(skos.ConceptScheme)
-          ? Maybe.of(
+          ? Right(
               new DefaultConceptScheme({
                 kos: this,
                 labelConstructor: Label,
@@ -58,7 +62,11 @@ export class DefaultKos extends Kos<
                 resource,
               }),
             )
-          : Maybe.empty(),
+          : Left(
+              new Error(
+                `${Resource.Identifier.toString(resource.identifier)} is not a skos:ConceptScheme`,
+              ),
+            ),
       resource: new Resource<Identifier>({ dataset: this.dataset, identifier }),
     });
   }

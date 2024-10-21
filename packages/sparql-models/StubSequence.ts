@@ -7,7 +7,7 @@ import {
 import { SparqlQueryClient } from "@kos-kit/sparql-client";
 import { DatasetCoreFactory } from "@rdfjs/types";
 import { Logger } from "pino";
-import { Either, Maybe } from "purify-ts";
+import { Either } from "purify-ts";
 import { Resource } from "rdfjs-resource";
 
 export class StubSequence<
@@ -20,7 +20,7 @@ export class StubSequence<
   private readonly logger: Logger;
   private readonly modelFactory: (
     resource: Resource<Identifier>,
-  ) => Maybe<ModelT>;
+  ) => Either<Error, ModelT>;
   private readonly modelVariable: GraphPattern.Variable;
   private readonly sparqlQueryClient: SparqlQueryClient;
   private readonly stubFactory: (identifier: Identifier) => Stub<ModelT>;
@@ -41,7 +41,7 @@ export class StubSequence<
     identifiers: readonly Identifier[];
     includeLanguageTags: LanguageTagSet;
     logger: Logger;
-    modelFactory: (resource: Resource<Identifier>) => Maybe<ModelT>;
+    modelFactory: (resource: Resource<Identifier>) => Either<Error, ModelT>;
     modelVariable?: GraphPattern.Variable;
     sparqlQueryClient: SparqlQueryClient;
     stubFactory: (identifier: Identifier) => Stub<ModelT>;
@@ -101,17 +101,14 @@ export class StubSequence<
           dataset: this.datasetCoreFactory.dataset(quads.concat()),
           identifier,
         }),
-      )
-        .toEither(null)
-        .mapLeft(() => {
-          // Avoid constructing the Stub if the resolution succeeded, the common case.
-          // There's no toEitherLazy.
-          this.logger.warn(
-            "%s is missing, unable to resolve",
-            Identifier.toString(identifier),
-          );
-          return this.at(identifierI)!;
-        }),
+      ).mapLeft((error) => {
+        this.logger.warn(
+          "%s is missing, unable to resolve: %s",
+          Identifier.toString(identifier),
+          error.message,
+        );
+        return this.at(identifierI)!;
+      }),
     );
   }
 }

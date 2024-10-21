@@ -6,7 +6,7 @@ import {
 } from "@kos-kit/sparql-builder";
 import { SparqlQueryClient } from "@kos-kit/sparql-client";
 import { DatasetCoreFactory } from "@rdfjs/types";
-import { Either, Maybe } from "purify-ts";
+import { Either } from "purify-ts";
 import { Resource } from "rdfjs-resource";
 
 export class Stub<ModelT extends Model> extends abc.Stub<ModelT> {
@@ -17,7 +17,7 @@ export class Stub<ModelT extends Model> extends abc.Stub<ModelT> {
   private readonly includeLanguageTags: LanguageTagSet;
   private readonly modelFactory: (
     resource: Resource<Identifier>,
-  ) => Maybe<ModelT>;
+  ) => Either<Error, ModelT>;
   private readonly modelVariable: GraphPattern.Variable;
   private readonly sparqlQueryClient: SparqlQueryClient;
 
@@ -35,7 +35,7 @@ export class Stub<ModelT extends Model> extends abc.Stub<ModelT> {
     graphPatterns: Iterable<GraphPattern>;
     identifier: Identifier;
     includeLanguageTags: LanguageTagSet;
-    modelFactory: (resource: Resource<Identifier>) => Maybe<ModelT>;
+    modelFactory: (resource: Resource<Identifier>) => Either<Error, ModelT>;
     modelVariable?: GraphPattern.Variable;
     sparqlQueryClient: SparqlQueryClient;
   } & abc.Stub.Parameters) {
@@ -73,13 +73,13 @@ export class Stub<ModelT extends Model> extends abc.Stub<ModelT> {
         dataset: this.datasetCoreFactory.dataset(quads.concat()),
         identifier: this.identifier,
       }),
-    )
-      .toEither(this)
-      .ifLeft(() => {
-        this.logger.warn(
-          "%s is missing, unable to resolve",
-          Identifier.toString(this.identifier),
-        );
-      });
+    ).mapLeft((error) => {
+      this.logger.warn(
+        "%s is missing, unable to resolve: %s",
+        Identifier.toString(this.identifier),
+        error.message,
+      );
+      return this;
+    });
   }
 }

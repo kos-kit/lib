@@ -1,11 +1,11 @@
 import { Identifier, Model, abc } from "@kos-kit/models";
-import { Either, Maybe } from "purify-ts";
+import { Either } from "purify-ts";
 import { Resource } from "rdfjs-resource";
 
 export class Stub<ModelT extends Model> extends abc.Stub<ModelT> {
   private readonly modelFactory: (
     resource: Resource<Identifier>,
-  ) => Maybe<ModelT>;
+  ) => Either<Error, ModelT>;
   private readonly resource: Resource<Identifier>;
 
   constructor({
@@ -13,7 +13,7 @@ export class Stub<ModelT extends Model> extends abc.Stub<ModelT> {
     resource,
     ...superParameters
   }: {
-    modelFactory: (resource: Resource<Identifier>) => Maybe<ModelT>;
+    modelFactory: (resource: Resource<Identifier>) => Either<Error, ModelT>;
     resource: Resource<Identifier>;
   } & Omit<abc.Stub.Parameters, "identifier">) {
     super(superParameters);
@@ -26,13 +26,13 @@ export class Stub<ModelT extends Model> extends abc.Stub<ModelT> {
   }
 
   async resolve(): Promise<Either<this, ModelT>> {
-    return this.modelFactory(this.resource)
-      .toEither(this)
-      .ifLeft(() => {
-        this.logger.warn(
-          "%s is missing, unable to resolve",
-          Identifier.toString(this.identifier),
-        );
-      });
+    return this.modelFactory(this.resource).mapLeft((error) => {
+      this.logger.warn(
+        "%s is missing, unable to resolve: %s",
+        Identifier.toString(this.identifier),
+        error.message,
+      );
+      return this;
+    });
   }
 }

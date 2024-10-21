@@ -6,7 +6,7 @@ import {
 import * as rdfjsDataset from "@kos-kit/rdfjs-dataset-models";
 import { GraphPattern } from "@kos-kit/sparql-builder";
 import { skos } from "@tpluscode/rdf-ns-builders";
-import { Maybe } from "purify-ts";
+import { Either, Left, Right } from "purify-ts";
 import { Resource } from "rdfjs-resource";
 import { Concept } from "./Concept.js";
 import { ConceptScheme } from "./ConceptScheme.js";
@@ -102,9 +102,9 @@ export class DefaultKos extends Kos<
 
   private conceptModelFactory(
     resource: Resource<Identifier>,
-  ): Maybe<DefaultConcept> {
+  ): Either<Error, DefaultConcept> {
     if (resource.isInstanceOf(skos.Concept)) {
-      return Maybe.of(
+      return Right(
         new DefaultConcept({
           kos: this,
           labelConstructor: DefaultLabel,
@@ -113,14 +113,18 @@ export class DefaultKos extends Kos<
         }),
       );
     }
-    return Maybe.empty();
+    return Left(
+      new Error(
+        `${Resource.Identifier.toString(resource.identifier)} is not a skos:Concept`,
+      ),
+    );
   }
 
   private conceptSchemeModelFactory(
     resource: Resource<Identifier>,
-  ): Maybe<DefaultConceptScheme> {
+  ): Either<Error, DefaultConceptScheme> {
     if (resource.isInstanceOf(skos.ConceptScheme)) {
-      return Maybe.of(
+      return Right(
         new DefaultConceptScheme({
           kos: this,
           labelConstructor: DefaultLabel,
@@ -129,6 +133,10 @@ export class DefaultKos extends Kos<
         }),
       );
     }
-    return Maybe.empty();
+    return Left(
+      new Error(
+        `${Resource.Identifier.toString(resource.identifier)} is not a skos:ConceptScheme`,
+      ),
+    );
   }
 }
