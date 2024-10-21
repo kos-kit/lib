@@ -28,6 +28,7 @@ export function labelsByType<LabelT extends ILabel>({
       .flatMap((value) =>
         value
           .toLiteral()
+          .toMaybe()
           .filter((literal) =>
             abc.matchLiteral(literal, {
               includeLanguageTags,
@@ -44,12 +45,14 @@ export function labelsByType<LabelT extends ILabel>({
       ...resource.values(skosXlPredicate).flatMap((labelValue) =>
         labelValue
           .toNamedResource()
+          .toMaybe()
           .chain((labelResource) =>
             Maybe.fromNullable(
               [
                 ...labelResource.values(skosxl.literalForm).flatMap((value) =>
                   value
                     .toLiteral()
+                    .toMaybe()
                     .filter((literal) =>
                       abc.matchLiteral(literal, {
                         includeLanguageTags,

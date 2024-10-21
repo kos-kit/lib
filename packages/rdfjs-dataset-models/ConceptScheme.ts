@@ -43,11 +43,11 @@ export class ConceptScheme<
     const literals: Literal[] = [];
 
     for (const value of this.resource.values(dcterms.license)) {
-      const iri = value.toIri();
+      const iri = value.toIri().toMaybe();
       if (iri.isJust()) {
         return iri;
       }
-      literals.push(...value.toLiteral().toList());
+      literals.push(...value.toLiteral().toMaybe().toList());
     }
 
     if (literals.length === 0) {
@@ -68,7 +68,8 @@ export class ConceptScheme<
   get modified(): Maybe<Literal> {
     return this.resource
       .value(dcterms.modified)
-      .chain((value) => value.toLiteral());
+      .chain((value) => value.toLiteral())
+      .toMaybe();
   }
 
   get rights(): Maybe<Literal> {
@@ -97,7 +98,7 @@ export class ConceptScheme<
   private literalObject(predicate: NamedNode): Maybe<Literal> {
     const literals: readonly Literal[] = [
       ...this.resource.values(predicate),
-    ].flatMap((value) => value.toLiteral().toList());
+    ].flatMap((value) => value.toLiteral().toMaybe().toList());
 
     if (literals.length === 0) {
       return Maybe.empty();

@@ -40,14 +40,15 @@ export class Concept<
   get modified(): Maybe<Literal> {
     return this.resource
       .value(dcterms.modified)
-      .chain((value) => value.toLiteral());
+      .chain((value) => value.toLiteral())
+      .toMaybe();
   }
 
   get notations(): readonly Literal[] {
     return [
       ...this.resource
         .values(skos.notation)
-        .flatMap((value) => value.toLiteral().toList()),
+        .flatMap((value) => value.toLiteral().toMaybe().toList()),
     ];
   }
 
@@ -56,6 +57,7 @@ export class Concept<
       ...this.resource.values(type.skosProperty).flatMap((value) =>
         value
           .toLiteral()
+          .toMaybe()
           .filter((literal) =>
             abc.matchLiteral(literal, {
               includeLanguageTags: this.kos.includeLanguageTags,
