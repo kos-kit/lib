@@ -7,7 +7,6 @@ import {
 import { skosxl } from "@tpluscode/rdf-ns-builders";
 import { Maybe } from "purify-ts";
 import { Resource } from "rdfjs-resource";
-import "iterator-helpers-polyfill";
 import { Label } from "./Label.js";
 
 export function labelsByType<LabelT extends ILabel>({

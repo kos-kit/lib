@@ -94,7 +94,7 @@ export class HttpSparqlQueryClient
       },
       options,
     );
-    return (await response.json()).boolean;
+    return ((await response.json()) as any).boolean;
   }
 
   async queryQuads(

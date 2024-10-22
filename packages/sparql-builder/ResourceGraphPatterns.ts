@@ -20,7 +20,7 @@ export abstract class ResourceGraphPatterns extends GraphPatterns {
     }
   }
 
-  abstract [Symbol.iterator](): Iterator<GraphPattern>;
+  abstract override [Symbol.iterator](): Iterator<GraphPattern>;
 
   protected variable(suffix: string): GraphPattern.Variable {
     return GraphPattern.variable(this.variablePrefix + suffix);

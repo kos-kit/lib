@@ -109,7 +109,11 @@ export abstract class Kos<
   override async conceptSchemesCount(
     query: ConceptSchemesQuery,
   ): Promise<number> {
-    return this.queryConceptSchemes(query).count();
+    let count = 0;
+    for (const _ of this.queryConceptSchemes(query)) {
+      count++;
+    }
+    return count;
   }
 
   async concepts({
@@ -130,7 +134,11 @@ export abstract class Kos<
   }
 
   override async conceptsCount(query: ConceptsQuery): Promise<number> {
-    return this.queryConcepts(query).count();
+    let count = 0;
+    for (const _ of this.queryConcepts(query)) {
+      count++;
+    }
+    return count;
   }
 
   private *allConceptSchemes(): Generator<Stub<ConceptSchemeT>> {

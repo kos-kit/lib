@@ -25,14 +25,13 @@ interface Project {
 const externalDependencyVersions = {
   "@rdfjs/types": "^1.1.0",
   "@tpluscode/rdf-ns-builders": "^4.3.0",
-  "@types/n3": "^1.16.4",
-  "iterator-helpers-polyfill": "^3.0.1",
+  "@types/n3": "^1.21.1",
   oxigraph: "^0.4.0",
-  n3: "^1.17.3",
+  n3: "^1.21.3",
   pino: "^9.1.0",
   "purify-ts": "~2.1.0",
-  "purify-ts-helpers": "1.0.6",
-  "rdfjs-resource": "1.0.6",
+  "purify-ts-helpers": "1.0.7",
+  "rdfjs-resource": "1.0.7",
 };
 
 const projects: readonly Project[] = [
@@ -51,7 +50,7 @@ const projects: readonly Project[] = [
   {
     externalDependencies: {
       "@rdfjs/types": externalDependencyVersions["@rdfjs/types"],
-      "@types/n3": "^1.16.4",
+      "@types/n3": externalDependencyVersions["@types/n3"],
       "@types/npmcli__promise-spawn": "6.0.3",
       "@types/unbzip2-stream": "^1.4.3",
       "base-x": "^3.0.9",
@@ -60,7 +59,7 @@ const projects: readonly Project[] = [
       mime: "^4.0.4",
       pino: externalDependencyVersions["pino"],
       "@npmcli/promise-spawn": "^8.0.0",
-      n3: "^1.17.3",
+      n3: externalDependencyVersions["n3"],
       "purify-ts": externalDependencyVersions["purify-ts"],
       "unbzip2-stream": "^1.4.3",
     },
@@ -74,8 +73,6 @@ const projects: readonly Project[] = [
     },
     externalDependencies: {
       "@rdfjs/types": externalDependencyVersions["@rdfjs/types"],
-      "iterator-helpers-polyfill":
-        externalDependencyVersions["iterator-helpers-polyfill"],
       pino: externalDependencyVersions["pino"],
       "purify-ts": externalDependencyVersions["purify-ts"],
       "rdfjs-resource": externalDependencyVersions["rdfjs-resource"],
@@ -101,8 +98,6 @@ const projects: readonly Project[] = [
       "@rdfjs/types": externalDependencyVersions["@rdfjs/types"],
       "@tpluscode/rdf-ns-builders":
         externalDependencyVersions["@tpluscode/rdf-ns-builders"],
-      "iterator-helpers-polyfill":
-        externalDependencyVersions["iterator-helpers-polyfill"],
     },
     name: "sparql-builder",
   },
@@ -114,8 +109,8 @@ const projects: readonly Project[] = [
     externalDependencies: {
       "@rdfjs/types": externalDependencyVersions["@rdfjs/types"],
       pino: externalDependencyVersions["pino"],
-      "@types/n3": "^1.16.4",
-      n3: "^1.17.3",
+      "@types/n3": externalDependencyVersions["@types/n3"],
+      n3: externalDependencyVersions.n3,
     },
     name: "sparql-client",
   },
@@ -218,7 +213,7 @@ fs.writeFileSync(
   `${JSON.stringify(
     {
       devDependencies: {
-        "@biomejs/biome": "1.8.3",
+        "@biomejs/biome": "1.9.4",
         "@tsconfig/strictest": "^2.0.5",
         "@types/node": "^20",
         "@vitest/coverage-v8": "^2.0.5",
@@ -226,7 +221,7 @@ fs.writeFileSync(
         "npm-run-all": "^4.1.5",
         rimraf: "^6.0.1",
         tsx: "^4.16.2",
-        typescript: "~5.5",
+        typescript: "~5.6",
         vitest: "^2.0.5",
         yaml: "^2.5.0",
       },

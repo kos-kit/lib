@@ -8,6 +8,7 @@
     "forceConsistentCasingInFileNames": true,
     "noUncheckedIndexedAccess": false,
     "incremental": true,
+    "lib": ["ESNext.Iterator"],
     "module": "ES2020",
     "moduleResolution": "Node",
     "target": "ES2020",

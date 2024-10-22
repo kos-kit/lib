@@ -100,7 +100,7 @@ export abstract class HttpSparqlBaseClient<
 
     return await fetch(url, {
       body,
-      cache: options?.cache ?? this.defaultRequestOptions?.cache,
+      // cache: options?.cache ?? this.defaultRequestOptions?.cache,
       headers: mergedHeaders,
       method,
     });
@@ -121,7 +121,7 @@ export namespace HttpSparqlBaseClient {
   }
 
   export interface RequestOptions {
-    cache?: RequestCache;
+    cache?: Request["cache"];
     headers?: Headers;
   }
 }

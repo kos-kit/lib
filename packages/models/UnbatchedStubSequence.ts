@@ -2,7 +2,6 @@ import { Either } from "purify-ts";
 import { Model } from "./Model.js";
 import { Stub } from "./Stub.js";
 import { StubSequence } from "./abc/StubSequence.js";
-import "iterator-helpers-polyfill";
 
 /**
  * An inefficient implementation of StubSequence that takes an array of Stubs and resolves them individually.

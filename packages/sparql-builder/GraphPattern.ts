@@ -56,21 +56,21 @@ export abstract class GraphPattern {
     );
   }
 
-  abstract toConstructIndentedStrings(indent: number): Iterable<IndentedString>;
+  abstract toConstructIndentedStrings(
+    indent: number,
+  ): readonly IndentedString[];
 
   abstract toWhereIndentedStrings(
     indent: number,
     options?: ToWhereOptions,
-  ): Iterable<IndentedString>;
+  ): readonly IndentedString[];
 
   toWhereString(options?: ToWhereOptions): string {
-    return this.toWhereStrings(options)[Symbol.iterator]().join("\n");
+    return this.toWhereStrings(options).join("\n");
   }
 
-  *toWhereStrings(options?: ToWhereOptions): Iterable<string> {
-    for (const indentedString of this.toWhereIndentedStrings(0, options)) {
-      yield IndentedString.toString(indentedString);
-    }
+  toWhereStrings(options?: ToWhereOptions): readonly string[] {
+    return this.toWhereIndentedStrings(0, options).map(IndentedString.toString);
   }
 }
 
@@ -268,12 +268,16 @@ class GroupGraphPattern extends GraphPattern {
     this.graphPatterns = [...graphPatterns];
   }
 
-  override *toConstructIndentedStrings(
+  override toConstructIndentedStrings(
     indent: number,
-  ): Iterable<IndentedString> {
+  ): readonly IndentedString[] {
+    let constructIndentedStrings: IndentedString[] = [];
     for (const graphPattern of this.graphPatterns) {
-      yield* graphPattern.toConstructIndentedStrings(indent);
+      constructIndentedStrings = constructIndentedStrings.concat(
+        graphPattern.toConstructIndentedStrings(indent),
+      );
     }
+    return constructIndentedStrings;
   }
 
   override toWhereIndentedStrings(
@@ -283,7 +287,7 @@ class GroupGraphPattern extends GraphPattern {
     let whereIndentedStrings: IndentedString[] = [{ string: "{", indent }];
     for (const graphPattern of this.graphPatterns) {
       whereIndentedStrings = whereIndentedStrings.concat(
-        ...graphPattern.toWhereIndentedStrings(indent + TAB_SPACES, options),
+        graphPattern.toWhereIndentedStrings(indent + TAB_SPACES, options),
       );
     }
     whereIndentedStrings.push({ string: "}", indent });
@@ -304,7 +308,7 @@ class OptionalGraphPattern extends GraphPattern {
 
   override toConstructIndentedStrings(
     indent: number,
-  ): Iterable<IndentedString> {
+  ): readonly IndentedString[] {
     return this.graphPattern.toConstructIndentedStrings(indent);
   }
 
@@ -331,21 +335,23 @@ class ScopedGraphPattern extends GraphPattern {
     super();
   }
 
-  override *toConstructIndentedStrings(
+  override toConstructIndentedStrings(
     indent: number,
-  ): Iterable<IndentedString> {
+  ): readonly IndentedString[] {
     if (this.scopes.has("CONSTRUCT")) {
-      yield* this.graphPattern.toConstructIndentedStrings(indent);
+      return this.graphPattern.toConstructIndentedStrings(indent);
     }
+    return [];
   }
 
-  override *toWhereIndentedStrings(
+  override toWhereIndentedStrings(
     indent: number,
     options?: ToWhereOptions,
-  ): Iterable<IndentedString> {
+  ): readonly IndentedString[] {
     if (this.scopes.has("WHERE")) {
-      yield* this.graphPattern.toWhereIndentedStrings(indent, options);
+      return this.graphPattern.toWhereIndentedStrings(indent, options);
     }
+    return [];
   }
 }
 
@@ -362,12 +368,16 @@ class UnionGraphPattern extends GraphPattern {
     super();
   }
 
-  override *toConstructIndentedStrings(
+  override toConstructIndentedStrings(
     indent: number,
-  ): Iterable<IndentedString> {
+  ): readonly IndentedString[] {
+    let constructIndentedStrings: IndentedString[] = [];
     for (const graphPattern of this.graphPatterns) {
-      yield* graphPattern.toConstructIndentedStrings(indent);
+      constructIndentedStrings = constructIndentedStrings.concat(
+        graphPattern.toConstructIndentedStrings(indent),
+      );
     }
+    return constructIndentedStrings;
   }
 
   override toWhereIndentedStrings(
@@ -381,7 +391,7 @@ class UnionGraphPattern extends GraphPattern {
       }
       whereIndentedStrings.push({ string: "{", indent });
       whereIndentedStrings = whereIndentedStrings.concat(
-        ...graphPattern.toWhereIndentedStrings(indent + TAB_SPACES, options),
+        graphPattern.toWhereIndentedStrings(indent + TAB_SPACES, options),
       );
       whereIndentedStrings.push({ string: "}", indent });
     });

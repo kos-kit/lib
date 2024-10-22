@@ -1,7 +1,6 @@
 import { GraphPattern } from "./GraphPattern.js";
 import { IndentedString, TAB_SPACES } from "./IndentedString.js";
 import { ToWhereOptions } from "./ToWhereOptions.js";
-import "iterator-helpers-polyfill";
 
 export abstract class GraphPatterns implements Iterable<GraphPattern> {
   static fromArray(array: readonly GraphPattern[]): GraphPatterns {
@@ -27,13 +26,11 @@ export abstract class GraphPatterns implements Iterable<GraphPattern> {
   }
 
   toConstructStrings(): readonly string[] {
-    return [
-      ...this[Symbol.iterator]()
-        .flatMap((graphPattern) =>
-          graphPattern.toConstructIndentedStrings(TAB_SPACES),
-        )
-        .map(IndentedString.toString),
-    ];
+    return [...this]
+      .flatMap((graphPattern) => [
+        ...graphPattern.toConstructIndentedStrings(TAB_SPACES),
+      ])
+      .map(IndentedString.toString);
   }
 
   toGroupGraphPattern(): GraphPattern {
@@ -45,13 +42,11 @@ export abstract class GraphPatterns implements Iterable<GraphPattern> {
   }
 
   toWhereStrings(options?: ToWhereOptions): readonly string[] {
-    return [
-      ...this[Symbol.iterator]()
-        .flatMap((graphPattern) =>
-          graphPattern.toWhereIndentedStrings(TAB_SPACES, options),
-        )
-        .map(IndentedString.toString),
-    ];
+    return [...this]
+      .flatMap((graphPattern) => [
+        ...graphPattern.toWhereIndentedStrings(TAB_SPACES, options),
+      ])
+      .map(IndentedString.toString);
   }
 }
 

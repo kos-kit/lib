@@ -1,8 +1,7 @@
 {
   "dependencies": {
     "@rdfjs/types": "^1.1.0",
-    "@tpluscode/rdf-ns-builders": "^4.3.0",
-    "iterator-helpers-polyfill": "^3.0.1"
+    "@tpluscode/rdf-ns-builders": "^4.3.0"
   },
   "devDependencies": {
     "@kos-kit/sparql-client": "2.0.88",

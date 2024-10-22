@@ -1,9 +1,8 @@
 import { Either } from "purify-ts";
+import { Equatable } from "purify-ts-helpers";
 import { Model } from "./Model.js";
 import { Stub } from "./Stub.js";
 import { StubSequence } from "./StubSequence.js";
-import "iterator-helpers-polyfill";
-import { Equatable } from "purify-ts-helpers";
 
 export class EmptyStubSequence<ModelT extends Model>
   implements StubSequence<ModelT>
