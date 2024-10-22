@@ -225,6 +225,7 @@ fs.writeFileSync(
       name: "@kos-kit/lib",
       optionalDependencies: {
         "@biomejs/cli-linux-x64": "1.9.4",
+        "@rollup/rollup-linux-x64-gnu": "4.24.0",
       },
       private: true,
       scripts: {
