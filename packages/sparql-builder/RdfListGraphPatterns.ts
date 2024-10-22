@@ -8,31 +8,28 @@ import { ResourceGraphPatterns } from "./ResourceGraphPatterns.js";
  * https://www.w3.org/TR/rdf-schema/#ch_collectionvocab
  */
 export class RdfListGraphPatterns extends ResourceGraphPatterns {
-  private readonly itemGraphPatterns?: (
-    itemVariable: GraphPattern.Variable,
-  ) => Iterable<GraphPattern>;
-
   constructor({
     itemGraphPatterns,
     rdfList,
   }: {
-    itemGraphPatterns?: RdfListGraphPatterns["itemGraphPatterns"];
+    itemGraphPatterns?: (
+      itemVariable: GraphPattern.Variable,
+    ) => Iterable<GraphPattern>;
     rdfList: ResourceGraphPatterns.Subject;
   }) {
     super(rdfList);
-    this.itemGraphPatterns = itemGraphPatterns;
-  }
 
-  override *[Symbol.iterator](): Iterator<GraphPattern> {
     // ?list rdf:first ?item0
     const item0Variable = this.variable("Item0");
-    yield GraphPattern.basic(this.subject, rdf.first, item0Variable);
-    if (this.itemGraphPatterns) {
-      yield* this.itemGraphPatterns(item0Variable);
+    this.add(GraphPattern.basic(this.subject, rdf.first, item0Variable));
+    if (itemGraphPatterns) {
+      this.add(...itemGraphPatterns(item0Variable));
     }
 
     // ?list rdf:rest ?rest0
-    yield GraphPattern.basic(this.subject, rdf.rest, this.variable("Rest0"));
+    this.add(
+      GraphPattern.basic(this.subject, rdf.rest, this.variable("Rest0")),
+    );
 
     const optionalGraphPatterns: GraphPattern[] = [];
     // ?list rdf:rest+ ?restN
@@ -53,8 +50,8 @@ export class RdfListGraphPatterns extends ResourceGraphPatterns {
     optionalGraphPatterns.push(
       GraphPattern.basic(restNVariable, rdf.first, itemNVariable),
     );
-    if (this.itemGraphPatterns) {
-      optionalGraphPatterns.push(...this.itemGraphPatterns(itemNVariable));
+    if (itemGraphPatterns) {
+      optionalGraphPatterns.push(...itemGraphPatterns(itemNVariable));
     }
 
     // ?restN rdf:rest ?restNBasic to get the rdf:rest statement in the CONSTRUCT
@@ -62,6 +59,8 @@ export class RdfListGraphPatterns extends ResourceGraphPatterns {
       GraphPattern.basic(restNVariable, rdf.rest, this.variable("RestNBasic")),
     );
 
-    yield GraphPattern.optional(GraphPattern.group(optionalGraphPatterns));
+    this.add(GraphPattern.optional(GraphPattern.group(optionalGraphPatterns)));
   }
+
+  override *[Symbol.iterator](): Iterator<GraphPattern> {}
 }

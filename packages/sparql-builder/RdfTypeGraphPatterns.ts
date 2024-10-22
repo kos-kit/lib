@@ -8,51 +8,46 @@ import { ResourceGraphPatterns } from "./ResourceGraphPatterns.js";
  * Graph patterns for the rdf:type of a subject resource.
  */
 export class RdfTypeGraphPatterns extends ResourceGraphPatterns {
+  readonly constructGraphPatterns: readonly GraphPattern[];
+  readonly whereGraphPatterns: readonly GraphPattern[];
+
   constructor(
     subject: ResourceGraphPatterns.SubjectParameter,
     readonly rdfType: NamedNode,
   ) {
     super(subject);
+
+    // CONSTRUCT ?subject rdf:type ?rdfType
+    this.constructGraphPatterns = [
+      GraphPattern.basic(
+        this.subject,
+        rdf.type,
+        this.variable("RdfType"),
+      ).scoped("CONSTRUCT"),
+    ];
+
+    this.whereGraphPatterns = [
+      GraphPattern.basic(
+        this.subject,
+        {
+          termType: "PropertyPath",
+          value: PropertyPath.sequence(
+            PropertyPath.predicate(rdf.type),
+            PropertyPath.zeroOrMore(PropertyPath.predicate(rdfs.subClassOf)),
+          ),
+        },
+        this.rdfType,
+      ).scoped("WHERE"),
+      // Get the rdf:type in a variable for CONSTRUCT
+      GraphPattern.basic(
+        this.subject,
+        rdf.type,
+        this.variable("RdfType"),
+      ).scoped("WHERE"),
+    ];
   }
 
-  override *[Symbol.iterator](): Iterator<GraphPattern> {
-    yield* this.constructGraphPatterns();
-    yield* this.whereGraphPatterns();
-  }
-
-  /**
-   * CONSTRUCT ?subject rdf:type ?rdfType
-   */
-  *constructGraphPatterns(): Iterable<GraphPattern> {
-    yield GraphPattern.basic(
-      this.subject,
-      rdf.type,
-      this.variable("RdfType"),
-    ).scoped("CONSTRUCT");
-  }
-
-  /**
-   * WHERE ?subject rdf:type/rdfs:subClassOf* ?rdfType
-   */
-  *whereGraphPatterns(): Iterable<GraphPattern> {
-    // Match the expected rdf:type or a subClassOf it
-    yield GraphPattern.basic(
-      this.subject,
-      {
-        termType: "PropertyPath",
-        value: PropertyPath.sequence(
-          PropertyPath.predicate(rdf.type),
-          PropertyPath.zeroOrMore(PropertyPath.predicate(rdfs.subClassOf)),
-        ),
-      },
-      this.rdfType,
-    ).scoped("WHERE");
-
-    // Get the rdf:type in a variable for CONSTRUCT
-    yield GraphPattern.basic(
-      this.subject,
-      rdf.type,
-      this.variable("RdfType"),
-    ).scoped("WHERE");
+  override toArray(): readonly GraphPattern[] {
+    return this.constructGraphPatterns.concat(this.whereGraphPatterns);
   }
 }

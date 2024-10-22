@@ -2,23 +2,33 @@ import { GraphPattern } from "./GraphPattern.js";
 import { IndentedString, TAB_SPACES } from "./IndentedString.js";
 import { ToWhereOptions } from "./ToWhereOptions.js";
 
-export abstract class GraphPatterns implements Iterable<GraphPattern> {
-  static fromArray(array: readonly GraphPattern[]): GraphPatterns {
-    return new ArrayGraphPatterns(array);
+export class GraphPatterns implements Iterable<GraphPattern> {
+  private readonly array: GraphPattern[]; // Mutable so subclasses can add to it in their constructors
+
+  constructor() {
+    this.array = [];
   }
 
-  abstract [Symbol.iterator](): Iterator<GraphPattern>;
+  static fromArray(array: readonly GraphPattern[]): GraphPatterns {
+    const instance = new GraphPatterns();
+    instance.array.push(...array);
+    return instance;
+  }
+
+  [Symbol.iterator](): Iterator<GraphPattern> {
+    return this.toArray()[Symbol.iterator]();
+  }
 
   sort(): GraphPatterns {
     const sortedGraphPatterns = this.toArray().concat();
     sortedGraphPatterns.sort((left, right) => {
       return left.sortRank - right.sortRank;
     });
-    return new ArrayGraphPatterns(sortedGraphPatterns);
+    return GraphPatterns.fromArray(sortedGraphPatterns);
   }
 
   toArray(): readonly GraphPattern[] {
-    return [...this];
+    return this.array;
   }
 
   toConstructString(): string {
@@ -26,7 +36,7 @@ export abstract class GraphPatterns implements Iterable<GraphPattern> {
   }
 
   toConstructStrings(): readonly string[] {
-    return [...this]
+    return this.toArray()
       .flatMap((graphPattern) => [
         ...graphPattern.toConstructIndentedStrings(TAB_SPACES),
       ])
@@ -42,20 +52,14 @@ export abstract class GraphPatterns implements Iterable<GraphPattern> {
   }
 
   toWhereStrings(options?: ToWhereOptions): readonly string[] {
-    return [...this]
+    return this.toArray()
       .flatMap((graphPattern) => [
         ...graphPattern.toWhereIndentedStrings(TAB_SPACES, options),
       ])
       .map(IndentedString.toString);
   }
-}
 
-class ArrayGraphPatterns extends GraphPatterns {
-  constructor(private readonly array: readonly GraphPattern[]) {
-    super();
-  }
-
-  override [Symbol.iterator](): Iterator<GraphPattern> {
-    return this.array[Symbol.iterator]();
+  protected add(...graphPatterns: readonly GraphPattern[]): void {
+    this.array.push(...graphPatterns);
   }
 }

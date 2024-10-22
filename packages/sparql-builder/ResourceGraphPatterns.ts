@@ -1,7 +1,7 @@
 import { BasicGraphPattern, GraphPattern } from "./GraphPattern.js";
 import { GraphPatterns } from "./GraphPatterns.js";
 
-export abstract class ResourceGraphPatterns extends GraphPatterns {
+export class ResourceGraphPatterns extends GraphPatterns {
   readonly subject: ResourceGraphPatterns.Subject;
   private readonly variablePrefix: string;
 
@@ -19,8 +19,6 @@ export abstract class ResourceGraphPatterns extends GraphPatterns {
       }
     }
   }
-
-  abstract override [Symbol.iterator](): Iterator<GraphPattern>;
 
   protected variable(suffix: string): GraphPattern.Variable {
     return GraphPattern.variable(this.variablePrefix + suffix);
