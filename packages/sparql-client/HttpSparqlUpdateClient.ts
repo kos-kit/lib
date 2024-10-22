@@ -1,4 +1,3 @@
-import { URLSearchParams } from "node:url";
 import { NamedNode } from "@rdfjs/types";
 import { HttpSparqlBaseClient } from "./HttpSparqlBaseClient.js";
 import { SparqlUpdateClient } from "./SparqlUpdateClient.js";

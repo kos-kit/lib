@@ -1,4 +1,3 @@
-import { URLSearchParams } from "node:url";
 import { BlankNode, DataFactory, Literal, NamedNode, Quad } from "@rdfjs/types";
 import N3 from "n3";
 import { HttpSparqlBaseClient } from "./HttpSparqlBaseClient.js";
