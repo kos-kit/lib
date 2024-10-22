@@ -212,7 +212,7 @@ fs.writeFileSync(
       devDependencies: {
         "@biomejs/biome": "1.9.4",
         "@tsconfig/strictest": "^2.0.5",
-        "@types/node": "^20",
+        "@types/node": "^22",
         "@vitest/coverage-v8": "^2.0.5",
         eslint: "^8",
         "npm-run-all": "^4.1.5",
