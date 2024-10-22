@@ -25,6 +25,7 @@ export class RdfTypeGraphPatterns extends ResourceGraphPatterns {
         this.variable("RdfType"),
       ).scoped("CONSTRUCT"),
     ];
+    this.add(...this.constructGraphPatterns);
 
     this.whereGraphPatterns = [
       GraphPattern.basic(
@@ -45,6 +46,7 @@ export class RdfTypeGraphPatterns extends ResourceGraphPatterns {
         this.variable("RdfType"),
       ).scoped("WHERE"),
     ];
+    this.add(...this.whereGraphPatterns);
   }
 
   override toArray(): readonly GraphPattern[] {
