@@ -14,9 +14,6 @@
     "purify-ts": "~2.1.0",
     "unbzip2-stream": "^1.4.3"
   },
-  "engines": {
-    "node": ">=20"
-  },
   "main": "index.js",
   "files": [
     "server/*.d.ts",

@@ -9,9 +9,6 @@
     "oxigraph": "^0.4.0",
     "vitest-fetch-mock": "^0.3.0"
   },
-  "engines": {
-    "node": ">=20"
-  },
   "main": "index.js",
   "files": [
     "*.d.ts",

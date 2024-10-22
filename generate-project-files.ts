@@ -156,9 +156,6 @@ for (const project of projects) {
           ...project.externalDependencies,
         },
         devDependencies: project.devDependencies,
-        engines: {
-          node: ">=20",
-        },
         main: "index.js",
         files: project.files ?? ["*.d.ts", "*.js"],
         license: "Apache-2.0",

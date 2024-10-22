@@ -7,9 +7,6 @@
     "@kos-kit/sparql-client": "2.0.89",
     "oxigraph": "^0.4.0"
   },
-  "engines": {
-    "node": ">=20"
-  },
   "main": "index.js",
   "files": [
     "*.d.ts",

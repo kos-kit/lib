@@ -7,9 +7,6 @@
     "lunr": "^2.3.9",
     "rdfjs-resource": "1.0.7"
   },
-  "engines": {
-    "node": ">=20"
-  },
   "main": "index.js",
   "files": [
     "*.d.ts",

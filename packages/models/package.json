@@ -6,9 +6,6 @@
     "purify-ts": "~2.1.0",
     "purify-ts-helpers": "1.0.7"
   },
-  "engines": {
-    "node": ">=20"
-  },
   "main": "index.js",
   "files": [
     "abc/*.d.ts",
