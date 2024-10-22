@@ -223,6 +223,9 @@ fs.writeFileSync(
         yaml: "^2.5.0",
       },
       name: "@kos-kit/lib",
+      optionalDependencies: {
+        "@biomejs/cli-linux-x64": "1.9.4",
+      },
       private: true,
       scripts: {
         build: "npm run build --workspaces",
