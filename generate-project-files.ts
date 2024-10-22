@@ -281,7 +281,7 @@ fs.writeFileSync(
           },
           {
             name: "Install dependencies",
-            run: "npm install",
+            run: "npm ci",
           },
           {
             name: "Build",
