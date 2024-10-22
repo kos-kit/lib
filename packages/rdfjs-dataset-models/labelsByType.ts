@@ -20,28 +20,25 @@ export function labelsByType<LabelT extends ILabel>({
   resource: Resource;
   type: ILabel.Type;
 }): readonly ILabel[] {
-  const labels: ILabel[] = [
+  const labels: ILabel[] = [...resource.values(type.literalProperty)]
     // All literals that are the objects of the skosPredicate
-    ...resource
-      .values(type.literalProperty)
-      .flatMap((value) =>
-        value
-          .toLiteral()
-          .toMaybe()
-          .filter((literal) =>
-            abc.matchLiteral(literal, {
-              includeLanguageTags,
-            }),
-          )
-          .toList(),
-      )
-      .map((literalForm) => new LiteralLabel({ literalForm, type })),
-  ];
+    .flatMap((value) =>
+      value
+        .toLiteral()
+        .toMaybe()
+        .filter((literal) =>
+          abc.matchLiteral(literal, {
+            includeLanguageTags,
+          }),
+        )
+        .toList(),
+    )
+    .map((literalForm) => new LiteralLabel({ literalForm, type }));
 
   type.skosXlProperty.ifJust((skosXlPredicate) => {
     // Any resource in the range of a skosxl: label predicate is considered a skosxl:Label
     labels.push(
-      ...resource.values(skosXlPredicate).flatMap((labelValue) =>
+      ...[...resource.values(skosXlPredicate)].flatMap((labelValue) =>
         labelValue
           .toNamedResource()
           .toMaybe()

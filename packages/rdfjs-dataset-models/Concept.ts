@@ -53,8 +53,8 @@ export class Concept<
   }
 
   notes(options?: { types?: readonly Note.Type[] }): readonly Note[] {
-    return (options?.types ?? Note.Types).flatMap((type) => [
-      ...this.resource.values(type.skosProperty).flatMap((value) =>
+    return (options?.types ?? Note.Types).flatMap((type) =>
+      [...this.resource.values(type.skosProperty)].flatMap((value) =>
         value
           .toLiteral()
           .toMaybe()
@@ -66,7 +66,7 @@ export class Concept<
           .map((literalForm) => new abc.Note({ literalForm, type }))
           .toList(),
       ),
-    ]);
+    );
   }
 
   protected labelsByType(type: ILabel.Type): readonly ILabel[] {
