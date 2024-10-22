@@ -4,7 +4,7 @@
     "@tpluscode/rdf-ns-builders": "^4.3.0"
   },
   "devDependencies": {
-    "@kos-kit/sparql-client": "2.0.88",
+    "@kos-kit/sparql-client": "2.0.89",
     "oxigraph": "^0.4.0"
   },
   "engines": {
@@ -43,5 +43,5 @@
   },
   "type": "module",
   "types": "index.d.ts",
-  "version": "2.0.88"
+  "version": "2.0.89"
 }
