@@ -16,7 +16,7 @@ export class GraphPatterns implements Iterable<GraphPattern> {
   }
 
   [Symbol.iterator](): Iterator<GraphPattern> {
-    return this.toArray()[Symbol.iterator]();
+    return this.array[Symbol.iterator]();
   }
 
   sort(): GraphPatterns {

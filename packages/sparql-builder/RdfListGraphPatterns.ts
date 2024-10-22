@@ -61,6 +61,4 @@ export class RdfListGraphPatterns extends ResourceGraphPatterns {
 
     this.add(GraphPattern.optional(GraphPattern.group(optionalGraphPatterns)));
   }
-
-  override *[Symbol.iterator](): Iterator<GraphPattern> {}
 }
