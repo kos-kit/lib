@@ -3,7 +3,7 @@ import { GraphPatterns } from "./GraphPatterns.js";
 
 export class ResourceGraphPatterns extends GraphPatterns {
   readonly subject: ResourceGraphPatterns.Subject;
-  private readonly variablePrefix: string;
+  protected readonly variablePrefix: string;
 
   constructor(subject: ResourceGraphPatterns.SubjectParameter) {
     super();
