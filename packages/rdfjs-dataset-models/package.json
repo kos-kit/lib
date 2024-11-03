@@ -3,7 +3,7 @@
     "@rdfjs/types": "^1.1.0",
     "pino": "^9.1.0",
     "purify-ts": "~2.1.0",
-    "rdfjs-resource": "1.0.7"
+    "rdfjs-resource": "1.0.8"
   },
   "devDependencies": {
     "@types/n3": "^1.21.1",
