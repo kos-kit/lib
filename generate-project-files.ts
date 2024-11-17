@@ -31,7 +31,7 @@ const externalDependencyVersions = {
   pino: "^9.1.0",
   "purify-ts": "~2.1.0",
   "purify-ts-helpers": "1.0.7",
-  "rdfjs-resource": "1.0.10",
+  "rdfjs-resource": "1.0.11",
 };
 
 const projects: readonly Project[] = [
