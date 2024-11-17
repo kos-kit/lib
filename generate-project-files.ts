@@ -27,6 +27,7 @@ const externalDependencyVersions = {
   "@rdfjs/types": "^1.1.0",
   "@tpluscode/rdf-ns-builders": "^4.3.0",
   "@types/n3": "^1.21.1",
+  "@types/rdfjs__term-set": "^2.0.9",
   oxigraph: "^0.4.0",
   n3: "^1.21.3",
   pino: "^9.1.0",
@@ -42,6 +43,8 @@ const projects: readonly Project[] = [
       "@rdfjs/types": externalDependencyVersions["@rdfjs/types"],
       "@tpluscode/rdf-ns-builders":
         externalDependencyVersions["@tpluscode/rdf-ns-builders"],
+      "@types/rdfjs__term-set":
+        externalDependencyVersions["@types/rdfjs__term-set"],
       pino: externalDependencyVersions["pino"],
       "purify-ts": externalDependencyVersions["purify-ts"],
       "purify-ts-helpers": externalDependencyVersions["purify-ts-helpers"],
@@ -76,6 +79,8 @@ const projects: readonly Project[] = [
     externalDependencies: {
       "@rdfjs/term-set": externalDependencyVersions["@rdfjs/term-set"],
       "@rdfjs/types": externalDependencyVersions["@rdfjs/types"],
+      "@types/rdfjs__term-set":
+        externalDependencyVersions["@types/rdfjs__term-set"],
       pino: externalDependencyVersions["pino"],
       "purify-ts": externalDependencyVersions["purify-ts"],
       "rdfjs-resource": externalDependencyVersions["rdfjs-resource"],
