@@ -23,6 +23,7 @@ interface Project {
 }
 
 const externalDependencyVersions = {
+  "@rdfjs/term-set": "^2.0.3",
   "@rdfjs/types": "^1.1.0",
   "@tpluscode/rdf-ns-builders": "^4.3.0",
   "@types/n3": "^1.21.1",
@@ -37,6 +38,7 @@ const externalDependencyVersions = {
 const projects: readonly Project[] = [
   {
     externalDependencies: {
+      "@rdfjs/term-set": externalDependencyVersions["@rdfjs/term-set"],
       "@rdfjs/types": externalDependencyVersions["@rdfjs/types"],
       "@tpluscode/rdf-ns-builders":
         externalDependencyVersions["@tpluscode/rdf-ns-builders"],
@@ -72,6 +74,7 @@ const projects: readonly Project[] = [
       n3: externalDependencyVersions.n3,
     },
     externalDependencies: {
+      "@rdfjs/term-set": externalDependencyVersions["@rdfjs/term-set"],
       "@rdfjs/types": externalDependencyVersions["@rdfjs/types"],
       pino: externalDependencyVersions["pino"],
       "purify-ts": externalDependencyVersions["purify-ts"],
