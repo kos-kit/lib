@@ -16,7 +16,6 @@ type PackageName =
 interface Package {
   devDependencies?: Record<string, string>;
   externalDependencies?: Record<string, string>;
-  files?: readonly string[];
   internalDependencies?: readonly PackageName[];
   linkableDependencies?: readonly string[];
   name: PackageName;
@@ -49,7 +48,6 @@ const packages: readonly Package[] = [
       "purify-ts": externalDependencyVersions["purify-ts"],
       "purify-ts-helpers": externalDependencyVersions["purify-ts-helpers"],
     },
-    files: ["abc/*.d.ts", "abc/*.js", "*.d.ts", "*.js"],
     name: "models",
   },
   {
@@ -68,7 +66,6 @@ const packages: readonly Package[] = [
       "purify-ts": externalDependencyVersions["purify-ts"],
       "unbzip2-stream": "^1.4.3",
     },
-    files: ["server/*.d.ts", "server/*.js", "*.d.ts", "*.js"],
     name: "next-utils",
   },
   {
@@ -153,6 +150,29 @@ for (const package_ of packages) {
 
   const packageDirectoryPath = path.join(__dirname, "packages", package_.name);
 
+  const files = new Set<string>();
+  for (const dirent of fs.readdirSync(packageDirectoryPath, {
+    withFileTypes: true,
+    recursive: true,
+  })) {
+    if (
+      !dirent.name.endsWith(".ts") ||
+      !dirent.isFile() ||
+      dirent.path.startsWith(path.join(packageDirectoryPath, "node_modules")) ||
+      dirent.path.startsWith(path.join(packageDirectoryPath, "__tests__"))
+    ) {
+      continue;
+    }
+    for (const fileNameGlob of ["*.js", "*.d.ts"]) {
+      files.add(
+        path.join(
+          path.relative(packageDirectoryPath, dirent.parentPath),
+          fileNameGlob,
+        ),
+      );
+    }
+  }
+
   fs.mkdirSync(packageDirectoryPath, { recursive: true });
 
   fs.writeFileSync(
@@ -164,8 +184,8 @@ for (const package_ of packages) {
           ...package_.externalDependencies,
         },
         devDependencies: package_.devDependencies,
+        files: [...files].sort(),
         main: "index.js",
-        files: package_.files ?? ["*.d.ts", "*.js"],
         license: "Apache-2.0",
         name: `@kos-kit/${package_.name}`,
         scripts: {
@@ -174,7 +194,7 @@ for (const package_ of packages) {
           "check:write": "biome check --write",
           "check:write:unsafe": "biome check --write --unsafe",
           clean:
-            "rimraf *.d.ts* *.js *.js.map __tests__/*.d.ts* __tests__/*.js __tests__/*.js.map tsconfig.tsbuildinfo",
+            "rimraf -g **/*.d.ts* **/*.js **/*.js.map tsconfig.tsbuildinfo",
           format: "biome format",
           "format:write": "biome format --write",
           "format:write:unsafe": "biome format --write --unsafe",

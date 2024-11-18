@@ -7,11 +7,11 @@
     "lunr": "^2.3.9",
     "rdfjs-resource": "1.0.12"
   },
-  "main": "index.js",
   "files": [
     "*.d.ts",
     "*.js"
   ],
+  "main": "index.js",
   "license": "Apache-2.0",
   "name": "@kos-kit/search",
   "scripts": {

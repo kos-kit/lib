@@ -11,11 +11,11 @@
     "@types/n3": "^1.21.1",
     "n3": "^1.21.3"
   },
-  "main": "index.js",
   "files": [
     "*.d.ts",
     "*.js"
   ],
+  "main": "index.js",
   "license": "Apache-2.0",
   "name": "@kos-kit/rdfjs-dataset-models",
   "scripts": {

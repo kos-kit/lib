@@ -8,13 +8,13 @@
     "purify-ts": "~2.1.0",
     "purify-ts-helpers": "1.0.7"
   },
-  "main": "index.js",
   "files": [
-    "abc/*.d.ts",
-    "abc/*.js",
     "*.d.ts",
-    "*.js"
+    "*.js",
+    "abc/*.d.ts",
+    "abc/*.js"
   ],
+  "main": "index.js",
   "license": "Apache-2.0",
   "name": "@kos-kit/models",
   "scripts": {
