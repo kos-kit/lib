@@ -222,7 +222,6 @@ fs.writeFileSync(
         "@tsconfig/strictest": "^2.0.5",
         "@types/node": "^22",
         "@vitest/coverage-v8": "^2.0.5",
-        eslint: "^8",
         "npm-run-all": "^4.1.5",
         rimraf: "^6.0.1",
         tsx: "^4.16.2",
