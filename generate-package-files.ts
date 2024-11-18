@@ -4,7 +4,7 @@ import { stringify as stringifyYaml } from "yaml";
 
 const VERSION = "2.0.94";
 
-type ProjectName =
+type PackageName =
   | "rdfjs-dataset-models"
   | "models"
   | "next-utils"
@@ -13,13 +13,13 @@ type ProjectName =
   | "sparql-client"
   | "sparql-models";
 
-interface Project {
+interface Package {
   devDependencies?: Record<string, string>;
   externalDependencies?: Record<string, string>;
   files?: readonly string[];
-  internalDependencies?: readonly ProjectName[];
+  internalDependencies?: readonly PackageName[];
   linkableDependencies?: readonly string[];
-  name: ProjectName;
+  name: PackageName;
 }
 
 const externalDependencyVersions = {
@@ -36,7 +36,7 @@ const externalDependencyVersions = {
   "rdfjs-resource": "1.0.12",
 };
 
-const projects: readonly Project[] = [
+const packages: readonly Package[] = [
   {
     externalDependencies: {
       "@rdfjs/term-set": externalDependencyVersions["@rdfjs/term-set"],
@@ -145,29 +145,29 @@ const projects: readonly Project[] = [
   },
 ];
 
-for (const project of projects) {
+for (const package_ of packages) {
   const internalDependencies: Record<string, string> = {};
-  for (const internalDependency of project.internalDependencies ?? []) {
+  for (const internalDependency of package_.internalDependencies ?? []) {
     internalDependencies[`@kos-kit/${internalDependency}`] = VERSION;
   }
 
-  const projectDirectoryPath = path.join(__dirname, "packages", project.name);
+  const packageDirectoryPath = path.join(__dirname, "packages", package_.name);
 
-  fs.mkdirSync(projectDirectoryPath, { recursive: true });
+  fs.mkdirSync(packageDirectoryPath, { recursive: true });
 
   fs.writeFileSync(
-    path.join(projectDirectoryPath, "package.json"),
+    path.join(packageDirectoryPath, "package.json"),
     `${JSON.stringify(
       {
         dependencies: {
           ...internalDependencies,
-          ...project.externalDependencies,
+          ...package_.externalDependencies,
         },
-        devDependencies: project.devDependencies,
+        devDependencies: package_.devDependencies,
         main: "index.js",
-        files: project.files ?? ["*.d.ts", "*.js"],
+        files: package_.files ?? ["*.d.ts", "*.js"],
         license: "Apache-2.0",
-        name: `@kos-kit/${project.name}`,
+        name: `@kos-kit/${package_.name}`,
         scripts: {
           build: "tsc -b",
           check: "biome check",
@@ -186,7 +186,7 @@ for (const project of projects) {
           test: "biome check && vitest run",
           "test:coverage": "biome check && vitest run --coverage",
           "test:watch": "vitest watch",
-          unlink: `npm unlink -g @kos-kit/${project.name}`,
+          unlink: `npm unlink -g @kos-kit/${package_.name}`,
           watch: "tsc -w --preserveWatchOutput",
         },
         repository: {
@@ -204,11 +204,11 @@ for (const project of projects) {
 
   for (const fileName of ["biome.json", "LICENSE", "tsconfig.json"]) {
     // const rootFilePath = path.resolve(__dirname, fileName);
-    const projectFilePath = path.resolve(projectDirectoryPath, fileName);
-    if (fs.existsSync(projectFilePath)) {
+    const packageFilePath = path.resolve(packageDirectoryPath, fileName);
+    if (fs.existsSync(packageFilePath)) {
       continue;
     }
-    fs.symlinkSync(`../../${fileName}`, projectFilePath);
+    fs.symlinkSync(`../../${fileName}`, packageFilePath);
   }
 }
 
@@ -240,7 +240,7 @@ fs.writeFileSync(
         build: "npm run build --workspaces",
         check: "npm run check --workspaces",
         clean: "npm run clean --workspaces",
-        "generate-project-files": "tsx generate-project-files.ts",
+        "generate-package-files": "tsx generate-package-files.ts",
         link: "npm link --workspaces",
         "link-dependencies": "npm run link-dependencies --workspaces",
         lint: "npm run lint --workspaces",
@@ -249,16 +249,16 @@ fs.writeFileSync(
         "test:coverage": "npm run test:coverage --if-present --workspaces",
         unlink: "npm run unlink --workspaces",
         watch: "run-p watch:*",
-        ...projects.reduce(
-          (watchEntries, project) => {
-            watchEntries[`watch:${project.name}`] =
-              `npm run watch -w @kos-kit/${project.name}`;
+        ...packages.reduce(
+          (watchEntries, package_) => {
+            watchEntries[`watch:${package_.name}`] =
+              `npm run watch -w @kos-kit/${package_.name}`;
             return watchEntries;
           },
           {} as Record<string, string>,
         ),
       },
-      workspaces: projects.map((project) => `packages/${project.name}`),
+      workspaces: packages.map((package_) => `packages/${package_.name}`),
     },
     undefined,
     2,
@@ -303,21 +303,21 @@ fs.writeFileSync(
             name: "Test",
             run: "npm run test:coverage",
           },
-          ...projects
-            .filter((project) =>
+          ...packages
+            .filter((package_) =>
               fs.existsSync(
-                path.join(__dirname, "packages", project.name, "__tests__"),
+                path.join(__dirname, "packages", package_.name, "__tests__"),
               ),
             )
-            .map((project) => {
+            .map((package_) => {
               return {
                 if: "always()",
                 uses: "davelosert/vitest-coverage-report-action@v2",
                 with: {
                   "file-coverage-mode": "all",
-                  name: project.name,
-                  "json-final-path": `./packages/${project.name}/coverage/coverage-final.json`,
-                  "json-summary-path": `./packages/${project.name}/coverage/coverage-summary.json`,
+                  name: package_.name,
+                  "json-final-path": `./packages/${package_.name}/coverage/coverage-final.json`,
+                  "json-summary-path": `./packages/${package_.name}/coverage/coverage-summary.json`,
                 },
               };
             }),
