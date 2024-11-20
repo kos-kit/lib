@@ -3,7 +3,7 @@ import { GraphPattern, ResourceGraphPatterns } from "@kos-kit/sparql-builder";
 import { skosxl } from "@tpluscode/rdf-ns-builders";
 import { Model } from "./Model.js";
 
-export namespace LabeledModel {
+export namespace Resource {
   export class GraphPatterns extends Model.GraphPatterns {
     constructor(subject: ResourceGraphPatterns.SubjectParameter) {
       super(subject);

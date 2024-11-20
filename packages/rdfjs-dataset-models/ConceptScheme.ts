@@ -8,10 +8,10 @@ import {
 import { Literal, NamedNode } from "@rdfjs/types";
 import { dc11, dcterms } from "@tpluscode/rdf-ns-builders";
 import { Maybe } from "purify-ts";
-import { Resource } from "rdfjs-resource";
+import * as rdfjsResource from "rdfjs-resource";
 import { Concept } from "./Concept.js";
 import { Label } from "./Label.js";
-import { labelsByType } from "./labelsByType.js";
+import { Resource } from "./Resource.js";
 
 const rightsPredicates = [dcterms.rights, dc11.rights];
 
@@ -20,10 +20,12 @@ export class ConceptScheme<
   ConceptSchemeT extends IConceptScheme<ConceptT, LabelT>,
   LabelT extends ILabel,
 > extends abc.ConceptScheme<ConceptT, ConceptSchemeT, LabelT> {
-  protected readonly resource: Resource<Identifier>;
-  private readonly labelConstructor: new (
+  readonly labelConstructor: new (
     _: Label.Parameters,
   ) => LabelT;
+  notes = Resource.notes;
+  readonly resource: rdfjsResource.Resource<Identifier>;
+  protected labelsByType = Resource.labelsByType;
 
   constructor({
     labelConstructor,
@@ -66,10 +68,11 @@ export class ConceptScheme<
   }
 
   get modified(): Maybe<Literal> {
-    return this.resource
-      .value(dcterms.modified)
-      .chain((value) => value.toLiteral())
-      .toMaybe();
+    return Resource.modified.bind(this)();
+  }
+
+  get notations(): readonly Literal[] {
+    return Resource.notations.bind(this)();
   }
 
   get rights(): Maybe<Literal> {
@@ -84,15 +87,6 @@ export class ConceptScheme<
 
   get rightsHolder(): Maybe<Literal> {
     return this.literalObject(dcterms.rightsHolder);
-  }
-
-  protected labelsByType(type: ILabel.Type): readonly ILabel[] {
-    return labelsByType({
-      includeLanguageTags: this.kos.includeLanguageTags,
-      labelConstructor: this.labelConstructor,
-      resource: this.resource,
-      type,
-    });
   }
 
   private literalObject(predicate: NamedNode): Maybe<Literal> {
@@ -123,6 +117,6 @@ export namespace ConceptScheme {
     LabelT extends ILabel,
   > extends abc.ConceptScheme.Parameters<ConceptT, ConceptSchemeT, LabelT> {
     labelConstructor: new (parameters: Label.Parameters) => LabelT;
-    resource: Resource<Identifier>;
+    resource: rdfjsResource.Resource<Identifier>;
   }
 }

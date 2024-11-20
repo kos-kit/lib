@@ -2,7 +2,7 @@ export * from "./Concept.js";
 export * from "./ConceptScheme.js";
 export * from "./DefaultKos.js";
 export * from "./Kos.js";
-export * from "./LabeledModel.js";
+export * from "./Resource.js";
 export * from "./Model.js";
 export * from "./Stub.js";
 export * from "./StubSequence.js";
