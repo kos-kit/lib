@@ -1,10 +1,7 @@
-import { Literal } from "@rdfjs/types";
-import { Maybe } from "purify-ts";
 import { Equatable } from "purify-ts-helpers";
 import { ConceptScheme } from "./ConceptScheme.js";
 import { Label } from "./Label.js";
-import { LabeledModel } from "./LabeledModel.js";
-import { Note } from "./Note";
+import { Resource } from "./Resource.js";
 import { SemanticRelation } from "./SemanticRelation.js";
 import { StubSequence } from "./StubSequence.js";
 
@@ -13,12 +10,8 @@ export interface Concept<
   ConceptSchemeT extends ConceptScheme<ConceptT, LabelT>,
   LabelT extends Label,
 > extends Equatable<ConceptT>,
-    LabeledModel<LabelT> {
-  readonly modified: Maybe<Literal>;
-  readonly notations: readonly Literal[];
-
+    Resource<LabelT> {
   inSchemes(): Promise<StubSequence<ConceptSchemeT>>;
-  notes(options?: { types?: readonly Note.Type[] }): readonly Note[];
   semanticRelations(
     type: SemanticRelation.Type,
     options?: {

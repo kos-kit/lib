@@ -8,19 +8,18 @@ import {
 } from "@kos-kit/models";
 import { Literal, NamedNode } from "@rdfjs/types";
 import { Maybe } from "purify-ts";
-import { Arrays, Equatable } from "purify-ts-helpers";
-import { LabeledModel } from "./LabeledModel.js";
+import { Equatable } from "purify-ts-helpers";
+import { Resource } from "./Resource.js";
 
 export abstract class ConceptScheme<
     ConceptT extends IConcept<ConceptT, ConceptSchemeT, LabelT>,
     ConceptSchemeT extends IConceptScheme<ConceptT, LabelT>,
     LabelT extends ILabel,
   >
-  extends LabeledModel<ConceptT, ConceptSchemeT, LabelT>
+  extends Resource<ConceptT, ConceptSchemeT, LabelT>
   implements IConceptScheme<ConceptT, LabelT>
 {
   abstract readonly license: Maybe<Literal | NamedNode>;
-  abstract readonly modified: Maybe<Literal>;
   abstract readonly rights: Maybe<Literal>;
   abstract readonly rightsHolder: Maybe<Literal>;
 
@@ -86,10 +85,6 @@ export abstract class ConceptScheme<
       type: "TopConceptOf",
     });
   }
-
-  protected abstract override labelsByType(
-    type: ILabel.Type,
-  ): readonly ILabel[];
 }
 
 export namespace ConceptScheme {
@@ -97,16 +92,12 @@ export namespace ConceptScheme {
     this: IConceptScheme<any, any>,
     other: IConceptScheme<any, any>,
   ): Equatable.EqualsResult {
-    return Equatable.objectEquals(this, other, {
-      identifier: Equatable.booleanEquals,
-      labels: (left, right) =>
-        Arrays.equals(left(), right(), (left, right) => left.equals(right)),
-    });
+    return Resource.resourceEquals.bind(this)(other);
   }
 
   export type Parameters<
     ConceptT extends IConcept<ConceptT, ConceptSchemeT, LabelT>,
     ConceptSchemeT extends IConceptScheme<ConceptT, LabelT>,
     LabelT extends ILabel,
-  > = LabeledModel.Parameters<ConceptT, ConceptSchemeT, LabelT>;
+  > = Resource.Parameters<ConceptT, ConceptSchemeT, LabelT>;
 }

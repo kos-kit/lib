@@ -1,5 +1,5 @@
-import { LabeledModel } from "./LabeledModel.js";
+import { Resource } from "./Resource.js";
 
 export namespace ConceptScheme {
-  export const GraphPatterns = LabeledModel.GraphPatterns;
+  export const GraphPatterns = Resource.GraphPatterns;
 }

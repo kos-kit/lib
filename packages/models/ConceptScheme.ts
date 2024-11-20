@@ -4,7 +4,7 @@ import { Equatable } from "purify-ts-helpers";
 import { Concept } from "./Concept.js";
 import { Identifier } from "./Identifier.js";
 import { Label } from "./Label.js";
-import { LabeledModel } from "./LabeledModel.js";
+import { Resource } from "./Resource.js";
 import { Stub } from "./Stub.js";
 import { StubSequence } from "./StubSequence.js";
 
@@ -12,7 +12,7 @@ export interface ConceptScheme<
   ConceptT extends Concept<any, any, LabelT>,
   LabelT extends Label,
 > extends Equatable<ConceptScheme<any, any>>,
-    LabeledModel<LabelT> {
+    Resource<LabelT> {
   readonly license: Maybe<Literal | NamedNode>;
   readonly modified: Maybe<Literal>;
   readonly rights: Maybe<Literal>;

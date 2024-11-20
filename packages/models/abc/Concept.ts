@@ -3,29 +3,23 @@ import {
   ConceptScheme as IConceptScheme,
   Label as ILabel,
   Identifier,
-  Note,
   SemanticRelation,
   Stub,
   StubSequence,
   UnbatchedStubSequence,
 } from "@kos-kit/models";
 import TermSet from "@rdfjs/term-set";
-import { Literal } from "@rdfjs/types";
-import { Maybe } from "purify-ts";
-import { Arrays, Equatable } from "purify-ts-helpers";
-import { LabeledModel } from "./LabeledModel.js";
+import { Equatable } from "purify-ts-helpers";
+import { Resource } from "./Resource.js";
 
 export abstract class Concept<
     ConceptT extends IConcept<ConceptT, ConceptSchemeT, LabelT>,
     ConceptSchemeT extends IConceptScheme<ConceptT, LabelT>,
     LabelT extends ILabel,
   >
-  extends LabeledModel<ConceptT, ConceptSchemeT, LabelT>
+  extends Resource<ConceptT, ConceptSchemeT, LabelT>
   implements IConcept<ConceptT, ConceptSchemeT, LabelT>
 {
-  abstract readonly modified: Maybe<Literal>;
-  abstract readonly notations: readonly Literal[];
-
   equals(other: ConceptT): Equatable.EqualsResult {
     // This is a method and not an assignment to the function so it can be overridden in subclasses
     return Concept.equals.bind(this)(other);
@@ -38,8 +32,6 @@ export abstract class Concept<
       query: { conceptIdentifier: this.identifier, type: "HasConcept" },
     });
   }
-
-  abstract notes(options?: { types?: readonly Note.Type[] }): readonly Note[];
 
   async semanticRelations(
     type: SemanticRelation.Type,
@@ -100,18 +92,18 @@ export namespace Concept {
     this: IConcept<any, any, any>,
     other: IConcept<any, any, any>,
   ): Equatable.EqualsResult {
-    return Equatable.objectEquals(this, other, {
-      identifier: Equatable.booleanEquals,
-      labels: (left, right) =>
-        Arrays.equals(left(), right(), (left, right) => left.equals(right)),
-      notations: (left, right) =>
-        Arrays.equals(left, right, (left, right) => left.equals(right)),
-    });
+    return Resource.resourceEquals
+      .bind(this)(other)
+      .chain(() =>
+        Equatable.objectEquals(this, other, {
+          identifier: Equatable.booleanEquals,
+        }),
+      );
   }
 
   export type Parameters<
     ConceptT extends IConcept<ConceptT, ConceptSchemeT, LabelT>,
     ConceptSchemeT extends IConceptScheme<ConceptT, LabelT>,
     LabelT extends ILabel,
-  > = LabeledModel.Parameters<ConceptT, ConceptSchemeT, LabelT>;
+  > = Resource.Parameters<ConceptT, ConceptSchemeT, LabelT>;
 }
