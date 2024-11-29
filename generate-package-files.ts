@@ -208,6 +208,7 @@ for (const package_ of packages) {
           "test:watch": "vitest watch",
           unlink: `npm unlink -g @kos-kit/${package_.name}`,
           watch: "tsc -w --preserveWatchOutput",
+          "watch:noEmit": "tsc -w --noEmit --preserveWatchOutput",
         },
         repository: {
           type: "git",
@@ -272,6 +273,15 @@ fs.writeFileSync(
           (watchEntries, package_) => {
             watchEntries[`watch:${package_.name}`] =
               `npm run watch -w @kos-kit/${package_.name}`;
+            return watchEntries;
+          },
+          {} as Record<string, string>,
+        ),
+        "watch:noEmit": "run-p watch:noEmit:*",
+        ...packages.reduce(
+          (watchEntries, package_) => {
+            watchEntries[`watch:noEmit:${package_.name}`] =
+              `npm run watch:noEmit -w @kos-kit/${package_.name}`;
             return watchEntries;
           },
           {} as Record<string, string>,
