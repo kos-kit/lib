@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { ConstructQueryBuilder } from "../ConstructQueryBuilder.js";
 import { GraphPattern } from "../GraphPattern.js";
 import { RdfListGraphPatterns } from "../RdfListGraphPatterns.js";
-import { termToString } from "../termToString";
+import { termToString } from "../termToString.js";
 
 describe("RdfListGraphPatterns", () => {
   function testRdfListGraphPatterns(

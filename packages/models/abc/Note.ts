@@ -1,6 +1,6 @@
 import { Literal } from "@rdfjs/types";
 import { Equatable } from "purify-ts-helpers";
-import { Note as INote } from "../index.js";
+import { Note as INote } from "../Note.js";
 
 export class Note implements INote {
   equals = Note.equals;

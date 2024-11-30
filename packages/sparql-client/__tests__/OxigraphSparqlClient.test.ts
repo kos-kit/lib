@@ -1,6 +1,6 @@
 import * as oxigraph from "oxigraph";
 import { beforeEach, describe, it } from "vitest";
-import { OxigraphSparqlClient } from "../OxigraphSparqlClient";
+import { OxigraphSparqlClient } from "../OxigraphSparqlClient.js";
 
 describe("OxigraphSparqlClient", () => {
   let object: oxigraph.Literal;

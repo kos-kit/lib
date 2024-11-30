@@ -1,7 +1,7 @@
 import { Either } from "purify-ts";
 import { Equatable } from "purify-ts-helpers";
 import { Model } from "../Model.js";
-import { Stub } from "../Stub";
+import { Stub } from "../Stub.js";
 import { StubSequence as IStubSequence } from "../StubSequence.js";
 
 export abstract class StubSequence<ModelT extends Model>

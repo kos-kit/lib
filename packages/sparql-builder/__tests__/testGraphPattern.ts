@@ -1,5 +1,5 @@
 import { GraphPattern } from "../GraphPattern.js";
-import { testGraphPatterns } from "./testGraphPatterns";
+import { testGraphPatterns } from "./testGraphPatterns.js";
 
 export function testGraphPattern(
   inputTtl: string,

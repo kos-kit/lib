@@ -7,6 +7,11 @@ export type ConceptsQuery =
       readonly type: "All";
     }
   | {
+      // Concepts with the given identifiers
+      readonly identifiers: readonly Identifier[];
+      readonly type: "Identifiers";
+    }
+  | {
       // Concepts that are in the given concept scheme
       // If conceptIdentifier is supplied, only check if it's in the given concept scheme
       readonly conceptIdentifier?: Identifier;

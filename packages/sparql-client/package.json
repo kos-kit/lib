@@ -34,7 +34,8 @@
     "test:coverage": "biome check && vitest run --coverage",
     "test:watch": "vitest watch",
     "unlink": "npm unlink -g @kos-kit/sparql-client",
-    "watch": "tsc -w --preserveWatchOutput"
+    "watch": "tsc -w --preserveWatchOutput",
+    "watch:noEmit": "tsc -w --noEmit --preserveWatchOutput"
   },
   "repository": {
     "type": "git",

@@ -1,15 +1,13 @@
-import {
-  Concept as IConcept,
-  ConceptScheme as IConceptScheme,
-  Label as ILabel,
-  Identifier,
-  SemanticRelation,
-  Stub,
-  StubSequence,
-  UnbatchedStubSequence,
-} from "@kos-kit/models";
 import TermSet from "@rdfjs/term-set";
 import { Equatable } from "purify-ts-helpers";
+import { Concept as IConcept } from "../Concept.js";
+import { ConceptScheme as IConceptScheme } from "../ConceptScheme.js";
+import { Identifier } from "../Identifier.js";
+import { Label as ILabel } from "../Label.js";
+import { SemanticRelation } from "../SemanticRelation.js";
+import { Stub } from "../Stub.js";
+import { StubSequence } from "../StubSequence.js";
+import { UnbatchedStubSequence } from "../UnbatchedStubSequence.js";
 import { Resource } from "./Resource.js";
 
 export abstract class Concept<

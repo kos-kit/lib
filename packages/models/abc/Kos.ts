@@ -1,16 +1,14 @@
-import {
-  ConceptSchemesQuery,
-  ConceptsQuery,
-  Concept as IConcept,
-  ConceptScheme as IConceptScheme,
-  Kos as IKos,
-  Label as ILabel,
-  Identifier,
-  LanguageTagSet,
-  Stub,
-  StubSequence,
-} from "@kos-kit/models";
 import { Logger, pino } from "pino";
+import { Concept as IConcept } from "../Concept.js";
+import { ConceptScheme as IConceptScheme } from "../ConceptScheme.js";
+import { ConceptSchemesQuery } from "../ConceptSchemesQuery.js";
+import { ConceptsQuery } from "../ConceptsQuery.js";
+import { Identifier } from "../Identifier.js";
+import { Kos as IKos } from "../Kos.js";
+import { Label as ILabel } from "../Label.js";
+import { LanguageTagSet } from "../LanguageTagSet.js";
+import { Stub } from "../Stub.js";
+import { StubSequence } from "../StubSequence.js";
 
 export abstract class Kos<
   ConceptT extends IConcept<ConceptT, ConceptSchemeT, LabelT>,

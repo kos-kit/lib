@@ -1,6 +1,7 @@
 import { skos } from "@tpluscode/rdf-ns-builders";
 import { describe, expect, it } from "vitest";
-import { ConstructQueryBuilder, GraphPattern } from "..";
+import { ConstructQueryBuilder } from "../ConstructQueryBuilder.js";
+import { GraphPattern } from "../GraphPattern.js";
 
 describe("ConstructQueryBuilder", () => {
   const subject = {

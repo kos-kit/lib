@@ -1,7 +1,9 @@
 import { Logger } from "pino";
 import { Either } from "purify-ts";
 import { Equatable } from "purify-ts-helpers";
-import { Stub as IStub, Identifier, Model } from "../index.js";
+import { Identifier } from "../Identifier.js";
+import { Model } from "../Model.js";
+import { Stub as IStub } from "../Stub.js";
 
 export abstract class Stub<ModelT extends Model> implements IStub<ModelT> {
   equals = Stub.equals;
