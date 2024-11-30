@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 import { LanguageTag, LanguageTagSet } from "@kos-kit/models";
 import { OxigraphSparqlClient } from "@kos-kit/sparql-client/OxigraphSparqlClient";
 import * as oxigraph from "oxigraph";
-import { DefaultKos } from "..";
+import { DefaultKos } from "../DefaultKos.js";
 import { OxigraphDatasetCore } from "./OxigraphDatasetCore.js";
 
 // const sparqlQueryClient = new HttpSparqlQueryClient({
