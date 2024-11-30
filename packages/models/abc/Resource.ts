@@ -8,7 +8,7 @@ import { Identifier } from "../Identifier.js";
 import { Kos } from "../Kos.js";
 import { Label as ILabel } from "../Label.js";
 import { LiteralLabel } from "../LiteralLabel.js";
-import { Note } from "../Note";
+import { Note } from "../Note.js";
 import { Resource as IResource } from "../Resource.js";
 import { matchLiteral } from "./matchLiteral.js";
 

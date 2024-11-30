@@ -1,4 +1,4 @@
-import { Identifier } from "./Identifier";
+import { Identifier } from "./Identifier.js";
 
 /**
  * Models are implemented in the spirit of Labeled Property Graphs:
