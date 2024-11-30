@@ -1,7 +1,7 @@
 import { rdf, rdfs } from "@tpluscode/rdf-ns-builders";
 import { describe, it } from "vitest";
-import { RdfTypeGraphPatterns } from "../RdfTypeGraphPatterns";
-import { testGraphPatterns } from "./testGraphPatterns";
+import { RdfTypeGraphPatterns } from "../RdfTypeGraphPatterns.js";
+import { testGraphPatterns } from "./testGraphPatterns.js";
 
 describe("RdfTypeGraphPatterns", () => {
   it("should match a direct RDF type", () => {
