@@ -117,16 +117,6 @@ ${offset > 0 ? `OFFSET ${offset}` : ""}
       ];
     }
 
-    if (query.type === "Identifiers") {
-      return [
-        `VALUES ?conceptScheme { ${query.identifiers.map((identifier) => Identifier.toString(identifier)).join(" ")} }`,
-        ...new RdfTypeGraphPatterns(
-          GraphPattern.variable("conceptScheme"),
-          skos.ConceptScheme,
-        ).toWhereStrings(),
-      ];
-    }
-
     const whereGraphPatterns: string[] = [
       `VALUES ?concept { ${Identifier.toString(query.conceptIdentifier)} }`,
       // skos:topConceptOf's range is skos:ConceptScheme, so we don't have to check the rdf:type
@@ -155,16 +145,6 @@ ${offset > 0 ? `OFFSET ${offset}` : ""}
         GraphPattern.variable("concept"),
         skos.Concept,
       ).toWhereStrings();
-    }
-
-    if (query.type === "Identifiers") {
-      return [
-        `VALUES ?concept { ${query.identifiers.map((identifier) => Identifier.toString(identifier)).join(" ")} }`,
-        ...new RdfTypeGraphPatterns(
-          GraphPattern.variable("concept"),
-          skos.Concept,
-        ).toWhereStrings(),
-      ];
     }
 
     if (query.type === "InScheme" || query.type === "TopConceptOf") {

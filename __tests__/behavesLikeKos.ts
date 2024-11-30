@@ -69,16 +69,11 @@ export const behavesLikeKos = (kos: Kos<any, any, any>) => {
     ).flatResolve();
     expect(expectedConcepts).toHaveLength(10);
 
-    const actualConcepts = await (
-      await kos.getConceptsByQuery({
-        limit: null,
-        offset: 0,
-        query: {
-          identifiers: expectedConcepts.map((concept) => concept.identifier),
-          type: "Identifiers",
-        },
-      })
-    ).flatResolve();
+    const actualConcepts = await kos
+      .getConceptsByIdentifiers(
+        expectedConcepts.map((concept) => concept.identifier),
+      )
+      .flatResolve();
     expect(actualConcepts).toHaveLength(10);
 
     for (let conceptI = 0; conceptI < expectedConcepts.length; conceptI++) {
@@ -146,16 +141,9 @@ export const behavesLikeKos = (kos: Kos<any, any, any>) => {
       expectConceptScheme(
         (await expectedConceptScheme.resolve()).toMaybe().extractNullable(),
       );
-      const actualConceptSchemes = await (
-        await kos.getConceptSchemesByQuery({
-          limit: null,
-          offset: 0,
-          query: {
-            identifiers: [expectedConceptScheme.identifier],
-            type: "Identifiers",
-          },
-        })
-      ).flatResolve();
+      const actualConceptSchemes = await kos
+        .getConceptSchemesByIdentifiers([expectedConceptScheme.identifier])
+        .flatResolve();
       expect(actualConceptSchemes).toHaveLength(1);
       const actualConceptScheme = actualConceptSchemes[0];
       expect(actualConceptScheme).toBeTruthy();
