@@ -22,7 +22,7 @@ export abstract class ConceptScheme<
   abstract readonly rightsHolder: Maybe<Literal>;
 
   async concept(identifier: Identifier): Promise<Maybe<Stub<ConceptT>>> {
-    for (const conceptStub of await this.kos.concepts({
+    for (const conceptStub of await this.kos.getConceptsByQuery({
       limit: 1,
       offset: 0,
       query: {
@@ -45,7 +45,7 @@ export abstract class ConceptScheme<
     limit?: number;
     offset?: number;
   }): Promise<StubSequence<ConceptT>> {
-    return this.kos.concepts({
+    return this.kos.getConceptsByQuery({
       limit: null,
       offset: 0,
       query: { conceptSchemeIdentifier: this.identifier, type: "InScheme" },
@@ -54,7 +54,7 @@ export abstract class ConceptScheme<
   }
 
   conceptsCount(): Promise<number> {
-    return this.kos.conceptsCount({
+    return this.kos.getConceptsCountByQuery({
       conceptSchemeIdentifier: this.identifier,
       type: "InScheme",
     });
@@ -69,7 +69,7 @@ export abstract class ConceptScheme<
     limit?: number;
     offset?: number;
   }): Promise<StubSequence<ConceptT>> {
-    return this.kos.concepts({
+    return this.kos.getConceptsByQuery({
       limit: null,
       offset: 0,
       query: { conceptSchemeIdentifier: this.identifier, type: "TopConceptOf" },
@@ -78,7 +78,7 @@ export abstract class ConceptScheme<
   }
 
   topConceptsCount(): Promise<number> {
-    return this.kos.conceptsCount({
+    return this.kos.getConceptsCountByQuery({
       conceptSchemeIdentifier: this.identifier,
       type: "TopConceptOf",
     });

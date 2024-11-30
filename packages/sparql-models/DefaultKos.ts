@@ -42,7 +42,9 @@ export class DefaultKos extends Kos<
   DefaultConceptScheme,
   DefaultLabel
 > {
-  concept(identifier: Identifier): Stub<DefaultConcept> {
+  override getConceptByIdentifier(
+    identifier: Identifier,
+  ): Stub<DefaultConcept> {
     return new Stub({
       datasetCoreFactory: this.datasetCoreFactory,
       graphPatterns: conceptGraphPatterns_,
@@ -54,7 +56,9 @@ export class DefaultKos extends Kos<
     });
   }
 
-  conceptScheme(identifier: Identifier): Stub<DefaultConceptScheme> {
+  override getConceptSchemeByIdentifier(
+    identifier: Identifier,
+  ): Stub<DefaultConceptScheme> {
     return new Stub({
       datasetCoreFactory: this.datasetCoreFactory,
       graphPatterns: conceptSchemeGraphPatterns_,
@@ -66,7 +70,23 @@ export class DefaultKos extends Kos<
     });
   }
 
-  async conceptSchemes(kwds: {
+  override getConceptSchemesByIdentifiers(
+    identifiers: readonly Identifier[],
+  ): StubSequence<DefaultConceptScheme> {
+    return new StubSequence<DefaultConceptScheme>({
+      datasetCoreFactory: this.datasetCoreFactory,
+      graphPatterns: conceptSchemeGraphPatterns_,
+      identifiers,
+      includeLanguageTags: this.includeLanguageTags,
+      logger: this.logger,
+      modelFactory: (resource) => this.conceptSchemeModelFactory(resource),
+      sparqlQueryClient: this.sparqlQueryClient,
+      stubFactory: (identifier) =>
+        this.getConceptSchemeByIdentifier(identifier),
+    });
+  }
+
+  async getConceptSchemesByQuery(kwds: {
     limit: number | null;
     offset: number;
     query: ConceptSchemesQuery;
@@ -79,11 +99,27 @@ export class DefaultKos extends Kos<
       modelFactory: (resource) => this.conceptSchemeModelFactory(resource),
       logger: this.logger,
       sparqlQueryClient: this.sparqlQueryClient,
-      stubFactory: (identifier) => this.conceptScheme(identifier),
+      stubFactory: (identifier) =>
+        this.getConceptSchemeByIdentifier(identifier),
     });
   }
 
-  async concepts(kwds: {
+  override getConceptsByIdentifiers(
+    identifiers: readonly Identifier[],
+  ): StubSequence<DefaultConcept> {
+    return new StubSequence<DefaultConcept>({
+      datasetCoreFactory: this.datasetCoreFactory,
+      graphPatterns: conceptGraphPatterns_,
+      identifiers,
+      includeLanguageTags: this.includeLanguageTags,
+      logger: this.logger,
+      modelFactory: (resource) => this.conceptModelFactory(resource),
+      sparqlQueryClient: this.sparqlQueryClient,
+      stubFactory: (identifier) => this.getConceptByIdentifier(identifier),
+    });
+  }
+
+  async getConceptsByQuery(kwds: {
     limit: number | null;
     offset: number;
     query: ConceptsQuery;
@@ -96,7 +132,7 @@ export class DefaultKos extends Kos<
       modelFactory: (resource) => this.conceptModelFactory(resource),
       logger: this.logger,
       sparqlQueryClient: this.sparqlQueryClient,
-      stubFactory: (identifier) => this.concept(identifier),
+      stubFactory: (identifier) => this.getConceptByIdentifier(identifier),
     });
   }
 

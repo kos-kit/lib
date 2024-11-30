@@ -24,7 +24,7 @@ export abstract class Concept<
   }
 
   async inSchemes(): Promise<StubSequence<ConceptSchemeT>> {
-    return this.kos.conceptSchemes({
+    return this.kos.getConceptSchemesByQuery({
       limit: null,
       offset: 0,
       query: { conceptIdentifier: this.identifier, type: "HasConcept" },
@@ -38,7 +38,7 @@ export abstract class Concept<
     const conceptIdentifiers = new TermSet<Identifier>();
     const conceptStubs: Stub<ConceptT>[] = [];
 
-    for (const conceptStub of await this.kos.concepts({
+    for (const conceptStub of await this.kos.getConceptsByQuery({
       limit: null,
       offset: 0,
       query: {
@@ -56,7 +56,7 @@ export abstract class Concept<
     if (options?.includeInverse) {
       const inverseProperty = type.inverse.extractNullable();
       if (inverseProperty !== null) {
-        for (const conceptStub of await this.kos.concepts({
+        for (const conceptStub of await this.kos.getConceptsByQuery({
           limit: null,
           offset: 0,
           query: {
@@ -77,7 +77,7 @@ export abstract class Concept<
   }
 
   topConceptOf(): Promise<StubSequence<ConceptSchemeT>> {
-    return this.kos.conceptSchemes({
+    return this.kos.getConceptSchemesByQuery({
       limit: null,
       offset: 0,
       query: { conceptIdentifier: this.identifier, type: "HasTopConcept" },

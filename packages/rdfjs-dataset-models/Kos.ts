@@ -89,7 +89,7 @@ export abstract class Kos<
     return this.resourceSet.dataset;
   }
 
-  async conceptSchemes({
+  async getConceptSchemesByQuery({
     limit,
     offset,
     query,
@@ -106,7 +106,7 @@ export abstract class Kos<
     );
   }
 
-  override async conceptSchemesCount(
+  override async getConceptSchemesCountByQuery(
     query: ConceptSchemesQuery,
   ): Promise<number> {
     let count = 0;
@@ -116,7 +116,7 @@ export abstract class Kos<
     return count;
   }
 
-  async concepts({
+  async getConceptsByQuery({
     limit,
     offset,
     query,
@@ -133,7 +133,9 @@ export abstract class Kos<
     );
   }
 
-  override async conceptsCount(query: ConceptsQuery): Promise<number> {
+  override async getConceptsCountByQuery(
+    query: ConceptsQuery,
+  ): Promise<number> {
     let count = 0;
     for (const _ of this.queryConcepts(query)) {
       count++;
@@ -145,7 +147,7 @@ export abstract class Kos<
     for (const resource of this.resourceSet.namedInstancesOf(
       skos.ConceptScheme,
     )) {
-      yield this.conceptScheme(resource.identifier);
+      yield this.getConceptSchemeByIdentifier(resource.identifier);
     }
   }
 
@@ -195,15 +197,6 @@ export abstract class Kos<
       };
 
       switch (query.type) {
-        case "Identifiers":
-          if (
-            !query.identifiers.some((identifier) =>
-              conceptSchemeIdentifier.equals(identifier),
-            )
-          ) {
-            continue;
-          }
-          break;
         case "HasConcept":
           if (!hasConcept(query.conceptIdentifier)) {
             continue;
@@ -223,14 +216,7 @@ export abstract class Kos<
   private *queryConcepts(query: ConceptsQuery): Generator<Stub<ConceptT>> {
     if (query.type === "All") {
       for (const resource of this.resourceSet.namedInstancesOf(skos.Concept)) {
-        yield this.concept(resource.identifier);
-      }
-      return;
-    }
-
-    if (query.type === "Identifiers") {
-      for (const identifier of query.identifiers) {
-        yield this.concept(identifier);
+        yield this.getConceptByIdentifier(resource.identifier);
       }
       return;
     }
@@ -243,7 +229,7 @@ export abstract class Kos<
           dataset: this.dataset,
         })
       ) {
-        yield this.concept(query.conceptIdentifier);
+        yield this.getConceptByIdentifier(query.conceptIdentifier);
       }
       return;
     }
@@ -261,7 +247,7 @@ export abstract class Kos<
           quad.object.termType === "NamedNode" &&
           !yieldedConceptIdentifiers.has(quad.object)
         ) {
-          yield this.concept(quad.object);
+          yield this.getConceptByIdentifier(quad.object);
           yieldedConceptIdentifiers.add(quad.object);
         }
       }
@@ -277,7 +263,7 @@ export abstract class Kos<
           quad.subject.termType === "NamedNode" &&
           !yieldedConceptIdentifiers.has(quad.subject)
         ) {
-          yield this.concept(quad.subject);
+          yield this.getConceptByIdentifier(quad.subject);
           yieldedConceptIdentifiers.add(quad.subject);
         }
       }
@@ -304,7 +290,7 @@ export abstract class Kos<
           ) {
             continue;
           }
-          yield this.concept(quad.subject);
+          yield this.getConceptByIdentifier(quad.subject);
           yieldedConceptIdentifiers.add(quad.subject);
         }
       }
@@ -319,7 +305,7 @@ export abstract class Kos<
       )) {
         // The semantic relation properties have a range of skos:Concept
         if (quad.object.termType === "NamedNode") {
-          yield this.concept(quad.object);
+          yield this.getConceptByIdentifier(quad.object);
         }
       }
       return;
@@ -333,7 +319,7 @@ export abstract class Kos<
       )) {
         // The semantic relation properties have a domain of skos:Concept
         if (quad.subject.termType === "NamedNode") {
-          yield this.concept(quad.subject);
+          yield this.getConceptByIdentifier(quad.subject);
         }
       }
       return;

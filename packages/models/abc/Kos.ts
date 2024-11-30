@@ -9,6 +9,7 @@ import { Label as ILabel } from "../Label.js";
 import { LanguageTagSet } from "../LanguageTagSet.js";
 import { Stub } from "../Stub.js";
 import { StubSequence } from "../StubSequence.js";
+import { UnbatchedStubSequence } from "../UnbatchedStubSequence.js";
 
 export abstract class Kos<
   ConceptT extends IConcept<ConceptT, ConceptSchemeT, LabelT>,
@@ -28,25 +29,67 @@ export abstract class Kos<
       });
   }
 
-  abstract concept(identifier: Identifier): Stub<ConceptT>;
+  abstract getConceptByIdentifier(identifier: Identifier): Stub<ConceptT>;
 
-  abstract conceptScheme(identifier: Identifier): Stub<ConceptSchemeT>;
+  abstract getConceptSchemeByIdentifier(
+    identifier: Identifier,
+  ): Stub<ConceptSchemeT>;
 
-  abstract conceptSchemes(kwds: {
+  getConceptSchemes(kwds: { limit: number | null; offset: number }): Promise<
+    StubSequence<ConceptSchemeT>
+  > {
+    return this.getConceptSchemesByQuery({ ...kwds, query: { type: "All" } });
+  }
+
+  getConceptSchemesByIdentifiers(
+    identifiers: readonly Identifier[],
+  ): StubSequence<ConceptSchemeT> {
+    return new UnbatchedStubSequence(
+      identifiers.map((identifier) =>
+        this.getConceptSchemeByIdentifier(identifier),
+      ),
+    );
+  }
+
+  abstract getConceptSchemesByQuery(kwds: {
     limit: number | null;
     offset: number;
     query: ConceptSchemesQuery;
   }): Promise<StubSequence<ConceptSchemeT>>;
 
-  abstract conceptSchemesCount(query: ConceptSchemesQuery): Promise<number>;
+  getConceptSchemesCount(): Promise<number> {
+    return this.getConceptSchemesCountByQuery({ type: "All" });
+  }
 
-  abstract concepts(kwds: {
+  abstract getConceptSchemesCountByQuery(
+    query: ConceptSchemesQuery,
+  ): Promise<number>;
+
+  getConcepts(kwds: { limit: number | null; offset: number }): Promise<
+    StubSequence<ConceptT>
+  > {
+    return this.getConceptsByQuery({ ...kwds, query: { type: "All" } });
+  }
+
+  getConceptsByIdentifiers(
+    identifiers: readonly Identifier[],
+  ): StubSequence<ConceptT> {
+    return new UnbatchedStubSequence(
+      identifiers.map((identifier) => this.getConceptByIdentifier(identifier)),
+    );
+  }
+
+  abstract getConceptsByQuery(kwds: {
     limit: number | null;
     offset: number;
     query: ConceptsQuery;
   }): Promise<StubSequence<ConceptT>>;
 
-  abstract conceptsCount(query: ConceptsQuery): Promise<number>;
+  getConceptsCount(): Promise<number> {
+    return this.getConceptsCountByQuery({ type: "All" });
+  }
+
+  abstract getConceptsCountByQuery(query: ConceptsQuery): Promise<number>;
 }
 
 export namespace Kos {
