@@ -2,7 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { stringify as stringifyYaml } from "yaml";
 
-const VERSION = "2.0.95";
+const VERSION = "2.0.96";
 
 type PackageName =
   | "rdfjs-dataset-models"
