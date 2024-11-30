@@ -1,6 +1,7 @@
 import { Literal } from "@rdfjs/types";
 import { Equatable } from "purify-ts-helpers";
-import { Label as ILabel, Identifier } from "../index.js";
+import { Identifier } from "../Identifier.js";
+import { Label as ILabel } from "../Label.js";
 
 export abstract class Label implements ILabel {
   equals = Label.equals;

@@ -1,14 +1,12 @@
-import {
-  Concept as IConcept,
-  ConceptScheme as IConceptScheme,
-  Label as ILabel,
-  Identifier,
-  Stub,
-  StubSequence,
-} from "@kos-kit/models";
 import { Literal, NamedNode } from "@rdfjs/types";
 import { Maybe } from "purify-ts";
 import { Equatable } from "purify-ts-helpers";
+import { Concept as IConcept } from "../Concept.js";
+import { ConceptScheme as IConceptScheme } from "../ConceptScheme.js";
+import { Identifier } from "../Identifier.js";
+import { Label as ILabel } from "../Label.js";
+import { Stub } from "../Stub.js";
+import { StubSequence } from "../StubSequence.js";
 import { Resource } from "./Resource.js";
 
 export abstract class ConceptScheme<
