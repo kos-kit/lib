@@ -55,6 +55,37 @@ export const behavesLikeKos = (kos: Kos<any, any, any>) => {
     assert.fail("no concepts");
   });
 
+  it("should get concepts by identifiers", async () => {
+    const expectedConcepts = await (
+      await kos.concepts({
+        limit: 10,
+        offset: 0,
+        query: { type: "All" },
+      })
+    ).flatResolve();
+    expect(expectedConcepts).toHaveLength(10);
+
+    const actualConcepts = await (
+      await kos.concepts({
+        limit: null,
+        offset: 0,
+        query: {
+          identifiers: expectedConcepts.map((concept) => concept.identifier),
+          type: "Identifiers",
+        },
+      })
+    ).flatResolve();
+    expect(actualConcepts).toHaveLength(10);
+
+    for (let conceptI = 0; conceptI < expectedConcepts.length; conceptI++) {
+      expect(
+        actualConcepts[conceptI].identifier.equals(
+          expectedConcepts[conceptI].identifier,
+        ),
+      ).toBeTruthy();
+    }
+  });
+
   it("should get a count of concepts", async () => {
     expect(await kos.conceptsCount({ type: "All" })).not.toStrictEqual(0);
   });
@@ -95,6 +126,38 @@ export const behavesLikeKos = (kos: Kos<any, any, any>) => {
           actualConceptScheme!.identifier,
         ),
       ).toBeTruthy();
+    }
+  });
+
+  it("should get concept schemes by identifiers", async () => {
+    for (const expectedConceptScheme of await kos.conceptSchemes({
+      limit: null,
+      offset: 0,
+      query: { type: "All" },
+    })) {
+      expectConceptScheme(
+        (await expectedConceptScheme.resolve()).toMaybe().extractNullable(),
+      );
+      const actualConceptSchemes = await (
+        await kos.conceptSchemes({
+          limit: null,
+          offset: 0,
+          query: {
+            identifiers: [expectedConceptScheme.identifier],
+            type: "Identifiers",
+          },
+        })
+      ).flatResolve();
+      expect(actualConceptSchemes).toHaveLength(1);
+      const actualConceptScheme = actualConceptSchemes[0];
+      expect(actualConceptScheme).toBeTruthy();
+      expectConceptScheme(actualConceptScheme!);
+      expect(
+        expectedConceptScheme.identifier.equals(
+          actualConceptScheme!.identifier,
+        ),
+      ).toBeTruthy();
+      return;
     }
   });
 };
