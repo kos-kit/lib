@@ -195,6 +195,15 @@ export abstract class Kos<
       };
 
       switch (query.type) {
+        case "Identifiers":
+          if (
+            !query.identifiers.some((identifier) =>
+              conceptSchemeIdentifier.equals(identifier),
+            )
+          ) {
+            continue;
+          }
+          break;
         case "HasConcept":
           if (!hasConcept(query.conceptIdentifier)) {
             continue;
@@ -215,6 +224,13 @@ export abstract class Kos<
     if (query.type === "All") {
       for (const resource of this.resourceSet.namedInstancesOf(skos.Concept)) {
         yield this.concept(resource.identifier);
+      }
+      return;
+    }
+
+    if (query.type === "Identifiers") {
+      for (const identifier of query.identifiers) {
+        yield this.concept(identifier);
       }
       return;
     }
