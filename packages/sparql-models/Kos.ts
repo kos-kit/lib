@@ -35,7 +35,9 @@ export abstract class Kos<
     this.sparqlQueryClient = sparqlQueryClient;
   }
 
-  async conceptSchemesCount(query: ConceptSchemesQuery): Promise<number> {
+  async getConceptSchemesCountByQuery(
+    query: ConceptSchemesQuery,
+  ): Promise<number> {
     return mapBindingsToCount(
       await this.sparqlQueryClient.queryBindings(`\
 SELECT (COUNT(DISTINCT ?conceptScheme) AS ?count)
@@ -46,7 +48,7 @@ ${this.conceptSchemesQueryToWhereGraphPatterns(query).join("\n")}
     );
   }
 
-  async conceptsCount(query: ConceptsQuery): Promise<number> {
+  async getConceptsCountByQuery(query: ConceptsQuery): Promise<number> {
     return mapBindingsToCount(
       await this.sparqlQueryClient.queryBindings(`\
 SELECT (COUNT(DISTINCT ?concept) AS ?count)

@@ -6,7 +6,11 @@ import { expectConceptScheme } from "./expectConceptScheme.js";
 export const behavesLikeKos = (kos: Kos<any, any, any>) => {
   it("should get concepts", async () => {
     const firstConcepts = [
-      ...(await kos.concepts({ limit: 10, offset: 0, query: { type: "All" } })),
+      ...(await kos.getConceptsByQuery({
+        limit: 10,
+        offset: 0,
+        query: { type: "All" },
+      })),
     ];
     expect(firstConcepts).toHaveLength(10);
     for (const firstConcept of firstConcepts) {
@@ -14,7 +18,7 @@ export const behavesLikeKos = (kos: Kos<any, any, any>) => {
     }
 
     const nextConcepts = [
-      ...(await kos.concepts({
+      ...(await kos.getConceptsByQuery({
         limit: 10,
         offset: 10,
         query: { type: "All" },
@@ -33,7 +37,7 @@ export const behavesLikeKos = (kos: Kos<any, any, any>) => {
   });
 
   it("should get a concept by its identifier", async () => {
-    for (const expectedConcept of await kos.concepts({
+    for (const expectedConcept of await kos.getConceptsByQuery({
       limit: 1,
       offset: 0,
       query: { type: "All" },
@@ -42,7 +46,7 @@ export const behavesLikeKos = (kos: Kos<any, any, any>) => {
         (await expectedConcept.resolve()).toMaybe().extractNullable(),
       );
       const actualConcept = (
-        await kos.concept(expectedConcept.identifier).resolve()
+        await kos.getConceptByIdentifier(expectedConcept.identifier).resolve()
       )
         .toMaybe()
         .extractNullable();
@@ -57,7 +61,7 @@ export const behavesLikeKos = (kos: Kos<any, any, any>) => {
 
   it("should get concepts by identifiers", async () => {
     const expectedConcepts = await (
-      await kos.concepts({
+      await kos.getConceptsByQuery({
         limit: 10,
         offset: 0,
         query: { type: "All" },
@@ -66,7 +70,7 @@ export const behavesLikeKos = (kos: Kos<any, any, any>) => {
     expect(expectedConcepts).toHaveLength(10);
 
     const actualConcepts = await (
-      await kos.concepts({
+      await kos.getConceptsByQuery({
         limit: null,
         offset: 0,
         query: {
@@ -87,12 +91,14 @@ export const behavesLikeKos = (kos: Kos<any, any, any>) => {
   });
 
   it("should get a count of concepts", async () => {
-    expect(await kos.conceptsCount({ type: "All" })).not.toStrictEqual(0);
+    expect(
+      await kos.getConceptsCountByQuery({ type: "All" }),
+    ).not.toStrictEqual(0);
   });
 
   it("should get concept schemes", async () => {
     const conceptSchemes: Stub<ConceptScheme<any, any>>[] = [];
-    for (const conceptScheme of await kos.conceptSchemes({
+    for (const conceptScheme of await kos.getConceptSchemesByQuery({
       limit: null,
       offset: 0,
       query: { type: "All" },
@@ -106,7 +112,7 @@ export const behavesLikeKos = (kos: Kos<any, any, any>) => {
   });
 
   it("should get a concept scheme by an identifier", async () => {
-    for (const expectedConceptScheme of await kos.conceptSchemes({
+    for (const expectedConceptScheme of await kos.getConceptSchemesByQuery({
       limit: null,
       offset: 0,
       query: { type: "All" },
@@ -115,7 +121,9 @@ export const behavesLikeKos = (kos: Kos<any, any, any>) => {
         (await expectedConceptScheme.resolve()).toMaybe().extractNullable(),
       );
       const actualConceptScheme = (
-        await kos.conceptScheme(expectedConceptScheme.identifier).resolve()
+        await kos
+          .getConceptSchemeByIdentifier(expectedConceptScheme.identifier)
+          .resolve()
       )
         .toMaybe()
         .extractNullable();
@@ -130,7 +138,7 @@ export const behavesLikeKos = (kos: Kos<any, any, any>) => {
   });
 
   it("should get concept schemes by identifiers", async () => {
-    for (const expectedConceptScheme of await kos.conceptSchemes({
+    for (const expectedConceptScheme of await kos.getConceptSchemesByQuery({
       limit: null,
       offset: 0,
       query: { type: "All" },
@@ -139,7 +147,7 @@ export const behavesLikeKos = (kos: Kos<any, any, any>) => {
         (await expectedConceptScheme.resolve()).toMaybe().extractNullable(),
       );
       const actualConceptSchemes = await (
-        await kos.conceptSchemes({
+        await kos.getConceptSchemesByQuery({
           limit: null,
           offset: 0,
           query: {

@@ -42,7 +42,7 @@ export class DefaultKos extends Kos<
   DefaultConceptScheme,
   DefaultLabel
 > {
-  concept(identifier: Identifier): Stub<DefaultConcept> {
+  getConceptByIdentifier(identifier: Identifier): Stub<DefaultConcept> {
     return new Stub({
       datasetCoreFactory: this.datasetCoreFactory,
       graphPatterns: conceptGraphPatterns_,
@@ -54,7 +54,9 @@ export class DefaultKos extends Kos<
     });
   }
 
-  conceptScheme(identifier: Identifier): Stub<DefaultConceptScheme> {
+  getConceptSchemeByIdentifier(
+    identifier: Identifier,
+  ): Stub<DefaultConceptScheme> {
     return new Stub({
       datasetCoreFactory: this.datasetCoreFactory,
       graphPatterns: conceptSchemeGraphPatterns_,
@@ -66,7 +68,7 @@ export class DefaultKos extends Kos<
     });
   }
 
-  async conceptSchemes(kwds: {
+  async getConceptSchemesByQuery(kwds: {
     limit: number | null;
     offset: number;
     query: ConceptSchemesQuery;
@@ -79,11 +81,12 @@ export class DefaultKos extends Kos<
       modelFactory: (resource) => this.conceptSchemeModelFactory(resource),
       logger: this.logger,
       sparqlQueryClient: this.sparqlQueryClient,
-      stubFactory: (identifier) => this.conceptScheme(identifier),
+      stubFactory: (identifier) =>
+        this.getConceptSchemeByIdentifier(identifier),
     });
   }
 
-  async concepts(kwds: {
+  async getConceptsByQuery(kwds: {
     limit: number | null;
     offset: number;
     query: ConceptsQuery;
@@ -96,7 +99,7 @@ export class DefaultKos extends Kos<
       modelFactory: (resource) => this.conceptModelFactory(resource),
       logger: this.logger,
       sparqlQueryClient: this.sparqlQueryClient,
-      stubFactory: (identifier) => this.concept(identifier),
+      stubFactory: (identifier) => this.getConceptByIdentifier(identifier),
     });
   }
 

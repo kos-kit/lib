@@ -28,25 +28,29 @@ export abstract class Kos<
       });
   }
 
-  abstract concept(identifier: Identifier): Stub<ConceptT>;
+  abstract getConceptByIdentifier(identifier: Identifier): Stub<ConceptT>;
 
-  abstract conceptScheme(identifier: Identifier): Stub<ConceptSchemeT>;
+  abstract getConceptSchemeByIdentifier(
+    identifier: Identifier,
+  ): Stub<ConceptSchemeT>;
 
-  abstract conceptSchemes(kwds: {
+  abstract getConceptSchemesByQuery(kwds: {
     limit: number | null;
     offset: number;
     query: ConceptSchemesQuery;
   }): Promise<StubSequence<ConceptSchemeT>>;
 
-  abstract conceptSchemesCount(query: ConceptSchemesQuery): Promise<number>;
+  abstract getConceptSchemesCountByQuery(
+    query: ConceptSchemesQuery,
+  ): Promise<number>;
 
-  abstract concepts(kwds: {
+  abstract getConceptsByQuery(kwds: {
     limit: number | null;
     offset: number;
     query: ConceptsQuery;
   }): Promise<StubSequence<ConceptT>>;
 
-  abstract conceptsCount(query: ConceptsQuery): Promise<number>;
+  abstract getConceptsCountByQuery(query: ConceptsQuery): Promise<number>;
 }
 
 export namespace Kos {

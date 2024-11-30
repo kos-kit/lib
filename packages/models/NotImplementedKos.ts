@@ -19,15 +19,15 @@ export class NotImplementedKos<
     throw new Error("Method not implemented.");
   }
 
-  concept(_identifier: Identifier): Stub<ConceptT> {
+  getConceptByIdentifier(_identifier: Identifier): Stub<ConceptT> {
     throw new Error("Method not implemented.");
   }
 
-  conceptScheme(_identifier: Identifier): Stub<ConceptSchemeT> {
+  getConceptSchemeByIdentifier(_identifier: Identifier): Stub<ConceptSchemeT> {
     throw new Error("Method not implemented.");
   }
 
-  conceptSchemes(_kwds: {
+  getConceptSchemesByQuery(_kwds: {
     limit: number | null;
     offset: number;
     query: ConceptSchemesQuery;
@@ -35,11 +35,11 @@ export class NotImplementedKos<
     throw new Error("Method not implemented.");
   }
 
-  conceptSchemesCount(_query: ConceptSchemesQuery): Promise<number> {
+  getConceptSchemesCountByQuery(_query: ConceptSchemesQuery): Promise<number> {
     throw new Error("Method not implemented.");
   }
 
-  concepts(_kwds: {
+  getConceptsByQuery(_kwds: {
     limit: number | null;
     offset: number;
     query: ConceptsQuery;
@@ -47,7 +47,7 @@ export class NotImplementedKos<
     throw new Error("Method not implemented.");
   }
 
-  conceptsCount(_query: ConceptsQuery): Promise<number> {
+  getConceptsCountByQuery(_query: ConceptsQuery): Promise<number> {
     throw new Error("Method not implemented.");
   }
 }
