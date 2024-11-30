@@ -15,9 +15,9 @@ export interface Kos<
 > {
   readonly includeLanguageTags: LanguageTagSet;
 
-  conceptByIdentifier(identifier: Identifier): Stub<ConceptT>;
+  concept(identifier: Identifier): Stub<ConceptT>;
 
-  conceptSchemeByIdentifier(identifier: Identifier): Stub<ConceptSchemeT>;
+  conceptScheme(identifier: Identifier): Stub<ConceptSchemeT>;
 
   conceptSchemes(kwds: {
     limit: number | null;

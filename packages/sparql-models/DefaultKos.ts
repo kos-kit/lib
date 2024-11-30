@@ -42,7 +42,7 @@ export class DefaultKos extends Kos<
   DefaultConceptScheme,
   DefaultLabel
 > {
-  override conceptByIdentifier(identifier: Identifier): Stub<DefaultConcept> {
+  override concept(identifier: Identifier): Stub<DefaultConcept> {
     return new Stub({
       datasetCoreFactory: this.datasetCoreFactory,
       graphPatterns: conceptGraphPatterns_,
@@ -54,9 +54,7 @@ export class DefaultKos extends Kos<
     });
   }
 
-  override conceptSchemeByIdentifier(
-    identifier: Identifier,
-  ): Stub<DefaultConceptScheme> {
+  override conceptScheme(identifier: Identifier): Stub<DefaultConceptScheme> {
     return new Stub({
       datasetCoreFactory: this.datasetCoreFactory,
       graphPatterns: conceptSchemeGraphPatterns_,
@@ -79,7 +77,7 @@ export class DefaultKos extends Kos<
       logger: this.logger,
       modelFactory: (resource) => this.conceptSchemeModelFactory(resource),
       sparqlQueryClient: this.sparqlQueryClient,
-      stubFactory: (identifier) => this.conceptSchemeByIdentifier(identifier),
+      stubFactory: (identifier) => this.conceptScheme(identifier),
     });
   }
 
@@ -96,7 +94,7 @@ export class DefaultKos extends Kos<
       modelFactory: (resource) => this.conceptSchemeModelFactory(resource),
       logger: this.logger,
       sparqlQueryClient: this.sparqlQueryClient,
-      stubFactory: (identifier) => this.conceptSchemeByIdentifier(identifier),
+      stubFactory: (identifier) => this.conceptScheme(identifier),
     });
   }
 
@@ -111,7 +109,7 @@ export class DefaultKos extends Kos<
       logger: this.logger,
       modelFactory: (resource) => this.conceptModelFactory(resource),
       sparqlQueryClient: this.sparqlQueryClient,
-      stubFactory: (identifier) => this.conceptByIdentifier(identifier),
+      stubFactory: (identifier) => this.concept(identifier),
     });
   }
 
@@ -128,7 +126,7 @@ export class DefaultKos extends Kos<
       modelFactory: (resource) => this.conceptModelFactory(resource),
       logger: this.logger,
       sparqlQueryClient: this.sparqlQueryClient,
-      stubFactory: (identifier) => this.conceptByIdentifier(identifier),
+      stubFactory: (identifier) => this.concept(identifier),
     });
   }
 

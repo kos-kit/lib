@@ -29,11 +29,9 @@ export abstract class Kos<
       });
   }
 
-  abstract conceptByIdentifier(identifier: Identifier): Stub<ConceptT>;
+  abstract concept(identifier: Identifier): Stub<ConceptT>;
 
-  abstract conceptSchemeByIdentifier(
-    identifier: Identifier,
-  ): Stub<ConceptSchemeT>;
+  abstract conceptScheme(identifier: Identifier): Stub<ConceptSchemeT>;
 
   conceptSchemes(kwds: { limit: number | null; offset: number }): Promise<
     StubSequence<ConceptSchemeT>
@@ -45,9 +43,7 @@ export abstract class Kos<
     identifiers: readonly Identifier[],
   ): StubSequence<ConceptSchemeT> {
     return new UnbatchedStubSequence(
-      identifiers.map((identifier) =>
-        this.conceptSchemeByIdentifier(identifier),
-      ),
+      identifiers.map((identifier) => this.conceptScheme(identifier)),
     );
   }
 
@@ -75,7 +71,7 @@ export abstract class Kos<
     identifiers: readonly Identifier[],
   ): StubSequence<ConceptT> {
     return new UnbatchedStubSequence(
-      identifiers.map((identifier) => this.conceptByIdentifier(identifier)),
+      identifiers.map((identifier) => this.concept(identifier)),
     );
   }
 

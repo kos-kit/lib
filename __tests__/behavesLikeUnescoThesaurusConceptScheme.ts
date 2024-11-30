@@ -21,7 +21,7 @@ export const behavesLikeUnescoThesaurusConceptScheme = <
 ) => {
   const testConceptScheme = (includeLanguageTag: LanguageTag) =>
     kosFactory(includeLanguageTag)
-      .conceptSchemeByIdentifier(
+      .conceptScheme(
         DataFactory.namedNode("http://vocabularies.unesco.org/thesaurus"),
       )
       .resolve()

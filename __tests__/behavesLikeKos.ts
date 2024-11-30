@@ -46,7 +46,7 @@ export const behavesLikeKos = (kos: Kos<any, any, any>) => {
         (await expectedConcept.resolve()).toMaybe().extractNullable(),
       );
       const actualConcept = (
-        await kos.conceptByIdentifier(expectedConcept.identifier).resolve()
+        await kos.concept(expectedConcept.identifier).resolve()
       )
         .toMaybe()
         .extractNullable();
@@ -116,9 +116,7 @@ export const behavesLikeKos = (kos: Kos<any, any, any>) => {
         (await expectedConceptScheme.resolve()).toMaybe().extractNullable(),
       );
       const actualConceptScheme = (
-        await kos
-          .conceptSchemeByIdentifier(expectedConceptScheme.identifier)
-          .resolve()
+        await kos.conceptScheme(expectedConceptScheme.identifier).resolve()
       )
         .toMaybe()
         .extractNullable();

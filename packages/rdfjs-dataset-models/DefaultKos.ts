@@ -27,7 +27,7 @@ export class DefaultKos extends Kos<
   DefaultConceptScheme,
   DefaultLabel
 > {
-  conceptByIdentifier(identifier: Identifier): Stub<DefaultConcept> {
+  concept(identifier: Identifier): Stub<DefaultConcept> {
     return new Stub({
       logger: this.logger,
       modelFactory: (resource) =>
@@ -49,9 +49,7 @@ export class DefaultKos extends Kos<
     });
   }
 
-  conceptSchemeByIdentifier(
-    identifier: Identifier,
-  ): Stub<DefaultConceptScheme> {
+  conceptScheme(identifier: Identifier): Stub<DefaultConceptScheme> {
     return new Stub({
       logger: this.logger,
       modelFactory: (resource) =>
