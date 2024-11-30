@@ -67,7 +67,7 @@ export const behavesLikeUnescoThesaurusKos = <
 
   // it("should get all concept schemes", async () => {
   //   const conceptSchemes = await (
-  //     await testKos.conceptSchemes({
+  //     await testKos.getConceptSchemes({
   //       limit: null,
   //       offset: 0,
   //       query: { type: "All" },
