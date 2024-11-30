@@ -22,7 +22,7 @@ export function behavesLikeUnescoThesaurusConcept10<
 ) {
   const testConcept = async (includeLanguageTag: LanguageTag) =>
     kosFactory(includeLanguageTag)
-      .getConceptByIdentifier(
+      .conceptByIdentifier(
         DataFactory.namedNode(
           "http://vocabularies.unesco.org/thesaurus/concept10",
         ),

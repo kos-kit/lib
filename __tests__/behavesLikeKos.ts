@@ -6,7 +6,7 @@ import { expectConceptScheme } from "./expectConceptScheme.js";
 export const behavesLikeKos = (kos: Kos<any, any, any>) => {
   it("should get concepts", async () => {
     const firstConcepts = [
-      ...(await kos.getConceptsByQuery({
+      ...(await kos.conceptsByQuery({
         limit: 10,
         offset: 0,
         query: { type: "All" },
@@ -18,7 +18,7 @@ export const behavesLikeKos = (kos: Kos<any, any, any>) => {
     }
 
     const nextConcepts = [
-      ...(await kos.getConceptsByQuery({
+      ...(await kos.conceptsByQuery({
         limit: 10,
         offset: 10,
         query: { type: "All" },
@@ -37,7 +37,7 @@ export const behavesLikeKos = (kos: Kos<any, any, any>) => {
   });
 
   it("should get a concept by its identifier", async () => {
-    for (const expectedConcept of await kos.getConceptsByQuery({
+    for (const expectedConcept of await kos.conceptsByQuery({
       limit: 1,
       offset: 0,
       query: { type: "All" },
@@ -46,7 +46,7 @@ export const behavesLikeKos = (kos: Kos<any, any, any>) => {
         (await expectedConcept.resolve()).toMaybe().extractNullable(),
       );
       const actualConcept = (
-        await kos.getConceptByIdentifier(expectedConcept.identifier).resolve()
+        await kos.conceptByIdentifier(expectedConcept.identifier).resolve()
       )
         .toMaybe()
         .extractNullable();
@@ -61,7 +61,7 @@ export const behavesLikeKos = (kos: Kos<any, any, any>) => {
 
   it("should get concepts by identifiers", async () => {
     const expectedConcepts = await (
-      await kos.getConceptsByQuery({
+      await kos.conceptsByQuery({
         limit: 10,
         offset: 0,
         query: { type: "All" },
@@ -70,7 +70,7 @@ export const behavesLikeKos = (kos: Kos<any, any, any>) => {
     expect(expectedConcepts).toHaveLength(10);
 
     const actualConcepts = await kos
-      .getConceptsByIdentifiers(
+      .conceptsByIdentifiers(
         expectedConcepts.map((concept) => concept.identifier),
       )
       .flatResolve();
@@ -86,14 +86,14 @@ export const behavesLikeKos = (kos: Kos<any, any, any>) => {
   });
 
   it("should get a count of concepts", async () => {
-    expect(
-      await kos.getConceptsCountByQuery({ type: "All" }),
-    ).not.toStrictEqual(0);
+    expect(await kos.conceptsCountByQuery({ type: "All" })).not.toStrictEqual(
+      0,
+    );
   });
 
   it("should get concept schemes", async () => {
     const conceptSchemes: Stub<ConceptScheme<any, any>>[] = [];
-    for (const conceptScheme of await kos.getConceptSchemesByQuery({
+    for (const conceptScheme of await kos.conceptSchemesByQuery({
       limit: null,
       offset: 0,
       query: { type: "All" },
@@ -107,7 +107,7 @@ export const behavesLikeKos = (kos: Kos<any, any, any>) => {
   });
 
   it("should get a concept scheme by an identifier", async () => {
-    for (const expectedConceptScheme of await kos.getConceptSchemesByQuery({
+    for (const expectedConceptScheme of await kos.conceptSchemesByQuery({
       limit: null,
       offset: 0,
       query: { type: "All" },
@@ -117,7 +117,7 @@ export const behavesLikeKos = (kos: Kos<any, any, any>) => {
       );
       const actualConceptScheme = (
         await kos
-          .getConceptSchemeByIdentifier(expectedConceptScheme.identifier)
+          .conceptSchemeByIdentifier(expectedConceptScheme.identifier)
           .resolve()
       )
         .toMaybe()
@@ -133,7 +133,7 @@ export const behavesLikeKos = (kos: Kos<any, any, any>) => {
   });
 
   it("should get concept schemes by identifiers", async () => {
-    for (const expectedConceptScheme of await kos.getConceptSchemesByQuery({
+    for (const expectedConceptScheme of await kos.conceptSchemesByQuery({
       limit: null,
       offset: 0,
       query: { type: "All" },
@@ -142,7 +142,7 @@ export const behavesLikeKos = (kos: Kos<any, any, any>) => {
         (await expectedConceptScheme.resolve()).toMaybe().extractNullable(),
       );
       const actualConceptSchemes = await kos
-        .getConceptSchemesByIdentifiers([expectedConceptScheme.identifier])
+        .conceptSchemesByIdentifiers([expectedConceptScheme.identifier])
         .flatResolve();
       expect(actualConceptSchemes).toHaveLength(1);
       const actualConceptScheme = actualConceptSchemes[0];

@@ -15,45 +15,45 @@ export interface Kos<
 > {
   readonly includeLanguageTags: LanguageTagSet;
 
-  getConceptByIdentifier(identifier: Identifier): Stub<ConceptT>;
+  conceptByIdentifier(identifier: Identifier): Stub<ConceptT>;
 
-  getConceptSchemeByIdentifier(identifier: Identifier): Stub<ConceptSchemeT>;
+  conceptSchemeByIdentifier(identifier: Identifier): Stub<ConceptSchemeT>;
 
-  getConceptSchemes(kwds: {
+  conceptSchemes(kwds: {
     limit: number | null;
     offset: number;
   }): Promise<StubSequence<ConceptSchemeT>>;
 
-  getConceptSchemesByIdentifiers(
+  conceptSchemesByIdentifiers(
     identifiers: readonly Identifier[],
   ): StubSequence<ConceptSchemeT>;
 
-  getConceptSchemesByQuery(kwds: {
+  conceptSchemesByQuery(kwds: {
     limit: number | null;
     offset: number;
     query: ConceptSchemesQuery;
   }): Promise<StubSequence<ConceptSchemeT>>;
 
-  getConceptSchemesCount(): Promise<number>;
+  conceptSchemesCount(): Promise<number>;
 
-  getConceptSchemesCountByQuery(query: ConceptSchemesQuery): Promise<number>;
+  conceptSchemesCountByQuery(query: ConceptSchemesQuery): Promise<number>;
 
-  getConcepts(kwds: {
+  concepts(kwds: {
     limit: number | null;
     offset: number;
   }): Promise<StubSequence<ConceptT>>;
 
-  getConceptsByIdentifiers(
+  conceptsByIdentifiers(
     identifiers: readonly Identifier[],
   ): StubSequence<ConceptT>;
 
-  getConceptsByQuery(kwds: {
+  conceptsByQuery(kwds: {
     limit: number | null;
     offset: number;
     query: ConceptsQuery;
   }): Promise<StubSequence<ConceptT>>;
 
-  getConceptsCount(): Promise<number>;
+  conceptsCount(): Promise<number>;
 
-  getConceptsCountByQuery(query: ConceptsQuery): Promise<number>;
+  conceptsCountByQuery(query: ConceptsQuery): Promise<number>;
 }

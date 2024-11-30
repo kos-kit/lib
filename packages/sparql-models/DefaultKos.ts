@@ -42,9 +42,7 @@ export class DefaultKos extends Kos<
   DefaultConceptScheme,
   DefaultLabel
 > {
-  override getConceptByIdentifier(
-    identifier: Identifier,
-  ): Stub<DefaultConcept> {
+  override conceptByIdentifier(identifier: Identifier): Stub<DefaultConcept> {
     return new Stub({
       datasetCoreFactory: this.datasetCoreFactory,
       graphPatterns: conceptGraphPatterns_,
@@ -56,7 +54,7 @@ export class DefaultKos extends Kos<
     });
   }
 
-  override getConceptSchemeByIdentifier(
+  override conceptSchemeByIdentifier(
     identifier: Identifier,
   ): Stub<DefaultConceptScheme> {
     return new Stub({
@@ -70,7 +68,7 @@ export class DefaultKos extends Kos<
     });
   }
 
-  override getConceptSchemesByIdentifiers(
+  override conceptSchemesByIdentifiers(
     identifiers: readonly Identifier[],
   ): StubSequence<DefaultConceptScheme> {
     return new StubSequence<DefaultConceptScheme>({
@@ -81,12 +79,11 @@ export class DefaultKos extends Kos<
       logger: this.logger,
       modelFactory: (resource) => this.conceptSchemeModelFactory(resource),
       sparqlQueryClient: this.sparqlQueryClient,
-      stubFactory: (identifier) =>
-        this.getConceptSchemeByIdentifier(identifier),
+      stubFactory: (identifier) => this.conceptSchemeByIdentifier(identifier),
     });
   }
 
-  async getConceptSchemesByQuery(kwds: {
+  async conceptSchemesByQuery(kwds: {
     limit: number | null;
     offset: number;
     query: ConceptSchemesQuery;
@@ -99,12 +96,11 @@ export class DefaultKos extends Kos<
       modelFactory: (resource) => this.conceptSchemeModelFactory(resource),
       logger: this.logger,
       sparqlQueryClient: this.sparqlQueryClient,
-      stubFactory: (identifier) =>
-        this.getConceptSchemeByIdentifier(identifier),
+      stubFactory: (identifier) => this.conceptSchemeByIdentifier(identifier),
     });
   }
 
-  override getConceptsByIdentifiers(
+  override conceptsByIdentifiers(
     identifiers: readonly Identifier[],
   ): StubSequence<DefaultConcept> {
     return new StubSequence<DefaultConcept>({
@@ -115,11 +111,11 @@ export class DefaultKos extends Kos<
       logger: this.logger,
       modelFactory: (resource) => this.conceptModelFactory(resource),
       sparqlQueryClient: this.sparqlQueryClient,
-      stubFactory: (identifier) => this.getConceptByIdentifier(identifier),
+      stubFactory: (identifier) => this.conceptByIdentifier(identifier),
     });
   }
 
-  async getConceptsByQuery(kwds: {
+  async conceptsByQuery(kwds: {
     limit: number | null;
     offset: number;
     query: ConceptsQuery;
@@ -132,7 +128,7 @@ export class DefaultKos extends Kos<
       modelFactory: (resource) => this.conceptModelFactory(resource),
       logger: this.logger,
       sparqlQueryClient: this.sparqlQueryClient,
-      stubFactory: (identifier) => this.getConceptByIdentifier(identifier),
+      stubFactory: (identifier) => this.conceptByIdentifier(identifier),
     });
   }
 

@@ -25,7 +25,7 @@ export const behavesLikeUnescoThesaurusKos = <
     expect,
   }) => {
     const subjectConcepts = [
-      ...(await testKos.getConceptsByQuery({
+      ...(await testKos.conceptsByQuery({
         limit: null,
         offset: 0,
         query: {
@@ -81,14 +81,14 @@ export const behavesLikeUnescoThesaurusKos = <
   // });
 
   it("should get a count of concepts", async () => {
-    expect(
-      await testKos.getConceptsCountByQuery({ type: "All" }),
-    ).toStrictEqual(4482);
+    expect(await testKos.conceptsCountByQuery({ type: "All" })).toStrictEqual(
+      4482,
+    );
   });
 
   it("should get a count of concept schemes", async () => {
     expect(
-      await testKos.getConceptSchemesCountByQuery({ type: "All" }),
+      await testKos.conceptSchemesCountByQuery({ type: "All" }),
     ).toStrictEqual(1);
   });
 
