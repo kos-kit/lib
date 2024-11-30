@@ -117,7 +117,7 @@ ${offset > 0 ? `OFFSET ${offset}` : ""}
 
     if (query.type === "Identifiers") {
       return [
-        `VALUES ?conceptScheme { ${query.identifiers.map((identifier) => Identifier.toString(identifier))} }`,
+        `VALUES ?conceptScheme { ${query.identifiers.map((identifier) => Identifier.toString(identifier)).join(" ")} }`,
         ...new RdfTypeGraphPatterns(
           GraphPattern.variable("conceptScheme"),
           skos.ConceptScheme,
@@ -153,6 +153,16 @@ ${offset > 0 ? `OFFSET ${offset}` : ""}
         GraphPattern.variable("concept"),
         skos.Concept,
       ).toWhereStrings();
+    }
+
+    if (query.type === "Identifiers") {
+      return [
+        `VALUES ?concept { ${query.identifiers.map((identifier) => Identifier.toString(identifier)).join(" ")} }`,
+        ...new RdfTypeGraphPatterns(
+          GraphPattern.variable("concept"),
+          skos.Concept,
+        ).toWhereStrings(),
+      ];
     }
 
     if (query.type === "InScheme" || query.type === "TopConceptOf") {
