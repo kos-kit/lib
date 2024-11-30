@@ -19,19 +19,41 @@ export interface Kos<
 
   getConceptSchemeByIdentifier(identifier: Identifier): Stub<ConceptSchemeT>;
 
+  getConceptSchemes(kwds: {
+    limit: number | null;
+    offset: number;
+  }): Promise<StubSequence<ConceptSchemeT>>;
+
+  getConceptSchemesByIdentifiers(
+    identifiers: readonly Identifier[],
+  ): StubSequence<ConceptSchemeT>;
+
   getConceptSchemesByQuery(kwds: {
     limit: number | null;
     offset: number;
     query: ConceptSchemesQuery;
   }): Promise<StubSequence<ConceptSchemeT>>;
 
+  getConceptSchemesCount(): Promise<number>;
+
   getConceptSchemesCountByQuery(query: ConceptSchemesQuery): Promise<number>;
+
+  getConcepts(kwds: {
+    limit: number | null;
+    offset: number;
+  }): Promise<StubSequence<ConceptT>>;
+
+  getConceptsByIdentifiers(
+    identifiers: readonly Identifier[],
+  ): StubSequence<ConceptT>;
 
   getConceptsByQuery(kwds: {
     limit: number | null;
     offset: number;
     query: ConceptsQuery;
   }): Promise<StubSequence<ConceptT>>;
+
+  getConceptsCount(): Promise<number>;
 
   getConceptsCountByQuery(query: ConceptsQuery): Promise<number>;
 }

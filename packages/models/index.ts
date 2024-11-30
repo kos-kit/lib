@@ -14,7 +14,6 @@ export * from "./LiteralLabel.js";
 export * from "./Model.js";
 export * from "./Model.js";
 export * from "./Note.js";
-export * from "./NotImplementedKos.js";
 export * from "./SemanticRelation.js";
 export * from "./Stub.js";
 export * from "./StubSequence.js";
