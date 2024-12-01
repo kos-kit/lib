@@ -7,7 +7,13 @@ export class Note implements INote {
   readonly literalForm: Literal;
   readonly type: INote.Type;
 
-  constructor({ literalForm, type }: Note.Parameters) {
+  constructor({
+    literalForm,
+    type,
+  }: {
+    literalForm: Literal;
+    type: INote.Type;
+  }) {
     this.literalForm = literalForm;
     this.type = type;
   }
@@ -19,10 +25,5 @@ export namespace Note {
       literalForm: Equatable.booleanEquals,
       type: Equatable.equals,
     });
-  }
-
-  export interface Parameters {
-    literalForm: Literal;
-    type: INote.Type;
   }
 }

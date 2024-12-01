@@ -15,7 +15,7 @@ export class Stub<ModelT extends Model> extends abc.Stub<ModelT> {
   }: {
     modelFactory: (resource: Resource<Identifier>) => Either<Error, ModelT>;
     resource: Resource<Identifier>;
-  } & Omit<abc.Stub.Parameters, "identifier">) {
+  } & Omit<ConstructorParameters<typeof abc.Stub>[0], "identifier">) {
     super(superParameters);
     this.modelFactory = modelFactory;
     this.resource = resource;

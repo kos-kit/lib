@@ -10,7 +10,11 @@ export abstract class Stub<ModelT extends Model> implements IStub<ModelT> {
   abstract readonly identifier: Identifier;
   protected readonly logger: Logger;
 
-  protected constructor({ logger }: Stub.Parameters) {
+  constructor({
+    logger,
+  }: {
+    logger: Logger;
+  }) {
     this.logger = logger;
   }
 
@@ -25,9 +29,5 @@ export namespace Stub {
     return Equatable.objectEquals(this, other, {
       identifier: Equatable.booleanEquals,
     });
-  }
-
-  export interface Parameters {
-    logger: Logger;
   }
 }

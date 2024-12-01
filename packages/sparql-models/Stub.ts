@@ -38,7 +38,7 @@ export class Stub<ModelT extends Model> extends abc.Stub<ModelT> {
     modelFactory: (resource: Resource<Identifier>) => Either<Error, ModelT>;
     modelVariable?: GraphPattern.Variable;
     sparqlQueryClient: SparqlQueryClient;
-  } & abc.Stub.Parameters) {
+  } & ConstructorParameters<typeof abc.Stub>[0]) {
     super(superParameters);
     this.datasetCoreFactory = datasetCoreFactory;
     this.graphPatterns = graphPatterns;

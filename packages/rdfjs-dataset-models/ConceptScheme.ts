@@ -21,7 +21,7 @@ export class ConceptScheme<
   LabelT extends ILabel,
 > extends abc.ConceptScheme<ConceptT, ConceptSchemeT, LabelT> {
   readonly labelConstructor: new (
-    _: Label.Parameters,
+    _: ConstructorParameters<typeof Label>[0],
   ) => LabelT;
   notes = Resource.notes;
   readonly resource: rdfjsResource.Resource<Identifier>;
@@ -116,7 +116,9 @@ export namespace ConceptScheme {
     ConceptSchemeT extends IConceptScheme<ConceptT, LabelT>,
     LabelT extends ILabel,
   > extends abc.ConceptScheme.Parameters<ConceptT, ConceptSchemeT, LabelT> {
-    labelConstructor: new (parameters: Label.Parameters) => LabelT;
+    labelConstructor: new (
+      parameters: ConstructorParameters<typeof Label>[0],
+    ) => LabelT;
     resource: rdfjsResource.Resource<Identifier>;
   }
 }

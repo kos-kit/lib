@@ -9,7 +9,15 @@ export abstract class Label implements ILabel {
   readonly literalForm: Literal;
   readonly type: ILabel.Type;
 
-  constructor({ identifier, literalForm, type }: Label.Parameters) {
+  constructor({
+    identifier,
+    literalForm,
+    type,
+  }: {
+    identifier: Identifier;
+    literalForm: Literal;
+    type: ILabel.Type;
+  }) {
     this.identifier = identifier;
     this.literalForm = literalForm;
     this.type = type;
@@ -22,11 +30,5 @@ export namespace Label {
       type: Equatable.equals,
       literalForm: Equatable.booleanEquals,
     });
-  }
-
-  export interface Parameters {
-    identifier: Identifier;
-    literalForm: Literal;
-    type: ILabel.Type;
   }
 }

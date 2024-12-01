@@ -29,7 +29,7 @@ export abstract class Kos<
   }: {
     datasetCoreFactory: DatasetCoreFactory;
     sparqlQueryClient: SparqlQueryClient;
-  } & abc.Kos.Parameters) {
+  } & ConstructorParameters<typeof abc.Kos>[0]) {
     super(superParameters);
     this.datasetCoreFactory = datasetCoreFactory;
     this.sparqlQueryClient = sparqlQueryClient;

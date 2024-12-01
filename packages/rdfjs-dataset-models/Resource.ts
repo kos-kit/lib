@@ -14,7 +14,7 @@ import { Label } from "./Label.js";
 
 interface Resource<LabelT extends ILabel> {
   kos: { readonly includeLanguageTags: LanguageTagSet };
-  labelConstructor: new (_: Label.Parameters) => LabelT;
+  labelConstructor: new (_: ConstructorParameters<typeof Label>[0]) => LabelT;
   resource: rdfjsResource.Resource<Identifier>;
 }
 

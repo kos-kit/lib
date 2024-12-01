@@ -80,7 +80,10 @@ export abstract class Kos<
 > extends abc.Kos<ConceptT, ConceptSchemeT, LabelT> {
   readonly resourceSet: ResourceSet;
 
-  constructor({ dataset, ...otherParameters }: Kos.Parameters) {
+  constructor({
+    dataset,
+    ...otherParameters
+  }: { dataset: DatasetCore } & ConstructorParameters<typeof abc.Kos>[0]) {
     super(otherParameters);
     this.resourceSet = new ResourceSet({ dataset });
   }
@@ -344,11 +347,5 @@ export abstract class Kos<
       left.identifier.value.localeCompare(right.identifier.value),
     );
     return sortedConceptStubs;
-  }
-}
-
-export namespace Kos {
-  export interface Parameters extends abc.Kos.Parameters {
-    dataset: DatasetCore;
   }
 }

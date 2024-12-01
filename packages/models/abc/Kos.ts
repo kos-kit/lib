@@ -20,7 +20,13 @@ export abstract class Kos<
   readonly includeLanguageTags: LanguageTagSet;
   readonly logger: Logger;
 
-  protected constructor({ includeLanguageTags, logger }: Kos.Parameters) {
+  constructor({
+    includeLanguageTags,
+    logger,
+  }: {
+    includeLanguageTags: LanguageTagSet;
+    logger?: Logger;
+  }) {
     this.includeLanguageTags = includeLanguageTags;
     this.logger =
       logger ??
@@ -86,11 +92,4 @@ export abstract class Kos<
   }
 
   abstract conceptsCountByQuery(query: ConceptsQuery): Promise<number>;
-}
-
-export namespace Kos {
-  export interface Parameters {
-    includeLanguageTags: LanguageTagSet;
-    logger?: Logger;
-  }
 }
