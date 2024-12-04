@@ -15,14 +15,26 @@ export interface StubSequence<ModelT extends Model>
   at(index: number): Stub<ModelT> | undefined;
 
   /**
-   * Try to resolve the stubs in the sequence, only returning the successful (Right) resolutions.
+   * Try to resolve all the stubs in the sequence at once, only returning the successful (Right) resolutions.
    */
   flatResolve(): Promise<readonly ModelT[]>;
 
   /**
-   * Try to resolve the stubs in the sequence.
+   * Try to resolve each stub individually, only returning the successful (Right) resolutions.
+   */
+  flatResolveEach(): AsyncIterable<ModelT>;
+
+  /**
+   * Try to resolve all the stubs in the sequence at once.
    *
    * Returns the equivalent of Stub.resolve for each stub. See the documentation for that method.
    */
   resolve(): Promise<readonly Either<Stub<ModelT>, ModelT>[]>;
+
+  /**
+   * Resolve each stub individually.
+   *
+   * Returns the equivalent of Stub.resolve for each stub. See the documentation for that method.
+   */
+  resolveEach(): AsyncIterable<Either<Stub<ModelT>, ModelT>>;
 }

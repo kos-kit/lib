@@ -23,5 +23,20 @@ export abstract class StubSequence<ModelT extends Model>
     );
   }
 
+  async *flatResolveEach(): AsyncIterable<ModelT> {
+    for (const stub of this) {
+      const model = await stub.resolve();
+      if (model.isRight()) {
+        yield model.unsafeCoerce();
+      }
+    }
+  }
+
   abstract resolve(): Promise<readonly Either<Stub<ModelT>, ModelT>[]>;
+
+  async *resolveEach(): AsyncIterable<Either<Stub<ModelT>, ModelT>> {
+    for (const stub of this) {
+      yield await stub.resolve();
+    }
+  }
 }
