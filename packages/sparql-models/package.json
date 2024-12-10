@@ -1,14 +1,14 @@
 {
   "dependencies": {
-    "@kos-kit/models": "2.0.101",
-    "@kos-kit/rdfjs-dataset-models": "2.0.101",
-    "@kos-kit/sparql-builder": "2.0.101",
-    "@kos-kit/sparql-client": "2.0.101",
+    "@kos-kit/models": "2.0.102",
+    "@kos-kit/rdfjs-dataset-models": "2.0.102",
+    "@kos-kit/sparql-builder": "2.0.102",
+    "@kos-kit/sparql-client": "2.0.102",
     "@rdfjs/types": "^1.1.0",
     "@tpluscode/rdf-ns-builders": "^4.3.0",
     "pino": "^9.1.0",
     "purify-ts": "~2.1.0",
-    "rdfjs-resource": "1.0.12"
+    "rdfjs-resource": "1.0.13"
   },
   "devDependencies": {
     "@types/n3": "^1.21.1",
@@ -48,5 +48,5 @@
   },
   "type": "module",
   "types": "index.d.ts",
-  "version": "2.0.101"
+  "version": "2.0.102"
 }

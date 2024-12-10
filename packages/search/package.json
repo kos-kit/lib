@@ -1,11 +1,11 @@
 {
   "dependencies": {
-    "@kos-kit/rdfjs-dataset-models": "2.0.101",
-    "@kos-kit/models": "2.0.101",
+    "@kos-kit/rdfjs-dataset-models": "2.0.102",
+    "@kos-kit/models": "2.0.102",
     "@rdfjs/types": "^1.1.0",
     "@types/lunr": "^2.3.7",
     "lunr": "^2.3.9",
-    "rdfjs-resource": "1.0.12"
+    "rdfjs-resource": "1.0.13"
   },
   "files": [
     "*.d.ts",
@@ -41,5 +41,5 @@
   },
   "type": "module",
   "types": "index.d.ts",
-  "version": "2.0.101"
+  "version": "2.0.102"
 }

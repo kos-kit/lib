@@ -2,7 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { stringify as stringifyYaml } from "yaml";
 
-const VERSION = "2.0.101";
+const VERSION = "2.0.102";
 
 type PackageName =
   | "rdfjs-dataset-models"
@@ -32,7 +32,7 @@ const externalDependencyVersions = {
   pino: "^9.1.0",
   "purify-ts": "~2.1.0",
   "purify-ts-helpers": "1.0.7",
-  "rdfjs-resource": "1.0.12",
+  "rdfjs-resource": "1.0.13",
 };
 
 const packages: readonly Package[] = [
