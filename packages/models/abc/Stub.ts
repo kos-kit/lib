@@ -4,11 +4,8 @@ import { Equatable } from "purify-ts-helpers";
 import { Identifier } from "../Identifier.js";
 import { Model } from "../Model.js";
 import { Stub as IStub } from "../Stub.js";
-import { StubSequence } from "../StubSequence.js";
 
 export abstract class Stub<ModelT extends Model> implements IStub<ModelT> {
-  equals = Stub.equals;
-  hash = Stub.hash;
   abstract readonly identifier: Identifier;
   protected readonly logger: Logger;
 
@@ -20,7 +17,17 @@ export abstract class Stub<ModelT extends Model> implements IStub<ModelT> {
     this.logger = logger;
   }
 
-  abstract cons(...tail: readonly IStub<ModelT>[]): StubSequence<ModelT>;
+  equals(other: IStub<ModelT>): Equatable.EqualsResult {
+    return Stub.equals(this, other);
+  }
+
+  hash<
+    HasherT extends {
+      update: (message: string | number[] | ArrayBuffer | Uint8Array) => void;
+    },
+  >(hasher: HasherT): HasherT {
+    return Stub.hash(this, hasher);
+  }
 
   abstract resolve(): Promise<Either<this, ModelT>>;
 }
@@ -31,16 +38,16 @@ export namespace Stub {
       update: (message: string | number[] | ArrayBuffer | Uint8Array) => void;
     },
     ModelT extends Model,
-  >(this: IStub<ModelT>, _hasher: HasherT): HasherT {
-    _hasher.update(Identifier.toString(this.identifier));
+  >(instance: IStub<ModelT>, _hasher: HasherT): HasherT {
+    _hasher.update(Identifier.toString(instance.identifier));
     return _hasher;
   }
 
   export function equals<ModelT extends Model>(
-    this: IStub<ModelT>,
-    other: IStub<ModelT>,
+    left: IStub<ModelT>,
+    right: IStub<ModelT>,
   ): Equatable.EqualsResult {
-    return Equatable.objectEquals(this, other, {
+    return Equatable.objectEquals(left, right, {
       identifier: Equatable.booleanEquals,
     });
   }
