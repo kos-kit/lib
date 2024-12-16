@@ -43,7 +43,7 @@ export interface StubSequence<ModelT extends Model>
 export namespace StubSequence {
   export function fromStubs<ModelT extends Model>(
     stubs: readonly Stub<ModelT>[],
-  ) {
+  ): StubSequence<ModelT> {
     if (stubs.length === 0) {
       return new EmptyStubSequence<ModelT>();
     }
