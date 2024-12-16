@@ -1,5 +1,6 @@
 import { Either } from "purify-ts";
 import { Equatable } from "purify-ts-helpers";
+import { EmptyStubSequence } from "./EmptyStubSequence.js";
 import { Model } from "./Model.js";
 import { Stub } from "./Stub.js";
 
@@ -37,4 +38,15 @@ export interface StubSequence<ModelT extends Model>
    * Returns the equivalent of Stub.resolve for each stub. See the documentation for that method.
    */
   resolveEach(): AsyncIterable<Either<Stub<ModelT>, ModelT>>;
+}
+
+export namespace StubSequence {
+  export function fromStubs<ModelT extends Model>(
+    stubs: readonly Stub<ModelT>[],
+  ) {
+    if (stubs.length === 0) {
+      return new EmptyStubSequence();
+    }
+    return stubs[0].cons(...stubs.slice(1));
+  }
 }

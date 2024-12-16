@@ -30,7 +30,7 @@ export class DefaultKos extends Kos<
   concept(identifier: Identifier): Stub<DefaultConcept> {
     return new Stub({
       logger: this.logger,
-      modelFactory: (resource) =>
+      modelFromRdf: (resource) =>
         resource.isInstanceOf(skos.Concept)
           ? Right(
               new DefaultConcept({
@@ -52,7 +52,7 @@ export class DefaultKos extends Kos<
   conceptScheme(identifier: Identifier): Stub<DefaultConceptScheme> {
     return new Stub({
       logger: this.logger,
-      modelFactory: (resource) =>
+      modelFromRdf: (resource) =>
         resource.isInstanceOf(skos.ConceptScheme)
           ? Right(
               new DefaultConceptScheme({

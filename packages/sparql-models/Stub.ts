@@ -8,14 +8,14 @@ import { SparqlQueryClient } from "@kos-kit/sparql-client";
 import { DatasetCoreFactory } from "@rdfjs/types";
 import { Either } from "purify-ts";
 import { Resource } from "rdfjs-resource";
+import { StubSequence } from "./StubSequence.js";
 
 export class Stub<ModelT extends Model> extends abc.Stub<ModelT> {
   readonly identifier: Identifier;
-
   private readonly datasetCoreFactory: DatasetCoreFactory;
   private readonly graphPatterns: Iterable<GraphPattern>;
   private readonly includeLanguageTags: LanguageTagSet;
-  private readonly modelFactory: (
+  private readonly modelFromRdf: (
     resource: Resource<Identifier>,
   ) => Either<Error, ModelT>;
   private readonly modelVariable: GraphPattern.Variable;
@@ -26,7 +26,7 @@ export class Stub<ModelT extends Model> extends abc.Stub<ModelT> {
     graphPatterns,
     identifier,
     includeLanguageTags,
-    modelFactory,
+    modelFromRdf,
     modelVariable,
     sparqlQueryClient,
     ...superParameters
@@ -35,7 +35,7 @@ export class Stub<ModelT extends Model> extends abc.Stub<ModelT> {
     graphPatterns: Iterable<GraphPattern>;
     identifier: Identifier;
     includeLanguageTags: LanguageTagSet;
-    modelFactory: (resource: Resource<Identifier>) => Either<Error, ModelT>;
+    modelFromRdf: (resource: Resource<Identifier>) => Either<Error, ModelT>;
     modelVariable?: GraphPattern.Variable;
     sparqlQueryClient: SparqlQueryClient;
   } & ConstructorParameters<typeof abc.Stub>[0]) {
@@ -44,7 +44,7 @@ export class Stub<ModelT extends Model> extends abc.Stub<ModelT> {
     this.graphPatterns = graphPatterns;
     this.identifier = identifier;
     this.includeLanguageTags = includeLanguageTags;
-    this.modelFactory = modelFactory;
+    this.modelFromRdf = modelFromRdf;
     if (modelVariable) {
       this.modelVariable = modelVariable;
     } else if (
@@ -58,6 +58,30 @@ export class Stub<ModelT extends Model> extends abc.Stub<ModelT> {
     this.sparqlQueryClient = sparqlQueryClient;
   }
 
+  override cons(...tail: readonly Stub<ModelT>[]): StubSequence<ModelT> {
+    return new StubSequence({
+      datasetCoreFactory: this.datasetCoreFactory,
+      graphPatterns: this.graphPatterns,
+      identifiers: [this.identifier, ...tail.map((stub) => stub.identifier)],
+      includeLanguageTags: this.includeLanguageTags,
+      logger: this.logger,
+      modelFromRdf: this.modelFromRdf,
+      modelVariable: this.modelVariable,
+      stubFactory: (identifier) =>
+        new Stub({
+          datasetCoreFactory: this.datasetCoreFactory,
+          graphPatterns: this.graphPatterns,
+          includeLanguageTags: this.includeLanguageTags,
+          identifier,
+          logger: this.logger,
+          modelFromRdf: this.modelFromRdf,
+          modelVariable: this.modelVariable,
+          sparqlQueryClient: this.sparqlQueryClient,
+        }),
+      sparqlQueryClient: this.sparqlQueryClient,
+    });
+  }
+
   async resolve(): Promise<Either<this, ModelT>> {
     const quads = await this.sparqlQueryClient.queryQuads(
       new ConstructQueryBuilder({
@@ -68,7 +92,7 @@ export class Stub<ModelT extends Model> extends abc.Stub<ModelT> {
         .build(),
     );
 
-    return this.modelFactory(
+    return this.modelFromRdf(
       new Resource({
         dataset: this.datasetCoreFactory.dataset(quads.concat()),
         identifier: this.identifier,

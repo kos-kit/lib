@@ -1,23 +1,29 @@
-import { Identifier, Model, abc } from "@kos-kit/models";
+import {
+  Identifier,
+  Model,
+  StubSequence,
+  UnbatchedStubSequence,
+  abc,
+} from "@kos-kit/models";
 import { Either } from "purify-ts";
 import { Resource } from "rdfjs-resource";
 
 export class Stub<ModelT extends Model> extends abc.Stub<ModelT> {
-  private readonly modelFactory: (
+  private readonly modelFromRdf: (
     resource: Resource<Identifier>,
   ) => Either<Error, ModelT>;
   private readonly resource: Resource<Identifier>;
 
   constructor({
-    modelFactory,
+    modelFromRdf,
     resource,
     ...superParameters
   }: {
-    modelFactory: (resource: Resource<Identifier>) => Either<Error, ModelT>;
+    modelFromRdf: (resource: Resource<Identifier>) => Either<Error, ModelT>;
     resource: Resource<Identifier>;
   } & Omit<ConstructorParameters<typeof abc.Stub>[0], "identifier">) {
     super(superParameters);
-    this.modelFactory = modelFactory;
+    this.modelFromRdf = modelFromRdf;
     this.resource = resource;
   }
 
@@ -25,8 +31,12 @@ export class Stub<ModelT extends Model> extends abc.Stub<ModelT> {
     return this.resource.identifier;
   }
 
+  override cons(...tail: readonly Stub<ModelT>[]): StubSequence<ModelT> {
+    return new UnbatchedStubSequence([this, ...tail]);
+  }
+
   async resolve(): Promise<Either<this, ModelT>> {
-    return this.modelFactory(this.resource).mapLeft((error) => {
+    return this.modelFromRdf(this.resource).mapLeft((error) => {
       this.logger.warn(
         "%s is missing, unable to resolve: %s",
         Identifier.toString(this.identifier),
