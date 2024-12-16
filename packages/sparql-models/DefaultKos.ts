@@ -49,7 +49,7 @@ export class DefaultKos extends Kos<
       identifier,
       includeLanguageTags: this.includeLanguageTags,
       logger: this.logger,
-      modelFactory: (resource) => this.conceptModelFactory(resource),
+      modelFromRdf: (resource) => this.conceptModelFactory(resource),
       sparqlQueryClient: this.sparqlQueryClient,
     });
   }
@@ -61,7 +61,7 @@ export class DefaultKos extends Kos<
       identifier,
       includeLanguageTags: this.includeLanguageTags,
       logger: this.logger,
-      modelFactory: (resource) => this.conceptSchemeModelFactory(resource),
+      modelFromRdf: (resource) => this.conceptSchemeModelFactory(resource),
       sparqlQueryClient: this.sparqlQueryClient,
     });
   }
@@ -75,7 +75,7 @@ export class DefaultKos extends Kos<
       identifiers,
       includeLanguageTags: this.includeLanguageTags,
       logger: this.logger,
-      modelFactory: (resource) => this.conceptSchemeModelFactory(resource),
+      modelFromRdf: (resource) => this.conceptSchemeModelFactory(resource),
       sparqlQueryClient: this.sparqlQueryClient,
       stubFactory: (identifier) => this.conceptScheme(identifier),
     });
@@ -91,7 +91,7 @@ export class DefaultKos extends Kos<
       graphPatterns: conceptSchemeGraphPatterns_,
       identifiers: await this.queryConceptSchemes(kwds),
       includeLanguageTags: this.includeLanguageTags,
-      modelFactory: (resource) => this.conceptSchemeModelFactory(resource),
+      modelFromRdf: (resource) => this.conceptSchemeModelFactory(resource),
       logger: this.logger,
       sparqlQueryClient: this.sparqlQueryClient,
       stubFactory: (identifier) => this.conceptScheme(identifier),
@@ -107,7 +107,7 @@ export class DefaultKos extends Kos<
       identifiers,
       includeLanguageTags: this.includeLanguageTags,
       logger: this.logger,
-      modelFactory: (resource) => this.conceptModelFactory(resource),
+      modelFromRdf: (resource) => this.conceptModelFactory(resource),
       sparqlQueryClient: this.sparqlQueryClient,
       stubFactory: (identifier) => this.concept(identifier),
     });
@@ -123,7 +123,7 @@ export class DefaultKos extends Kos<
       graphPatterns: conceptGraphPatterns_,
       identifiers: await this.queryConcepts(kwds),
       includeLanguageTags: this.includeLanguageTags,
-      modelFactory: (resource) => this.conceptModelFactory(resource),
+      modelFromRdf: (resource) => this.conceptModelFactory(resource),
       logger: this.logger,
       sparqlQueryClient: this.sparqlQueryClient,
       stubFactory: (identifier) => this.concept(identifier),

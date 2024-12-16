@@ -18,7 +18,7 @@ export class StubSequence<
   private readonly identifiers: readonly Identifier[];
   private readonly includeLanguageTags: LanguageTagSet;
   private readonly logger: Logger;
-  private readonly modelFactory: (
+  private readonly modelFromRdf: (
     resource: Resource<Identifier>,
   ) => Either<Error, ModelT>;
   private readonly modelVariable: GraphPattern.Variable;
@@ -31,7 +31,7 @@ export class StubSequence<
     includeLanguageTags,
     identifiers,
     logger,
-    modelFactory,
+    modelFromRdf,
     modelVariable,
     sparqlQueryClient,
     stubFactory,
@@ -41,7 +41,7 @@ export class StubSequence<
     identifiers: readonly Identifier[];
     includeLanguageTags: LanguageTagSet;
     logger: Logger;
-    modelFactory: (resource: Resource<Identifier>) => Either<Error, ModelT>;
+    modelFromRdf: (resource: Resource<Identifier>) => Either<Error, ModelT>;
     modelVariable?: GraphPattern.Variable;
     sparqlQueryClient: SparqlQueryClient;
     stubFactory: (identifier: Identifier) => Stub<ModelT>;
@@ -52,7 +52,7 @@ export class StubSequence<
     this.identifiers = identifiers;
     this.includeLanguageTags = includeLanguageTags;
     this.logger = logger;
-    this.modelFactory = modelFactory;
+    this.modelFromRdf = modelFromRdf;
     if (modelVariable) {
       this.modelVariable = modelVariable;
     } else if (
@@ -96,7 +96,7 @@ export class StubSequence<
     );
 
     return this.identifiers.map((identifier, identifierI) =>
-      this.modelFactory(
+      this.modelFromRdf(
         new Resource({
           dataset: this.datasetCoreFactory.dataset(quads.concat()),
           identifier,
