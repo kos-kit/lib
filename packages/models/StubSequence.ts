@@ -45,7 +45,7 @@ export namespace StubSequence {
     stubs: readonly Stub<ModelT>[],
   ) {
     if (stubs.length === 0) {
-      return new EmptyStubSequence();
+      return new EmptyStubSequence<ModelT>();
     }
     return stubs[0].cons(...stubs.slice(1));
   }
