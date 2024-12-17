@@ -5,7 +5,7 @@ import { Identifier } from "../Identifier.js";
 import { Model } from "../Model.js";
 import { Stub as IStub } from "../Stub.js";
 import { StubSequence } from "../StubSequence.js";
-import { UnbatchedStubSequence } from "../UnbatchedStubSequence";
+import { UnbatchedStubSequence } from "../UnbatchedStubSequence.js";
 
 export abstract class Stub<ModelT extends Model> implements IStub<ModelT> {
   abstract readonly identifier: Identifier;
