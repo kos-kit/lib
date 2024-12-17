@@ -5,6 +5,7 @@ import { Identifier } from "../Identifier.js";
 import { Model } from "../Model.js";
 import { Stub as IStub } from "../Stub.js";
 import { StubSequence } from "../StubSequence.js";
+import { UnbatchedStubSequence } from "../UnbatchedStubSequence";
 
 export abstract class Stub<ModelT extends Model> implements IStub<ModelT> {
   abstract readonly identifier: Identifier;
@@ -18,7 +19,9 @@ export abstract class Stub<ModelT extends Model> implements IStub<ModelT> {
     this.logger = logger;
   }
 
-  abstract cons(...tail: readonly IStub<ModelT>[]): StubSequence<ModelT>;
+  cons(...tail: readonly IStub<ModelT>[]): StubSequence<ModelT> {
+    return new UnbatchedStubSequence([this, ...tail]);
+  }
 
   equals(other: IStub<ModelT>): Equatable.EqualsResult {
     return Stub.equals(this, other);

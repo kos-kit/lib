@@ -1,12 +1,6 @@
-import {
-  Identifier,
-  Model,
-  StubSequence,
-  UnbatchedStubSequence,
-  abc,
-} from "@kos-kit/models";
+import { Stub as IStub, Identifier, Model, abc } from "@kos-kit/models";
 import { Either } from "purify-ts";
-import { Resource } from "rdfjs-resource";
+import { MutableResource, MutableResourceSet, Resource } from "rdfjs-resource";
 
 export class Stub<ModelT extends Model> extends abc.Stub<ModelT> {
   private readonly modelFromRdf: (
@@ -31,10 +25,6 @@ export class Stub<ModelT extends Model> extends abc.Stub<ModelT> {
     return this.resource.identifier;
   }
 
-  override cons(...tail: readonly Stub<ModelT>[]): StubSequence<ModelT> {
-    return new UnbatchedStubSequence([this, ...tail]);
-  }
-
   async resolve(): Promise<Either<this, ModelT>> {
     return this.modelFromRdf(this.resource).mapLeft((error) => {
       this.logger.warn(
@@ -43,6 +33,25 @@ export class Stub<ModelT extends Model> extends abc.Stub<ModelT> {
         error.message,
       );
       return this;
+    });
+  }
+}
+
+export namespace Stub {
+  export function toRdf<ModelT extends Model>(
+    instance: IStub<ModelT>,
+    {
+      mutateGraph,
+      resourceSet,
+    }: {
+      ignoreRdfType?: boolean;
+      mutateGraph: MutableResource.MutateGraph;
+      resourceSet: MutableResourceSet;
+    },
+  ): MutableResource<Identifier> {
+    return resourceSet.mutableNamedResource({
+      identifier: instance.identifier,
+      mutateGraph,
     });
   }
 }
