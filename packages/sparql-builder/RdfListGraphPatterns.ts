@@ -1,3 +1,4 @@
+import { NamedNode } from "@rdfjs/types";
 import { rdf } from "@tpluscode/rdf-ns-builders";
 import { GraphPattern } from "./GraphPattern.js";
 import { PropertyPath } from "./PropertyPath.js";
@@ -11,17 +12,22 @@ export class RdfListGraphPatterns extends ResourceGraphPatterns {
   constructor({
     itemGraphPatterns,
     rdfList,
+    rdfListType,
   }: {
     itemGraphPatterns?: (
       itemVariable: GraphPattern.Variable,
     ) => Iterable<GraphPattern>;
     rdfList: ResourceGraphPatterns.Subject;
+    rdfListType?: NamedNode;
   }) {
     super(rdfList);
 
     // ?list rdf:first ?item0
     const item0Variable = this.variable("Item0");
     this.add(GraphPattern.basic(this.subject, rdf.first, item0Variable));
+    if (rdfListType) {
+      this.add(GraphPattern.basic(this.subject, rdf.type, rdfListType));
+    }
     if (itemGraphPatterns) {
       this.add(...itemGraphPatterns(item0Variable));
     }
@@ -50,6 +56,11 @@ export class RdfListGraphPatterns extends ResourceGraphPatterns {
     optionalGraphPatterns.push(
       GraphPattern.basic(restNVariable, rdf.first, itemNVariable),
     );
+    if (rdfListType) {
+      optionalGraphPatterns.push(
+        GraphPattern.basic(restNVariable, rdf.type, rdfListType),
+      );
+    }
     if (itemGraphPatterns) {
       optionalGraphPatterns.push(...itemGraphPatterns(itemNVariable));
     }
