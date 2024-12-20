@@ -57,4 +57,14 @@ export namespace Stub {
       identifier: Equatable.booleanEquals,
     });
   }
+
+  export function toJson<ModelT extends Model>(
+    stub: IStub<ModelT>,
+  ): {
+    readonly "@id": string;
+  } {
+    return {
+      "@id": stub.identifier.value,
+    };
+  }
 }
