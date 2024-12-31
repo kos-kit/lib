@@ -2,7 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { LanguageTag, LanguageTagSet } from "@kos-kit/models";
-import { OxigraphSparqlClient } from "@kos-kit/sparql-client/OxigraphSparqlClient";
+import { OxigraphSparqlClient } from "@kos-kit/sparql-client";
 import * as oxigraph from "oxigraph";
 import { DefaultKos } from "../DefaultKos.js";
 import { OxigraphDatasetCore } from "./OxigraphDatasetCore.js";
