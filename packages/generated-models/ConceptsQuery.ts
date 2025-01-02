@@ -16,7 +16,7 @@ export type ConceptsQuery =
       // Object concepts that are semantic relations of the given subject concept
       // i.e. if semanticRelationProperty is skos:broader, then
       // (subjectConceptIdentifier, skos:broader, ?otherConcept)
-      readonly semanticRelationType: SemanticRelationProperty;
+      readonly semanticRelationProperty: SemanticRelationProperty;
       readonly subjectConceptIdentifier: Identifier;
       readonly type: "ObjectsOfSemanticRelation";
     }
@@ -24,7 +24,7 @@ export type ConceptsQuery =
       // Subject concepts that are semantic relations of the given object concept
       // i.e. if semanticRelationProperty is skos:broader, then
       // (?otherConcept, skos:broader, objectConceptIdentifier)
-      readonly semanticRelationType: SemanticRelationProperty;
+      readonly semanticRelationProperty: SemanticRelationProperty;
       readonly objectConceptIdentifier: Identifier;
       readonly type: "SubjectsOfSemanticRelation";
     }

@@ -11,8 +11,8 @@ import {
 
 export interface Kos<
   ConceptT extends Concept = Concept,
-  ConceptSchemeStubT extends ConceptSchemeStub = ConceptSchemeStub,
   ConceptSchemeT extends ConceptScheme = ConceptScheme,
+  ConceptSchemeStubT extends ConceptSchemeStub = ConceptSchemeStub,
   ConceptStubT extends ConceptStub = ConceptStub,
 > {
   concept(identifier: Identifier): Promise<Either<Error, ConceptT>>;
