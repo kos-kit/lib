@@ -164,7 +164,7 @@ for (const package_ of packages) {
     ) {
       continue;
     }
-    for (const fileNameGlob of ["*.js", "*.d.ts"]) {
+    for (const fileNameGlob of ["*.js", "*.d.ts", "*.ttl"]) {
       files.add(
         path.join(
           path.relative(packageDirectoryPath, dirent.parentPath),

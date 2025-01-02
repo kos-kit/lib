@@ -11,7 +11,8 @@
   },
   "files": [
     "*.d.ts",
-    "*.js"
+    "*.js",
+    "*.ttl"
   ],
   "main": "index.js",
   "license": "Apache-2.0",
