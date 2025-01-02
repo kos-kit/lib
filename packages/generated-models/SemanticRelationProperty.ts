@@ -8,51 +8,61 @@ export class SemanticRelationProperty {
     mapping: false,
     identifier: skos.broader,
   });
+
   static readonly BROADER_TRANSITIVE = new SemanticRelationProperty({
     inverseIdentifier: Maybe.of(skos.narrowerTransitive),
     mapping: false,
     identifier: skos.broaderTransitive,
   });
+
   static readonly BROAD_MATCH = new SemanticRelationProperty({
     inverseIdentifier: Maybe.of(skos.narrowMatch),
     mapping: true,
     identifier: skos.broadMatch,
   });
+
   static readonly CLOSE_MATCH = new SemanticRelationProperty({
     inverseIdentifier: Maybe.empty(),
     mapping: true,
     identifier: skos.closeMatch,
   });
+
   static readonly EXACT_MATCH = new SemanticRelationProperty({
     inverseIdentifier: Maybe.empty(),
     mapping: true,
     identifier: skos.exactMatch,
   });
+
   static readonly NARROWER = new SemanticRelationProperty({
     inverseIdentifier: Maybe.of(skos.broader),
     mapping: false,
     identifier: skos.narrower,
   });
+
   static readonly NARROWER_TRANSITIVE = new SemanticRelationProperty({
     inverseIdentifier: Maybe.of(skos.broaderTransitive),
     mapping: false,
     identifier: skos.narrowerTransitive,
   });
+
   static readonly NARROW_MATCH = new SemanticRelationProperty({
     inverseIdentifier: Maybe.of(skos.broadMatch),
     mapping: true,
     identifier: skos.narrowMatch,
   });
+
   static readonly RELATED = new SemanticRelationProperty({
     inverseIdentifier: Maybe.empty(),
     mapping: false,
     identifier: skos.related,
   });
+
   static readonly RELATED_MATCH = new SemanticRelationProperty({
     inverseIdentifier: Maybe.empty(),
     mapping: true,
     identifier: skos.relatedMatch,
   });
+
   readonly identifier: NamedNode;
   readonly mapping: boolean;
   private readonly inverseIdentifier: Maybe<NamedNode>;
