@@ -1,0 +1,201 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix kos-kit: <http://kos-kit.github.io/ns#> .
+@prefix dash: <http://datashapes.org/dash#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix shaclmate: <http://minorg.github.io/shaclmate/ns#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix skos-xl: <http://www.w3.org/2008/05/skos-xl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<http://kos-kit.github.io/ns#>
+    shaclmate:tsObjectDeclarationType shaclmate:_TsObjectDeclarationType_Class ;
+    a owl:Ontology .
+
+kos-kit:ConceptSchemeStub
+    shaclmate:fromRdfType skos:ConceptScheme ;
+    shaclmate:name "ConceptSchemeStub" ;
+    a owl:Class, sh:NodeShape ;
+    rdfs:subClassOf kos-kit:ResourceStub .
+
+kos-kit:ConceptStub
+    shaclmate:fromRdfType skos:Concept ;
+    shaclmate:name "ConceptStub" ;
+    a owl:Class, sh:NodeShape ;
+    rdfs:subClassOf kos-kit:ResourceStub .
+
+kos-kit:LabelStub
+    shaclmate:fromRdfType skos-xl:Label ;
+    shaclmate:name "LabelStub" ;
+    a owl:Class, sh:NodeShape ;
+    sh:nodeKind sh:BlankNodeOrIRI ;
+    sh:property [
+        sh:maxCount 1 ;
+        sh:name "literalForm" ;
+        sh:or dash:StringOrLangString ;
+        sh:path skos-xl:literalForm
+    ] .
+
+kos-kit:Resource
+    shaclmate:abstract true ;
+    shaclmate:export false ;
+    shaclmate:name "Resource" ;
+    a owl:Class, sh:NodeShape ;
+    sh:nodeKind sh:IRI ;
+    sh:property [
+        sh:name "hiddenLabelXl" ;
+        sh:node kos-kit:LabelStub ;
+        sh:path skos-xl:hiddenLabel
+    ], [
+        sh:name "historyNote" ;
+        sh:or dash:StringOrLangString ;
+        sh:path skos:historyNote
+    ], [
+        sh:name "altLabel" ;
+        sh:or dash:StringOrLangString ;
+        sh:path skos:altLabel
+    ], [
+        sh:datatype rdf:langString ;
+        sh:name "notation" ;
+        sh:path skos:notation
+    ], [
+        sh:name "note" ;
+        sh:or dash:StringOrLangString ;
+        sh:path skos:notation
+    ], [
+        sh:name "prefLabel" ;
+        sh:or dash:StringOrLangString ;
+        sh:path skos:prefLabel
+    ], [
+        sh:name "prefLabelXl" ;
+        sh:node kos-kit:LabelStub ;
+        sh:path skos-xl:prefLabel
+    ], [
+        sh:name "scopeNote" ;
+        sh:or dash:StringOrLangString ;
+        sh:path skos:scopeNote
+    ], [
+        sh:name "altLabelXl" ;
+        sh:node kos-kit:LabelStub ;
+        sh:path skos-xl:altLabel
+    ], [
+        sh:name "changeNote" ;
+        sh:or dash:StringOrLangString ;
+        sh:path skos:changeNote
+    ], [
+        sh:name "definition" ;
+        sh:or dash:StringOrLangString ;
+        sh:path skos:definition
+    ], [
+        sh:name "editorialNote" ;
+        sh:or dash:StringOrLangString ;
+        sh:path skos:editorialNote
+    ], [
+        sh:name "example" ;
+        sh:or dash:StringOrLangString ;
+        sh:path skos:example
+    ], [
+        sh:name "hiddenLabel" ;
+        sh:or dash:StringOrLangString ;
+        sh:path skos:hiddenLabel
+    ] .
+
+kos-kit:ResourceStub
+    shaclmate:abstract true ;
+    shaclmate:name "ResourceStub" ;
+    a owl:Class, sh:NodeShape ;
+    sh:nodeKind sh:BlankNodeOrIRI ;
+    sh:property [
+        sh:name "prefLabel" ;
+        sh:or dash:StringOrLangString ;
+        sh:path skos:prefLabel
+    ], [
+        sh:name "prefLabelXl" ;
+        sh:node kos-kit:LabelStub ;
+        sh:path skos-xl:prefLabel
+    ] .
+
+skos:Concept
+    shaclmate:name "Concept" ;
+    a owl:Class, sh:NodeShape ;
+    rdfs:subClassOf kos-kit:Resource ;
+    sh:property [
+        sh:name "broader" ;
+        sh:node kos-kit:ConceptStub ;
+        sh:path skos:broader
+    ], [
+        sh:name "broaderTransitive" ;
+        sh:node kos-kit:ConceptStub ;
+        sh:path skos:broaderTransitive
+    ], [
+        sh:name "broadMatch" ;
+        sh:node kos-kit:ConceptStub ;
+        sh:path skos:broadMatch
+    ], [
+        sh:name "closeMatch" ;
+        sh:node kos-kit:ConceptStub ;
+        sh:path skos:closeMatch
+    ], [
+        sh:name "exactMatch" ;
+        sh:node kos-kit:ConceptStub ;
+        sh:path skos:exactMatch
+    ], [
+        sh:name "inScheme" ;
+        sh:node kos-kit:ConceptSchemeStub ;
+        sh:path skos:inScheme
+    ], [
+        sh:name "mappingRelation" ;
+        sh:node kos-kit:ConceptStub ;
+        sh:path skos:mappingRelation
+    ], [
+        sh:name "narrower" ;
+        sh:node kos-kit:ConceptStub ;
+        sh:path skos:narrower
+    ], [
+        sh:name "narrowerTransitive" ;
+        sh:node kos-kit:ConceptStub ;
+        sh:path skos:narrowerTransitive
+    ], [
+        sh:name "narrowMatch" ;
+        sh:node kos-kit:ConceptStub ;
+        sh:path skos:narrowMatch
+    ], [
+        sh:name "related" ;
+        sh:node kos-kit:ConceptStub ;
+        sh:path skos:related
+    ], [
+        sh:name "relatedMatch" ;
+        sh:node kos-kit:ConceptStub ;
+        sh:path skos:relatedMatch
+    ], [
+        sh:name "semanticRelation" ;
+        sh:node kos-kit:ConceptStub ;
+        sh:path skos:semanticRelation
+    ], [
+        sh:name "topConceptOf" ;
+        sh:node kos-kit:ConceptSchemeStub ;
+        sh:path skos:topConceptOf
+    ] .
+
+skos:ConceptScheme
+    shaclmate:name "ConceptScheme" ;
+    a owl:Class, sh:NodeShape ;
+    rdfs:subClassOf kos-kit:Resource ;
+    sh:property [
+        sh:name "hasTopConcept" ;
+        sh:node kos-kit:ConceptStub ;
+        sh:path skos:hasTopConcept
+    ] .
+
+skos-xl:Label
+    shaclmate:name "Label" ;
+    a owl:Class, sh:NodeShape ;
+    sh:nodeKind sh:BlankNodeOrIRI ;
+    sh:property [
+        sh:minCount 1 ;
+        sh:name "literalForm" ;
+        sh:or dash:StringOrLangString ;
+        sh:path skos-xl:literalForm
+    ] .
+
