@@ -44,6 +44,7 @@ const packages: readonly Package[] = [
         externalDependencyVersions["@tpluscode/rdf-ns-builders"],
       "@types/rdfjs__term-set":
         externalDependencyVersions["@types/rdfjs__term-set"],
+      "js-sha256": "^0.11.0",
       pino: externalDependencyVersions["pino"],
       "purify-ts": externalDependencyVersions["purify-ts"],
       "purify-ts-helpers": externalDependencyVersions["purify-ts-helpers"],
