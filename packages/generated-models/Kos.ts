@@ -11,7 +11,9 @@ import {
 
 export interface Kos<
   ConceptT extends Concept = Concept,
+  ConceptSchemeStubT extends ConceptSchemeStub = ConceptSchemeStub,
   ConceptSchemeT extends ConceptScheme = ConceptScheme,
+  ConceptStubT extends ConceptStub = ConceptStub,
 > {
   concept(identifier: Identifier): Promise<Either<Error, ConceptT>>;
 
@@ -33,7 +35,7 @@ export interface Kos<
     limit: number | null;
     offset: number;
     query: ConceptSchemesQuery;
-  }): Promise<readonly ConceptSchemeStub[]>;
+  }): Promise<readonly ConceptSchemeStubT[]>;
 
   conceptSchemesCount(query: ConceptSchemesQuery): Promise<number>;
 
@@ -41,7 +43,7 @@ export interface Kos<
     limit: number | null;
     offset: number;
     query: ConceptsQuery;
-  }): Promise<readonly ConceptStub[]>;
+  }): Promise<readonly ConceptStubT[]>;
 
   conceptsCount(query: ConceptsQuery): Promise<number>;
 }
