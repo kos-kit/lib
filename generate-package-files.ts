@@ -5,9 +5,10 @@ import { stringify as stringifyYaml } from "yaml";
 const VERSION = "2.0.107";
 
 type PackageName =
-  | "rdfjs-dataset-models"
+  | "generated-models"
   | "models"
   | "next-utils"
+  | "rdfjs-dataset-models"
   | "search"
   | "sparql-builder"
   | "sparql-client"
@@ -45,6 +46,20 @@ const packages: readonly Package[] = [
       "@types/rdfjs__term-set":
         externalDependencyVersions["@types/rdfjs__term-set"],
       "js-sha256": "^0.11.0",
+      pino: externalDependencyVersions["pino"],
+      "purify-ts": externalDependencyVersions["purify-ts"],
+      "purify-ts-helpers": externalDependencyVersions["purify-ts-helpers"],
+    },
+    name: "generated-models",
+  },
+  {
+    externalDependencies: {
+      "@rdfjs/term-set": externalDependencyVersions["@rdfjs/term-set"],
+      "@rdfjs/types": externalDependencyVersions["@rdfjs/types"],
+      "@tpluscode/rdf-ns-builders":
+        externalDependencyVersions["@tpluscode/rdf-ns-builders"],
+      "@types/rdfjs__term-set":
+        externalDependencyVersions["@types/rdfjs__term-set"],
       pino: externalDependencyVersions["pino"],
       "purify-ts": externalDependencyVersions["purify-ts"],
       "purify-ts-helpers": externalDependencyVersions["purify-ts-helpers"],

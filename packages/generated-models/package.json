@@ -4,6 +4,7 @@
     "@rdfjs/types": "^1.1.0",
     "@tpluscode/rdf-ns-builders": "^4.3.0",
     "@types/rdfjs__term-set": "^2.0.9",
+    "js-sha256": "^0.11.0",
     "pino": "^9.1.0",
     "purify-ts": "~2.1.0",
     "purify-ts-helpers": "1.0.7"
@@ -11,14 +12,11 @@
   "files": [
     "*.d.ts",
     "*.js",
-    "*.ttl",
-    "abc/*.d.ts",
-    "abc/*.js",
-    "abc/*.ttl"
+    "*.ttl"
   ],
   "main": "index.js",
   "license": "Apache-2.0",
-  "name": "@kos-kit/models",
+  "name": "@kos-kit/generated-models",
   "scripts": {
     "build": "tsc -b",
     "check": "biome check",
@@ -36,7 +34,7 @@
     "test": "biome check && vitest run",
     "test:coverage": "biome check && vitest run --coverage",
     "test:watch": "vitest watch",
-    "unlink": "npm unlink -g @kos-kit/models",
+    "unlink": "npm unlink -g @kos-kit/generated-models",
     "watch": "tsc -w --preserveWatchOutput",
     "watch:noEmit": "tsc -w --noEmit --preserveWatchOutput"
   },
