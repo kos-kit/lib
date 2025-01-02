@@ -50,6 +50,7 @@ const packages: readonly Package[] = [
       "purify-ts": externalDependencyVersions["purify-ts"],
       "purify-ts-helpers": externalDependencyVersions["purify-ts-helpers"],
     },
+    internalDependencies: ["sparql-builder", "sparql-client"],
     name: "generated-models",
   },
   {
