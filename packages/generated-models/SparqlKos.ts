@@ -277,14 +277,16 @@ ${this.conceptsQueryToWhereGraphPatterns(query).join("\n")}
     Either<Resource.ValueError, ModelT>
   > {
     const subjectVariable = GraphPattern.variable("subject");
-    const quads = await this.sparqlQueryClient.queryQuads(
-      new ConstructQueryBuilder({
-        includeLanguageTags: this.languageIn,
-      })
-        .addGraphPatterns(new modelFactory.SparqlGraphPatterns(subjectVariable))
-        .addValues(subjectVariable, identifier)
-        .build(),
-    );
+    const constructQuery = new ConstructQueryBuilder({
+      includeLanguageTags: this.languageIn,
+    })
+      .addGraphPatterns(new modelFactory.SparqlGraphPatterns(subjectVariable))
+      .addValues(subjectVariable, identifier)
+      .build();
+    const quads = await this.sparqlQueryClient.queryQuads(constructQuery);
+
+    const quadsString = quads.map((quad) => quad.toString()).join("\n");
+    console.log(quadsString);
 
     return modelFactory.fromRdf({
       languageIn: this.languageIn,
