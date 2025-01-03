@@ -138,7 +138,7 @@ export const behavesLikeUnescoThesaurusKos = (
     expect(conceptStub.prefLabel).toHaveLength(1);
     const prefLabel = conceptStub.prefLabel[0];
     expect(prefLabel.language).toStrictEqual("en");
-    expect(prefLabel.value).toStrictEqual("Unknown");
+    expect(prefLabel.value).toStrictEqual("Right to education");
   });
 
   it("UNESCO thesaurus KOS: conceptsCount", async () => {

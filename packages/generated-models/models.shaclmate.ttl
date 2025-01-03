@@ -45,10 +45,6 @@ kos-kit:Resource
     a owl:Class, sh:NodeShape ;
     sh:nodeKind sh:IRI ;
     sh:property [
-        sh:name "changeNote" ;
-        sh:or dash:StringOrLangString ;
-        sh:path skos:changeNote
-    ], [
         sh:name "definition" ;
         sh:or dash:StringOrLangString ;
         sh:path skos:definition
@@ -105,6 +101,10 @@ kos-kit:Resource
         sh:name "altLabelXl" ;
         sh:node kos-kit:LabelStub ;
         sh:path skos-xl:altLabel
+    ], [
+        sh:name "changeNote" ;
+        sh:or dash:StringOrLangString ;
+        sh:path skos:changeNote
     ] .
 
 kos-kit:ResourceStub

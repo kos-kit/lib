@@ -929,7 +929,11 @@ namespace Resource {
             .head()
             .chain((value) => value.toResource())
             .chain((_resource) =>
-              LabelStub.fromRdf({ ..._context, resource: _resource }),
+              LabelStub.fromRdf({
+                ..._context,
+                languageIn: _languageIn,
+                resource: _resource,
+              }),
             )
             .toMaybe()
             .toList(),
@@ -1145,7 +1149,11 @@ namespace Resource {
             .head()
             .chain((value) => value.toResource())
             .chain((_resource) =>
-              LabelStub.fromRdf({ ..._context, resource: _resource }),
+              LabelStub.fromRdf({
+                ..._context,
+                languageIn: _languageIn,
+                resource: _resource,
+              }),
             )
             .toMaybe()
             .toList(),
@@ -1337,7 +1345,11 @@ namespace Resource {
             .head()
             .chain((value) => value.toResource())
             .chain((_resource) =>
-              LabelStub.fromRdf({ ..._context, resource: _resource }),
+              LabelStub.fromRdf({
+                ..._context,
+                languageIn: _languageIn,
+                resource: _resource,
+              }),
             )
             .toMaybe()
             .toList(),
@@ -2712,6 +2724,7 @@ export namespace Concept {
     return Resource.interfaceFromRdf({
       ..._context,
       ignoreRdfType: true,
+      languageIn: _languageIn,
       resource: _resource,
     }).chain((_super) => {
       if (
@@ -2747,7 +2760,11 @@ export namespace Concept {
               .head()
               .chain((value) => value.toResource())
               .chain((_resource) =>
-                ConceptStub.fromRdf({ ..._context, resource: _resource }),
+                ConceptStub.fromRdf({
+                  ..._context,
+                  languageIn: _languageIn,
+                  resource: _resource,
+                }),
               )
               .toMaybe()
               .toList(),
@@ -2774,7 +2791,11 @@ export namespace Concept {
               .head()
               .chain((value) => value.toResource())
               .chain((_resource) =>
-                ConceptStub.fromRdf({ ..._context, resource: _resource }),
+                ConceptStub.fromRdf({
+                  ..._context,
+                  languageIn: _languageIn,
+                  resource: _resource,
+                }),
               )
               .toMaybe()
               .toList(),
@@ -2801,7 +2822,11 @@ export namespace Concept {
               .head()
               .chain((value) => value.toResource())
               .chain((_resource) =>
-                ConceptStub.fromRdf({ ..._context, resource: _resource }),
+                ConceptStub.fromRdf({
+                  ..._context,
+                  languageIn: _languageIn,
+                  resource: _resource,
+                }),
               )
               .toMaybe()
               .toList(),
@@ -2828,7 +2853,11 @@ export namespace Concept {
               .head()
               .chain((value) => value.toResource())
               .chain((_resource) =>
-                ConceptStub.fromRdf({ ..._context, resource: _resource }),
+                ConceptStub.fromRdf({
+                  ..._context,
+                  languageIn: _languageIn,
+                  resource: _resource,
+                }),
               )
               .toMaybe()
               .toList(),
@@ -2855,7 +2884,11 @@ export namespace Concept {
               .head()
               .chain((value) => value.toResource())
               .chain((_resource) =>
-                ConceptStub.fromRdf({ ..._context, resource: _resource }),
+                ConceptStub.fromRdf({
+                  ..._context,
+                  languageIn: _languageIn,
+                  resource: _resource,
+                }),
               )
               .toMaybe()
               .toList(),
@@ -2883,7 +2916,11 @@ export namespace Concept {
               .head()
               .chain((value) => value.toResource())
               .chain((_resource) =>
-                ConceptSchemeStub.fromRdf({ ..._context, resource: _resource }),
+                ConceptSchemeStub.fromRdf({
+                  ..._context,
+                  languageIn: _languageIn,
+                  resource: _resource,
+                }),
               )
               .toMaybe()
               .toList(),
@@ -2910,7 +2947,11 @@ export namespace Concept {
               .head()
               .chain((value) => value.toResource())
               .chain((_resource) =>
-                ConceptStub.fromRdf({ ..._context, resource: _resource }),
+                ConceptStub.fromRdf({
+                  ..._context,
+                  languageIn: _languageIn,
+                  resource: _resource,
+                }),
               )
               .toMaybe()
               .toList(),
@@ -2937,7 +2978,11 @@ export namespace Concept {
               .head()
               .chain((value) => value.toResource())
               .chain((_resource) =>
-                ConceptStub.fromRdf({ ..._context, resource: _resource }),
+                ConceptStub.fromRdf({
+                  ..._context,
+                  languageIn: _languageIn,
+                  resource: _resource,
+                }),
               )
               .toMaybe()
               .toList(),
@@ -2964,7 +3009,11 @@ export namespace Concept {
               .head()
               .chain((value) => value.toResource())
               .chain((_resource) =>
-                ConceptStub.fromRdf({ ..._context, resource: _resource }),
+                ConceptStub.fromRdf({
+                  ..._context,
+                  languageIn: _languageIn,
+                  resource: _resource,
+                }),
               )
               .toMaybe()
               .toList(),
@@ -2991,7 +3040,11 @@ export namespace Concept {
               .head()
               .chain((value) => value.toResource())
               .chain((_resource) =>
-                ConceptStub.fromRdf({ ..._context, resource: _resource }),
+                ConceptStub.fromRdf({
+                  ..._context,
+                  languageIn: _languageIn,
+                  resource: _resource,
+                }),
               )
               .toMaybe()
               .toList(),
@@ -3018,7 +3071,11 @@ export namespace Concept {
               .head()
               .chain((value) => value.toResource())
               .chain((_resource) =>
-                ConceptStub.fromRdf({ ..._context, resource: _resource }),
+                ConceptStub.fromRdf({
+                  ..._context,
+                  languageIn: _languageIn,
+                  resource: _resource,
+                }),
               )
               .toMaybe()
               .toList(),
@@ -3045,7 +3102,11 @@ export namespace Concept {
               .head()
               .chain((value) => value.toResource())
               .chain((_resource) =>
-                ConceptStub.fromRdf({ ..._context, resource: _resource }),
+                ConceptStub.fromRdf({
+                  ..._context,
+                  languageIn: _languageIn,
+                  resource: _resource,
+                }),
               )
               .toMaybe()
               .toList(),
@@ -3072,7 +3133,11 @@ export namespace Concept {
               .head()
               .chain((value) => value.toResource())
               .chain((_resource) =>
-                ConceptStub.fromRdf({ ..._context, resource: _resource }),
+                ConceptStub.fromRdf({
+                  ..._context,
+                  languageIn: _languageIn,
+                  resource: _resource,
+                }),
               )
               .toMaybe()
               .toList(),
@@ -3099,7 +3164,11 @@ export namespace Concept {
               .head()
               .chain((value) => value.toResource())
               .chain((_resource) =>
-                ConceptSchemeStub.fromRdf({ ..._context, resource: _resource }),
+                ConceptSchemeStub.fromRdf({
+                  ..._context,
+                  languageIn: _languageIn,
+                  resource: _resource,
+                }),
               )
               .toMaybe()
               .toList(),
@@ -3613,7 +3682,11 @@ export namespace ResourceStub {
             .head()
             .chain((value) => value.toResource())
             .chain((_resource) =>
-              LabelStub.fromRdf({ ..._context, resource: _resource }),
+              LabelStub.fromRdf({
+                ..._context,
+                languageIn: _languageIn,
+                resource: _resource,
+              }),
             )
             .toMaybe()
             .toList(),
@@ -3741,6 +3814,7 @@ export namespace ConceptStub {
     return ResourceStub.interfaceFromRdf({
       ..._context,
       ignoreRdfType: true,
+      languageIn: _languageIn,
       resource: _resource,
     }).chain((_super) => {
       if (
@@ -4195,6 +4269,7 @@ export namespace ConceptScheme {
     return Resource.interfaceFromRdf({
       ..._context,
       ignoreRdfType: true,
+      languageIn: _languageIn,
       resource: _resource,
     }).chain((_super) => {
       if (
@@ -4232,7 +4307,11 @@ export namespace ConceptScheme {
               .head()
               .chain((value) => value.toResource())
               .chain((_resource) =>
-                ConceptStub.fromRdf({ ..._context, resource: _resource }),
+                ConceptStub.fromRdf({
+                  ..._context,
+                  languageIn: _languageIn,
+                  resource: _resource,
+                }),
               )
               .toMaybe()
               .toList(),
@@ -4524,6 +4603,7 @@ export namespace ConceptSchemeStub {
     return ResourceStub.interfaceFromRdf({
       ..._context,
       ignoreRdfType: true,
+      languageIn: _languageIn,
       resource: _resource,
     }).chain((_super) => {
       if (
