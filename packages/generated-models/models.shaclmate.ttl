@@ -45,6 +45,35 @@ kos-kit:Resource
     a owl:Class, sh:NodeShape ;
     sh:nodeKind sh:IRI ;
     sh:property [
+        sh:name "changeNote" ;
+        sh:or dash:StringOrLangString ;
+        sh:path skos:changeNote
+    ], [
+        sh:name "definition" ;
+        sh:or dash:StringOrLangString ;
+        sh:path skos:definition
+    ], [
+        sh:name "editorialNote" ;
+        sh:or dash:StringOrLangString ;
+        sh:path skos:editorialNote
+    ], [
+        sh:name "example" ;
+        sh:or dash:StringOrLangString ;
+        sh:path skos:example
+    ], [
+        sh:name "hiddenLabel" ;
+        sh:or dash:StringOrLangString ;
+        sh:path skos:hiddenLabel
+    ], [
+        sh:datatype xsd:dateTime ;
+        sh:maxCount 1 ;
+        sh:name "modified" ;
+        sh:path dcterms:modified
+    ], [
+        sh:name "hiddenLabelXl" ;
+        sh:node kos-kit:LabelStub ;
+        sh:path skos-xl:hiddenLabel
+    ], [
         sh:name "historyNote" ;
         sh:or dash:StringOrLangString ;
         sh:path skos:historyNote
@@ -76,34 +105,6 @@ kos-kit:Resource
         sh:name "altLabelXl" ;
         sh:node kos-kit:LabelStub ;
         sh:path skos-xl:altLabel
-    ], [
-        sh:name "changeNote" ;
-        sh:or dash:StringOrLangString ;
-        sh:path skos:changeNote
-    ], [
-        sh:name "definition" ;
-        sh:or dash:StringOrLangString ;
-        sh:path skos:definition
-    ], [
-        sh:name "editorialNote" ;
-        sh:or dash:StringOrLangString ;
-        sh:path skos:editorialNote
-    ], [
-        sh:name "example" ;
-        sh:or dash:StringOrLangString ;
-        sh:path skos:example
-    ], [
-        sh:name "hiddenLabel" ;
-        sh:or dash:StringOrLangString ;
-        sh:path skos:hiddenLabel
-    ], [
-        sh:datatype xsd:dateTime ;
-        sh:name "modified" ;
-        sh:path dcterms:modified
-    ], [
-        sh:name "hiddenLabelXl" ;
-        sh:node kos-kit:LabelStub ;
-        sh:path skos-xl:hiddenLabel
     ] .
 
 kos-kit:ResourceStub

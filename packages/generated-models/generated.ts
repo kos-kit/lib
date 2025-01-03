@@ -17,7 +17,7 @@ abstract class Resource {
   readonly hiddenLabelXl: readonly LabelStub[];
   readonly historyNote: readonly rdfjs.Literal[];
   abstract readonly identifier: rdfjs.NamedNode;
-  readonly modified: readonly Date[];
+  readonly modified: purify.Maybe<Date>;
   readonly notation: readonly rdfjs.Literal[];
   readonly note: readonly rdfjs.Literal[];
   readonly prefLabel: readonly rdfjs.Literal[];
@@ -35,7 +35,7 @@ abstract class Resource {
     readonly hiddenLabel?: readonly rdfjs.Literal[];
     readonly hiddenLabelXl?: readonly LabelStub[];
     readonly historyNote?: readonly rdfjs.Literal[];
-    readonly modified?: readonly Date[];
+    readonly modified?: Date | purify.Maybe<Date>;
     readonly notation?: readonly rdfjs.Literal[];
     readonly note?: readonly rdfjs.Literal[];
     readonly prefLabel?: readonly rdfjs.Literal[];
@@ -114,10 +114,15 @@ abstract class Resource {
       this.historyNote = parameters.historyNote; // never
     }
 
-    if (Array.isArray(parameters.modified)) {
+    if (purify.Maybe.isMaybe(parameters.modified)) {
       this.modified = parameters.modified;
+    } else if (
+      typeof parameters.modified === "object" &&
+      parameters.modified instanceof Date
+    ) {
+      this.modified = purify.Maybe.of(parameters.modified);
     } else if (typeof parameters.modified === "undefined") {
-      this.modified = [];
+      this.modified = purify.Maybe.empty();
     } else {
       this.modified = parameters.modified; // never
     }
@@ -309,7 +314,7 @@ abstract class Resource {
       )
       .chain(() =>
         ((left, right) =>
-          purifyHelpers.Arrays.equals(left, right, (left, right) =>
+          purifyHelpers.Maybes.equals(left, right, (left, right) =>
             purifyHelpers.Equatable.EqualsResult.fromBooleanEqualsResult(
               left,
               right,
@@ -453,10 +458,9 @@ abstract class Resource {
       _hasher.update(_element0.value);
     }
 
-    for (const _element0 of this.modified) {
-      _hasher.update(_element0.toISOString());
-    }
-
+    this.modified.ifJust((_value0) => {
+      _hasher.update(_value0.toISOString());
+    });
     for (const _element0 of this.notation) {
       _hasher.update(_element0.value);
     }
@@ -540,7 +544,7 @@ abstract class Resource {
         }
     )[];
     readonly "@id": string;
-    readonly modified: readonly string[];
+    readonly modified: string | undefined;
     readonly notation: readonly (
       | string
       | {
@@ -686,7 +690,7 @@ abstract class Resource {
               },
         ),
         "@id": this.identifier.value,
-        modified: this.modified.map((_item) => _item.toISOString()),
+        modified: this.modified.map((_item) => _item.toISOString()).extract(),
         notation: this.notation.map((_item) =>
           _item.datatype.value === "http://www.w3.org/2001/XMLSchema#string" &&
           _item.language.length === 0
@@ -866,7 +870,7 @@ namespace Resource {
       hiddenLabelXl: readonly LabelStub[];
       historyNote: readonly rdfjs.Literal[];
       identifier: rdfjs.NamedNode;
-      modified: readonly Date[];
+      modified: purify.Maybe<Date>;
       notation: readonly rdfjs.Literal[];
       note: readonly rdfjs.Literal[];
       prefLabel: readonly rdfjs.Literal[];
@@ -1193,21 +1197,16 @@ namespace Resource {
     const identifier = _resource.identifier;
     const _modifiedEither: purify.Either<
       rdfjsResource.Resource.ValueError,
-      readonly Date[]
-    > = purify.Either.of([
-      ..._resource
+      purify.Maybe<Date>
+    > = purify.Either.of(
+      _resource
         .values(dataFactory.namedNode("http://purl.org/dc/terms/modified"), {
           unique: true,
         })
-        .flatMap((_value) =>
-          _value
-            .toValues()
-            .head()
-            .chain((_value) => _value.toDate())
-            .toMaybe()
-            .toList(),
-        ),
-    ]);
+        .head()
+        .chain((_value) => _value.toDate())
+        .toMaybe(),
+    );
     if (_modifiedEither.isLeft()) {
       return _modifiedEither;
     }

@@ -26,12 +26,12 @@ export function behavesLikeUnescoThesaurusConcept10(
     }
   });
 
-  // it("should have a modified date", async () => {
-  //   const concept = await testConcept("en");
-  //   expect(concept.modified.extractNullable()?.value).toStrictEqual(
-  //     "2019-12-15T13:26:49Z",
-  //   );
-  // });
+  it("should have a modified date", async () => {
+    const concept = await testConcept("en");
+    expect(concept.modified.extractNullable()?.getTime()).toStrictEqual(
+      Date.parse("2019-12-15T13:26:49Z"),
+    );
+  });
 
   it("should have multiple prefLabels", async () => {
     const conceptEn = await testConcept("en");

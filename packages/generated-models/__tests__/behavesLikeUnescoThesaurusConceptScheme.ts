@@ -1,38 +1,21 @@
-import {
-  Concept,
-  ConceptScheme,
-  Kos,
-  Label,
-  LanguageTag,
-} from "@kos-kit/models";
 import { DataFactory } from "n3";
 import { expect, it } from "vitest";
+import { Kos, LanguageTag } from "../index.js";
 
-export const behavesLikeUnescoThesaurusConceptScheme = <
-  ConceptT extends Concept<any, ConceptSchemeT, LabelT>,
-  ConceptSchemeT extends ConceptScheme<ConceptT, LabelT>,
-  LabelT extends Label,
->(
-  kosFactory: (
-    includeLanguageTag: LanguageTag,
-  ) => Kos<ConceptT, ConceptSchemeT, LabelT>,
+export const behavesLikeUnescoThesaurusConceptScheme = (
+  kosFactory: (languageTagIn: LanguageTag) => Kos,
 ) => {
   const testConceptScheme = (includeLanguageTag: LanguageTag) =>
     kosFactory(includeLanguageTag)
       .conceptScheme(
         DataFactory.namedNode("http://vocabularies.unesco.org/thesaurus"),
       )
-      .resolve()
-      .then((conceptScheme) =>
-        conceptScheme.orDefaultLazy(() => {
-          throw new Error("missing concept scheme");
-        }),
-      );
+      .then((conceptScheme) => conceptScheme.unsafeCoerce());
 
   it("should have a modified date", async () => {
     const conceptScheme = await testConceptScheme("en");
-    expect(conceptScheme.modified.extract()?.value).toStrictEqual(
-      "2024-03-25T14:24:28.295+01:00",
+    expect(conceptScheme.modified.extract()?.getTime()).toStrictEqual(
+      Date.parse("2024-03-25T14:24:28.295+01:00"),
     );
   });
 
@@ -50,19 +33,13 @@ export const behavesLikeUnescoThesaurusConceptScheme = <
     const conceptSchemeEn = await testConceptScheme("en");
     const conceptSchemeFr = await testConceptScheme("fr");
 
-    const enPrefLabels = conceptSchemeEn.labels({
-      types: [Label.Type.PREFERRED],
-    });
+    const enPrefLabels = conceptSchemeEn.prefLabel;
     expect(enPrefLabels).toHaveLength(1);
-    expect(enPrefLabels[0].literalForm.value).toStrictEqual("UNESCO Thesaurus");
+    expect(enPrefLabels[0].value).toStrictEqual("UNESCO Thesaurus");
 
-    const frPrefLabels = conceptSchemeFr.labels({
-      types: [Label.Type.PREFERRED],
-    });
+    const frPrefLabels = conceptSchemeFr.prefLabel;
     expect(frPrefLabels).toHaveLength(1);
-    expect(frPrefLabels[0].literalForm.value).toStrictEqual(
-      "Thésaurus de l'UNESCO",
-    );
+    expect(frPrefLabels[0].value).toStrictEqual("Thésaurus de l'UNESCO");
   });
 
   it("should have rights", async () => {
