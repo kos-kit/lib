@@ -281,9 +281,7 @@ ${this.conceptsQueryToWhereGraphPatterns(query).join("\n")}
       new ConstructQueryBuilder({
         includeLanguageTags: this.languageIn,
       })
-        .addGraphPatterns(
-          new this.modelFactories.concept.SparqlGraphPatterns(subjectVariable),
-        )
+        .addGraphPatterns(new modelFactory.SparqlGraphPatterns(subjectVariable))
         .addValues(subjectVariable, identifier)
         .build(),
     );
