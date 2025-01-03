@@ -45,6 +45,35 @@ kos-kit:Resource
     a owl:Class, sh:NodeShape ;
     sh:nodeKind sh:IRI ;
     sh:property [
+        sh:name "editorialNote" ;
+        sh:or dash:StringOrLangString ;
+        sh:path skos:editorialNote
+    ], [
+        sh:name "example" ;
+        sh:or dash:StringOrLangString ;
+        sh:path skos:example
+    ], [
+        sh:name "hiddenLabel" ;
+        sh:or dash:StringOrLangString ;
+        sh:path skos:hiddenLabel
+    ], [
+        sh:datatype xsd:dateTime ;
+        sh:maxCount 1 ;
+        sh:name "modified" ;
+        sh:path dcterms:modified
+    ], [
+        sh:name "hiddenLabelXl" ;
+        sh:node kos-kit:LabelStub ;
+        sh:path skos-xl:hiddenLabel
+    ], [
+        sh:name "historyNote" ;
+        sh:or dash:StringOrLangString ;
+        sh:path skos:historyNote
+    ], [
+        sh:name "altLabel" ;
+        sh:or dash:StringOrLangString ;
+        sh:path skos:altLabel
+    ], [
         sh:datatype rdf:langString ;
         sh:name "notation" ;
         sh:path skos:notation
@@ -76,35 +105,6 @@ kos-kit:Resource
         sh:name "definition" ;
         sh:or dash:StringOrLangString ;
         sh:path skos:definition
-    ], [
-        sh:name "editorialNote" ;
-        sh:or dash:StringOrLangString ;
-        sh:path skos:editorialNote
-    ], [
-        sh:name "example" ;
-        sh:or dash:StringOrLangString ;
-        sh:path skos:example
-    ], [
-        sh:name "hiddenLabel" ;
-        sh:or dash:StringOrLangString ;
-        sh:path skos:hiddenLabel
-    ], [
-        sh:datatype xsd:dateTime ;
-        sh:maxCount 1 ;
-        sh:name "modified" ;
-        sh:path dcterms:modified
-    ], [
-        sh:name "hiddenLabelXl" ;
-        sh:node kos-kit:LabelStub ;
-        sh:path skos-xl:hiddenLabel
-    ], [
-        sh:name "historyNote" ;
-        sh:or dash:StringOrLangString ;
-        sh:path skos:historyNote
-    ], [
-        sh:name "altLabel" ;
-        sh:or dash:StringOrLangString ;
-        sh:path skos:altLabel
     ] .
 
 kos-kit:ResourceStub

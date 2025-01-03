@@ -931,6 +931,7 @@ namespace Resource {
             .chain((_resource) =>
               LabelStub.fromRdf({
                 ..._context,
+                ignoreRdfType: true,
                 languageIn: _languageIn,
                 resource: _resource,
               }),
@@ -1151,6 +1152,7 @@ namespace Resource {
             .chain((_resource) =>
               LabelStub.fromRdf({
                 ..._context,
+                ignoreRdfType: true,
                 languageIn: _languageIn,
                 resource: _resource,
               }),
@@ -1347,6 +1349,7 @@ namespace Resource {
             .chain((_resource) =>
               LabelStub.fromRdf({
                 ..._context,
+                ignoreRdfType: true,
                 languageIn: _languageIn,
                 resource: _resource,
               }),
@@ -1445,7 +1448,10 @@ namespace Resource {
               ),
               this.variable("AltLabelXl"),
             ).chainObject(
-              (_object) => new LabelStub.SparqlGraphPatterns(_object),
+              (_object) =>
+                new LabelStub.SparqlGraphPatterns(_object, {
+                  ignoreRdfType: true,
+                }),
             ),
           ),
         ),
@@ -1515,7 +1521,10 @@ namespace Resource {
               ),
               this.variable("HiddenLabelXl"),
             ).chainObject(
-              (_object) => new LabelStub.SparqlGraphPatterns(_object),
+              (_object) =>
+                new LabelStub.SparqlGraphPatterns(_object, {
+                  ignoreRdfType: true,
+                }),
             ),
           ),
         ),
@@ -1583,7 +1592,10 @@ namespace Resource {
               ),
               this.variable("PrefLabelXl"),
             ).chainObject(
-              (_object) => new LabelStub.SparqlGraphPatterns(_object),
+              (_object) =>
+                new LabelStub.SparqlGraphPatterns(_object, {
+                  ignoreRdfType: true,
+                }),
             ),
           ),
         ),
@@ -2745,6 +2757,7 @@ export namespace Concept {
               .chain((_resource) =>
                 ConceptStub.fromRdf({
                   ..._context,
+                  ignoreRdfType: true,
                   languageIn: _languageIn,
                   resource: _resource,
                 }),
@@ -2776,6 +2789,7 @@ export namespace Concept {
               .chain((_resource) =>
                 ConceptStub.fromRdf({
                   ..._context,
+                  ignoreRdfType: true,
                   languageIn: _languageIn,
                   resource: _resource,
                 }),
@@ -2807,6 +2821,7 @@ export namespace Concept {
               .chain((_resource) =>
                 ConceptStub.fromRdf({
                   ..._context,
+                  ignoreRdfType: true,
                   languageIn: _languageIn,
                   resource: _resource,
                 }),
@@ -2838,6 +2853,7 @@ export namespace Concept {
               .chain((_resource) =>
                 ConceptStub.fromRdf({
                   ..._context,
+                  ignoreRdfType: true,
                   languageIn: _languageIn,
                   resource: _resource,
                 }),
@@ -2869,6 +2885,7 @@ export namespace Concept {
               .chain((_resource) =>
                 ConceptStub.fromRdf({
                   ..._context,
+                  ignoreRdfType: true,
                   languageIn: _languageIn,
                   resource: _resource,
                 }),
@@ -2901,6 +2918,7 @@ export namespace Concept {
               .chain((_resource) =>
                 ConceptSchemeStub.fromRdf({
                   ..._context,
+                  ignoreRdfType: true,
                   languageIn: _languageIn,
                   resource: _resource,
                 }),
@@ -2932,6 +2950,7 @@ export namespace Concept {
               .chain((_resource) =>
                 ConceptStub.fromRdf({
                   ..._context,
+                  ignoreRdfType: true,
                   languageIn: _languageIn,
                   resource: _resource,
                 }),
@@ -2963,6 +2982,7 @@ export namespace Concept {
               .chain((_resource) =>
                 ConceptStub.fromRdf({
                   ..._context,
+                  ignoreRdfType: true,
                   languageIn: _languageIn,
                   resource: _resource,
                 }),
@@ -2994,6 +3014,7 @@ export namespace Concept {
               .chain((_resource) =>
                 ConceptStub.fromRdf({
                   ..._context,
+                  ignoreRdfType: true,
                   languageIn: _languageIn,
                   resource: _resource,
                 }),
@@ -3025,6 +3046,7 @@ export namespace Concept {
               .chain((_resource) =>
                 ConceptStub.fromRdf({
                   ..._context,
+                  ignoreRdfType: true,
                   languageIn: _languageIn,
                   resource: _resource,
                 }),
@@ -3056,6 +3078,7 @@ export namespace Concept {
               .chain((_resource) =>
                 ConceptStub.fromRdf({
                   ..._context,
+                  ignoreRdfType: true,
                   languageIn: _languageIn,
                   resource: _resource,
                 }),
@@ -3087,6 +3110,7 @@ export namespace Concept {
               .chain((_resource) =>
                 ConceptStub.fromRdf({
                   ..._context,
+                  ignoreRdfType: true,
                   languageIn: _languageIn,
                   resource: _resource,
                 }),
@@ -3118,6 +3142,7 @@ export namespace Concept {
               .chain((_resource) =>
                 ConceptStub.fromRdf({
                   ..._context,
+                  ignoreRdfType: true,
                   languageIn: _languageIn,
                   resource: _resource,
                 }),
@@ -3149,6 +3174,7 @@ export namespace Concept {
               .chain((_resource) =>
                 ConceptSchemeStub.fromRdf({
                   ..._context,
+                  ignoreRdfType: true,
                   languageIn: _languageIn,
                   resource: _resource,
                 }),
@@ -3225,7 +3251,10 @@ export namespace Concept {
               ),
               this.variable("Broader"),
             ).chainObject(
-              (_object) => new ConceptStub.SparqlGraphPatterns(_object),
+              (_object) =>
+                new ConceptStub.SparqlGraphPatterns(_object, {
+                  ignoreRdfType: true,
+                }),
             ),
           ),
         ),
@@ -3240,7 +3269,10 @@ export namespace Concept {
               ),
               this.variable("BroaderTransitive"),
             ).chainObject(
-              (_object) => new ConceptStub.SparqlGraphPatterns(_object),
+              (_object) =>
+                new ConceptStub.SparqlGraphPatterns(_object, {
+                  ignoreRdfType: true,
+                }),
             ),
           ),
         ),
@@ -3255,7 +3287,10 @@ export namespace Concept {
               ),
               this.variable("BroadMatch"),
             ).chainObject(
-              (_object) => new ConceptStub.SparqlGraphPatterns(_object),
+              (_object) =>
+                new ConceptStub.SparqlGraphPatterns(_object, {
+                  ignoreRdfType: true,
+                }),
             ),
           ),
         ),
@@ -3270,7 +3305,10 @@ export namespace Concept {
               ),
               this.variable("CloseMatch"),
             ).chainObject(
-              (_object) => new ConceptStub.SparqlGraphPatterns(_object),
+              (_object) =>
+                new ConceptStub.SparqlGraphPatterns(_object, {
+                  ignoreRdfType: true,
+                }),
             ),
           ),
         ),
@@ -3285,7 +3323,10 @@ export namespace Concept {
               ),
               this.variable("ExactMatch"),
             ).chainObject(
-              (_object) => new ConceptStub.SparqlGraphPatterns(_object),
+              (_object) =>
+                new ConceptStub.SparqlGraphPatterns(_object, {
+                  ignoreRdfType: true,
+                }),
             ),
           ),
         ),
@@ -3300,7 +3341,10 @@ export namespace Concept {
               ),
               this.variable("InScheme"),
             ).chainObject(
-              (_object) => new ConceptSchemeStub.SparqlGraphPatterns(_object),
+              (_object) =>
+                new ConceptSchemeStub.SparqlGraphPatterns(_object, {
+                  ignoreRdfType: true,
+                }),
             ),
           ),
         ),
@@ -3315,7 +3359,10 @@ export namespace Concept {
               ),
               this.variable("MappingRelation"),
             ).chainObject(
-              (_object) => new ConceptStub.SparqlGraphPatterns(_object),
+              (_object) =>
+                new ConceptStub.SparqlGraphPatterns(_object, {
+                  ignoreRdfType: true,
+                }),
             ),
           ),
         ),
@@ -3330,7 +3377,10 @@ export namespace Concept {
               ),
               this.variable("Narrower"),
             ).chainObject(
-              (_object) => new ConceptStub.SparqlGraphPatterns(_object),
+              (_object) =>
+                new ConceptStub.SparqlGraphPatterns(_object, {
+                  ignoreRdfType: true,
+                }),
             ),
           ),
         ),
@@ -3345,7 +3395,10 @@ export namespace Concept {
               ),
               this.variable("NarrowerTransitive"),
             ).chainObject(
-              (_object) => new ConceptStub.SparqlGraphPatterns(_object),
+              (_object) =>
+                new ConceptStub.SparqlGraphPatterns(_object, {
+                  ignoreRdfType: true,
+                }),
             ),
           ),
         ),
@@ -3360,7 +3413,10 @@ export namespace Concept {
               ),
               this.variable("NarrowMatch"),
             ).chainObject(
-              (_object) => new ConceptStub.SparqlGraphPatterns(_object),
+              (_object) =>
+                new ConceptStub.SparqlGraphPatterns(_object, {
+                  ignoreRdfType: true,
+                }),
             ),
           ),
         ),
@@ -3375,7 +3431,10 @@ export namespace Concept {
               ),
               this.variable("Related"),
             ).chainObject(
-              (_object) => new ConceptStub.SparqlGraphPatterns(_object),
+              (_object) =>
+                new ConceptStub.SparqlGraphPatterns(_object, {
+                  ignoreRdfType: true,
+                }),
             ),
           ),
         ),
@@ -3390,7 +3449,10 @@ export namespace Concept {
               ),
               this.variable("RelatedMatch"),
             ).chainObject(
-              (_object) => new ConceptStub.SparqlGraphPatterns(_object),
+              (_object) =>
+                new ConceptStub.SparqlGraphPatterns(_object, {
+                  ignoreRdfType: true,
+                }),
             ),
           ),
         ),
@@ -3405,7 +3467,10 @@ export namespace Concept {
               ),
               this.variable("SemanticRelation"),
             ).chainObject(
-              (_object) => new ConceptStub.SparqlGraphPatterns(_object),
+              (_object) =>
+                new ConceptStub.SparqlGraphPatterns(_object, {
+                  ignoreRdfType: true,
+                }),
             ),
           ),
         ),
@@ -3420,7 +3485,10 @@ export namespace Concept {
               ),
               this.variable("TopConceptOf"),
             ).chainObject(
-              (_object) => new ConceptSchemeStub.SparqlGraphPatterns(_object),
+              (_object) =>
+                new ConceptSchemeStub.SparqlGraphPatterns(_object, {
+                  ignoreRdfType: true,
+                }),
             ),
           ),
         ),
@@ -3667,6 +3735,7 @@ export namespace ResourceStub {
             .chain((_resource) =>
               LabelStub.fromRdf({
                 ..._context,
+                ignoreRdfType: true,
                 languageIn: _languageIn,
                 resource: _resource,
               }),
@@ -3710,7 +3779,10 @@ export namespace ResourceStub {
               ),
               this.variable("PrefLabelXl"),
             ).chainObject(
-              (_object) => new LabelStub.SparqlGraphPatterns(_object),
+              (_object) =>
+                new LabelStub.SparqlGraphPatterns(_object, {
+                  ignoreRdfType: true,
+                }),
             ),
           ),
         ),
@@ -4275,6 +4347,7 @@ export namespace ConceptScheme {
               .chain((_resource) =>
                 ConceptStub.fromRdf({
                   ..._context,
+                  ignoreRdfType: true,
                   languageIn: _languageIn,
                   resource: _resource,
                 }),
@@ -4448,7 +4521,10 @@ export namespace ConceptScheme {
               ),
               this.variable("HasTopConcept"),
             ).chainObject(
-              (_object) => new ConceptStub.SparqlGraphPatterns(_object),
+              (_object) =>
+                new ConceptStub.SparqlGraphPatterns(_object, {
+                  ignoreRdfType: true,
+                }),
             ),
           ),
         ),
