@@ -2013,14 +2013,6 @@ export class LabelStub {
           "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
         ),
         _resource.dataFactory.namedNode(
-          "http://kos-kit.github.io/ns#LabelStub",
-        ),
-      );
-      _resource.add(
-        _resource.dataFactory.namedNode(
-          "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        ),
-        _resource.dataFactory.namedNode(
           "http://www.w3.org/2008/05/skos-xl#Label",
         ),
       );
@@ -2116,15 +2108,6 @@ export namespace LabelStub {
           ...new sparqlBuilder.RdfTypeGraphPatterns(
             this.subject,
             dataFactory.namedNode("http://www.w3.org/2008/05/skos-xl#Label"),
-          ),
-        );
-        this.add(
-          sparqlBuilder.GraphPattern.basic(
-            this.subject,
-            dataFactory.namedNode(
-              "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-            ),
-            dataFactory.namedNode("http://kos-kit.github.io/ns#LabelStub"),
           ),
         );
       }
@@ -3777,14 +3760,6 @@ export class ConceptStub extends ResourceStub {
           "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
         ),
         _resource.dataFactory.namedNode(
-          "http://kos-kit.github.io/ns#ConceptStub",
-        ),
-      );
-      _resource.add(
-        _resource.dataFactory.namedNode(
-          "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        ),
-        _resource.dataFactory.namedNode(
           "http://www.w3.org/2004/02/skos/core#Concept",
         ),
       );
@@ -3857,15 +3832,6 @@ export namespace ConceptStub {
             dataFactory.namedNode(
               "http://www.w3.org/2004/02/skos/core#Concept",
             ),
-          ),
-        );
-        this.add(
-          sparqlBuilder.GraphPattern.basic(
-            this.subject,
-            dataFactory.namedNode(
-              "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-            ),
-            dataFactory.namedNode("http://kos-kit.github.io/ns#ConceptStub"),
           ),
         );
       }
@@ -4566,14 +4532,6 @@ export class ConceptSchemeStub extends ResourceStub {
           "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
         ),
         _resource.dataFactory.namedNode(
-          "http://kos-kit.github.io/ns#ConceptSchemeStub",
-        ),
-      );
-      _resource.add(
-        _resource.dataFactory.namedNode(
-          "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        ),
-        _resource.dataFactory.namedNode(
           "http://www.w3.org/2004/02/skos/core#ConceptScheme",
         ),
       );
@@ -4647,17 +4605,6 @@ export namespace ConceptSchemeStub {
             this.subject,
             dataFactory.namedNode(
               "http://www.w3.org/2004/02/skos/core#ConceptScheme",
-            ),
-          ),
-        );
-        this.add(
-          sparqlBuilder.GraphPattern.basic(
-            this.subject,
-            dataFactory.namedNode(
-              "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-            ),
-            dataFactory.namedNode(
-              "http://kos-kit.github.io/ns#ConceptSchemeStub",
             ),
           ),
         );
