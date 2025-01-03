@@ -6,17 +6,17 @@ import { Parser, Store } from "n3";
 import { describe } from "vitest";
 import { ModelFactories } from "../ModelFactories.js";
 import { RdfjsDatasetKos } from "../RdfjsDatasetKos.js";
-import { behavesLikeUnescoThesaurusKos } from "./behavesLikeUnescoThesaurusKos.js";
+import { behavesLikeSyntheticKos } from "./behavesLikeSyntheticKos.js";
 
-const ntriplesStringToDataset = (input: string): Store => {
-  const parser = new Parser({ format: "N-Triples" });
+function parseRdfString(input: string): Store {
+  const parser = new Parser();
   const store = new Store();
   store.addQuads(parser.parse(input));
   return store;
-};
+}
 
 describe("RdfjsDatasetKos", () => {
-  const unescoThesaurusDataset: Store = ntriplesStringToDataset(
+  const syntheticDataset: Store = parseRdfString(
     fs
       .readFileSync(
         path.join(
@@ -26,18 +26,43 @@ describe("RdfjsDatasetKos", () => {
           "..",
           "__tests__",
           "data",
-          "unesco-thesaurus.nt",
+          "synthetic.ttl",
         ),
       )
       .toString(),
   );
 
-  behavesLikeUnescoThesaurusKos(
+  behavesLikeSyntheticKos(
     (languageIn: LanguageTag) =>
       new RdfjsDatasetKos({
-        dataset: unescoThesaurusDataset,
+        dataset: syntheticDataset,
         languageIn: [languageIn, ""],
         modelFactories: ModelFactories.default_,
       }),
   );
+
+  // const unescoThesaurusDataset: Store = parseRdfString(
+  //   fs
+  //     .readFileSync(
+  //       path.join(
+  //         path.dirname(fileURLToPath(import.meta.url)),
+  //         "..",
+  //         "..",
+  //         "..",
+  //         "__tests__",
+  //         "data",
+  //         "unesco-thesaurus.nt",
+  //       ),
+  //     )
+  //     .toString(),
+  // );
+  //
+  // behavesLikeUnescoThesaurusKos(
+  //   (languageIn: LanguageTag) =>
+  //     new RdfjsDatasetKos({
+  //       dataset: unescoThesaurusDataset,
+  //       languageIn: [languageIn, ""],
+  //       modelFactories: ModelFactories.default_,
+  //     }),
+  // );
 });

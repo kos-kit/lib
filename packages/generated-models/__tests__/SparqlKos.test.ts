@@ -11,8 +11,26 @@ import { OxigraphDatasetCore } from "./OxigraphDatasetCore.js";
 import { behavesLikeUnescoThesaurusKos } from "./behavesLikeUnescoThesaurusKos.js";
 
 describe("SparqlKos", () => {
-  const store = new oxigraph.Store();
-  store.load(
+  const syntheticStore = new oxigraph.Store();
+  syntheticStore.load(
+    fs
+      .readFileSync(
+        path.join(
+          path.dirname(fileURLToPath(import.meta.url)),
+          "..",
+          "..",
+          "..",
+          "__tests__",
+          "data",
+          "synthetic.ttl",
+        ),
+      )
+      .toString(),
+    { format: "ttl" },
+  );
+
+  const unescoThesaurusStore = new oxigraph.Store();
+  unescoThesaurusStore.load(
     fs
       .readFileSync(
         path.join(
@@ -28,10 +46,6 @@ describe("SparqlKos", () => {
       .toString(),
     { format: "nt" },
   );
-  const sparqlQueryClient = new OxigraphSparqlClient({
-    dataFactory: oxigraph,
-    store,
-  });
 
   behavesLikeUnescoThesaurusKos(
     (languageIn: LanguageTag) =>
@@ -42,7 +56,10 @@ describe("SparqlKos", () => {
         },
         languageIn: [languageIn, ""],
         modelFactories: ModelFactories.default_,
-        sparqlQueryClient,
+        sparqlQueryClient: new OxigraphSparqlClient({
+          dataFactory: oxigraph,
+          store: unescoThesaurusStore,
+        }),
       }),
   );
 });
