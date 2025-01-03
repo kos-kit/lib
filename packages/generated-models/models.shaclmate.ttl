@@ -32,7 +32,7 @@ kos-kit:LabelStub
     a owl:Class, sh:NodeShape ;
     sh:nodeKind sh:BlankNodeOrIRI ;
     sh:property [
-        sh:maxCount 1 ;
+        sh:minCount 1 ;
         sh:name "literalForm" ;
         sh:or dash:StringOrLangString ;
         sh:path skos-xl:literalForm
@@ -45,6 +45,34 @@ kos-kit:Resource
     a owl:Class, sh:NodeShape ;
     sh:nodeKind sh:IRI ;
     sh:property [
+        sh:name "note" ;
+        sh:or dash:StringOrLangString ;
+        sh:path skos:notation
+    ], [
+        sh:name "prefLabel" ;
+        sh:or dash:StringOrLangString ;
+        sh:path skos:prefLabel
+    ], [
+        sh:name "prefLabelXl" ;
+        sh:node kos-kit:LabelStub ;
+        sh:path skos-xl:prefLabel
+    ], [
+        sh:name "scopeNote" ;
+        sh:or dash:StringOrLangString ;
+        sh:path skos:scopeNote
+    ], [
+        sh:name "altLabelXl" ;
+        sh:node kos-kit:LabelStub ;
+        sh:path skos-xl:altLabel
+    ], [
+        sh:name "changeNote" ;
+        sh:or dash:StringOrLangString ;
+        sh:path skos:changeNote
+    ], [
+        sh:name "definition" ;
+        sh:or dash:StringOrLangString ;
+        sh:path skos:definition
+    ], [
         sh:name "editorialNote" ;
         sh:or dash:StringOrLangString ;
         sh:path skos:editorialNote
@@ -77,34 +105,6 @@ kos-kit:Resource
         sh:datatype rdf:langString ;
         sh:name "notation" ;
         sh:path skos:notation
-    ], [
-        sh:name "note" ;
-        sh:or dash:StringOrLangString ;
-        sh:path skos:notation
-    ], [
-        sh:name "prefLabel" ;
-        sh:or dash:StringOrLangString ;
-        sh:path skos:prefLabel
-    ], [
-        sh:name "prefLabelXl" ;
-        sh:node kos-kit:LabelStub ;
-        sh:path skos-xl:prefLabel
-    ], [
-        sh:name "scopeNote" ;
-        sh:or dash:StringOrLangString ;
-        sh:path skos:scopeNote
-    ], [
-        sh:name "altLabelXl" ;
-        sh:node kos-kit:LabelStub ;
-        sh:path skos-xl:altLabel
-    ], [
-        sh:name "changeNote" ;
-        sh:or dash:StringOrLangString ;
-        sh:path skos:changeNote
-    ], [
-        sh:name "definition" ;
-        sh:or dash:StringOrLangString ;
-        sh:path skos:definition
     ] .
 
 kos-kit:ResourceStub

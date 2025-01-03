@@ -1861,48 +1861,15 @@ export namespace Label {
 }
 export class LabelStub {
   private _identifier: rdfjs.BlankNode | rdfjs.NamedNode | undefined;
-  readonly literalForm: purify.Maybe<rdfjs.Literal>;
+  readonly literalForm: readonly rdfjs.Literal[];
   readonly type = "LabelStub";
 
   constructor(parameters: {
     readonly identifier?: rdfjs.BlankNode | rdfjs.NamedNode;
-    readonly literalForm?:
-      | Date
-      | boolean
-      | number
-      | purify.Maybe<rdfjs.Literal>
-      | rdfjs.Literal
-      | string;
+    readonly literalForm: readonly rdfjs.Literal[];
   }) {
     this._identifier = parameters.identifier;
-    if (purify.Maybe.isMaybe(parameters.literalForm)) {
-      this.literalForm = parameters.literalForm;
-    } else if (typeof parameters.literalForm === "boolean") {
-      this.literalForm = purify.Maybe.of(
-        rdfLiteral.toRdf(parameters.literalForm),
-      );
-    } else if (
-      typeof parameters.literalForm === "object" &&
-      parameters.literalForm instanceof Date
-    ) {
-      this.literalForm = purify.Maybe.of(
-        rdfLiteral.toRdf(parameters.literalForm),
-      );
-    } else if (typeof parameters.literalForm === "number") {
-      this.literalForm = purify.Maybe.of(
-        rdfLiteral.toRdf(parameters.literalForm),
-      );
-    } else if (typeof parameters.literalForm === "string") {
-      this.literalForm = purify.Maybe.of(
-        dataFactory.literal(parameters.literalForm),
-      );
-    } else if (typeof parameters.literalForm === "object") {
-      this.literalForm = purify.Maybe.of(parameters.literalForm);
-    } else if (typeof parameters.literalForm === "undefined") {
-      this.literalForm = purify.Maybe.empty();
-    } else {
-      this.literalForm = parameters.literalForm; // never
-    }
+    this.literalForm = parameters.literalForm;
   }
 
   get identifier(): rdfjs.BlankNode | rdfjs.NamedNode {
@@ -1928,7 +1895,7 @@ export class LabelStub {
       }))
       .chain(() =>
         ((left, right) =>
-          purifyHelpers.Maybes.equals(
+          purifyHelpers.Arrays.equals(
             left,
             right,
             purifyHelpers.Equatable.booleanEquals,
@@ -1960,47 +1927,43 @@ export class LabelStub {
       update: (message: string | number[] | ArrayBuffer | Uint8Array) => void;
     },
   >(_hasher: HasherT): HasherT {
-    this.literalForm.ifJust((_value0) => {
-      _hasher.update(_value0.value);
-    });
+    for (const _element0 of this.literalForm) {
+      _hasher.update(_element0.value);
+    }
+
     return _hasher;
   }
 
   toJson(): {
     readonly "@id": string;
-    readonly literalForm:
-      | (
-          | string
-          | {
-              "@language": string | undefined;
-              "@type": string | undefined;
-              "@value": string;
-            }
-        )
-      | undefined;
+    readonly literalForm: readonly (
+      | string
+      | {
+          "@language": string | undefined;
+          "@type": string | undefined;
+          "@value": string;
+        }
+    )[];
     readonly type: string;
   } {
     return JSON.parse(
       JSON.stringify({
         "@id": this.identifier.value,
-        literalForm: this.literalForm
-          .map((_item) =>
-            _item.datatype.value ===
-              "http://www.w3.org/2001/XMLSchema#string" &&
-            _item.language.length === 0
-              ? _item.value
-              : {
-                  "@language":
-                    _item.language.length > 0 ? _item.language : undefined,
-                  "@type":
-                    _item.datatype.value !==
-                    "http://www.w3.org/2001/XMLSchema#string"
-                      ? _item.datatype.value
-                      : undefined,
-                  "@value": _item.value,
-                },
-          )
-          .extract(),
+        literalForm: this.literalForm.map((_item) =>
+          _item.datatype.value === "http://www.w3.org/2001/XMLSchema#string" &&
+          _item.language.length === 0
+            ? _item.value
+            : {
+                "@language":
+                  _item.language.length > 0 ? _item.language : undefined,
+                "@type":
+                  _item.datatype.value !==
+                  "http://www.w3.org/2001/XMLSchema#string"
+                    ? _item.datatype.value
+                    : undefined,
+                "@value": _item.value,
+              },
+        ),
         type: this.type,
       } satisfies ReturnType<LabelStub["toJson"]>),
     );
@@ -2075,32 +2038,37 @@ export namespace LabelStub {
     const identifier = _resource.identifier;
     const _literalFormEither: purify.Either<
       rdfjsResource.Resource.ValueError,
-      purify.Maybe<rdfjs.Literal>
-    > = purify.Either.of(
-      _resource
+      readonly rdfjs.Literal[]
+    > = purify.Either.of([
+      ..._resource
         .values(
           dataFactory.namedNode(
             "http://www.w3.org/2008/05/skos-xl#literalForm",
           ),
           { unique: true },
         )
-        .filter((_value) => {
-          const _languageInOrDefault = _languageIn ?? [];
-          if (_languageInOrDefault.length === 0) {
-            return true;
-          }
-          const _valueLiteral = _value.toLiteral().toMaybe().extract();
-          if (typeof _valueLiteral === "undefined") {
-            return false;
-          }
-          return _languageInOrDefault.some(
-            (_languageIn) => _languageIn === _valueLiteral.language,
-          );
-        })
-        .head()
-        .chain((_value) => _value.toLiteral())
-        .toMaybe(),
-    );
+        .flatMap((_value) =>
+          _value
+            .toValues()
+            .filter((_value) => {
+              const _languageInOrDefault = _languageIn ?? [];
+              if (_languageInOrDefault.length === 0) {
+                return true;
+              }
+              const _valueLiteral = _value.toLiteral().toMaybe().extract();
+              if (typeof _valueLiteral === "undefined") {
+                return false;
+              }
+              return _languageInOrDefault.some(
+                (_languageIn) => _languageIn === _valueLiteral.language,
+              );
+            })
+            .head()
+            .chain((_value) => _value.toLiteral())
+            .toMaybe()
+            .toList(),
+        ),
+    ]);
     if (_literalFormEither.isLeft()) {
       return _literalFormEither;
     }
@@ -2125,14 +2093,12 @@ export namespace LabelStub {
       }
 
       this.add(
-        sparqlBuilder.GraphPattern.optional(
-          sparqlBuilder.GraphPattern.basic(
-            this.subject,
-            dataFactory.namedNode(
-              "http://www.w3.org/2008/05/skos-xl#literalForm",
-            ),
-            this.variable("LiteralForm"),
+        sparqlBuilder.GraphPattern.basic(
+          this.subject,
+          dataFactory.namedNode(
+            "http://www.w3.org/2008/05/skos-xl#literalForm",
           ),
+          this.variable("LiteralForm"),
         ),
       );
     }
