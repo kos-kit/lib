@@ -17,6 +17,7 @@ abstract class Resource {
   readonly hiddenLabelXl: readonly LabelStub[];
   readonly historyNote: readonly rdfjs.Literal[];
   abstract readonly identifier: rdfjs.NamedNode;
+  readonly modified: readonly Date[];
   readonly notation: readonly rdfjs.Literal[];
   readonly note: readonly rdfjs.Literal[];
   readonly prefLabel: readonly rdfjs.Literal[];
@@ -34,6 +35,7 @@ abstract class Resource {
     readonly hiddenLabel?: readonly rdfjs.Literal[];
     readonly hiddenLabelXl?: readonly LabelStub[];
     readonly historyNote?: readonly rdfjs.Literal[];
+    readonly modified?: readonly Date[];
     readonly notation?: readonly rdfjs.Literal[];
     readonly note?: readonly rdfjs.Literal[];
     readonly prefLabel?: readonly rdfjs.Literal[];
@@ -110,6 +112,14 @@ abstract class Resource {
       this.historyNote = [];
     } else {
       this.historyNote = parameters.historyNote; // never
+    }
+
+    if (Array.isArray(parameters.modified)) {
+      this.modified = parameters.modified;
+    } else if (typeof parameters.modified === "undefined") {
+      this.modified = [];
+    } else {
+      this.modified = parameters.modified; // never
     }
 
     if (Array.isArray(parameters.notation)) {
@@ -299,6 +309,24 @@ abstract class Resource {
       )
       .chain(() =>
         ((left, right) =>
+          purifyHelpers.Arrays.equals(left, right, (left, right) =>
+            purifyHelpers.Equatable.EqualsResult.fromBooleanEqualsResult(
+              left,
+              right,
+              left.getTime() === right.getTime(),
+            ),
+          ))(this.modified, other.modified).mapLeft(
+          (propertyValuesUnequal) => ({
+            left: this,
+            right: other,
+            propertyName: "modified",
+            propertyValuesUnequal,
+            type: "Property" as const,
+          }),
+        ),
+      )
+      .chain(() =>
+        ((left, right) =>
           purifyHelpers.Arrays.equals(
             left,
             right,
@@ -425,6 +453,10 @@ abstract class Resource {
       _hasher.update(_element0.value);
     }
 
+    for (const _element0 of this.modified) {
+      _hasher.update(_element0.toISOString());
+    }
+
     for (const _element0 of this.notation) {
       _hasher.update(_element0.value);
     }
@@ -508,6 +540,7 @@ abstract class Resource {
         }
     )[];
     readonly "@id": string;
+    readonly modified: readonly string[];
     readonly notation: readonly (
       | string
       | {
@@ -653,6 +686,7 @@ abstract class Resource {
               },
         ),
         "@id": this.identifier.value,
+        modified: this.modified.map((_item) => _item.toISOString()),
         notation: this.notation.map((_item) =>
           _item.datatype.value === "http://www.w3.org/2001/XMLSchema#string" &&
           _item.language.length === 0
@@ -774,6 +808,10 @@ abstract class Resource {
       this.historyNote,
     );
     _resource.add(
+      dataFactory.namedNode("http://purl.org/dc/terms/modified"),
+      this.modified,
+    );
+    _resource.add(
       dataFactory.namedNode("http://www.w3.org/2004/02/skos/core#notation"),
       this.notation,
     );
@@ -828,6 +866,7 @@ namespace Resource {
       hiddenLabelXl: readonly LabelStub[];
       historyNote: readonly rdfjs.Literal[];
       identifier: rdfjs.NamedNode;
+      modified: readonly Date[];
       notation: readonly rdfjs.Literal[];
       note: readonly rdfjs.Literal[];
       prefLabel: readonly rdfjs.Literal[];
@@ -1152,6 +1191,28 @@ namespace Resource {
 
     const historyNote = _historyNoteEither.unsafeCoerce();
     const identifier = _resource.identifier;
+    const _modifiedEither: purify.Either<
+      rdfjsResource.Resource.ValueError,
+      readonly Date[]
+    > = purify.Either.of([
+      ..._resource
+        .values(dataFactory.namedNode("http://purl.org/dc/terms/modified"), {
+          unique: true,
+        })
+        .flatMap((_value) =>
+          _value
+            .toValues()
+            .head()
+            .chain((_value) => _value.toDate())
+            .toMaybe()
+            .toList(),
+        ),
+    ]);
+    if (_modifiedEither.isLeft()) {
+      return _modifiedEither;
+    }
+
+    const modified = _modifiedEither.unsafeCoerce();
     const _notationEither: purify.Either<
       rdfjsResource.Resource.ValueError,
       readonly rdfjs.Literal[]
@@ -1337,6 +1398,7 @@ namespace Resource {
       hiddenLabelXl,
       historyNote,
       identifier,
+      modified,
       notation,
       note,
       prefLabel,
@@ -1455,6 +1517,15 @@ namespace Resource {
               "http://www.w3.org/2004/02/skos/core#historyNote",
             ),
             this.variable("HistoryNote"),
+          ),
+        ),
+      );
+      this.add(
+        sparqlBuilder.GraphPattern.optional(
+          sparqlBuilder.GraphPattern.basic(
+            this.subject,
+            dataFactory.namedNode("http://purl.org/dc/terms/modified"),
+            this.variable("Modified"),
           ),
         ),
       );
@@ -3051,6 +3122,7 @@ export namespace Concept {
           hiddenLabelXl: _super.hiddenLabelXl,
           historyNote: _super.historyNote,
           identifier,
+          modified: _super.modified,
           notation: _super.notation,
           note: _super.note,
           prefLabel: _super.prefLabel,
@@ -3730,12 +3802,32 @@ export namespace ConceptStub {
 export class ConceptScheme extends Resource {
   readonly hasTopConcept: readonly ConceptStub[];
   private _identifier: rdfjs.NamedNode | undefined;
+  readonly license: purify.Maybe<rdfjs.NamedNode | rdfjs.Literal>;
+  readonly rights: purify.Maybe<rdfjs.Literal>;
+  readonly rightsHolder: purify.Maybe<rdfjs.Literal>;
   override readonly type = "ConceptScheme";
 
   constructor(
     parameters: {
       readonly hasTopConcept?: readonly ConceptStub[];
       readonly identifier?: rdfjs.NamedNode;
+      readonly license?:
+        | (rdfjs.NamedNode | rdfjs.Literal)
+        | purify.Maybe<rdfjs.NamedNode | rdfjs.Literal>;
+      readonly rights?:
+        | Date
+        | boolean
+        | number
+        | purify.Maybe<rdfjs.Literal>
+        | rdfjs.Literal
+        | string;
+      readonly rightsHolder?:
+        | Date
+        | boolean
+        | number
+        | purify.Maybe<rdfjs.Literal>
+        | rdfjs.Literal
+        | string;
     } & ConstructorParameters<typeof Resource>[0],
   ) {
     super(parameters);
@@ -3748,6 +3840,65 @@ export class ConceptScheme extends Resource {
     }
 
     this._identifier = parameters.identifier;
+    if (purify.Maybe.isMaybe(parameters.license)) {
+      this.license = parameters.license;
+    } else if (typeof parameters.license === "object") {
+      this.license = purify.Maybe.of(parameters.license);
+    } else if (typeof parameters.license === "undefined") {
+      this.license = purify.Maybe.empty();
+    } else {
+      this.license = parameters.license; // never
+    }
+
+    if (purify.Maybe.isMaybe(parameters.rights)) {
+      this.rights = parameters.rights;
+    } else if (typeof parameters.rights === "boolean") {
+      this.rights = purify.Maybe.of(rdfLiteral.toRdf(parameters.rights));
+    } else if (
+      typeof parameters.rights === "object" &&
+      parameters.rights instanceof Date
+    ) {
+      this.rights = purify.Maybe.of(rdfLiteral.toRdf(parameters.rights));
+    } else if (typeof parameters.rights === "number") {
+      this.rights = purify.Maybe.of(rdfLiteral.toRdf(parameters.rights));
+    } else if (typeof parameters.rights === "string") {
+      this.rights = purify.Maybe.of(dataFactory.literal(parameters.rights));
+    } else if (typeof parameters.rights === "object") {
+      this.rights = purify.Maybe.of(parameters.rights);
+    } else if (typeof parameters.rights === "undefined") {
+      this.rights = purify.Maybe.empty();
+    } else {
+      this.rights = parameters.rights; // never
+    }
+
+    if (purify.Maybe.isMaybe(parameters.rightsHolder)) {
+      this.rightsHolder = parameters.rightsHolder;
+    } else if (typeof parameters.rightsHolder === "boolean") {
+      this.rightsHolder = purify.Maybe.of(
+        rdfLiteral.toRdf(parameters.rightsHolder),
+      );
+    } else if (
+      typeof parameters.rightsHolder === "object" &&
+      parameters.rightsHolder instanceof Date
+    ) {
+      this.rightsHolder = purify.Maybe.of(
+        rdfLiteral.toRdf(parameters.rightsHolder),
+      );
+    } else if (typeof parameters.rightsHolder === "number") {
+      this.rightsHolder = purify.Maybe.of(
+        rdfLiteral.toRdf(parameters.rightsHolder),
+      );
+    } else if (typeof parameters.rightsHolder === "string") {
+      this.rightsHolder = purify.Maybe.of(
+        dataFactory.literal(parameters.rightsHolder),
+      );
+    } else if (typeof parameters.rightsHolder === "object") {
+      this.rightsHolder = purify.Maybe.of(parameters.rightsHolder);
+    } else if (typeof parameters.rightsHolder === "undefined") {
+      this.rightsHolder = purify.Maybe.empty();
+    } else {
+      this.rightsHolder = parameters.rightsHolder; // never
+    }
   }
 
   override get identifier(): rdfjs.NamedNode {
@@ -3773,6 +3924,75 @@ export class ConceptScheme extends Resource {
           propertyValuesUnequal,
           type: "Property" as const,
         })),
+      )
+      .chain(() =>
+        ((left, right) =>
+          purifyHelpers.Maybes.equals(
+            left,
+            right,
+            (
+              left: rdfjs.NamedNode | rdfjs.Literal,
+              right: rdfjs.NamedNode | rdfjs.Literal,
+            ) => {
+              if (
+                left.termType === "NamedNode" &&
+                right.termType === "NamedNode"
+              ) {
+                return purifyHelpers.Equatable.booleanEquals(left, right);
+              }
+              if (left.termType === "Literal" && right.termType === "Literal") {
+                return purifyHelpers.Equatable.booleanEquals(left, right);
+              }
+
+              return purify.Left({
+                left,
+                right,
+                propertyName: "type",
+                propertyValuesUnequal: {
+                  left: typeof left,
+                  right: typeof right,
+                  type: "BooleanEquals" as const,
+                },
+                type: "Property" as const,
+              });
+            },
+          ))(this.license, other.license).mapLeft((propertyValuesUnequal) => ({
+          left: this,
+          right: other,
+          propertyName: "license",
+          propertyValuesUnequal,
+          type: "Property" as const,
+        })),
+      )
+      .chain(() =>
+        ((left, right) =>
+          purifyHelpers.Maybes.equals(
+            left,
+            right,
+            purifyHelpers.Equatable.booleanEquals,
+          ))(this.rights, other.rights).mapLeft((propertyValuesUnequal) => ({
+          left: this,
+          right: other,
+          propertyName: "rights",
+          propertyValuesUnequal,
+          type: "Property" as const,
+        })),
+      )
+      .chain(() =>
+        ((left, right) =>
+          purifyHelpers.Maybes.equals(
+            left,
+            right,
+            purifyHelpers.Equatable.booleanEquals,
+          ))(this.rightsHolder, other.rightsHolder).mapLeft(
+          (propertyValuesUnequal) => ({
+            left: this,
+            right: other,
+            propertyName: "rightsHolder",
+            propertyValuesUnequal,
+            type: "Property" as const,
+          }),
+        ),
       );
   }
 
@@ -3786,16 +4006,121 @@ export class ConceptScheme extends Resource {
       _element0.hash(_hasher);
     }
 
+    this.license.ifJust((_value0) => {
+      switch (_value0.termType) {
+        case "NamedNode": {
+          _hasher.update(rdfjsResource.Resource.Identifier.toString(_value0));
+          break;
+        }
+        case "Literal": {
+          _hasher.update(_value0.value);
+          break;
+        }
+      }
+    });
+    this.rights.ifJust((_value0) => {
+      _hasher.update(_value0.value);
+    });
+    this.rightsHolder.ifJust((_value0) => {
+      _hasher.update(_value0.value);
+    });
     return _hasher;
   }
 
   override toJson(): {
     readonly hasTopConcept: readonly ReturnType<ConceptStub["toJson"]>[];
+    readonly license:
+      | (
+          | { "@id": string }
+          | string
+          | {
+              "@language": string | undefined;
+              "@type": string | undefined;
+              "@value": string;
+            }
+        )
+      | undefined;
+    readonly rights:
+      | (
+          | string
+          | {
+              "@language": string | undefined;
+              "@type": string | undefined;
+              "@value": string;
+            }
+        )
+      | undefined;
+    readonly rightsHolder:
+      | (
+          | string
+          | {
+              "@language": string | undefined;
+              "@type": string | undefined;
+              "@value": string;
+            }
+        )
+      | undefined;
   } & ReturnType<Resource["toJson"]> {
     return JSON.parse(
       JSON.stringify({
         ...super.toJson(),
         hasTopConcept: this.hasTopConcept.map((_item) => _item.toJson()),
+        license: this.license
+          .map((_item) =>
+            _item.termType === "Literal"
+              ? _item.datatype.value ===
+                  "http://www.w3.org/2001/XMLSchema#string" &&
+                _item.language.length === 0
+                ? _item.value
+                : {
+                    "@language":
+                      _item.language.length > 0 ? _item.language : undefined,
+                    "@type":
+                      _item.datatype.value !==
+                      "http://www.w3.org/2001/XMLSchema#string"
+                        ? _item.datatype.value
+                        : undefined,
+                    "@value": _item.value,
+                  }
+              : { "@id": _item.value },
+          )
+          .extract(),
+        rights: this.rights
+          .map((_item) =>
+            _item.datatype.value ===
+              "http://www.w3.org/2001/XMLSchema#string" &&
+            _item.language.length === 0
+              ? _item.value
+              : {
+                  "@language":
+                    _item.language.length > 0 ? _item.language : undefined,
+                  "@type":
+                    _item.datatype.value !==
+                    "http://www.w3.org/2001/XMLSchema#string"
+                      ? _item.datatype.value
+                      : undefined,
+                  "@value": _item.value,
+                },
+          )
+          .extract(),
+        rightsHolder: this.rightsHolder
+          .map((_item) =>
+            _item.datatype.value ===
+              "http://www.w3.org/2001/XMLSchema#string" &&
+            _item.language.length === 0
+              ? _item.value
+              : {
+                  "@language":
+                    _item.language.length > 0 ? _item.language : undefined,
+                  "@type":
+                    _item.datatype.value !==
+                    "http://www.w3.org/2001/XMLSchema#string"
+                      ? _item.datatype.value
+                      : undefined,
+                  "@value": _item.value,
+                },
+          )
+          .extract(),
       } satisfies ReturnType<ConceptScheme["toJson"]>),
     );
   }
@@ -3832,6 +4157,20 @@ export class ConceptScheme extends Resource {
       this.hasTopConcept.map((_value) =>
         _value.toRdf({ mutateGraph: mutateGraph, resourceSet: resourceSet }),
       ),
+    );
+    _resource.add(
+      dataFactory.namedNode("http://purl.org/dc/terms/license"),
+      this.license.map((_value) =>
+        _value.termType === "Literal" ? _value : _value,
+      ),
+    );
+    _resource.add(
+      dataFactory.namedNode("http://purl.org/dc/terms/rights"),
+      this.rights,
+    );
+    _resource.add(
+      dataFactory.namedNode("http://purl.org/dc/terms/rightsHolder"),
+      this.rightsHolder,
     );
     return _resource;
   }
@@ -3905,6 +4244,112 @@ export namespace ConceptScheme {
       }
       const hasTopConcept = _hasTopConceptEither.unsafeCoerce();
       const identifier = _resource.identifier;
+      const _licenseEither: purify.Either<
+        rdfjsResource.Resource.ValueError,
+        purify.Maybe<rdfjs.NamedNode | rdfjs.Literal>
+      > = purify.Either.of(
+        (
+          _resource
+            .values(dataFactory.namedNode("http://purl.org/dc/terms/license"), {
+              unique: true,
+            })
+            .head()
+            .chain((_value) => _value.toIri()) as purify.Either<
+            rdfjsResource.Resource.ValueError,
+            rdfjs.NamedNode | rdfjs.Literal
+          >
+        )
+          .altLazy(
+            () =>
+              _resource
+                .values(
+                  dataFactory.namedNode("http://purl.org/dc/terms/license"),
+                  { unique: true },
+                )
+                .filter((_value) => {
+                  const _languageInOrDefault = _languageIn ?? [];
+                  if (_languageInOrDefault.length === 0) {
+                    return true;
+                  }
+                  const _valueLiteral = _value.toLiteral().toMaybe().extract();
+                  if (typeof _valueLiteral === "undefined") {
+                    return false;
+                  }
+                  return _languageInOrDefault.some(
+                    (_languageIn) => _languageIn === _valueLiteral.language,
+                  );
+                })
+                .head()
+                .chain((_value) => _value.toLiteral()) as purify.Either<
+                rdfjsResource.Resource.ValueError,
+                rdfjs.NamedNode | rdfjs.Literal
+              >,
+          )
+          .toMaybe(),
+      );
+      if (_licenseEither.isLeft()) {
+        return _licenseEither;
+      }
+      const license = _licenseEither.unsafeCoerce();
+      const _rightsEither: purify.Either<
+        rdfjsResource.Resource.ValueError,
+        purify.Maybe<rdfjs.Literal>
+      > = purify.Either.of(
+        _resource
+          .values(dataFactory.namedNode("http://purl.org/dc/terms/rights"), {
+            unique: true,
+          })
+          .filter((_value) => {
+            const _languageInOrDefault = _languageIn ?? [];
+            if (_languageInOrDefault.length === 0) {
+              return true;
+            }
+            const _valueLiteral = _value.toLiteral().toMaybe().extract();
+            if (typeof _valueLiteral === "undefined") {
+              return false;
+            }
+            return _languageInOrDefault.some(
+              (_languageIn) => _languageIn === _valueLiteral.language,
+            );
+          })
+          .head()
+          .chain((_value) => _value.toLiteral())
+          .toMaybe(),
+      );
+      if (_rightsEither.isLeft()) {
+        return _rightsEither;
+      }
+      const rights = _rightsEither.unsafeCoerce();
+      const _rightsHolderEither: purify.Either<
+        rdfjsResource.Resource.ValueError,
+        purify.Maybe<rdfjs.Literal>
+      > = purify.Either.of(
+        _resource
+          .values(
+            dataFactory.namedNode("http://purl.org/dc/terms/rightsHolder"),
+            { unique: true },
+          )
+          .filter((_value) => {
+            const _languageInOrDefault = _languageIn ?? [];
+            if (_languageInOrDefault.length === 0) {
+              return true;
+            }
+            const _valueLiteral = _value.toLiteral().toMaybe().extract();
+            if (typeof _valueLiteral === "undefined") {
+              return false;
+            }
+            return _languageInOrDefault.some(
+              (_languageIn) => _languageIn === _valueLiteral.language,
+            );
+          })
+          .head()
+          .chain((_value) => _value.toLiteral())
+          .toMaybe(),
+      );
+      if (_rightsHolderEither.isLeft()) {
+        return _rightsHolderEither;
+      }
+      const rightsHolder = _rightsHolderEither.unsafeCoerce();
       return purify.Either.of(
         new ConceptScheme({
           altLabel: _super.altLabel,
@@ -3917,12 +4362,16 @@ export namespace ConceptScheme {
           hiddenLabelXl: _super.hiddenLabelXl,
           historyNote: _super.historyNote,
           identifier,
+          modified: _super.modified,
           notation: _super.notation,
           note: _super.note,
           prefLabel: _super.prefLabel,
           prefLabelXl: _super.prefLabelXl,
           scopeNote: _super.scopeNote,
           hasTopConcept,
+          license,
+          rights,
+          rightsHolder,
         }),
       );
     });
@@ -3957,6 +4406,40 @@ export namespace ConceptScheme {
             ).chainObject(
               (_object) => new ConceptStub.SparqlGraphPatterns(_object),
             ),
+          ),
+        ),
+      );
+      this.add(
+        sparqlBuilder.GraphPattern.optional(
+          sparqlBuilder.GraphPattern.union(
+            sparqlBuilder.GraphPattern.basic(
+              this.subject,
+              dataFactory.namedNode("http://purl.org/dc/terms/license"),
+              this.variable("License"),
+            ),
+            sparqlBuilder.GraphPattern.basic(
+              this.subject,
+              dataFactory.namedNode("http://purl.org/dc/terms/license"),
+              this.variable("License"),
+            ),
+          ),
+        ),
+      );
+      this.add(
+        sparqlBuilder.GraphPattern.optional(
+          sparqlBuilder.GraphPattern.basic(
+            this.subject,
+            dataFactory.namedNode("http://purl.org/dc/terms/rights"),
+            this.variable("Rights"),
+          ),
+        ),
+      );
+      this.add(
+        sparqlBuilder.GraphPattern.optional(
+          sparqlBuilder.GraphPattern.basic(
+            this.subject,
+            dataFactory.namedNode("http://purl.org/dc/terms/rightsHolder"),
+            this.variable("RightsHolder"),
           ),
         ),
       );

@@ -1,6 +1,7 @@
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix kos-kit: <http://kos-kit.github.io/ns#> .
 @prefix dash: <http://datashapes.org/dash#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix sh: <http://www.w3.org/ns/shacl#> .
@@ -44,10 +45,6 @@ kos-kit:Resource
     a owl:Class, sh:NodeShape ;
     sh:nodeKind sh:IRI ;
     sh:property [
-        sh:name "hiddenLabelXl" ;
-        sh:node kos-kit:LabelStub ;
-        sh:path skos-xl:hiddenLabel
-    ], [
         sh:name "historyNote" ;
         sh:or dash:StringOrLangString ;
         sh:path skos:historyNote
@@ -99,6 +96,14 @@ kos-kit:Resource
         sh:name "hiddenLabel" ;
         sh:or dash:StringOrLangString ;
         sh:path skos:hiddenLabel
+    ], [
+        sh:datatype xsd:dateTime ;
+        sh:name "modified" ;
+        sh:path dcterms:modified
+    ], [
+        sh:name "hiddenLabelXl" ;
+        sh:node kos-kit:LabelStub ;
+        sh:path skos-xl:hiddenLabel
     ] .
 
 kos-kit:ResourceStub
@@ -186,6 +191,27 @@ skos:ConceptScheme
         sh:name "hasTopConcept" ;
         sh:node kos-kit:ConceptStub ;
         sh:path skos:hasTopConcept
+    ], [
+        sh:maxCount 1 ;
+        sh:name "license" ;
+        sh:or ([
+                sh:nodeKind sh:IRI
+            ]
+            [
+                sh:nodeKind sh:Literal
+            ]
+        ) ;
+        sh:path dcterms:license
+    ], [
+        sh:maxCount 1 ;
+        sh:name "rights" ;
+        sh:nodeKind sh:Literal ;
+        sh:path dcterms:rights
+    ], [
+        sh:maxCount 1 ;
+        sh:name "rightsHolder" ;
+        sh:nodeKind sh:Literal ;
+        sh:path dcterms:rightsHolder
     ] .
 
 skos-xl:Label
