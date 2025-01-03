@@ -6,7 +6,7 @@ import * as purify from "purify-ts";
 import * as purifyHelpers from "purify-ts-helpers";
 import * as rdfLiteral from "rdf-literal";
 import * as rdfjsResource from "rdfjs-resource";
-abstract class Resource {
+export abstract class Resource {
   readonly altLabel: readonly rdfjs.Literal[];
   readonly altLabelXl: readonly LabelStub[];
   readonly changeNote: readonly rdfjs.Literal[];
@@ -845,7 +845,7 @@ abstract class Resource {
   }
 }
 
-namespace Resource {
+export namespace Resource {
   export function interfaceFromRdf({
     ignoreRdfType: _ignoreRdfType,
     languageIn: _languageIn,
