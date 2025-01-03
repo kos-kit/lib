@@ -12,14 +12,14 @@ export const behavesLikeUnescoThesaurusConceptScheme = (
       )
       .then((conceptScheme) => conceptScheme.unsafeCoerce());
 
-  it("should have a modified date", async () => {
+  it("UNESCO thesaurus concept scheme: should have a modified date", async () => {
     const conceptScheme = await testConceptScheme("en");
     expect(conceptScheme.modified.extract()?.getTime()).toStrictEqual(
       Date.parse("2024-03-25T14:24:28.295+01:00"),
     );
   });
 
-  it("should have a license", async () => {
+  it("UNESCO thesaurus concept scheme: should have a license", async () => {
     const conceptScheme = await testConceptScheme("en");
     const license = conceptScheme.license.extract();
     expect(license).toBeDefined();
@@ -29,7 +29,7 @@ export const behavesLikeUnescoThesaurusConceptScheme = (
     );
   });
 
-  it("should have multiple prefLabels", async () => {
+  it("UNESCO thesaurus concept scheme: should have multiple prefLabels", async () => {
     const conceptSchemeEn = await testConceptScheme("en");
     const conceptSchemeFr = await testConceptScheme("fr");
 
@@ -42,14 +42,14 @@ export const behavesLikeUnescoThesaurusConceptScheme = (
     expect(frPrefLabels[0].value).toStrictEqual("Thésaurus de l'UNESCO");
   });
 
-  it("should have rights", async () => {
+  it("UNESCO thesaurus concept scheme: should have rights", async () => {
     const conceptScheme = await testConceptScheme("en");
     const rights = conceptScheme.rights.extract();
     expect(rights).toBeDefined();
     expect(rights?.value).toStrictEqual("CC-BY-SA");
   });
 
-  it("should have a rights holder", async () => {
+  it("UNESCO thesaurus concept scheme: should have a rights holder", async () => {
     const conceptScheme = await testConceptScheme("en");
     const rightsHolder = conceptScheme.rightsHolder.extract();
     expect(rightsHolder).toBeDefined();

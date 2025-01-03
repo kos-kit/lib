@@ -14,7 +14,7 @@ export function behavesLikeUnescoThesaurusConcept10(
       )
       .then((concept) => concept.unsafeCoerce());
 
-  it("should be in the single concept scheme", async () => {
+  it("UNESCO thesaurus concept 10: should be in the single concept scheme", async () => {
     const concept = await testConcept("en");
     for (const inSchemes of [concept.topConceptOf, concept.inScheme]) {
       expect(inSchemes).toHaveLength(1);
@@ -26,14 +26,14 @@ export function behavesLikeUnescoThesaurusConcept10(
     }
   });
 
-  it("should have a modified date", async () => {
+  it("UNESCO thesaurus concept 10: should have a modified date", async () => {
     const concept = await testConcept("en");
     expect(concept.modified.extractNullable()?.getTime()).toStrictEqual(
       Date.parse("2019-12-15T13:26:49Z"),
     );
   });
 
-  it("should have multiple prefLabels", async () => {
+  it("UNESCO thesaurus concept 10: should have multiple prefLabels", async () => {
     const conceptEn = await testConcept("en");
     const conceptFr = await testConcept("fr");
 
@@ -46,7 +46,7 @@ export function behavesLikeUnescoThesaurusConcept10(
     expect(frPrefLabels[0].value).toStrictEqual("Droit à l'éducation");
   });
 
-  it("should be a top concept of the single concept scheme", async () => {
+  it("UNESCO thesaurus concept 10: should be a top concept of the single concept scheme", async () => {
     const concept = await testConcept("en");
     const topConceptOf = concept.topConceptOf;
     expect(topConceptOf).toHaveLength(1);
@@ -57,7 +57,7 @@ export function behavesLikeUnescoThesaurusConcept10(
     );
   });
 
-  it("should have known semantic relations", async () => {
+  it("UNESCO thesaurus concept 10: should have known semantic relations", async () => {
     const concept = await testConcept("en");
     for (const { actualConcepts, expectedConceptNumbers } of [
       {

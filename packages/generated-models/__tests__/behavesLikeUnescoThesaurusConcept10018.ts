@@ -14,7 +14,7 @@ export function behavesLikeUnescoThesaurusConcept10018(
       )
       .then((concept) => concept.unsafeCoerce());
 
-  it("should be in the single concept scheme", async () => {
+  it("UNESCO thesaurus concept 10018: should be in the single concept scheme", async () => {
     const concept = await testConcept("en");
     const inSchemes = concept.inScheme;
     expect(inSchemes).toHaveLength(1);
@@ -25,14 +25,14 @@ export function behavesLikeUnescoThesaurusConcept10018(
     );
   });
 
-  it("should have a modified date", async () => {
+  it("UNESCO thesaurus concept 10018: should have a modified date", async () => {
     const concept = await testConcept("en");
     expect(concept.modified.extract()?.getTime()).toStrictEqual(
       Date.parse("2019-12-15T13:44:31Z"),
     );
   });
 
-  it("should have multiple altLabels", async () => {
+  it("UNESCO thesaurus concept 10018: should have multiple altLabels", async () => {
     const conceptAr = await testConcept("ar");
     const conceptEs = await testConcept("es");
 
@@ -47,7 +47,7 @@ export function behavesLikeUnescoThesaurusConcept10018(
     );
   });
 
-  it("should have multiple prefLabels", async () => {
+  it("UNESCO thesaurus concept 10018: should have multiple prefLabels", async () => {
     const conceptEn = await testConcept("en");
     const conceptFr = await testConcept("fr");
 
@@ -64,7 +64,7 @@ export function behavesLikeUnescoThesaurusConcept10018(
     );
   });
 
-  it("should have known semantic relations", async () => {
+  it("UNESCO thesaurus concept 10018: should have known semantic relations", async () => {
     const concept = await testConcept("en");
     for (const { actualConcepts, expectedConceptNumbers } of [
       {
@@ -90,7 +90,7 @@ export function behavesLikeUnescoThesaurusConcept10018(
     }
   });
 
-  it("should have multiple notes", async () => {
+  it("UNESCO thesaurus concept 10018: should have multiple notes", async () => {
     const conceptEn = await testConcept("en");
     const conceptFr = await testConcept("fr");
 
