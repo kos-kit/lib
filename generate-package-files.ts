@@ -108,7 +108,7 @@ const packages: readonly Package[] = [
       lunr: "^2.3.9",
       "rdfjs-resource": externalDependencyVersions["rdfjs-resource"],
     },
-    internalDependencies: ["rdfjs-dataset-models", "models"],
+    internalDependencies: ["generated-models"],
     name: "search",
   },
   {
