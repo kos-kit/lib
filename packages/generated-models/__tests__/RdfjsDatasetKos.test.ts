@@ -4,8 +4,8 @@ import { fileURLToPath } from "node:url";
 import { LanguageTag } from "@kos-kit/models";
 import { Parser, Store } from "n3";
 import { describe } from "vitest";
+import { ModelFactories } from "../ModelFactories.js";
 import { RdfjsDatasetKos } from "../RdfjsDatasetKos.js";
-import { RdfjsModelFactory } from "../RdfjsModelFactory.js";
 import { behavesLikeUnescoThesaurusKos } from "./behavesLikeUnescoThesaurusKos.js";
 
 const ntriplesStringToDataset = (input: string): Store => {
@@ -37,7 +37,7 @@ describe("RdfjsDatasetKos", () => {
       new RdfjsDatasetKos({
         dataset: unescoThesaurusDataset,
         languageIn: [languageIn, ""],
-        modelFactory: RdfjsModelFactory.default_,
+        modelFactories: ModelFactories.default_,
       }),
   );
 });

@@ -3,7 +3,7 @@ import { DatasetCore } from "@rdfjs/types";
 import { skos } from "@tpluscode/rdf-ns-builders";
 import { Either } from "purify-ts";
 import { Resource, ResourceSet } from "rdfjs-resource";
-import { RdfjsModelFactory } from "./RdfjsModelFactory.js";
+import { ModelFactories } from "./ModelFactories.js";
 import {
   Concept,
   ConceptScheme,
@@ -93,7 +93,7 @@ export class RdfjsDatasetKos<
 {
   readonly resourceSet: ResourceSet;
   private readonly languageIn: readonly LanguageTag[];
-  private readonly modelFactory: RdfjsModelFactory<
+  private readonly modelFactories: ModelFactories<
     ConceptT,
     ConceptSchemeT,
     ConceptSchemeStubT,
@@ -103,11 +103,11 @@ export class RdfjsDatasetKos<
   constructor({
     dataset,
     languageIn,
-    modelFactory,
+    modelFactories,
   }: {
     dataset: DatasetCore;
     languageIn: readonly LanguageTag[];
-    modelFactory: RdfjsModelFactory<
+    modelFactories: ModelFactories<
       ConceptT,
       ConceptSchemeT,
       ConceptSchemeStubT,
@@ -115,7 +115,7 @@ export class RdfjsDatasetKos<
     >;
   }) {
     this.languageIn = languageIn;
-    this.modelFactory = modelFactory;
+    this.modelFactories = modelFactories;
     this.resourceSet = new ResourceSet({ dataset });
   }
 
@@ -199,8 +199,8 @@ export class RdfjsDatasetKos<
     const conceptSchemeStubs: ConceptSchemeStubT[] = [];
     let conceptSchemeI = 0;
     for (const conceptSchemeIdentifier of this.queryConceptSchemes(query)) {
-      this.modelFactory
-        .conceptSchemeStubFromRdf({
+      this.modelFactories.conceptSchemeStub
+        .fromRdf({
           languageIn: this.languageIn,
           resource: this.resourceSet.namedResource(conceptSchemeIdentifier),
         })
@@ -217,7 +217,7 @@ export class RdfjsDatasetKos<
   }
 
   conceptSchemeSync(identifier: Identifier): Either<Error, ConceptSchemeT> {
-    return this.modelFactory.conceptSchemeFromRdf({
+    return this.modelFactories.conceptScheme.fromRdf({
       languageIn: this.languageIn,
       resource: this.resourceSet.namedResource(identifier),
     });
@@ -255,8 +255,8 @@ export class RdfjsDatasetKos<
     const conceptStubs: ConceptStubT[] = [];
     let conceptI = 0;
     for (const conceptIdentifier of this.queryConcepts(query)) {
-      this.modelFactory
-        .conceptStubFromRdf({
+      this.modelFactories.conceptStub
+        .fromRdf({
           languageIn: this.languageIn,
           resource: this.resourceSet.namedResource(conceptIdentifier),
         })
@@ -273,7 +273,7 @@ export class RdfjsDatasetKos<
   }
 
   conceptSync(identifier: Identifier): Either<Error, ConceptT> {
-    return this.modelFactory.conceptFromRdf({
+    return this.modelFactories.concept.fromRdf({
       languageIn: this.languageIn,
       resource: this.resourceSet.namedResource(identifier),
     });
