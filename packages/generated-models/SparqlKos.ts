@@ -66,10 +66,12 @@ export class SparqlKos<
   }
 
   async concept(identifier: Identifier): Promise<Either<Error, ConceptT>> {
-    return this.modelByIdentifier({
-      identifier,
-      modelFactory: this.modelFactories.concept,
-    });
+    return (
+      await this.modelsByIdentifiers({
+        identifiers: [identifier],
+        modelFactory: this.modelFactories.concept,
+      })
+    )[0];
   }
 
   async conceptIdentifiers({
@@ -98,10 +100,12 @@ ${offset > 0 ? `OFFSET ${offset}` : ""}
   async conceptScheme(
     identifier: Identifier,
   ): Promise<Either<Error, ConceptSchemeT>> {
-    return this.modelByIdentifier({
-      identifier,
-      modelFactory: this.modelFactories.conceptScheme,
-    });
+    return (
+      await this.modelsByIdentifiers({
+        identifiers: [identifier],
+        modelFactory: this.modelFactories.conceptScheme,
+      })
+    )[0];
   }
 
   async conceptSchemeIdentifiers({
@@ -127,12 +131,28 @@ ${offset > 0 ? `OFFSET ${offset}` : ""}
     );
   }
 
-  async conceptSchemeStubs(_parameters: {
+  async conceptSchemeStubs(parameters: {
     limit: number | null;
     offset: number;
     query: ConceptSchemesQuery;
   }): Promise<readonly ConceptSchemeStubT[]> {
-    throw new Error("not implemented");
+    const identifiers = await this.conceptSchemeIdentifiers(parameters);
+    const modelEithers = await this.modelsByIdentifiers({
+      identifiers: identifiers,
+      modelFactory: this.modelFactories.conceptSchemeStub,
+    });
+    if (modelEithers.length !== identifiers.length) {
+      throw new Error("should never happen");
+    }
+    return modelEithers.map((modelEither, index) =>
+      modelEither
+        .mapLeft(() =>
+          this.modelFactories.conceptSchemeStub.fromIdentifier(
+            identifiers[index],
+          ),
+        )
+        .extract(),
+    );
   }
 
   async conceptSchemesCount(query: ConceptSchemesQuery): Promise<number> {
@@ -146,12 +166,26 @@ ${this.conceptSchemesQueryToWhereGraphPatterns(query).join("\n")}
     );
   }
 
-  async conceptStubs(_parameters: {
+  async conceptStubs(parameters: {
     limit: number | null;
     offset: number;
     query: ConceptsQuery;
   }): Promise<readonly ConceptStubT[]> {
-    throw new Error("not implemented");
+    const identifiers = await this.conceptIdentifiers(parameters);
+    const modelEithers = await this.modelsByIdentifiers({
+      identifiers: identifiers,
+      modelFactory: this.modelFactories.conceptStub,
+    });
+    if (modelEithers.length !== identifiers.length) {
+      throw new Error("should never happen");
+    }
+    return modelEithers.map((modelEither, index) =>
+      modelEither
+        .mapLeft(() =>
+          this.modelFactories.conceptStub.fromIdentifier(identifiers[index]),
+        )
+        .extract(),
+    );
   }
 
   async conceptsCount(query: ConceptsQuery): Promise<number> {
@@ -270,30 +304,37 @@ ${this.conceptsQueryToWhereGraphPatterns(query).join("\n")}
     throw new RangeError("should never reach this code");
   }
 
-  private async modelByIdentifier<ModelT>({
-    identifier,
+  private async modelsByIdentifiers<ModelT>({
+    identifiers,
     modelFactory,
-  }: { identifier: Identifier; modelFactory: ModelFactory<ModelT> }): Promise<
-    Either<Resource.ValueError, ModelT>
-  > {
+  }: {
+    identifiers: readonly Identifier[];
+    modelFactory: ModelFactory<ModelT>;
+  }): Promise<readonly Either<Resource.ValueError, ModelT>[]> {
+    if (identifiers.length === 0) {
+      return [];
+    }
+
     const subjectVariable = GraphPattern.variable("subject");
     const constructQuery = new ConstructQueryBuilder({
       includeLanguageTags: this.languageIn,
     })
       .addGraphPatterns(new modelFactory.SparqlGraphPatterns(subjectVariable))
-      .addValues(subjectVariable, identifier)
+      .addValues(subjectVariable, ...identifiers)
       .build();
     const quads = await this.sparqlQueryClient.queryQuads(constructQuery);
 
-    const quadsString = quads.map((quad) => quad.toString()).join("\n");
-    console.log(quadsString);
+    // const quadsString = quads.map((quad) => quad.toString()).join("\n");
+    // console.log(quadsString);
 
-    return modelFactory.fromRdf({
-      languageIn: this.languageIn,
-      resource: new Resource({
-        dataset: this.datasetCoreFactory.dataset(quads.concat()),
-        identifier: identifier,
+    return identifiers.map((identifier) =>
+      modelFactory.fromRdf({
+        languageIn: this.languageIn,
+        resource: new Resource({
+          dataset: this.datasetCoreFactory.dataset(quads.concat()),
+          identifier,
+        }),
       }),
-    });
+    );
   }
 }

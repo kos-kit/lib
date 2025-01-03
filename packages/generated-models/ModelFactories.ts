@@ -4,6 +4,7 @@ import {
   ConceptScheme,
   ConceptSchemeStub,
   ConceptStub,
+  Identifier,
 } from "./index.js";
 
 export interface ModelFactories<
@@ -14,8 +15,12 @@ export interface ModelFactories<
 > {
   readonly concept: ModelFactory<ConceptT>;
   readonly conceptScheme: ModelFactory<ConceptSchemeT>;
-  readonly conceptSchemeStub: ModelFactory<ConceptSchemeStubT>;
-  readonly conceptStub: ModelFactory<ConceptStubT>;
+  readonly conceptSchemeStub: ModelFactory<ConceptSchemeStubT> & {
+    fromIdentifier: (identifier: Identifier) => ConceptSchemeStubT;
+  };
+  readonly conceptStub: ModelFactory<ConceptStubT> & {
+    fromIdentifier: (identifier: Identifier) => ConceptStubT;
+  };
 }
 
 export namespace ModelFactories {
@@ -29,10 +34,12 @@ export namespace ModelFactories {
       SparqlGraphPatterns: ConceptScheme.SparqlGraphPatterns,
     },
     conceptSchemeStub: {
+      fromIdentifier: (identifier) => new ConceptSchemeStub({ identifier }),
       fromRdf: ConceptSchemeStub.fromRdf,
       SparqlGraphPatterns: ConceptSchemeStub.SparqlGraphPatterns,
     },
     conceptStub: {
+      fromIdentifier: (identifier) => new ConceptStub({ identifier }),
       fromRdf: ConceptStub.fromRdf,
       SparqlGraphPatterns: ConceptStub.SparqlGraphPatterns,
     },
