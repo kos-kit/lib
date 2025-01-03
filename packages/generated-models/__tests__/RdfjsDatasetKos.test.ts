@@ -2,11 +2,13 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { LanguageTag } from "@kos-kit/models";
+import { DatasetCore } from "@rdfjs/types";
 import { Parser, Store } from "n3";
 import { describe } from "vitest";
 import { ModelFactories } from "../ModelFactories.js";
 import { RdfjsDatasetKos } from "../RdfjsDatasetKos.js";
 import { behavesLikeSyntheticKos } from "./behavesLikeSyntheticKos.js";
+import { behavesLikeUnescoThesaurusKos } from "./behavesLikeUnescoThesaurusKos.js";
 
 function parseRdfString(input: string): Store {
   const parser = new Parser();
@@ -32,37 +34,31 @@ describe("RdfjsDatasetKos", () => {
       .toString(),
   );
 
-  behavesLikeSyntheticKos(
-    (languageIn: LanguageTag) =>
+  const kosFactoryFactory =
+    (dataset: DatasetCore) => (languageIn: LanguageTag) =>
       new RdfjsDatasetKos({
-        dataset: syntheticDataset,
+        dataset: dataset,
         languageIn: [languageIn, ""],
         modelFactories: ModelFactories.default_,
-      }),
+      });
+
+  behavesLikeSyntheticKos(kosFactoryFactory(syntheticDataset));
+
+  const unescoThesaurusDataset: Store = parseRdfString(
+    fs
+      .readFileSync(
+        path.join(
+          path.dirname(fileURLToPath(import.meta.url)),
+          "..",
+          "..",
+          "..",
+          "__tests__",
+          "data",
+          "unesco-thesaurus.nt",
+        ),
+      )
+      .toString(),
   );
 
-  // const unescoThesaurusDataset: Store = parseRdfString(
-  //   fs
-  //     .readFileSync(
-  //       path.join(
-  //         path.dirname(fileURLToPath(import.meta.url)),
-  //         "..",
-  //         "..",
-  //         "..",
-  //         "__tests__",
-  //         "data",
-  //         "unesco-thesaurus.nt",
-  //       ),
-  //     )
-  //     .toString(),
-  // );
-  //
-  // behavesLikeUnescoThesaurusKos(
-  //   (languageIn: LanguageTag) =>
-  //     new RdfjsDatasetKos({
-  //       dataset: unescoThesaurusDataset,
-  //       languageIn: [languageIn, ""],
-  //       modelFactories: ModelFactories.default_,
-  //     }),
-  // );
+  behavesLikeUnescoThesaurusKos(kosFactoryFactory(unescoThesaurusDataset));
 });

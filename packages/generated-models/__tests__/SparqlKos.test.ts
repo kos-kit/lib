@@ -8,6 +8,7 @@ import { describe } from "vitest";
 import { ModelFactories } from "../ModelFactories.js";
 import { SparqlKos } from "../SparqlKos.js";
 import { OxigraphDatasetCore } from "./OxigraphDatasetCore.js";
+import { behavesLikeSyntheticKos } from "./behavesLikeSyntheticKos.js";
 import { behavesLikeUnescoThesaurusKos } from "./behavesLikeUnescoThesaurusKos.js";
 
 describe("SparqlKos", () => {
@@ -28,6 +29,23 @@ describe("SparqlKos", () => {
       .toString(),
     { format: "ttl" },
   );
+
+  const kosFactoryFactory =
+    (store: oxigraph.Store) => (languageIn: LanguageTag) =>
+      new SparqlKos({
+        datasetCoreFactory: {
+          dataset: (quads) =>
+            new OxigraphDatasetCore(new oxigraph.Store(quads)),
+        },
+        languageIn: [languageIn, ""],
+        modelFactories: ModelFactories.default_,
+        sparqlQueryClient: new OxigraphSparqlClient({
+          dataFactory: oxigraph,
+          store,
+        }),
+      });
+
+  behavesLikeSyntheticKos(kosFactoryFactory(syntheticStore));
 
   const unescoThesaurusStore = new oxigraph.Store();
   unescoThesaurusStore.load(
