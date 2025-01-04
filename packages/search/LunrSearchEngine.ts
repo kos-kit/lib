@@ -1,4 +1,4 @@
-import { Kos, Label, LanguageTag, Resource } from "@kos-kit/models";
+import { Kos, Label, LanguageTag } from "@kos-kit/generated-models";
 import lunr, { Index } from "lunr";
 import * as rdfjsResource from "rdfjs-resource";
 import { LunrIndexCompactor } from "./LunrIndexCompactor.js";
@@ -24,7 +24,7 @@ export class LunrSearchEngine implements SearchEngine {
   }: {
     conceptsLimit?: number;
     languageTag: LanguageTag;
-    kos: Kos<any, any, any>;
+    kos: Kos;
   }): Promise<LunrSearchEngine> {
     interface IndexDocument {
       readonly identifier: string;
@@ -34,7 +34,7 @@ export class LunrSearchEngine implements SearchEngine {
     }
 
     const toIndexDocument = (
-      model: Resource<any>,
+      model: Resource,
       type: SearchResult["type"],
     ): IndexDocument | null => {
       const prefLabels = model.labels({ types: [Label.Type.PREFERRED] });

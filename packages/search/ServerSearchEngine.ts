@@ -1,5 +1,9 @@
-import { Label, LanguageTag, LanguageTagSet } from "@kos-kit/models";
-import * as mem from "@kos-kit/rdfjs-dataset-models";
+import {
+  Label,
+  LanguageTag,
+  ModelFactories,
+  RdfjsDatasetKos,
+} from "@kos-kit/generated-models";
 import { Parser, Store } from "n3";
 import { Resource } from "rdfjs-resource";
 import { SearchEngine } from "./SearchEngine.js";
@@ -35,19 +39,20 @@ export class ServerSearchEngine implements SearchEngine {
     const parser = new Parser({ format: "N-Triples" });
     const store = new Store();
     store.addQuads(parser.parse(await response.text()));
-    const kos = new mem.DefaultKos({
+    const kos = new RdfjsDatasetKos({
       dataset: store,
-      includeLanguageTags: new LanguageTagSet(params.languageTag, ""),
+      languageIn: [params.languageTag, ""],
+      modelFactories: ModelFactories.default_,
     });
 
     const page: SearchResult[] = [];
 
-    for (const concept of await kos.conceptsByQuery({
+    for (const conceptStub of kos.conceptStubsSync({
       limit: null,
       offset: 0,
       query: { type: "All" },
     })) {
-      (await concept.resolve()).ifRight((concept) => {
+      (await conceptStub.resolve()).ifRight((concept) => {
         const prefLabels = concept.labels({ types: [Label.Type.PREFERRED] });
         if (prefLabels.length === 0) {
           return;
@@ -60,12 +65,12 @@ export class ServerSearchEngine implements SearchEngine {
       });
     }
 
-    for (const conceptScheme of await kos.conceptSchemesByQuery({
+    for (const conceptSchemeStub of kos.conceptSchemeStubsSync({
       limit: null,
       offset: 0,
       query: { type: "All" },
-    })) {
-      (await conceptScheme.resolve()).ifRight((conceptScheme) => {
+    }))
+      (await conceptSchemeStub.resolve()).ifRight((conceptScheme) => {
         const prefLabels = conceptScheme.labels({
           types: [Label.Type.PREFERRED],
         });
@@ -78,7 +83,6 @@ export class ServerSearchEngine implements SearchEngine {
           type: "ConceptScheme",
         });
       });
-    }
 
     return { page, total };
   }

@@ -1,4 +1,4 @@
-import { LanguageTag } from "@kos-kit/models";
+import { LanguageTag } from "@kos-kit/generated-models";
 import { SearchEngineJson } from "./SearchEngineJson.js";
 import { SearchResults } from "./SearchResults.js";
 
