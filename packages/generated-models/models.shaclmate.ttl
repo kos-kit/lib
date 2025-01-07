@@ -34,7 +34,7 @@ kos-kit:LabelStub
     sh:property [
         sh:minCount 1 ;
         sh:name "literalForm" ;
-        sh:or dash:StringOrLangString ;
+        sh:xone dash:StringOrLangString ;
         sh:path skos-xl:literalForm
     ] .
 
@@ -45,11 +45,11 @@ kos-kit:Resource
     sh:nodeKind sh:IRI ;
     sh:property [
         sh:name "example" ;
-        sh:or dash:StringOrLangString ;
+        sh:xone dash:StringOrLangString ;
         sh:path skos:example
     ], [
         sh:name "hiddenLabel" ;
-        sh:or dash:StringOrLangString ;
+        sh:xone dash:StringOrLangString ;
         sh:path skos:hiddenLabel
     ], [
         sh:datatype xsd:dateTime ;
@@ -62,11 +62,11 @@ kos-kit:Resource
         sh:path skos-xl:hiddenLabel
     ], [
         sh:name "historyNote" ;
-        sh:or dash:StringOrLangString ;
+        sh:xone dash:StringOrLangString ;
         sh:path skos:historyNote
     ], [
         sh:name "altLabel" ;
-        sh:or dash:StringOrLangString ;
+        sh:xone dash:StringOrLangString ;
         sh:path skos:altLabel
     ], [
         sh:datatype rdf:langString ;
@@ -74,11 +74,11 @@ kos-kit:Resource
         sh:path skos:notation
     ], [
         sh:name "note" ;
-        sh:or dash:StringOrLangString ;
+        sh:xone dash:StringOrLangString ;
         sh:path skos:notation
     ], [
         sh:name "prefLabel" ;
-        sh:or dash:StringOrLangString ;
+        sh:xone dash:StringOrLangString ;
         sh:path skos:prefLabel
     ], [
         sh:name "prefLabelXl" ;
@@ -86,7 +86,7 @@ kos-kit:Resource
         sh:path skos-xl:prefLabel
     ], [
         sh:name "scopeNote" ;
-        sh:or dash:StringOrLangString ;
+        sh:xone dash:StringOrLangString ;
         sh:path skos:scopeNote
     ], [
         sh:name "altLabelXl" ;
@@ -94,15 +94,15 @@ kos-kit:Resource
         sh:path skos-xl:altLabel
     ], [
         sh:name "changeNote" ;
-        sh:or dash:StringOrLangString ;
+        sh:xone dash:StringOrLangString ;
         sh:path skos:changeNote
     ], [
         sh:name "definition" ;
-        sh:or dash:StringOrLangString ;
+        sh:xone dash:StringOrLangString ;
         sh:path skos:definition
     ], [
         sh:name "editorialNote" ;
-        sh:or dash:StringOrLangString ;
+        sh:xone dash:StringOrLangString ;
         sh:path skos:editorialNote
     ] .
 
@@ -113,7 +113,7 @@ kos-kit:ResourceStub
     sh:nodeKind sh:BlankNodeOrIRI ;
     sh:property [
         sh:name "prefLabel" ;
-        sh:or dash:StringOrLangString ;
+        sh:xone dash:StringOrLangString ;
         sh:path skos:prefLabel
     ], [
         sh:name "prefLabelXl" ;
@@ -194,7 +194,7 @@ skos:ConceptScheme
     ], [
         sh:maxCount 1 ;
         sh:name "license" ;
-        sh:or ([
+        sh:xone ([
                 sh:nodeKind sh:IRI
             ]
             [
@@ -221,7 +221,7 @@ skos-xl:Label
     sh:property [
         sh:minCount 1 ;
         sh:name "literalForm" ;
-        sh:or dash:StringOrLangString ;
+        sh:xone dash:StringOrLangString ;
         sh:path skos-xl:literalForm
     ] .
 
