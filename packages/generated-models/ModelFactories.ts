@@ -34,12 +34,12 @@ export namespace ModelFactories {
       SparqlGraphPatterns: ConceptScheme.SparqlGraphPatterns,
     },
     conceptSchemeStub: {
-      fromIdentifier: (identifier) => new ConceptSchemeStub({ identifier }),
+      fromIdentifier: (identifier) => ConceptSchemeStub.create({ identifier }),
       fromRdf: ConceptSchemeStub.fromRdf,
       SparqlGraphPatterns: ConceptSchemeStub.SparqlGraphPatterns,
     },
     conceptStub: {
-      fromIdentifier: (identifier) => new ConceptStub({ identifier }),
+      fromIdentifier: (identifier) => ConceptStub.create({ identifier }),
       fromRdf: ConceptStub.fromRdf,
       SparqlGraphPatterns: ConceptStub.SparqlGraphPatterns,
     },
