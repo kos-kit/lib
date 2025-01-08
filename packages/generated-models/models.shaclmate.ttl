@@ -34,8 +34,8 @@ kos-kit:LabelStub
     sh:property [
         sh:minCount 1 ;
         sh:name "literalForm" ;
-        sh:xone dash:StringOrLangString ;
-        sh:path skos-xl:literalForm
+        sh:path skos-xl:literalForm ;
+        sh:xone dash:StringOrLangString
     ] .
 
 kos-kit:Resource
@@ -44,13 +44,41 @@ kos-kit:Resource
     a owl:Class, sh:NodeShape ;
     sh:nodeKind sh:IRI ;
     sh:property [
+        sh:name "prefLabel" ;
+        sh:path skos:prefLabel ;
+        sh:xone dash:StringOrLangString
+    ], [
+        sh:name "prefLabelXl" ;
+        sh:node kos-kit:LabelStub ;
+        sh:path skos-xl:prefLabel
+    ], [
+        sh:name "scopeNote" ;
+        sh:path skos:scopeNote ;
+        sh:xone dash:StringOrLangString
+    ], [
+        sh:name "altLabelXl" ;
+        sh:node kos-kit:LabelStub ;
+        sh:path skos-xl:altLabel
+    ], [
+        sh:name "changeNote" ;
+        sh:path skos:changeNote ;
+        sh:xone dash:StringOrLangString
+    ], [
+        sh:name "definition" ;
+        sh:path skos:definition ;
+        sh:xone dash:StringOrLangString
+    ], [
+        sh:name "editorialNote" ;
+        sh:path skos:editorialNote ;
+        sh:xone dash:StringOrLangString
+    ], [
         sh:name "example" ;
-        sh:xone dash:StringOrLangString ;
-        sh:path skos:example
+        sh:path skos:example ;
+        sh:xone dash:StringOrLangString
     ], [
         sh:name "hiddenLabel" ;
-        sh:xone dash:StringOrLangString ;
-        sh:path skos:hiddenLabel
+        sh:path skos:hiddenLabel ;
+        sh:xone dash:StringOrLangString
     ], [
         sh:datatype xsd:dateTime ;
         sh:maxCount 1 ;
@@ -62,48 +90,20 @@ kos-kit:Resource
         sh:path skos-xl:hiddenLabel
     ], [
         sh:name "historyNote" ;
-        sh:xone dash:StringOrLangString ;
-        sh:path skos:historyNote
+        sh:path skos:historyNote ;
+        sh:xone dash:StringOrLangString
     ], [
         sh:name "altLabel" ;
-        sh:xone dash:StringOrLangString ;
-        sh:path skos:altLabel
+        sh:path skos:altLabel ;
+        sh:xone dash:StringOrLangString
     ], [
         sh:datatype rdf:langString ;
         sh:name "notation" ;
         sh:path skos:notation
     ], [
         sh:name "note" ;
-        sh:xone dash:StringOrLangString ;
-        sh:path skos:notation
-    ], [
-        sh:name "prefLabel" ;
-        sh:xone dash:StringOrLangString ;
-        sh:path skos:prefLabel
-    ], [
-        sh:name "prefLabelXl" ;
-        sh:node kos-kit:LabelStub ;
-        sh:path skos-xl:prefLabel
-    ], [
-        sh:name "scopeNote" ;
-        sh:xone dash:StringOrLangString ;
-        sh:path skos:scopeNote
-    ], [
-        sh:name "altLabelXl" ;
-        sh:node kos-kit:LabelStub ;
-        sh:path skos-xl:altLabel
-    ], [
-        sh:name "changeNote" ;
-        sh:xone dash:StringOrLangString ;
-        sh:path skos:changeNote
-    ], [
-        sh:name "definition" ;
-        sh:xone dash:StringOrLangString ;
-        sh:path skos:definition
-    ], [
-        sh:name "editorialNote" ;
-        sh:xone dash:StringOrLangString ;
-        sh:path skos:editorialNote
+        sh:path skos:notation ;
+        sh:xone dash:StringOrLangString
     ] .
 
 kos-kit:ResourceStub
@@ -113,8 +113,8 @@ kos-kit:ResourceStub
     sh:nodeKind sh:BlankNodeOrIRI ;
     sh:property [
         sh:name "prefLabel" ;
-        sh:xone dash:StringOrLangString ;
-        sh:path skos:prefLabel
+        sh:path skos:prefLabel ;
+        sh:xone dash:StringOrLangString
     ], [
         sh:name "prefLabelXl" ;
         sh:node kos-kit:LabelStub ;
@@ -194,14 +194,14 @@ skos:ConceptScheme
     ], [
         sh:maxCount 1 ;
         sh:name "license" ;
+        sh:path dcterms:license ;
         sh:xone ([
                 sh:nodeKind sh:IRI
             ]
             [
                 sh:nodeKind sh:Literal
             ]
-        ) ;
-        sh:path dcterms:license
+        )
     ], [
         sh:maxCount 1 ;
         sh:name "rights" ;
@@ -221,7 +221,7 @@ skos-xl:Label
     sh:property [
         sh:minCount 1 ;
         sh:name "literalForm" ;
-        sh:xone dash:StringOrLangString ;
-        sh:path skos-xl:literalForm
+        sh:path skos-xl:literalForm ;
+        sh:xone dash:StringOrLangString
     ] .
 

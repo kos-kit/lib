@@ -1,6 +1,5 @@
 import * as sparqlBuilder from "@kos-kit/sparql-builder";
 import type * as rdfjs from "@rdfjs/types";
-import { sha256 } from "js-sha256";
 import { DataFactory as dataFactory } from "n3";
 import * as purify from "purify-ts";
 import * as purifyHelpers from "purify-ts-helpers";
@@ -42,76 +41,76 @@ export abstract class Resource {
     readonly prefLabelXl?: readonly LabelStub[];
     readonly scopeNote?: readonly rdfjs.Literal[];
   }) {
-    if (Array.isArray(parameters.altLabel)) {
-      this.altLabel = parameters.altLabel;
-    } else if (typeof parameters.altLabel === "undefined") {
+    if (typeof parameters.altLabel === "undefined") {
       this.altLabel = [];
+    } else if (Array.isArray(parameters.altLabel)) {
+      this.altLabel = parameters.altLabel;
     } else {
-      this.altLabel = parameters.altLabel; // never
+      this.altLabel = parameters.altLabel as never;
     }
 
-    if (Array.isArray(parameters.altLabelXl)) {
-      this.altLabelXl = parameters.altLabelXl;
-    } else if (typeof parameters.altLabelXl === "undefined") {
+    if (typeof parameters.altLabelXl === "undefined") {
       this.altLabelXl = [];
+    } else if (Array.isArray(parameters.altLabelXl)) {
+      this.altLabelXl = parameters.altLabelXl;
     } else {
-      this.altLabelXl = parameters.altLabelXl; // never
+      this.altLabelXl = parameters.altLabelXl as never;
     }
 
-    if (Array.isArray(parameters.changeNote)) {
-      this.changeNote = parameters.changeNote;
-    } else if (typeof parameters.changeNote === "undefined") {
+    if (typeof parameters.changeNote === "undefined") {
       this.changeNote = [];
+    } else if (Array.isArray(parameters.changeNote)) {
+      this.changeNote = parameters.changeNote;
     } else {
-      this.changeNote = parameters.changeNote; // never
+      this.changeNote = parameters.changeNote as never;
     }
 
-    if (Array.isArray(parameters.definition)) {
-      this.definition = parameters.definition;
-    } else if (typeof parameters.definition === "undefined") {
+    if (typeof parameters.definition === "undefined") {
       this.definition = [];
+    } else if (Array.isArray(parameters.definition)) {
+      this.definition = parameters.definition;
     } else {
-      this.definition = parameters.definition; // never
+      this.definition = parameters.definition as never;
     }
 
-    if (Array.isArray(parameters.editorialNote)) {
-      this.editorialNote = parameters.editorialNote;
-    } else if (typeof parameters.editorialNote === "undefined") {
+    if (typeof parameters.editorialNote === "undefined") {
       this.editorialNote = [];
+    } else if (Array.isArray(parameters.editorialNote)) {
+      this.editorialNote = parameters.editorialNote;
     } else {
-      this.editorialNote = parameters.editorialNote; // never
+      this.editorialNote = parameters.editorialNote as never;
     }
 
-    if (Array.isArray(parameters.example)) {
-      this.example = parameters.example;
-    } else if (typeof parameters.example === "undefined") {
+    if (typeof parameters.example === "undefined") {
       this.example = [];
+    } else if (Array.isArray(parameters.example)) {
+      this.example = parameters.example;
     } else {
-      this.example = parameters.example; // never
+      this.example = parameters.example as never;
     }
 
-    if (Array.isArray(parameters.hiddenLabel)) {
-      this.hiddenLabel = parameters.hiddenLabel;
-    } else if (typeof parameters.hiddenLabel === "undefined") {
+    if (typeof parameters.hiddenLabel === "undefined") {
       this.hiddenLabel = [];
+    } else if (Array.isArray(parameters.hiddenLabel)) {
+      this.hiddenLabel = parameters.hiddenLabel;
     } else {
-      this.hiddenLabel = parameters.hiddenLabel; // never
+      this.hiddenLabel = parameters.hiddenLabel as never;
     }
 
-    if (Array.isArray(parameters.hiddenLabelXl)) {
-      this.hiddenLabelXl = parameters.hiddenLabelXl;
-    } else if (typeof parameters.hiddenLabelXl === "undefined") {
+    if (typeof parameters.hiddenLabelXl === "undefined") {
       this.hiddenLabelXl = [];
+    } else if (Array.isArray(parameters.hiddenLabelXl)) {
+      this.hiddenLabelXl = parameters.hiddenLabelXl;
     } else {
-      this.hiddenLabelXl = parameters.hiddenLabelXl; // never
+      this.hiddenLabelXl = parameters.hiddenLabelXl as never;
     }
 
-    if (Array.isArray(parameters.historyNote)) {
-      this.historyNote = parameters.historyNote;
-    } else if (typeof parameters.historyNote === "undefined") {
+    if (typeof parameters.historyNote === "undefined") {
       this.historyNote = [];
+    } else if (Array.isArray(parameters.historyNote)) {
+      this.historyNote = parameters.historyNote;
     } else {
-      this.historyNote = parameters.historyNote; // never
+      this.historyNote = parameters.historyNote as never;
     }
 
     if (purify.Maybe.isMaybe(parameters.modified)) {
@@ -124,47 +123,47 @@ export abstract class Resource {
     } else if (typeof parameters.modified === "undefined") {
       this.modified = purify.Maybe.empty();
     } else {
-      this.modified = parameters.modified; // never
+      this.modified = parameters.modified as never;
     }
 
-    if (Array.isArray(parameters.notation)) {
-      this.notation = parameters.notation;
-    } else if (typeof parameters.notation === "undefined") {
+    if (typeof parameters.notation === "undefined") {
       this.notation = [];
+    } else if (Array.isArray(parameters.notation)) {
+      this.notation = parameters.notation;
     } else {
-      this.notation = parameters.notation; // never
+      this.notation = parameters.notation as never;
     }
 
-    if (Array.isArray(parameters.note)) {
-      this.note = parameters.note;
-    } else if (typeof parameters.note === "undefined") {
+    if (typeof parameters.note === "undefined") {
       this.note = [];
+    } else if (Array.isArray(parameters.note)) {
+      this.note = parameters.note;
     } else {
-      this.note = parameters.note; // never
+      this.note = parameters.note as never;
     }
 
-    if (Array.isArray(parameters.prefLabel)) {
-      this.prefLabel = parameters.prefLabel;
-    } else if (typeof parameters.prefLabel === "undefined") {
+    if (typeof parameters.prefLabel === "undefined") {
       this.prefLabel = [];
+    } else if (Array.isArray(parameters.prefLabel)) {
+      this.prefLabel = parameters.prefLabel;
     } else {
-      this.prefLabel = parameters.prefLabel; // never
+      this.prefLabel = parameters.prefLabel as never;
     }
 
-    if (Array.isArray(parameters.prefLabelXl)) {
-      this.prefLabelXl = parameters.prefLabelXl;
-    } else if (typeof parameters.prefLabelXl === "undefined") {
+    if (typeof parameters.prefLabelXl === "undefined") {
       this.prefLabelXl = [];
+    } else if (Array.isArray(parameters.prefLabelXl)) {
+      this.prefLabelXl = parameters.prefLabelXl;
     } else {
-      this.prefLabelXl = parameters.prefLabelXl; // never
+      this.prefLabelXl = parameters.prefLabelXl as never;
     }
 
-    if (Array.isArray(parameters.scopeNote)) {
-      this.scopeNote = parameters.scopeNote;
-    } else if (typeof parameters.scopeNote === "undefined") {
+    if (typeof parameters.scopeNote === "undefined") {
       this.scopeNote = [];
+    } else if (Array.isArray(parameters.scopeNote)) {
+      this.scopeNote = parameters.scopeNote;
     } else {
-      this.scopeNote = parameters.scopeNote; // never
+      this.scopeNote = parameters.scopeNote as never;
     }
   }
 
@@ -422,336 +421,237 @@ export abstract class Resource {
       update: (message: string | number[] | ArrayBuffer | Uint8Array) => void;
     },
   >(_hasher: HasherT): HasherT {
-    for (const _element0 of this.altLabel) {
-      _hasher.update(_element0.value);
+    for (const _item0 of this.altLabel) {
+      _hasher.update(_item0.termType);
+      _hasher.update(_item0.value);
     }
 
-    for (const _element0 of this.altLabelXl) {
-      _element0.hash(_hasher);
+    for (const _item0 of this.altLabelXl) {
+      _item0.hash(_hasher);
     }
 
-    for (const _element0 of this.changeNote) {
-      _hasher.update(_element0.value);
+    for (const _item0 of this.changeNote) {
+      _hasher.update(_item0.termType);
+      _hasher.update(_item0.value);
     }
 
-    for (const _element0 of this.definition) {
-      _hasher.update(_element0.value);
+    for (const _item0 of this.definition) {
+      _hasher.update(_item0.termType);
+      _hasher.update(_item0.value);
     }
 
-    for (const _element0 of this.editorialNote) {
-      _hasher.update(_element0.value);
+    for (const _item0 of this.editorialNote) {
+      _hasher.update(_item0.termType);
+      _hasher.update(_item0.value);
     }
 
-    for (const _element0 of this.example) {
-      _hasher.update(_element0.value);
+    for (const _item0 of this.example) {
+      _hasher.update(_item0.termType);
+      _hasher.update(_item0.value);
     }
 
-    for (const _element0 of this.hiddenLabel) {
-      _hasher.update(_element0.value);
+    for (const _item0 of this.hiddenLabel) {
+      _hasher.update(_item0.termType);
+      _hasher.update(_item0.value);
     }
 
-    for (const _element0 of this.hiddenLabelXl) {
-      _element0.hash(_hasher);
+    for (const _item0 of this.hiddenLabelXl) {
+      _item0.hash(_hasher);
     }
 
-    for (const _element0 of this.historyNote) {
-      _hasher.update(_element0.value);
+    for (const _item0 of this.historyNote) {
+      _hasher.update(_item0.termType);
+      _hasher.update(_item0.value);
     }
 
     this.modified.ifJust((_value0) => {
       _hasher.update(_value0.toISOString());
     });
-    for (const _element0 of this.notation) {
-      _hasher.update(_element0.value);
+    for (const _item0 of this.notation) {
+      _hasher.update(_item0.termType);
+      _hasher.update(_item0.value);
     }
 
-    for (const _element0 of this.note) {
-      _hasher.update(_element0.value);
+    for (const _item0 of this.note) {
+      _hasher.update(_item0.termType);
+      _hasher.update(_item0.value);
     }
 
-    for (const _element0 of this.prefLabel) {
-      _hasher.update(_element0.value);
+    for (const _item0 of this.prefLabel) {
+      _hasher.update(_item0.termType);
+      _hasher.update(_item0.value);
     }
 
-    for (const _element0 of this.prefLabelXl) {
-      _element0.hash(_hasher);
+    for (const _item0 of this.prefLabelXl) {
+      _item0.hash(_hasher);
     }
 
-    for (const _element0 of this.scopeNote) {
-      _hasher.update(_element0.value);
+    for (const _item0 of this.scopeNote) {
+      _hasher.update(_item0.termType);
+      _hasher.update(_item0.value);
     }
 
     return _hasher;
   }
 
   toJson(): {
-    readonly altLabel: readonly (
-      | string
-      | {
-          "@language": string | undefined;
-          "@type": string | undefined;
-          "@value": string;
-        }
-    )[];
+    readonly altLabel: readonly {
+      "@language": string | undefined;
+      "@type": string | undefined;
+      "@value": string;
+    }[];
     readonly altLabelXl: readonly ReturnType<LabelStub["toJson"]>[];
-    readonly changeNote: readonly (
-      | string
-      | {
-          "@language": string | undefined;
-          "@type": string | undefined;
-          "@value": string;
-        }
-    )[];
-    readonly definition: readonly (
-      | string
-      | {
-          "@language": string | undefined;
-          "@type": string | undefined;
-          "@value": string;
-        }
-    )[];
-    readonly editorialNote: readonly (
-      | string
-      | {
-          "@language": string | undefined;
-          "@type": string | undefined;
-          "@value": string;
-        }
-    )[];
-    readonly example: readonly (
-      | string
-      | {
-          "@language": string | undefined;
-          "@type": string | undefined;
-          "@value": string;
-        }
-    )[];
-    readonly hiddenLabel: readonly (
-      | string
-      | {
-          "@language": string | undefined;
-          "@type": string | undefined;
-          "@value": string;
-        }
-    )[];
+    readonly changeNote: readonly {
+      "@language": string | undefined;
+      "@type": string | undefined;
+      "@value": string;
+    }[];
+    readonly definition: readonly {
+      "@language": string | undefined;
+      "@type": string | undefined;
+      "@value": string;
+    }[];
+    readonly editorialNote: readonly {
+      "@language": string | undefined;
+      "@type": string | undefined;
+      "@value": string;
+    }[];
+    readonly example: readonly {
+      "@language": string | undefined;
+      "@type": string | undefined;
+      "@value": string;
+    }[];
+    readonly hiddenLabel: readonly {
+      "@language": string | undefined;
+      "@type": string | undefined;
+      "@value": string;
+    }[];
     readonly hiddenLabelXl: readonly ReturnType<LabelStub["toJson"]>[];
-    readonly historyNote: readonly (
-      | string
-      | {
-          "@language": string | undefined;
-          "@type": string | undefined;
-          "@value": string;
-        }
-    )[];
+    readonly historyNote: readonly {
+      "@language": string | undefined;
+      "@type": string | undefined;
+      "@value": string;
+    }[];
     readonly "@id": string;
     readonly modified: string | undefined;
-    readonly notation: readonly (
-      | string
-      | {
-          "@language": string | undefined;
-          "@type": string | undefined;
-          "@value": string;
-        }
-    )[];
-    readonly note: readonly (
-      | string
-      | {
-          "@language": string | undefined;
-          "@type": string | undefined;
-          "@value": string;
-        }
-    )[];
-    readonly prefLabel: readonly (
-      | string
-      | {
-          "@language": string | undefined;
-          "@type": string | undefined;
-          "@value": string;
-        }
-    )[];
+    readonly notation: readonly {
+      "@language": string | undefined;
+      "@type": string | undefined;
+      "@value": string;
+    }[];
+    readonly note: readonly {
+      "@language": string | undefined;
+      "@type": string | undefined;
+      "@value": string;
+    }[];
+    readonly prefLabel: readonly {
+      "@language": string | undefined;
+      "@type": string | undefined;
+      "@value": string;
+    }[];
     readonly prefLabelXl: readonly ReturnType<LabelStub["toJson"]>[];
-    readonly scopeNote: readonly (
-      | string
-      | {
-          "@language": string | undefined;
-          "@type": string | undefined;
-          "@value": string;
-        }
-    )[];
+    readonly scopeNote: readonly {
+      "@language": string | undefined;
+      "@type": string | undefined;
+      "@value": string;
+    }[];
     readonly type: string;
   } {
     return JSON.parse(
       JSON.stringify({
-        altLabel: this.altLabel.map((_item) =>
-          _item.datatype.value === "http://www.w3.org/2001/XMLSchema#string" &&
-          _item.language.length === 0
-            ? _item.value
-            : {
-                "@language":
-                  _item.language.length > 0 ? _item.language : undefined,
-                "@type":
-                  _item.datatype.value !==
-                  "http://www.w3.org/2001/XMLSchema#string"
-                    ? _item.datatype.value
-                    : undefined,
-                "@value": _item.value,
-              },
-        ),
+        altLabel: this.altLabel.map((_item) => ({
+          "@language": _item.language.length > 0 ? _item.language : undefined,
+          "@type":
+            _item.datatype.value !== "http://www.w3.org/2001/XMLSchema#string"
+              ? _item.datatype.value
+              : undefined,
+          "@value": _item.value,
+        })),
         altLabelXl: this.altLabelXl.map((_item) => _item.toJson()),
-        changeNote: this.changeNote.map((_item) =>
-          _item.datatype.value === "http://www.w3.org/2001/XMLSchema#string" &&
-          _item.language.length === 0
-            ? _item.value
-            : {
-                "@language":
-                  _item.language.length > 0 ? _item.language : undefined,
-                "@type":
-                  _item.datatype.value !==
-                  "http://www.w3.org/2001/XMLSchema#string"
-                    ? _item.datatype.value
-                    : undefined,
-                "@value": _item.value,
-              },
-        ),
-        definition: this.definition.map((_item) =>
-          _item.datatype.value === "http://www.w3.org/2001/XMLSchema#string" &&
-          _item.language.length === 0
-            ? _item.value
-            : {
-                "@language":
-                  _item.language.length > 0 ? _item.language : undefined,
-                "@type":
-                  _item.datatype.value !==
-                  "http://www.w3.org/2001/XMLSchema#string"
-                    ? _item.datatype.value
-                    : undefined,
-                "@value": _item.value,
-              },
-        ),
-        editorialNote: this.editorialNote.map((_item) =>
-          _item.datatype.value === "http://www.w3.org/2001/XMLSchema#string" &&
-          _item.language.length === 0
-            ? _item.value
-            : {
-                "@language":
-                  _item.language.length > 0 ? _item.language : undefined,
-                "@type":
-                  _item.datatype.value !==
-                  "http://www.w3.org/2001/XMLSchema#string"
-                    ? _item.datatype.value
-                    : undefined,
-                "@value": _item.value,
-              },
-        ),
-        example: this.example.map((_item) =>
-          _item.datatype.value === "http://www.w3.org/2001/XMLSchema#string" &&
-          _item.language.length === 0
-            ? _item.value
-            : {
-                "@language":
-                  _item.language.length > 0 ? _item.language : undefined,
-                "@type":
-                  _item.datatype.value !==
-                  "http://www.w3.org/2001/XMLSchema#string"
-                    ? _item.datatype.value
-                    : undefined,
-                "@value": _item.value,
-              },
-        ),
-        hiddenLabel: this.hiddenLabel.map((_item) =>
-          _item.datatype.value === "http://www.w3.org/2001/XMLSchema#string" &&
-          _item.language.length === 0
-            ? _item.value
-            : {
-                "@language":
-                  _item.language.length > 0 ? _item.language : undefined,
-                "@type":
-                  _item.datatype.value !==
-                  "http://www.w3.org/2001/XMLSchema#string"
-                    ? _item.datatype.value
-                    : undefined,
-                "@value": _item.value,
-              },
-        ),
+        changeNote: this.changeNote.map((_item) => ({
+          "@language": _item.language.length > 0 ? _item.language : undefined,
+          "@type":
+            _item.datatype.value !== "http://www.w3.org/2001/XMLSchema#string"
+              ? _item.datatype.value
+              : undefined,
+          "@value": _item.value,
+        })),
+        definition: this.definition.map((_item) => ({
+          "@language": _item.language.length > 0 ? _item.language : undefined,
+          "@type":
+            _item.datatype.value !== "http://www.w3.org/2001/XMLSchema#string"
+              ? _item.datatype.value
+              : undefined,
+          "@value": _item.value,
+        })),
+        editorialNote: this.editorialNote.map((_item) => ({
+          "@language": _item.language.length > 0 ? _item.language : undefined,
+          "@type":
+            _item.datatype.value !== "http://www.w3.org/2001/XMLSchema#string"
+              ? _item.datatype.value
+              : undefined,
+          "@value": _item.value,
+        })),
+        example: this.example.map((_item) => ({
+          "@language": _item.language.length > 0 ? _item.language : undefined,
+          "@type":
+            _item.datatype.value !== "http://www.w3.org/2001/XMLSchema#string"
+              ? _item.datatype.value
+              : undefined,
+          "@value": _item.value,
+        })),
+        hiddenLabel: this.hiddenLabel.map((_item) => ({
+          "@language": _item.language.length > 0 ? _item.language : undefined,
+          "@type":
+            _item.datatype.value !== "http://www.w3.org/2001/XMLSchema#string"
+              ? _item.datatype.value
+              : undefined,
+          "@value": _item.value,
+        })),
         hiddenLabelXl: this.hiddenLabelXl.map((_item) => _item.toJson()),
-        historyNote: this.historyNote.map((_item) =>
-          _item.datatype.value === "http://www.w3.org/2001/XMLSchema#string" &&
-          _item.language.length === 0
-            ? _item.value
-            : {
-                "@language":
-                  _item.language.length > 0 ? _item.language : undefined,
-                "@type":
-                  _item.datatype.value !==
-                  "http://www.w3.org/2001/XMLSchema#string"
-                    ? _item.datatype.value
-                    : undefined,
-                "@value": _item.value,
-              },
-        ),
+        historyNote: this.historyNote.map((_item) => ({
+          "@language": _item.language.length > 0 ? _item.language : undefined,
+          "@type":
+            _item.datatype.value !== "http://www.w3.org/2001/XMLSchema#string"
+              ? _item.datatype.value
+              : undefined,
+          "@value": _item.value,
+        })),
         "@id": this.identifier.value,
         modified: this.modified.map((_item) => _item.toISOString()).extract(),
-        notation: this.notation.map((_item) =>
-          _item.datatype.value === "http://www.w3.org/2001/XMLSchema#string" &&
-          _item.language.length === 0
-            ? _item.value
-            : {
-                "@language":
-                  _item.language.length > 0 ? _item.language : undefined,
-                "@type":
-                  _item.datatype.value !==
-                  "http://www.w3.org/2001/XMLSchema#string"
-                    ? _item.datatype.value
-                    : undefined,
-                "@value": _item.value,
-              },
-        ),
-        note: this.note.map((_item) =>
-          _item.datatype.value === "http://www.w3.org/2001/XMLSchema#string" &&
-          _item.language.length === 0
-            ? _item.value
-            : {
-                "@language":
-                  _item.language.length > 0 ? _item.language : undefined,
-                "@type":
-                  _item.datatype.value !==
-                  "http://www.w3.org/2001/XMLSchema#string"
-                    ? _item.datatype.value
-                    : undefined,
-                "@value": _item.value,
-              },
-        ),
-        prefLabel: this.prefLabel.map((_item) =>
-          _item.datatype.value === "http://www.w3.org/2001/XMLSchema#string" &&
-          _item.language.length === 0
-            ? _item.value
-            : {
-                "@language":
-                  _item.language.length > 0 ? _item.language : undefined,
-                "@type":
-                  _item.datatype.value !==
-                  "http://www.w3.org/2001/XMLSchema#string"
-                    ? _item.datatype.value
-                    : undefined,
-                "@value": _item.value,
-              },
-        ),
+        notation: this.notation.map((_item) => ({
+          "@language": _item.language.length > 0 ? _item.language : undefined,
+          "@type":
+            _item.datatype.value !== "http://www.w3.org/2001/XMLSchema#string"
+              ? _item.datatype.value
+              : undefined,
+          "@value": _item.value,
+        })),
+        note: this.note.map((_item) => ({
+          "@language": _item.language.length > 0 ? _item.language : undefined,
+          "@type":
+            _item.datatype.value !== "http://www.w3.org/2001/XMLSchema#string"
+              ? _item.datatype.value
+              : undefined,
+          "@value": _item.value,
+        })),
+        prefLabel: this.prefLabel.map((_item) => ({
+          "@language": _item.language.length > 0 ? _item.language : undefined,
+          "@type":
+            _item.datatype.value !== "http://www.w3.org/2001/XMLSchema#string"
+              ? _item.datatype.value
+              : undefined,
+          "@value": _item.value,
+        })),
         prefLabelXl: this.prefLabelXl.map((_item) => _item.toJson()),
-        scopeNote: this.scopeNote.map((_item) =>
-          _item.datatype.value === "http://www.w3.org/2001/XMLSchema#string" &&
-          _item.language.length === 0
-            ? _item.value
-            : {
-                "@language":
-                  _item.language.length > 0 ? _item.language : undefined,
-                "@type":
-                  _item.datatype.value !==
-                  "http://www.w3.org/2001/XMLSchema#string"
-                    ? _item.datatype.value
-                    : undefined,
-                "@value": _item.value,
-              },
-        ),
+        scopeNote: this.scopeNote.map((_item) => ({
+          "@language": _item.language.length > 0 ? _item.language : undefined,
+          "@type":
+            _item.datatype.value !== "http://www.w3.org/2001/XMLSchema#string"
+              ? _item.datatype.value
+              : undefined,
+          "@value": _item.value,
+        })),
         type: this.type,
       } satisfies ReturnType<Resource["toJson"]>),
     );
@@ -771,45 +671,45 @@ export abstract class Resource {
     });
     _resource.add(
       dataFactory.namedNode("http://www.w3.org/2004/02/skos/core#altLabel"),
-      this.altLabel,
+      this.altLabel.map((_item) => _item),
     );
     _resource.add(
       dataFactory.namedNode("http://www.w3.org/2008/05/skos-xl#altLabel"),
-      this.altLabelXl.map((_value) =>
-        _value.toRdf({ mutateGraph: mutateGraph, resourceSet: resourceSet }),
+      this.altLabelXl.map((_item) =>
+        _item.toRdf({ mutateGraph: mutateGraph, resourceSet: resourceSet }),
       ),
     );
     _resource.add(
       dataFactory.namedNode("http://www.w3.org/2004/02/skos/core#changeNote"),
-      this.changeNote,
+      this.changeNote.map((_item) => _item),
     );
     _resource.add(
       dataFactory.namedNode("http://www.w3.org/2004/02/skos/core#definition"),
-      this.definition,
+      this.definition.map((_item) => _item),
     );
     _resource.add(
       dataFactory.namedNode(
         "http://www.w3.org/2004/02/skos/core#editorialNote",
       ),
-      this.editorialNote,
+      this.editorialNote.map((_item) => _item),
     );
     _resource.add(
       dataFactory.namedNode("http://www.w3.org/2004/02/skos/core#example"),
-      this.example,
+      this.example.map((_item) => _item),
     );
     _resource.add(
       dataFactory.namedNode("http://www.w3.org/2004/02/skos/core#hiddenLabel"),
-      this.hiddenLabel,
+      this.hiddenLabel.map((_item) => _item),
     );
     _resource.add(
       dataFactory.namedNode("http://www.w3.org/2008/05/skos-xl#hiddenLabel"),
-      this.hiddenLabelXl.map((_value) =>
-        _value.toRdf({ mutateGraph: mutateGraph, resourceSet: resourceSet }),
+      this.hiddenLabelXl.map((_item) =>
+        _item.toRdf({ mutateGraph: mutateGraph, resourceSet: resourceSet }),
       ),
     );
     _resource.add(
       dataFactory.namedNode("http://www.w3.org/2004/02/skos/core#historyNote"),
-      this.historyNote,
+      this.historyNote.map((_item) => _item),
     );
     _resource.add(
       dataFactory.namedNode("http://purl.org/dc/terms/modified"),
@@ -817,25 +717,25 @@ export abstract class Resource {
     );
     _resource.add(
       dataFactory.namedNode("http://www.w3.org/2004/02/skos/core#notation"),
-      this.notation,
+      this.notation.map((_item) => _item),
     );
     _resource.add(
       dataFactory.namedNode("http://www.w3.org/2004/02/skos/core#notation"),
-      this.note,
+      this.note.map((_item) => _item),
     );
     _resource.add(
       dataFactory.namedNode("http://www.w3.org/2004/02/skos/core#prefLabel"),
-      this.prefLabel,
+      this.prefLabel.map((_item) => _item),
     );
     _resource.add(
       dataFactory.namedNode("http://www.w3.org/2008/05/skos-xl#prefLabel"),
-      this.prefLabelXl.map((_value) =>
-        _value.toRdf({ mutateGraph: mutateGraph, resourceSet: resourceSet }),
+      this.prefLabelXl.map((_item) =>
+        _item.toRdf({ mutateGraph: mutateGraph, resourceSet: resourceSet }),
       ),
     );
     _resource.add(
       dataFactory.namedNode("http://www.w3.org/2004/02/skos/core#scopeNote"),
-      this.scopeNote,
+      this.scopeNote.map((_item) => _item),
     );
     return _resource;
   }
@@ -887,8 +787,8 @@ export namespace Resource {
           dataFactory.namedNode("http://www.w3.org/2004/02/skos/core#altLabel"),
           { unique: true },
         )
-        .flatMap((_value) =>
-          _value
+        .flatMap((_item) =>
+          _item
             .toValues()
             .filter((_value) => {
               const _languageInOrDefault = _languageIn ?? [];
@@ -923,8 +823,8 @@ export namespace Resource {
           dataFactory.namedNode("http://www.w3.org/2008/05/skos-xl#altLabel"),
           { unique: true },
         )
-        .flatMap((_value) =>
-          _value
+        .flatMap((_item) =>
+          _item
             .toValues()
             .head()
             .chain((value) => value.toResource())
@@ -956,8 +856,8 @@ export namespace Resource {
           ),
           { unique: true },
         )
-        .flatMap((_value) =>
-          _value
+        .flatMap((_item) =>
+          _item
             .toValues()
             .filter((_value) => {
               const _languageInOrDefault = _languageIn ?? [];
@@ -994,8 +894,8 @@ export namespace Resource {
           ),
           { unique: true },
         )
-        .flatMap((_value) =>
-          _value
+        .flatMap((_item) =>
+          _item
             .toValues()
             .filter((_value) => {
               const _languageInOrDefault = _languageIn ?? [];
@@ -1032,8 +932,8 @@ export namespace Resource {
           ),
           { unique: true },
         )
-        .flatMap((_value) =>
-          _value
+        .flatMap((_item) =>
+          _item
             .toValues()
             .filter((_value) => {
               const _languageInOrDefault = _languageIn ?? [];
@@ -1068,8 +968,8 @@ export namespace Resource {
           dataFactory.namedNode("http://www.w3.org/2004/02/skos/core#example"),
           { unique: true },
         )
-        .flatMap((_value) =>
-          _value
+        .flatMap((_item) =>
+          _item
             .toValues()
             .filter((_value) => {
               const _languageInOrDefault = _languageIn ?? [];
@@ -1106,8 +1006,8 @@ export namespace Resource {
           ),
           { unique: true },
         )
-        .flatMap((_value) =>
-          _value
+        .flatMap((_item) =>
+          _item
             .toValues()
             .filter((_value) => {
               const _languageInOrDefault = _languageIn ?? [];
@@ -1144,8 +1044,8 @@ export namespace Resource {
           ),
           { unique: true },
         )
-        .flatMap((_value) =>
-          _value
+        .flatMap((_item) =>
+          _item
             .toValues()
             .head()
             .chain((value) => value.toResource())
@@ -1177,8 +1077,8 @@ export namespace Resource {
           ),
           { unique: true },
         )
-        .flatMap((_value) =>
-          _value
+        .flatMap((_item) =>
+          _item
             .toValues()
             .filter((_value) => {
               const _languageInOrDefault = _languageIn ?? [];
@@ -1231,8 +1131,8 @@ export namespace Resource {
           dataFactory.namedNode("http://www.w3.org/2004/02/skos/core#notation"),
           { unique: true },
         )
-        .flatMap((_value) =>
-          _value
+        .flatMap((_item) =>
+          _item
             .toValues()
             .filter((_value) => {
               const _languageInOrDefault = _languageIn ?? [];
@@ -1267,8 +1167,8 @@ export namespace Resource {
           dataFactory.namedNode("http://www.w3.org/2004/02/skos/core#notation"),
           { unique: true },
         )
-        .flatMap((_value) =>
-          _value
+        .flatMap((_item) =>
+          _item
             .toValues()
             .filter((_value) => {
               const _languageInOrDefault = _languageIn ?? [];
@@ -1305,8 +1205,8 @@ export namespace Resource {
           ),
           { unique: true },
         )
-        .flatMap((_value) =>
-          _value
+        .flatMap((_item) =>
+          _item
             .toValues()
             .filter((_value) => {
               const _languageInOrDefault = _languageIn ?? [];
@@ -1341,8 +1241,8 @@ export namespace Resource {
           dataFactory.namedNode("http://www.w3.org/2008/05/skos-xl#prefLabel"),
           { unique: true },
         )
-        .flatMap((_value) =>
-          _value
+        .flatMap((_item) =>
+          _item
             .toValues()
             .head()
             .chain((value) => value.toResource())
@@ -1374,8 +1274,8 @@ export namespace Resource {
           ),
           { unique: true },
         )
-        .flatMap((_value) =>
-          _value
+        .flatMap((_item) =>
+          _item
             .toValues()
             .filter((_value) => {
               const _languageInOrDefault = _languageIn ?? [];
@@ -1615,13 +1515,13 @@ export namespace Resource {
   }
 }
 export class Label {
-  private _identifier: rdfjs.BlankNode | rdfjs.NamedNode | undefined;
-  readonly literalForm: readonly rdfjs.Literal[];
+  private _identifier: (rdfjs.BlankNode | rdfjs.NamedNode) | undefined;
+  readonly literalForm: purify.NonEmptyList<rdfjs.Literal>;
   readonly type = "Label";
 
   constructor(parameters: {
     readonly identifier?: rdfjs.BlankNode | rdfjs.NamedNode;
-    readonly literalForm: readonly rdfjs.Literal[];
+    readonly literalForm: purify.NonEmptyList<rdfjs.Literal>;
   }) {
     this._identifier = parameters.identifier;
     this.literalForm = parameters.literalForm;
@@ -1629,9 +1529,7 @@ export class Label {
 
   get identifier(): rdfjs.BlankNode | rdfjs.NamedNode {
     if (typeof this._identifier === "undefined") {
-      this._identifier = dataFactory.namedNode(
-        `urn:shaclmate:object:${this.type}:${this.hash(sha256.create())}`,
-      );
+      this._identifier = dataFactory.blankNode();
     }
     return this._identifier;
   }
@@ -1682,8 +1580,9 @@ export class Label {
       update: (message: string | number[] | ArrayBuffer | Uint8Array) => void;
     },
   >(_hasher: HasherT): HasherT {
-    for (const _element0 of this.literalForm) {
-      _hasher.update(_element0.value);
+    for (const _item0 of this.literalForm) {
+      _hasher.update(_item0.termType);
+      _hasher.update(_item0.value);
     }
 
     return _hasher;
@@ -1691,34 +1590,24 @@ export class Label {
 
   toJson(): {
     readonly "@id": string;
-    readonly literalForm: readonly (
-      | string
-      | {
-          "@language": string | undefined;
-          "@type": string | undefined;
-          "@value": string;
-        }
-    )[];
+    readonly literalForm: readonly {
+      "@language": string | undefined;
+      "@type": string | undefined;
+      "@value": string;
+    }[];
     readonly type: string;
   } {
     return JSON.parse(
       JSON.stringify({
         "@id": this.identifier.value,
-        literalForm: this.literalForm.map((_item) =>
-          _item.datatype.value === "http://www.w3.org/2001/XMLSchema#string" &&
-          _item.language.length === 0
-            ? _item.value
-            : {
-                "@language":
-                  _item.language.length > 0 ? _item.language : undefined,
-                "@type":
-                  _item.datatype.value !==
-                  "http://www.w3.org/2001/XMLSchema#string"
-                    ? _item.datatype.value
-                    : undefined,
-                "@value": _item.value,
-              },
-        ),
+        literalForm: this.literalForm.map((_item) => ({
+          "@language": _item.language.length > 0 ? _item.language : undefined,
+          "@type":
+            _item.datatype.value !== "http://www.w3.org/2001/XMLSchema#string"
+              ? _item.datatype.value
+              : undefined,
+          "@value": _item.value,
+        })),
         type: this.type,
       } satisfies ReturnType<Label["toJson"]>),
     );
@@ -1750,7 +1639,7 @@ export class Label {
 
     _resource.add(
       dataFactory.namedNode("http://www.w3.org/2008/05/skos-xl#literalForm"),
-      this.literalForm,
+      this.literalForm.map((_item) => _item),
     );
     return _resource;
   }
@@ -1793,8 +1682,8 @@ export namespace Label {
     const identifier = _resource.identifier;
     const _literalFormEither: purify.Either<
       rdfjsResource.Resource.ValueError,
-      readonly rdfjs.Literal[]
-    > = purify.Either.of([
+      purify.NonEmptyList<rdfjs.Literal>
+    > = purify.NonEmptyList.fromArray([
       ..._resource
         .values(
           dataFactory.namedNode(
@@ -1802,8 +1691,8 @@ export namespace Label {
           ),
           { unique: true },
         )
-        .flatMap((_value) =>
-          _value
+        .flatMap((_item) =>
+          _item
             .toValues()
             .filter((_value) => {
               const _languageInOrDefault = _languageIn ?? [];
@@ -1823,7 +1712,15 @@ export namespace Label {
             .toMaybe()
             .toList(),
         ),
-    ]);
+    ]).toEither(
+      new rdfjsResource.Resource.ValueError({
+        focusResource: _resource,
+        message: `${rdfjsResource.Resource.Identifier.toString(_resource.identifier)} is empty`,
+        predicate: dataFactory.namedNode(
+          "http://www.w3.org/2008/05/skos-xl#literalForm",
+        ),
+      }),
+    );
     if (_literalFormEither.isLeft()) {
       return _literalFormEither;
     }
@@ -1860,13 +1757,13 @@ export namespace Label {
   }
 }
 export class LabelStub {
-  private _identifier: rdfjs.BlankNode | rdfjs.NamedNode | undefined;
-  readonly literalForm: readonly rdfjs.Literal[];
+  private _identifier: (rdfjs.BlankNode | rdfjs.NamedNode) | undefined;
+  readonly literalForm: purify.NonEmptyList<rdfjs.Literal>;
   readonly type = "LabelStub";
 
   constructor(parameters: {
     readonly identifier?: rdfjs.BlankNode | rdfjs.NamedNode;
-    readonly literalForm: readonly rdfjs.Literal[];
+    readonly literalForm: purify.NonEmptyList<rdfjs.Literal>;
   }) {
     this._identifier = parameters.identifier;
     this.literalForm = parameters.literalForm;
@@ -1874,9 +1771,7 @@ export class LabelStub {
 
   get identifier(): rdfjs.BlankNode | rdfjs.NamedNode {
     if (typeof this._identifier === "undefined") {
-      this._identifier = dataFactory.namedNode(
-        `urn:shaclmate:object:${this.type}:${this.hash(sha256.create())}`,
-      );
+      this._identifier = dataFactory.blankNode();
     }
     return this._identifier;
   }
@@ -1927,8 +1822,9 @@ export class LabelStub {
       update: (message: string | number[] | ArrayBuffer | Uint8Array) => void;
     },
   >(_hasher: HasherT): HasherT {
-    for (const _element0 of this.literalForm) {
-      _hasher.update(_element0.value);
+    for (const _item0 of this.literalForm) {
+      _hasher.update(_item0.termType);
+      _hasher.update(_item0.value);
     }
 
     return _hasher;
@@ -1936,34 +1832,24 @@ export class LabelStub {
 
   toJson(): {
     readonly "@id": string;
-    readonly literalForm: readonly (
-      | string
-      | {
-          "@language": string | undefined;
-          "@type": string | undefined;
-          "@value": string;
-        }
-    )[];
+    readonly literalForm: readonly {
+      "@language": string | undefined;
+      "@type": string | undefined;
+      "@value": string;
+    }[];
     readonly type: string;
   } {
     return JSON.parse(
       JSON.stringify({
         "@id": this.identifier.value,
-        literalForm: this.literalForm.map((_item) =>
-          _item.datatype.value === "http://www.w3.org/2001/XMLSchema#string" &&
-          _item.language.length === 0
-            ? _item.value
-            : {
-                "@language":
-                  _item.language.length > 0 ? _item.language : undefined,
-                "@type":
-                  _item.datatype.value !==
-                  "http://www.w3.org/2001/XMLSchema#string"
-                    ? _item.datatype.value
-                    : undefined,
-                "@value": _item.value,
-              },
-        ),
+        literalForm: this.literalForm.map((_item) => ({
+          "@language": _item.language.length > 0 ? _item.language : undefined,
+          "@type":
+            _item.datatype.value !== "http://www.w3.org/2001/XMLSchema#string"
+              ? _item.datatype.value
+              : undefined,
+          "@value": _item.value,
+        })),
         type: this.type,
       } satisfies ReturnType<LabelStub["toJson"]>),
     );
@@ -1995,7 +1881,7 @@ export class LabelStub {
 
     _resource.add(
       dataFactory.namedNode("http://www.w3.org/2008/05/skos-xl#literalForm"),
-      this.literalForm,
+      this.literalForm.map((_item) => _item),
     );
     return _resource;
   }
@@ -2038,8 +1924,8 @@ export namespace LabelStub {
     const identifier = _resource.identifier;
     const _literalFormEither: purify.Either<
       rdfjsResource.Resource.ValueError,
-      readonly rdfjs.Literal[]
-    > = purify.Either.of([
+      purify.NonEmptyList<rdfjs.Literal>
+    > = purify.NonEmptyList.fromArray([
       ..._resource
         .values(
           dataFactory.namedNode(
@@ -2047,8 +1933,8 @@ export namespace LabelStub {
           ),
           { unique: true },
         )
-        .flatMap((_value) =>
-          _value
+        .flatMap((_item) =>
+          _item
             .toValues()
             .filter((_value) => {
               const _languageInOrDefault = _languageIn ?? [];
@@ -2068,7 +1954,15 @@ export namespace LabelStub {
             .toMaybe()
             .toList(),
         ),
-    ]);
+    ]).toEither(
+      new rdfjsResource.Resource.ValueError({
+        focusResource: _resource,
+        message: `${rdfjsResource.Resource.Identifier.toString(_resource.identifier)} is empty`,
+        predicate: dataFactory.namedNode(
+          "http://www.w3.org/2008/05/skos-xl#literalForm",
+        ),
+      }),
+    );
     if (_literalFormEither.isLeft()) {
       return _literalFormEither;
     }
@@ -2110,7 +2004,7 @@ export class Concept extends Resource {
   readonly broadMatch: readonly ConceptStub[];
   readonly closeMatch: readonly ConceptStub[];
   readonly exactMatch: readonly ConceptStub[];
-  private _identifier: rdfjs.NamedNode | undefined;
+  identifier: rdfjs.NamedNode;
   readonly inScheme: readonly ConceptSchemeStub[];
   readonly mappingRelation: readonly ConceptStub[];
   readonly narrower: readonly ConceptStub[];
@@ -2129,7 +2023,7 @@ export class Concept extends Resource {
       readonly broadMatch?: readonly ConceptStub[];
       readonly closeMatch?: readonly ConceptStub[];
       readonly exactMatch?: readonly ConceptStub[];
-      readonly identifier?: rdfjs.NamedNode;
+      readonly identifier: rdfjs.NamedNode;
       readonly inScheme?: readonly ConceptSchemeStub[];
       readonly mappingRelation?: readonly ConceptStub[];
       readonly narrower?: readonly ConceptStub[];
@@ -2142,127 +2036,118 @@ export class Concept extends Resource {
     } & ConstructorParameters<typeof Resource>[0],
   ) {
     super(parameters);
-    if (Array.isArray(parameters.broader)) {
-      this.broader = parameters.broader;
-    } else if (typeof parameters.broader === "undefined") {
+    if (typeof parameters.broader === "undefined") {
       this.broader = [];
+    } else if (Array.isArray(parameters.broader)) {
+      this.broader = parameters.broader;
     } else {
-      this.broader = parameters.broader; // never
+      this.broader = parameters.broader as never;
     }
 
-    if (Array.isArray(parameters.broaderTransitive)) {
-      this.broaderTransitive = parameters.broaderTransitive;
-    } else if (typeof parameters.broaderTransitive === "undefined") {
+    if (typeof parameters.broaderTransitive === "undefined") {
       this.broaderTransitive = [];
+    } else if (Array.isArray(parameters.broaderTransitive)) {
+      this.broaderTransitive = parameters.broaderTransitive;
     } else {
-      this.broaderTransitive = parameters.broaderTransitive; // never
+      this.broaderTransitive = parameters.broaderTransitive as never;
     }
 
-    if (Array.isArray(parameters.broadMatch)) {
-      this.broadMatch = parameters.broadMatch;
-    } else if (typeof parameters.broadMatch === "undefined") {
+    if (typeof parameters.broadMatch === "undefined") {
       this.broadMatch = [];
+    } else if (Array.isArray(parameters.broadMatch)) {
+      this.broadMatch = parameters.broadMatch;
     } else {
-      this.broadMatch = parameters.broadMatch; // never
+      this.broadMatch = parameters.broadMatch as never;
     }
 
-    if (Array.isArray(parameters.closeMatch)) {
-      this.closeMatch = parameters.closeMatch;
-    } else if (typeof parameters.closeMatch === "undefined") {
+    if (typeof parameters.closeMatch === "undefined") {
       this.closeMatch = [];
+    } else if (Array.isArray(parameters.closeMatch)) {
+      this.closeMatch = parameters.closeMatch;
     } else {
-      this.closeMatch = parameters.closeMatch; // never
+      this.closeMatch = parameters.closeMatch as never;
     }
 
-    if (Array.isArray(parameters.exactMatch)) {
-      this.exactMatch = parameters.exactMatch;
-    } else if (typeof parameters.exactMatch === "undefined") {
+    if (typeof parameters.exactMatch === "undefined") {
       this.exactMatch = [];
+    } else if (Array.isArray(parameters.exactMatch)) {
+      this.exactMatch = parameters.exactMatch;
     } else {
-      this.exactMatch = parameters.exactMatch; // never
+      this.exactMatch = parameters.exactMatch as never;
     }
 
-    this._identifier = parameters.identifier;
-    if (Array.isArray(parameters.inScheme)) {
-      this.inScheme = parameters.inScheme;
-    } else if (typeof parameters.inScheme === "undefined") {
+    this.identifier = parameters.identifier;
+    if (typeof parameters.inScheme === "undefined") {
       this.inScheme = [];
+    } else if (Array.isArray(parameters.inScheme)) {
+      this.inScheme = parameters.inScheme;
     } else {
-      this.inScheme = parameters.inScheme; // never
+      this.inScheme = parameters.inScheme as never;
     }
 
-    if (Array.isArray(parameters.mappingRelation)) {
-      this.mappingRelation = parameters.mappingRelation;
-    } else if (typeof parameters.mappingRelation === "undefined") {
+    if (typeof parameters.mappingRelation === "undefined") {
       this.mappingRelation = [];
+    } else if (Array.isArray(parameters.mappingRelation)) {
+      this.mappingRelation = parameters.mappingRelation;
     } else {
-      this.mappingRelation = parameters.mappingRelation; // never
+      this.mappingRelation = parameters.mappingRelation as never;
     }
 
-    if (Array.isArray(parameters.narrower)) {
-      this.narrower = parameters.narrower;
-    } else if (typeof parameters.narrower === "undefined") {
+    if (typeof parameters.narrower === "undefined") {
       this.narrower = [];
+    } else if (Array.isArray(parameters.narrower)) {
+      this.narrower = parameters.narrower;
     } else {
-      this.narrower = parameters.narrower; // never
+      this.narrower = parameters.narrower as never;
     }
 
-    if (Array.isArray(parameters.narrowerTransitive)) {
-      this.narrowerTransitive = parameters.narrowerTransitive;
-    } else if (typeof parameters.narrowerTransitive === "undefined") {
+    if (typeof parameters.narrowerTransitive === "undefined") {
       this.narrowerTransitive = [];
+    } else if (Array.isArray(parameters.narrowerTransitive)) {
+      this.narrowerTransitive = parameters.narrowerTransitive;
     } else {
-      this.narrowerTransitive = parameters.narrowerTransitive; // never
+      this.narrowerTransitive = parameters.narrowerTransitive as never;
     }
 
-    if (Array.isArray(parameters.narrowMatch)) {
-      this.narrowMatch = parameters.narrowMatch;
-    } else if (typeof parameters.narrowMatch === "undefined") {
+    if (typeof parameters.narrowMatch === "undefined") {
       this.narrowMatch = [];
+    } else if (Array.isArray(parameters.narrowMatch)) {
+      this.narrowMatch = parameters.narrowMatch;
     } else {
-      this.narrowMatch = parameters.narrowMatch; // never
+      this.narrowMatch = parameters.narrowMatch as never;
     }
 
-    if (Array.isArray(parameters.related)) {
-      this.related = parameters.related;
-    } else if (typeof parameters.related === "undefined") {
+    if (typeof parameters.related === "undefined") {
       this.related = [];
+    } else if (Array.isArray(parameters.related)) {
+      this.related = parameters.related;
     } else {
-      this.related = parameters.related; // never
+      this.related = parameters.related as never;
     }
 
-    if (Array.isArray(parameters.relatedMatch)) {
-      this.relatedMatch = parameters.relatedMatch;
-    } else if (typeof parameters.relatedMatch === "undefined") {
+    if (typeof parameters.relatedMatch === "undefined") {
       this.relatedMatch = [];
+    } else if (Array.isArray(parameters.relatedMatch)) {
+      this.relatedMatch = parameters.relatedMatch;
     } else {
-      this.relatedMatch = parameters.relatedMatch; // never
+      this.relatedMatch = parameters.relatedMatch as never;
     }
 
-    if (Array.isArray(parameters.semanticRelation)) {
-      this.semanticRelation = parameters.semanticRelation;
-    } else if (typeof parameters.semanticRelation === "undefined") {
+    if (typeof parameters.semanticRelation === "undefined") {
       this.semanticRelation = [];
+    } else if (Array.isArray(parameters.semanticRelation)) {
+      this.semanticRelation = parameters.semanticRelation;
     } else {
-      this.semanticRelation = parameters.semanticRelation; // never
+      this.semanticRelation = parameters.semanticRelation as never;
     }
 
-    if (Array.isArray(parameters.topConceptOf)) {
-      this.topConceptOf = parameters.topConceptOf;
-    } else if (typeof parameters.topConceptOf === "undefined") {
+    if (typeof parameters.topConceptOf === "undefined") {
       this.topConceptOf = [];
+    } else if (Array.isArray(parameters.topConceptOf)) {
+      this.topConceptOf = parameters.topConceptOf;
     } else {
-      this.topConceptOf = parameters.topConceptOf; // never
+      this.topConceptOf = parameters.topConceptOf as never;
     }
-  }
-
-  override get identifier(): rdfjs.NamedNode {
-    if (typeof this._identifier === "undefined") {
-      this._identifier = dataFactory.namedNode(
-        `urn:shaclmate:object:${this.type}:${this.hash(sha256.create())}`,
-      );
-    }
-    return this._identifier;
   }
 
   override equals(other: Concept): purifyHelpers.Equatable.EqualsResult {
@@ -2444,60 +2329,60 @@ export class Concept extends Resource {
     },
   >(_hasher: HasherT): HasherT {
     super.hash(_hasher);
-    for (const _element0 of this.broader) {
-      _element0.hash(_hasher);
+    for (const _item0 of this.broader) {
+      _item0.hash(_hasher);
     }
 
-    for (const _element0 of this.broaderTransitive) {
-      _element0.hash(_hasher);
+    for (const _item0 of this.broaderTransitive) {
+      _item0.hash(_hasher);
     }
 
-    for (const _element0 of this.broadMatch) {
-      _element0.hash(_hasher);
+    for (const _item0 of this.broadMatch) {
+      _item0.hash(_hasher);
     }
 
-    for (const _element0 of this.closeMatch) {
-      _element0.hash(_hasher);
+    for (const _item0 of this.closeMatch) {
+      _item0.hash(_hasher);
     }
 
-    for (const _element0 of this.exactMatch) {
-      _element0.hash(_hasher);
+    for (const _item0 of this.exactMatch) {
+      _item0.hash(_hasher);
     }
 
-    for (const _element0 of this.inScheme) {
-      _element0.hash(_hasher);
+    for (const _item0 of this.inScheme) {
+      _item0.hash(_hasher);
     }
 
-    for (const _element0 of this.mappingRelation) {
-      _element0.hash(_hasher);
+    for (const _item0 of this.mappingRelation) {
+      _item0.hash(_hasher);
     }
 
-    for (const _element0 of this.narrower) {
-      _element0.hash(_hasher);
+    for (const _item0 of this.narrower) {
+      _item0.hash(_hasher);
     }
 
-    for (const _element0 of this.narrowerTransitive) {
-      _element0.hash(_hasher);
+    for (const _item0 of this.narrowerTransitive) {
+      _item0.hash(_hasher);
     }
 
-    for (const _element0 of this.narrowMatch) {
-      _element0.hash(_hasher);
+    for (const _item0 of this.narrowMatch) {
+      _item0.hash(_hasher);
     }
 
-    for (const _element0 of this.related) {
-      _element0.hash(_hasher);
+    for (const _item0 of this.related) {
+      _item0.hash(_hasher);
     }
 
-    for (const _element0 of this.relatedMatch) {
-      _element0.hash(_hasher);
+    for (const _item0 of this.relatedMatch) {
+      _item0.hash(_hasher);
     }
 
-    for (const _element0 of this.semanticRelation) {
-      _element0.hash(_hasher);
+    for (const _item0 of this.semanticRelation) {
+      _item0.hash(_hasher);
     }
 
-    for (const _element0 of this.topConceptOf) {
-      _element0.hash(_hasher);
+    for (const _item0 of this.topConceptOf) {
+      _item0.hash(_hasher);
     }
 
     return _hasher;
@@ -2571,94 +2456,94 @@ export class Concept extends Resource {
 
     _resource.add(
       dataFactory.namedNode("http://www.w3.org/2004/02/skos/core#broader"),
-      this.broader.map((_value) =>
-        _value.toRdf({ mutateGraph: mutateGraph, resourceSet: resourceSet }),
+      this.broader.map((_item) =>
+        _item.toRdf({ mutateGraph: mutateGraph, resourceSet: resourceSet }),
       ),
     );
     _resource.add(
       dataFactory.namedNode(
         "http://www.w3.org/2004/02/skos/core#broaderTransitive",
       ),
-      this.broaderTransitive.map((_value) =>
-        _value.toRdf({ mutateGraph: mutateGraph, resourceSet: resourceSet }),
+      this.broaderTransitive.map((_item) =>
+        _item.toRdf({ mutateGraph: mutateGraph, resourceSet: resourceSet }),
       ),
     );
     _resource.add(
       dataFactory.namedNode("http://www.w3.org/2004/02/skos/core#broadMatch"),
-      this.broadMatch.map((_value) =>
-        _value.toRdf({ mutateGraph: mutateGraph, resourceSet: resourceSet }),
+      this.broadMatch.map((_item) =>
+        _item.toRdf({ mutateGraph: mutateGraph, resourceSet: resourceSet }),
       ),
     );
     _resource.add(
       dataFactory.namedNode("http://www.w3.org/2004/02/skos/core#closeMatch"),
-      this.closeMatch.map((_value) =>
-        _value.toRdf({ mutateGraph: mutateGraph, resourceSet: resourceSet }),
+      this.closeMatch.map((_item) =>
+        _item.toRdf({ mutateGraph: mutateGraph, resourceSet: resourceSet }),
       ),
     );
     _resource.add(
       dataFactory.namedNode("http://www.w3.org/2004/02/skos/core#exactMatch"),
-      this.exactMatch.map((_value) =>
-        _value.toRdf({ mutateGraph: mutateGraph, resourceSet: resourceSet }),
+      this.exactMatch.map((_item) =>
+        _item.toRdf({ mutateGraph: mutateGraph, resourceSet: resourceSet }),
       ),
     );
     _resource.add(
       dataFactory.namedNode("http://www.w3.org/2004/02/skos/core#inScheme"),
-      this.inScheme.map((_value) =>
-        _value.toRdf({ mutateGraph: mutateGraph, resourceSet: resourceSet }),
+      this.inScheme.map((_item) =>
+        _item.toRdf({ mutateGraph: mutateGraph, resourceSet: resourceSet }),
       ),
     );
     _resource.add(
       dataFactory.namedNode(
         "http://www.w3.org/2004/02/skos/core#mappingRelation",
       ),
-      this.mappingRelation.map((_value) =>
-        _value.toRdf({ mutateGraph: mutateGraph, resourceSet: resourceSet }),
+      this.mappingRelation.map((_item) =>
+        _item.toRdf({ mutateGraph: mutateGraph, resourceSet: resourceSet }),
       ),
     );
     _resource.add(
       dataFactory.namedNode("http://www.w3.org/2004/02/skos/core#narrower"),
-      this.narrower.map((_value) =>
-        _value.toRdf({ mutateGraph: mutateGraph, resourceSet: resourceSet }),
+      this.narrower.map((_item) =>
+        _item.toRdf({ mutateGraph: mutateGraph, resourceSet: resourceSet }),
       ),
     );
     _resource.add(
       dataFactory.namedNode(
         "http://www.w3.org/2004/02/skos/core#narrowerTransitive",
       ),
-      this.narrowerTransitive.map((_value) =>
-        _value.toRdf({ mutateGraph: mutateGraph, resourceSet: resourceSet }),
+      this.narrowerTransitive.map((_item) =>
+        _item.toRdf({ mutateGraph: mutateGraph, resourceSet: resourceSet }),
       ),
     );
     _resource.add(
       dataFactory.namedNode("http://www.w3.org/2004/02/skos/core#narrowMatch"),
-      this.narrowMatch.map((_value) =>
-        _value.toRdf({ mutateGraph: mutateGraph, resourceSet: resourceSet }),
+      this.narrowMatch.map((_item) =>
+        _item.toRdf({ mutateGraph: mutateGraph, resourceSet: resourceSet }),
       ),
     );
     _resource.add(
       dataFactory.namedNode("http://www.w3.org/2004/02/skos/core#related"),
-      this.related.map((_value) =>
-        _value.toRdf({ mutateGraph: mutateGraph, resourceSet: resourceSet }),
+      this.related.map((_item) =>
+        _item.toRdf({ mutateGraph: mutateGraph, resourceSet: resourceSet }),
       ),
     );
     _resource.add(
       dataFactory.namedNode("http://www.w3.org/2004/02/skos/core#relatedMatch"),
-      this.relatedMatch.map((_value) =>
-        _value.toRdf({ mutateGraph: mutateGraph, resourceSet: resourceSet }),
+      this.relatedMatch.map((_item) =>
+        _item.toRdf({ mutateGraph: mutateGraph, resourceSet: resourceSet }),
       ),
     );
     _resource.add(
       dataFactory.namedNode(
         "http://www.w3.org/2004/02/skos/core#semanticRelation",
       ),
-      this.semanticRelation.map((_value) =>
-        _value.toRdf({ mutateGraph: mutateGraph, resourceSet: resourceSet }),
+      this.semanticRelation.map((_item) =>
+        _item.toRdf({ mutateGraph: mutateGraph, resourceSet: resourceSet }),
       ),
     );
     _resource.add(
       dataFactory.namedNode("http://www.w3.org/2004/02/skos/core#topConceptOf"),
-      this.topConceptOf.map((_value) =>
-        _value.toRdf({ mutateGraph: mutateGraph, resourceSet: resourceSet }),
+      this.topConceptOf.map((_item) =>
+        _item.toRdf({ mutateGraph: mutateGraph, resourceSet: resourceSet }),
       ),
     );
     return _resource;
@@ -2715,8 +2600,8 @@ export namespace Concept {
             ),
             { unique: true },
           )
-          .flatMap((_value) =>
-            _value
+          .flatMap((_item) =>
+            _item
               .toValues()
               .head()
               .chain((value) => value.toResource())
@@ -2747,8 +2632,8 @@ export namespace Concept {
             ),
             { unique: true },
           )
-          .flatMap((_value) =>
-            _value
+          .flatMap((_item) =>
+            _item
               .toValues()
               .head()
               .chain((value) => value.toResource())
@@ -2779,8 +2664,8 @@ export namespace Concept {
             ),
             { unique: true },
           )
-          .flatMap((_value) =>
-            _value
+          .flatMap((_item) =>
+            _item
               .toValues()
               .head()
               .chain((value) => value.toResource())
@@ -2811,8 +2696,8 @@ export namespace Concept {
             ),
             { unique: true },
           )
-          .flatMap((_value) =>
-            _value
+          .flatMap((_item) =>
+            _item
               .toValues()
               .head()
               .chain((value) => value.toResource())
@@ -2843,8 +2728,8 @@ export namespace Concept {
             ),
             { unique: true },
           )
-          .flatMap((_value) =>
-            _value
+          .flatMap((_item) =>
+            _item
               .toValues()
               .head()
               .chain((value) => value.toResource())
@@ -2876,8 +2761,8 @@ export namespace Concept {
             ),
             { unique: true },
           )
-          .flatMap((_value) =>
-            _value
+          .flatMap((_item) =>
+            _item
               .toValues()
               .head()
               .chain((value) => value.toResource())
@@ -2908,8 +2793,8 @@ export namespace Concept {
             ),
             { unique: true },
           )
-          .flatMap((_value) =>
-            _value
+          .flatMap((_item) =>
+            _item
               .toValues()
               .head()
               .chain((value) => value.toResource())
@@ -2940,8 +2825,8 @@ export namespace Concept {
             ),
             { unique: true },
           )
-          .flatMap((_value) =>
-            _value
+          .flatMap((_item) =>
+            _item
               .toValues()
               .head()
               .chain((value) => value.toResource())
@@ -2972,8 +2857,8 @@ export namespace Concept {
             ),
             { unique: true },
           )
-          .flatMap((_value) =>
-            _value
+          .flatMap((_item) =>
+            _item
               .toValues()
               .head()
               .chain((value) => value.toResource())
@@ -3004,8 +2889,8 @@ export namespace Concept {
             ),
             { unique: true },
           )
-          .flatMap((_value) =>
-            _value
+          .flatMap((_item) =>
+            _item
               .toValues()
               .head()
               .chain((value) => value.toResource())
@@ -3036,8 +2921,8 @@ export namespace Concept {
             ),
             { unique: true },
           )
-          .flatMap((_value) =>
-            _value
+          .flatMap((_item) =>
+            _item
               .toValues()
               .head()
               .chain((value) => value.toResource())
@@ -3068,8 +2953,8 @@ export namespace Concept {
             ),
             { unique: true },
           )
-          .flatMap((_value) =>
-            _value
+          .flatMap((_item) =>
+            _item
               .toValues()
               .head()
               .chain((value) => value.toResource())
@@ -3100,8 +2985,8 @@ export namespace Concept {
             ),
             { unique: true },
           )
-          .flatMap((_value) =>
-            _value
+          .flatMap((_item) =>
+            _item
               .toValues()
               .head()
               .chain((value) => value.toResource())
@@ -3132,8 +3017,8 @@ export namespace Concept {
             ),
             { unique: true },
           )
-          .flatMap((_value) =>
-            _value
+          .flatMap((_item) =>
+            _item
               .toValues()
               .head()
               .chain((value) => value.toResource())
@@ -3472,20 +3357,20 @@ export abstract class ResourceStub {
     readonly prefLabel?: readonly rdfjs.Literal[];
     readonly prefLabelXl?: readonly LabelStub[];
   }) {
-    if (Array.isArray(parameters.prefLabel)) {
-      this.prefLabel = parameters.prefLabel;
-    } else if (typeof parameters.prefLabel === "undefined") {
+    if (typeof parameters.prefLabel === "undefined") {
       this.prefLabel = [];
+    } else if (Array.isArray(parameters.prefLabel)) {
+      this.prefLabel = parameters.prefLabel;
     } else {
-      this.prefLabel = parameters.prefLabel; // never
+      this.prefLabel = parameters.prefLabel as never;
     }
 
-    if (Array.isArray(parameters.prefLabelXl)) {
-      this.prefLabelXl = parameters.prefLabelXl;
-    } else if (typeof parameters.prefLabelXl === "undefined") {
+    if (typeof parameters.prefLabelXl === "undefined") {
       this.prefLabelXl = [];
+    } else if (Array.isArray(parameters.prefLabelXl)) {
+      this.prefLabelXl = parameters.prefLabelXl;
     } else {
-      this.prefLabelXl = parameters.prefLabelXl; // never
+      this.prefLabelXl = parameters.prefLabelXl as never;
     }
   }
 
@@ -3547,12 +3432,13 @@ export abstract class ResourceStub {
       update: (message: string | number[] | ArrayBuffer | Uint8Array) => void;
     },
   >(_hasher: HasherT): HasherT {
-    for (const _element0 of this.prefLabel) {
-      _hasher.update(_element0.value);
+    for (const _item0 of this.prefLabel) {
+      _hasher.update(_item0.termType);
+      _hasher.update(_item0.value);
     }
 
-    for (const _element0 of this.prefLabelXl) {
-      _element0.hash(_hasher);
+    for (const _item0 of this.prefLabelXl) {
+      _item0.hash(_hasher);
     }
 
     return _hasher;
@@ -3560,35 +3446,25 @@ export abstract class ResourceStub {
 
   toJson(): {
     readonly "@id": string;
-    readonly prefLabel: readonly (
-      | string
-      | {
-          "@language": string | undefined;
-          "@type": string | undefined;
-          "@value": string;
-        }
-    )[];
+    readonly prefLabel: readonly {
+      "@language": string | undefined;
+      "@type": string | undefined;
+      "@value": string;
+    }[];
     readonly prefLabelXl: readonly ReturnType<LabelStub["toJson"]>[];
     readonly type: string;
   } {
     return JSON.parse(
       JSON.stringify({
         "@id": this.identifier.value,
-        prefLabel: this.prefLabel.map((_item) =>
-          _item.datatype.value === "http://www.w3.org/2001/XMLSchema#string" &&
-          _item.language.length === 0
-            ? _item.value
-            : {
-                "@language":
-                  _item.language.length > 0 ? _item.language : undefined,
-                "@type":
-                  _item.datatype.value !==
-                  "http://www.w3.org/2001/XMLSchema#string"
-                    ? _item.datatype.value
-                    : undefined,
-                "@value": _item.value,
-              },
-        ),
+        prefLabel: this.prefLabel.map((_item) => ({
+          "@language": _item.language.length > 0 ? _item.language : undefined,
+          "@type":
+            _item.datatype.value !== "http://www.w3.org/2001/XMLSchema#string"
+              ? _item.datatype.value
+              : undefined,
+          "@value": _item.value,
+        })),
         prefLabelXl: this.prefLabelXl.map((_item) => _item.toJson()),
         type: this.type,
       } satisfies ReturnType<ResourceStub["toJson"]>),
@@ -3609,12 +3485,12 @@ export abstract class ResourceStub {
     });
     _resource.add(
       dataFactory.namedNode("http://www.w3.org/2004/02/skos/core#prefLabel"),
-      this.prefLabel,
+      this.prefLabel.map((_item) => _item),
     );
     _resource.add(
       dataFactory.namedNode("http://www.w3.org/2008/05/skos-xl#prefLabel"),
-      this.prefLabelXl.map((_value) =>
-        _value.toRdf({ mutateGraph: mutateGraph, resourceSet: resourceSet }),
+      this.prefLabelXl.map((_item) =>
+        _item.toRdf({ mutateGraph: mutateGraph, resourceSet: resourceSet }),
       ),
     );
     return _resource;
@@ -3657,8 +3533,8 @@ export namespace ResourceStub {
           ),
           { unique: true },
         )
-        .flatMap((_value) =>
-          _value
+        .flatMap((_item) =>
+          _item
             .toValues()
             .filter((_value) => {
               const _languageInOrDefault = _languageIn ?? [];
@@ -3693,8 +3569,8 @@ export namespace ResourceStub {
           dataFactory.namedNode("http://www.w3.org/2008/05/skos-xl#prefLabel"),
           { unique: true },
         )
-        .flatMap((_value) =>
-          _value
+        .flatMap((_item) =>
+          _item
             .toValues()
             .head()
             .chain((value) => value.toResource())
@@ -3757,7 +3633,7 @@ export namespace ResourceStub {
   }
 }
 export class ConceptStub extends ResourceStub {
-  private _identifier: rdfjs.BlankNode | rdfjs.NamedNode | undefined;
+  private _identifier: (rdfjs.BlankNode | rdfjs.NamedNode) | undefined;
   override readonly type = "ConceptStub";
 
   constructor(
@@ -3771,9 +3647,7 @@ export class ConceptStub extends ResourceStub {
 
   override get identifier(): rdfjs.BlankNode | rdfjs.NamedNode {
     if (typeof this._identifier === "undefined") {
-      this._identifier = dataFactory.namedNode(
-        `urn:shaclmate:object:${this.type}:${this.hash(sha256.create())}`,
-      );
+      this._identifier = dataFactory.blankNode();
     }
     return this._identifier;
   }
@@ -3878,7 +3752,7 @@ export namespace ConceptStub {
 }
 export class ConceptScheme extends Resource {
   readonly hasTopConcept: readonly ConceptStub[];
-  private _identifier: rdfjs.NamedNode | undefined;
+  identifier: rdfjs.NamedNode;
   readonly license: purify.Maybe<rdfjs.NamedNode | rdfjs.Literal>;
   readonly rights: purify.Maybe<rdfjs.Literal>;
   readonly rightsHolder: purify.Maybe<rdfjs.Literal>;
@@ -3887,36 +3761,36 @@ export class ConceptScheme extends Resource {
   constructor(
     parameters: {
       readonly hasTopConcept?: readonly ConceptStub[];
-      readonly identifier?: rdfjs.NamedNode;
+      readonly identifier: rdfjs.NamedNode;
       readonly license?:
         | (rdfjs.NamedNode | rdfjs.Literal)
         | purify.Maybe<rdfjs.NamedNode | rdfjs.Literal>;
       readonly rights?:
+        | rdfjs.Literal
         | Date
         | boolean
         | number
         | purify.Maybe<rdfjs.Literal>
-        | rdfjs.Literal
         | string;
       readonly rightsHolder?:
+        | rdfjs.Literal
         | Date
         | boolean
         | number
         | purify.Maybe<rdfjs.Literal>
-        | rdfjs.Literal
         | string;
     } & ConstructorParameters<typeof Resource>[0],
   ) {
     super(parameters);
-    if (Array.isArray(parameters.hasTopConcept)) {
-      this.hasTopConcept = parameters.hasTopConcept;
-    } else if (typeof parameters.hasTopConcept === "undefined") {
+    if (typeof parameters.hasTopConcept === "undefined") {
       this.hasTopConcept = [];
+    } else if (Array.isArray(parameters.hasTopConcept)) {
+      this.hasTopConcept = parameters.hasTopConcept;
     } else {
-      this.hasTopConcept = parameters.hasTopConcept; // never
+      this.hasTopConcept = parameters.hasTopConcept as never;
     }
 
-    this._identifier = parameters.identifier;
+    this.identifier = parameters.identifier;
     if (purify.Maybe.isMaybe(parameters.license)) {
       this.license = parameters.license;
     } else if (typeof parameters.license === "object") {
@@ -3924,7 +3798,7 @@ export class ConceptScheme extends Resource {
     } else if (typeof parameters.license === "undefined") {
       this.license = purify.Maybe.empty();
     } else {
-      this.license = parameters.license; // never
+      this.license = parameters.license as never;
     }
 
     if (purify.Maybe.isMaybe(parameters.rights)) {
@@ -3945,7 +3819,7 @@ export class ConceptScheme extends Resource {
     } else if (typeof parameters.rights === "undefined") {
       this.rights = purify.Maybe.empty();
     } else {
-      this.rights = parameters.rights; // never
+      this.rights = parameters.rights as never;
     }
 
     if (purify.Maybe.isMaybe(parameters.rightsHolder)) {
@@ -3974,17 +3848,8 @@ export class ConceptScheme extends Resource {
     } else if (typeof parameters.rightsHolder === "undefined") {
       this.rightsHolder = purify.Maybe.empty();
     } else {
-      this.rightsHolder = parameters.rightsHolder; // never
+      this.rightsHolder = parameters.rightsHolder as never;
     }
-  }
-
-  override get identifier(): rdfjs.NamedNode {
-    if (typeof this._identifier === "undefined") {
-      this._identifier = dataFactory.namedNode(
-        `urn:shaclmate:object:${this.type}:${this.hash(sha256.create())}`,
-      );
-    }
-    return this._identifier;
   }
 
   override equals(other: ConceptScheme): purifyHelpers.Equatable.EqualsResult {
@@ -4079,26 +3944,30 @@ export class ConceptScheme extends Resource {
     },
   >(_hasher: HasherT): HasherT {
     super.hash(_hasher);
-    for (const _element0 of this.hasTopConcept) {
-      _element0.hash(_hasher);
+    for (const _item0 of this.hasTopConcept) {
+      _item0.hash(_hasher);
     }
 
     this.license.ifJust((_value0) => {
       switch (_value0.termType) {
         case "NamedNode": {
-          _hasher.update(rdfjsResource.Resource.Identifier.toString(_value0));
+          _hasher.update(_value0.termType);
+          _hasher.update(_value0.value);
           break;
         }
         case "Literal": {
+          _hasher.update(_value0.termType);
           _hasher.update(_value0.value);
           break;
         }
       }
     });
     this.rights.ifJust((_value0) => {
+      _hasher.update(_value0.termType);
       _hasher.update(_value0.value);
     });
     this.rightsHolder.ifJust((_value0) => {
+      _hasher.update(_value0.termType);
       _hasher.update(_value0.value);
     });
     return _hasher;
@@ -4109,7 +3978,6 @@ export class ConceptScheme extends Resource {
     readonly license:
       | (
           | { "@id": string }
-          | string
           | {
               "@language": string | undefined;
               "@type": string | undefined;
@@ -4118,24 +3986,18 @@ export class ConceptScheme extends Resource {
         )
       | undefined;
     readonly rights:
-      | (
-          | string
-          | {
-              "@language": string | undefined;
-              "@type": string | undefined;
-              "@value": string;
-            }
-        )
+      | {
+          "@language": string | undefined;
+          "@type": string | undefined;
+          "@value": string;
+        }
       | undefined;
     readonly rightsHolder:
-      | (
-          | string
-          | {
-              "@language": string | undefined;
-              "@type": string | undefined;
-              "@value": string;
-            }
-        )
+      | {
+          "@language": string | undefined;
+          "@type": string | undefined;
+          "@value": string;
+        }
       | undefined;
   } & ReturnType<Resource["toJson"]> {
     return JSON.parse(
@@ -4145,58 +4007,38 @@ export class ConceptScheme extends Resource {
         license: this.license
           .map((_item) =>
             _item.termType === "Literal"
-              ? _item.datatype.value ===
-                  "http://www.w3.org/2001/XMLSchema#string" &&
-                _item.language.length === 0
-                ? _item.value
-                : {
-                    "@language":
-                      _item.language.length > 0 ? _item.language : undefined,
-                    "@type":
-                      _item.datatype.value !==
-                      "http://www.w3.org/2001/XMLSchema#string"
-                        ? _item.datatype.value
-                        : undefined,
-                    "@value": _item.value,
-                  }
+              ? {
+                  "@language":
+                    _item.language.length > 0 ? _item.language : undefined,
+                  "@type":
+                    _item.datatype.value !==
+                    "http://www.w3.org/2001/XMLSchema#string"
+                      ? _item.datatype.value
+                      : undefined,
+                  "@value": _item.value,
+                }
               : { "@id": _item.value },
           )
           .extract(),
         rights: this.rights
-          .map((_item) =>
-            _item.datatype.value ===
-              "http://www.w3.org/2001/XMLSchema#string" &&
-            _item.language.length === 0
-              ? _item.value
-              : {
-                  "@language":
-                    _item.language.length > 0 ? _item.language : undefined,
-                  "@type":
-                    _item.datatype.value !==
-                    "http://www.w3.org/2001/XMLSchema#string"
-                      ? _item.datatype.value
-                      : undefined,
-                  "@value": _item.value,
-                },
-          )
+          .map((_item) => ({
+            "@language": _item.language.length > 0 ? _item.language : undefined,
+            "@type":
+              _item.datatype.value !== "http://www.w3.org/2001/XMLSchema#string"
+                ? _item.datatype.value
+                : undefined,
+            "@value": _item.value,
+          }))
           .extract(),
         rightsHolder: this.rightsHolder
-          .map((_item) =>
-            _item.datatype.value ===
-              "http://www.w3.org/2001/XMLSchema#string" &&
-            _item.language.length === 0
-              ? _item.value
-              : {
-                  "@language":
-                    _item.language.length > 0 ? _item.language : undefined,
-                  "@type":
-                    _item.datatype.value !==
-                    "http://www.w3.org/2001/XMLSchema#string"
-                      ? _item.datatype.value
-                      : undefined,
-                  "@value": _item.value,
-                },
-          )
+          .map((_item) => ({
+            "@language": _item.language.length > 0 ? _item.language : undefined,
+            "@type":
+              _item.datatype.value !== "http://www.w3.org/2001/XMLSchema#string"
+                ? _item.datatype.value
+                : undefined,
+            "@value": _item.value,
+          }))
           .extract(),
       } satisfies ReturnType<ConceptScheme["toJson"]>),
     );
@@ -4231,8 +4073,8 @@ export class ConceptScheme extends Resource {
       dataFactory.namedNode(
         "http://www.w3.org/2004/02/skos/core#hasTopConcept",
       ),
-      this.hasTopConcept.map((_value) =>
-        _value.toRdf({ mutateGraph: mutateGraph, resourceSet: resourceSet }),
+      this.hasTopConcept.map((_item) =>
+        _item.toRdf({ mutateGraph: mutateGraph, resourceSet: resourceSet }),
       ),
     );
     _resource.add(
@@ -4305,8 +4147,8 @@ export namespace ConceptScheme {
             ),
             { unique: true },
           )
-          .flatMap((_value) =>
-            _value
+          .flatMap((_item) =>
+            _item
               .toValues()
               .head()
               .chain((value) => value.toResource())
@@ -4533,7 +4375,7 @@ export namespace ConceptScheme {
   }
 }
 export class ConceptSchemeStub extends ResourceStub {
-  private _identifier: rdfjs.BlankNode | rdfjs.NamedNode | undefined;
+  private _identifier: (rdfjs.BlankNode | rdfjs.NamedNode) | undefined;
   override readonly type = "ConceptSchemeStub";
 
   constructor(
@@ -4547,9 +4389,7 @@ export class ConceptSchemeStub extends ResourceStub {
 
   override get identifier(): rdfjs.BlankNode | rdfjs.NamedNode {
     if (typeof this._identifier === "undefined") {
-      this._identifier = dataFactory.namedNode(
-        `urn:shaclmate:object:${this.type}:${this.hash(sha256.create())}`,
-      );
+      this._identifier = dataFactory.blankNode();
     }
     return this._identifier;
   }
