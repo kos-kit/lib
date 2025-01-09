@@ -19,13 +19,13 @@ kos-kit:ConceptSchemeStub
     shaclmate:fromRdfType skos:ConceptScheme ;
     shaclmate:name "ConceptSchemeStub" ;
     a owl:Class, sh:NodeShape ;
-    rdfs:subClassOf kos-kit:ResourceStub .
+    rdfs:subClassOf kos-kit:KosResourceStub .
 
 kos-kit:ConceptStub
     shaclmate:fromRdfType skos:Concept ;
     shaclmate:name "ConceptStub" ;
     a owl:Class, sh:NodeShape ;
-    rdfs:subClassOf kos-kit:ResourceStub .
+    rdfs:subClassOf kos-kit:KosResourceStub .
 
 kos-kit:LabelStub
     shaclmate:fromRdfType skos-xl:Label ;
@@ -39,9 +39,9 @@ kos-kit:LabelStub
         sh:xone dash:StringOrLangString
     ] .
 
-kos-kit:ResourceStub
+kos-kit:KosResourceStub
     shaclmate:abstract true ;
-    shaclmate:name "ResourceStub" ;
+    shaclmate:name "KosResourceStub" ;
     a owl:Class, sh:NodeShape ;
     sh:nodeKind sh:IRI ;
     sh:property [

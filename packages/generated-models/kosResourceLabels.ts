@@ -1,8 +1,13 @@
 import { Literal } from "@rdfjs/types";
-import { Label, LanguageTag, Resource, resourcePrefLabel } from "./index.js";
+import {
+  KosResource,
+  Label,
+  LanguageTag,
+  kosResourcePrefLabel,
+} from "./index.js";
 
-export function resourceLabels(
-  resource: Resource,
+export function kosResourceLabels(
+  kosResource: KosResource,
   options?: { languageIn?: readonly LanguageTag[] },
 ): {
   alternative: readonly { label: Label | null; literalForm: Literal }[];
@@ -36,13 +41,13 @@ export function resourceLabels(
 
   return {
     alternative: alternativeOrHiddenLabels(
-      resource.altLabel,
-      resource.altLabelXl,
+      kosResource.altLabel,
+      kosResource.altLabelXl,
     ),
     hidden: alternativeOrHiddenLabels(
-      resource.hiddenLabel,
-      resource.hiddenLabelXl,
+      kosResource.hiddenLabel,
+      kosResource.hiddenLabelXl,
     ),
-    preferred: resourcePrefLabel(resource, options).toList(),
+    preferred: kosResourcePrefLabel(kosResource, options).toList(),
   };
 }

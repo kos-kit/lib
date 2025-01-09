@@ -1,9 +1,9 @@
 import { Literal } from "@rdfjs/types";
 import { Maybe } from "purify-ts";
-import { LanguageTag, ResourceStub } from "./index.js";
+import { KosResourceStub, LanguageTag } from "./index.js";
 
-export function resourceStubPrefLabel(
-  resourceStub: ResourceStub,
+export function kosResourceStubPrefLabel(
+  resourceStub: KosResourceStub,
   options?: { languageIn?: readonly LanguageTag[] },
 ): Maybe<Literal> {
   const languageIn = new Set(options?.languageIn ?? []);

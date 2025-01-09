@@ -15,15 +15,40 @@
     shaclmate:tsObjectDeclarationType shaclmate:_TsObjectDeclarationType_Interface ;
     a owl:Ontology .
 
-kos-kit:Resource
+kos-kit:KosResource
     shaclmate:abstract true ;
-    shaclmate:name "Resource" ;
+    shaclmate:name "KosResource" ;
     a owl:Class, sh:NodeShape ;
     sh:nodeKind sh:IRI ;
     sh:property [
         sh:name "scopeNote" ;
         sh:path skos:scopeNote ;
         sh:xone dash:StringOrLangString
+    ], [
+        sh:name "definition" ;
+        sh:path skos:definition ;
+        sh:xone dash:StringOrLangString
+    ], [
+        sh:name "editorialNote" ;
+        sh:path skos:editorialNote ;
+        sh:xone dash:StringOrLangString
+    ], [
+        sh:name "example" ;
+        sh:path skos:example ;
+        sh:xone dash:StringOrLangString
+    ], [
+        sh:name "hiddenLabel" ;
+        sh:path skos:hiddenLabel ;
+        sh:xone dash:StringOrLangString
+    ], [
+        sh:datatype xsd:dateTime ;
+        sh:maxCount 1 ;
+        sh:name "modified" ;
+        sh:path dcterms:modified
+    ], [
+        sh:name "hiddenLabelXl" ;
+        sh:node skos-xl:Label ;
+        sh:path skos-xl:hiddenLabel
     ], [
         sh:name "historyNote" ;
         sh:path skos:historyNote ;
@@ -56,31 +81,6 @@ kos-kit:Resource
         sh:name "changeNote" ;
         sh:path skos:changeNote ;
         sh:xone dash:StringOrLangString
-    ], [
-        sh:name "definition" ;
-        sh:path skos:definition ;
-        sh:xone dash:StringOrLangString
-    ], [
-        sh:name "editorialNote" ;
-        sh:path skos:editorialNote ;
-        sh:xone dash:StringOrLangString
-    ], [
-        sh:name "example" ;
-        sh:path skos:example ;
-        sh:xone dash:StringOrLangString
-    ], [
-        sh:name "hiddenLabel" ;
-        sh:path skos:hiddenLabel ;
-        sh:xone dash:StringOrLangString
-    ], [
-        sh:datatype xsd:dateTime ;
-        sh:maxCount 1 ;
-        sh:name "modified" ;
-        sh:path dcterms:modified
-    ], [
-        sh:name "hiddenLabelXl" ;
-        sh:node skos-xl:Label ;
-        sh:path skos-xl:hiddenLabel
     ] .
 
 <http://www.w3.org/2004/02/skos/core#>
@@ -91,7 +91,7 @@ kos-kit:Resource
 skos:Concept
     shaclmate:name "Concept" ;
     a owl:Class, sh:NodeShape ;
-    rdfs:subClassOf kos-kit:Resource ;
+    rdfs:subClassOf kos-kit:KosResource ;
     sh:property [
         sh:name "broader" ;
         sh:node kos-kit:ConceptStub ;
@@ -153,7 +153,7 @@ skos:Concept
 skos:ConceptScheme
     shaclmate:name "ConceptScheme" ;
     a owl:Class, sh:NodeShape ;
-    rdfs:subClassOf kos-kit:Resource ;
+    rdfs:subClassOf kos-kit:KosResource ;
     sh:property [
         sh:name "hasTopConcept" ;
         sh:node kos-kit:ConceptStub ;

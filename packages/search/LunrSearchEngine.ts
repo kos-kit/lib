@@ -1,9 +1,9 @@
 import {
   Kos,
+  KosResource,
   LanguageTag,
-  Resource,
-  resourceLabels,
-  resourcePrefLabel,
+  kosResourceLabels,
+  kosResourcePrefLabel,
 } from "@kos-kit/generated-models";
 import lunr, { Index } from "lunr";
 import * as rdfjsResource from "rdfjs-resource";
@@ -40,10 +40,10 @@ export class LunrSearchEngine implements SearchEngine {
     }
 
     const toIndexDocument = (
-      model: Resource,
+      model: KosResource,
       type: SearchResult["type"],
     ): IndexDocument | null => {
-      const prefLabel = resourcePrefLabel(model, { languageIn })
+      const prefLabel = kosResourcePrefLabel(model, { languageIn })
         .map((_) => _.literalForm)
         .extract();
       if (!prefLabel) {
@@ -56,7 +56,7 @@ export class LunrSearchEngine implements SearchEngine {
 
       return {
         identifier: identifierString,
-        joinedLabels: Object.values(resourceLabels(model))
+        joinedLabels: Object.values(kosResourceLabels(model))
           .flatMap((labels) => labels.map((label) => label.literalForm.value))
           .join(" "),
         prefLabel: prefLabel.value,

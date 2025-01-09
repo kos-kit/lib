@@ -2,7 +2,7 @@ import {
   LanguageTag,
   ModelFactories,
   RdfjsDatasetKos,
-  resourcePrefLabel,
+  kosResourcePrefLabel,
 } from "@kos-kit/generated-models";
 import { Parser, Store } from "n3";
 import { Resource } from "rdfjs-resource";
@@ -54,7 +54,9 @@ export class ServerSearchEngine implements SearchEngine {
       query: { type: "All" },
     })) {
       kos.conceptSync(conceptStub.identifier).ifRight((concept) => {
-        const prefLabel = resourcePrefLabel(concept, { languageIn }).extract();
+        const prefLabel = kosResourcePrefLabel(concept, {
+          languageIn,
+        }).extract();
         if (!prefLabel) {
           return;
         }
@@ -74,7 +76,7 @@ export class ServerSearchEngine implements SearchEngine {
       kos
         .conceptSchemeSync(conceptSchemeStub.identifier)
         .ifRight((conceptScheme) => {
-          const prefLabel = resourcePrefLabel(conceptScheme, {
+          const prefLabel = kosResourcePrefLabel(conceptScheme, {
             languageIn,
           }).extract();
           if (!prefLabel) {

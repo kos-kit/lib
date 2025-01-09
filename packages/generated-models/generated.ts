@@ -128,19 +128,19 @@ export namespace LabelStub {
     }
   }
 }
-export interface ResourceStub {
+export interface KosResourceStub {
   readonly identifier: rdfjs.NamedNode;
   readonly prefLabel: readonly rdfjs.Literal[];
   readonly prefLabelXl: readonly LabelStub[];
   readonly type: "ConceptSchemeStub" | "ConceptStub";
 }
 
-export namespace ResourceStub {
+export namespace KosResourceStub {
   export function create(parameters: {
     readonly identifier: rdfjs.NamedNode;
     readonly prefLabel?: readonly rdfjs.Literal[];
     readonly prefLabelXl?: readonly LabelStub[];
-  }): Omit<ResourceStub, "type"> {
+  }): Omit<KosResourceStub, "type"> {
     const identifier = parameters.identifier;
     let prefLabel: readonly rdfjs.Literal[];
     if (typeof parameters.prefLabel === "undefined") {
@@ -293,7 +293,7 @@ export namespace ResourceStub {
     }
   }
 }
-export interface Resource {
+export interface KosResource {
   readonly altLabel: readonly rdfjs.Literal[];
   readonly altLabelXl: readonly Label[];
   readonly changeNote: readonly rdfjs.Literal[];
@@ -313,7 +313,7 @@ export interface Resource {
   readonly type: "Concept" | "ConceptScheme";
 }
 
-export namespace Resource {
+export namespace KosResource {
   export function create(parameters: {
     readonly altLabel?: readonly rdfjs.Literal[];
     readonly altLabelXl?: readonly Label[];
@@ -331,7 +331,7 @@ export namespace Resource {
     readonly prefLabel?: readonly rdfjs.Literal[];
     readonly prefLabelXl?: readonly Label[];
     readonly scopeNote?: readonly rdfjs.Literal[];
-  }): Omit<Resource, "type"> {
+  }): Omit<KosResource, "type"> {
     let altLabel: readonly rdfjs.Literal[];
     if (typeof parameters.altLabel === "undefined") {
       altLabel = [];
@@ -1255,7 +1255,7 @@ export namespace Resource {
     }
   }
 }
-export interface ConceptScheme extends Resource {
+export interface ConceptScheme extends KosResource {
   readonly hasTopConcept: readonly ConceptStub[];
   readonly identifier: rdfjs.NamedNode;
   readonly license: purify.Maybe<rdfjs.NamedNode | rdfjs.Literal>;
@@ -1286,7 +1286,7 @@ export namespace ConceptScheme {
         | number
         | purify.Maybe<rdfjs.Literal>
         | string;
-    } & Parameters<typeof Resource.create>[0],
+    } & Parameters<typeof KosResource.create>[0],
   ): ConceptScheme {
     let hasTopConcept: readonly ConceptStub[];
     if (typeof parameters.hasTopConcept === "undefined") {
@@ -1357,7 +1357,7 @@ export namespace ConceptScheme {
 
     const type = "ConceptScheme" as const;
     return {
-      ...Resource.create(parameters),
+      ...KosResource.create(parameters),
       hasTopConcept,
       identifier,
       license,
@@ -1379,7 +1379,7 @@ export namespace ConceptScheme {
     languageIn?: readonly string[];
     resource: rdfjsResource.Resource<rdfjs.NamedNode>;
   }): purify.Either<rdfjsResource.Resource.ValueError, ConceptScheme> {
-    return Resource.fromRdf({
+    return KosResource.fromRdf({
       ..._context,
       ignoreRdfType: true,
       languageIn: _languageIn,
@@ -1569,7 +1569,7 @@ export namespace ConceptScheme {
     });
   }
 
-  export class SparqlGraphPatterns extends Resource.SparqlGraphPatterns {
+  export class SparqlGraphPatterns extends KosResource.SparqlGraphPatterns {
     constructor(
       subject: sparqlBuilder.ResourceGraphPatterns.SubjectParameter,
       _options?: { ignoreRdfType?: boolean },
@@ -1641,7 +1641,7 @@ export namespace ConceptScheme {
     }
   }
 }
-export interface ConceptSchemeStub extends ResourceStub {
+export interface ConceptSchemeStub extends KosResourceStub {
   readonly identifier: rdfjs.NamedNode;
   readonly type: "ConceptSchemeStub";
 }
@@ -1649,12 +1649,12 @@ export interface ConceptSchemeStub extends ResourceStub {
 export namespace ConceptSchemeStub {
   export function create(
     parameters: { readonly identifier: rdfjs.NamedNode } & Parameters<
-      typeof ResourceStub.create
+      typeof KosResourceStub.create
     >[0],
   ): ConceptSchemeStub {
     const identifier = parameters.identifier;
     const type = "ConceptSchemeStub" as const;
-    return { ...ResourceStub.create(parameters), identifier, type };
+    return { ...KosResourceStub.create(parameters), identifier, type };
   }
 
   export function fromRdf({
@@ -1669,7 +1669,7 @@ export namespace ConceptSchemeStub {
     languageIn?: readonly string[];
     resource: rdfjsResource.Resource<rdfjs.NamedNode>;
   }): purify.Either<rdfjsResource.Resource.ValueError, ConceptSchemeStub> {
-    return ResourceStub.fromRdf({
+    return KosResourceStub.fromRdf({
       ..._context,
       ignoreRdfType: true,
       languageIn: _languageIn,
@@ -1704,7 +1704,7 @@ export namespace ConceptSchemeStub {
     });
   }
 
-  export class SparqlGraphPatterns extends ResourceStub.SparqlGraphPatterns {
+  export class SparqlGraphPatterns extends KosResourceStub.SparqlGraphPatterns {
     constructor(
       subject: sparqlBuilder.ResourceGraphPatterns.SubjectParameter,
       _options?: { ignoreRdfType?: boolean },
@@ -1723,7 +1723,7 @@ export namespace ConceptSchemeStub {
     }
   }
 }
-export interface ConceptStub extends ResourceStub {
+export interface ConceptStub extends KosResourceStub {
   readonly identifier: rdfjs.NamedNode;
   readonly type: "ConceptStub";
 }
@@ -1731,12 +1731,12 @@ export interface ConceptStub extends ResourceStub {
 export namespace ConceptStub {
   export function create(
     parameters: { readonly identifier: rdfjs.NamedNode } & Parameters<
-      typeof ResourceStub.create
+      typeof KosResourceStub.create
     >[0],
   ): ConceptStub {
     const identifier = parameters.identifier;
     const type = "ConceptStub" as const;
-    return { ...ResourceStub.create(parameters), identifier, type };
+    return { ...KosResourceStub.create(parameters), identifier, type };
   }
 
   export function fromRdf({
@@ -1751,7 +1751,7 @@ export namespace ConceptStub {
     languageIn?: readonly string[];
     resource: rdfjsResource.Resource<rdfjs.NamedNode>;
   }): purify.Either<rdfjsResource.Resource.ValueError, ConceptStub> {
-    return ResourceStub.fromRdf({
+    return KosResourceStub.fromRdf({
       ..._context,
       ignoreRdfType: true,
       languageIn: _languageIn,
@@ -1784,7 +1784,7 @@ export namespace ConceptStub {
     });
   }
 
-  export class SparqlGraphPatterns extends ResourceStub.SparqlGraphPatterns {
+  export class SparqlGraphPatterns extends KosResourceStub.SparqlGraphPatterns {
     constructor(
       subject: sparqlBuilder.ResourceGraphPatterns.SubjectParameter,
       _options?: { ignoreRdfType?: boolean },
@@ -1803,7 +1803,7 @@ export namespace ConceptStub {
     }
   }
 }
-export interface Concept extends Resource {
+export interface Concept extends KosResource {
   readonly broader: readonly ConceptStub[];
   readonly broaderTransitive: readonly ConceptStub[];
   readonly broadMatch: readonly ConceptStub[];
@@ -1840,7 +1840,7 @@ export namespace Concept {
       readonly relatedMatch?: readonly ConceptStub[];
       readonly semanticRelation?: readonly ConceptStub[];
       readonly topConceptOf?: readonly ConceptSchemeStub[];
-    } & Parameters<typeof Resource.create>[0],
+    } & Parameters<typeof KosResource.create>[0],
   ): Concept {
     let broader: readonly ConceptStub[];
     if (typeof parameters.broader === "undefined") {
@@ -1971,7 +1971,7 @@ export namespace Concept {
 
     const type = "Concept" as const;
     return {
-      ...Resource.create(parameters),
+      ...KosResource.create(parameters),
       broader,
       broaderTransitive,
       broadMatch,
@@ -2003,7 +2003,7 @@ export namespace Concept {
     languageIn?: readonly string[];
     resource: rdfjsResource.Resource<rdfjs.NamedNode>;
   }): purify.Either<rdfjsResource.Resource.ValueError, Concept> {
-    return Resource.fromRdf({
+    return KosResource.fromRdf({
       ..._context,
       ignoreRdfType: true,
       languageIn: _languageIn,
@@ -2511,7 +2511,7 @@ export namespace Concept {
     });
   }
 
-  export class SparqlGraphPatterns extends Resource.SparqlGraphPatterns {
+  export class SparqlGraphPatterns extends KosResource.SparqlGraphPatterns {
     constructor(
       subject: sparqlBuilder.ResourceGraphPatterns.SubjectParameter,
       _options?: { ignoreRdfType?: boolean },
