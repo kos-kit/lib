@@ -2,25 +2,24 @@ import * as sparqlBuilder from "@kos-kit/sparql-builder";
 import type * as rdfjs from "@rdfjs/types";
 import { DataFactory as dataFactory } from "n3";
 import * as purify from "purify-ts";
-import * as purifyHelpers from "purify-ts-helpers";
 import * as rdfLiteral from "rdf-literal";
 import * as rdfjsResource from "rdfjs-resource";
 export interface Resource {
   readonly altLabel: readonly rdfjs.Literal[];
-  readonly altLabelXl: readonly LabelStub[];
+  readonly altLabelXl: readonly Label[];
   readonly changeNote: readonly rdfjs.Literal[];
   readonly definition: readonly rdfjs.Literal[];
   readonly editorialNote: readonly rdfjs.Literal[];
   readonly example: readonly rdfjs.Literal[];
   readonly hiddenLabel: readonly rdfjs.Literal[];
-  readonly hiddenLabelXl: readonly LabelStub[];
+  readonly hiddenLabelXl: readonly Label[];
   readonly historyNote: readonly rdfjs.Literal[];
   readonly identifier: rdfjs.NamedNode;
   readonly modified: purify.Maybe<Date>;
   readonly notation: readonly rdfjs.Literal[];
   readonly note: readonly rdfjs.Literal[];
   readonly prefLabel: readonly rdfjs.Literal[];
-  readonly prefLabelXl: readonly LabelStub[];
+  readonly prefLabelXl: readonly Label[];
   readonly scopeNote: readonly rdfjs.Literal[];
   readonly type: "Concept" | "ConceptScheme";
 }
@@ -28,20 +27,20 @@ export interface Resource {
 export namespace Resource {
   export function create(parameters: {
     readonly altLabel?: readonly rdfjs.Literal[];
-    readonly altLabelXl?: readonly LabelStub[];
+    readonly altLabelXl?: readonly Label[];
     readonly changeNote?: readonly rdfjs.Literal[];
     readonly definition?: readonly rdfjs.Literal[];
     readonly editorialNote?: readonly rdfjs.Literal[];
     readonly example?: readonly rdfjs.Literal[];
     readonly hiddenLabel?: readonly rdfjs.Literal[];
-    readonly hiddenLabelXl?: readonly LabelStub[];
+    readonly hiddenLabelXl?: readonly Label[];
     readonly historyNote?: readonly rdfjs.Literal[];
     readonly identifier: rdfjs.NamedNode;
     readonly modified?: Date | purify.Maybe<Date>;
     readonly notation?: readonly rdfjs.Literal[];
     readonly note?: readonly rdfjs.Literal[];
     readonly prefLabel?: readonly rdfjs.Literal[];
-    readonly prefLabelXl?: readonly LabelStub[];
+    readonly prefLabelXl?: readonly Label[];
     readonly scopeNote?: readonly rdfjs.Literal[];
   }): Omit<Resource, "type"> {
     let altLabel: readonly rdfjs.Literal[];
@@ -53,7 +52,7 @@ export namespace Resource {
       altLabel = parameters.altLabel as never;
     }
 
-    let altLabelXl: readonly LabelStub[];
+    let altLabelXl: readonly Label[];
     if (typeof parameters.altLabelXl === "undefined") {
       altLabelXl = [];
     } else if (Array.isArray(parameters.altLabelXl)) {
@@ -107,7 +106,7 @@ export namespace Resource {
       hiddenLabel = parameters.hiddenLabel as never;
     }
 
-    let hiddenLabelXl: readonly LabelStub[];
+    let hiddenLabelXl: readonly Label[];
     if (typeof parameters.hiddenLabelXl === "undefined") {
       hiddenLabelXl = [];
     } else if (Array.isArray(parameters.hiddenLabelXl)) {
@@ -167,7 +166,7 @@ export namespace Resource {
       prefLabel = parameters.prefLabel as never;
     }
 
-    let prefLabelXl: readonly LabelStub[];
+    let prefLabelXl: readonly Label[];
     if (typeof parameters.prefLabelXl === "undefined") {
       prefLabelXl = [];
     } else if (Array.isArray(parameters.prefLabelXl)) {
@@ -220,20 +219,20 @@ export namespace Resource {
     rdfjsResource.Resource.ValueError,
     {
       altLabel: readonly rdfjs.Literal[];
-      altLabelXl: readonly LabelStub[];
+      altLabelXl: readonly Label[];
       changeNote: readonly rdfjs.Literal[];
       definition: readonly rdfjs.Literal[];
       editorialNote: readonly rdfjs.Literal[];
       example: readonly rdfjs.Literal[];
       hiddenLabel: readonly rdfjs.Literal[];
-      hiddenLabelXl: readonly LabelStub[];
+      hiddenLabelXl: readonly Label[];
       historyNote: readonly rdfjs.Literal[];
       identifier: rdfjs.NamedNode;
       modified: purify.Maybe<Date>;
       notation: readonly rdfjs.Literal[];
       note: readonly rdfjs.Literal[];
       prefLabel: readonly rdfjs.Literal[];
-      prefLabelXl: readonly LabelStub[];
+      prefLabelXl: readonly Label[];
       scopeNote: readonly rdfjs.Literal[];
     }
   > {
@@ -275,7 +274,7 @@ export namespace Resource {
     const altLabel = _altLabelEither.unsafeCoerce();
     const _altLabelXlEither: purify.Either<
       rdfjsResource.Resource.ValueError,
-      readonly LabelStub[]
+      readonly Label[]
     > = purify.Either.of([
       ..._resource
         .values(
@@ -288,7 +287,7 @@ export namespace Resource {
             .head()
             .chain((value) => value.toResource())
             .chain((_resource) =>
-              LabelStub.fromRdf({
+              Label.fromRdf({
                 ..._context,
                 ignoreRdfType: true,
                 languageIn: _languageIn,
@@ -494,7 +493,7 @@ export namespace Resource {
     const hiddenLabel = _hiddenLabelEither.unsafeCoerce();
     const _hiddenLabelXlEither: purify.Either<
       rdfjsResource.Resource.ValueError,
-      readonly LabelStub[]
+      readonly Label[]
     > = purify.Either.of([
       ..._resource
         .values(
@@ -509,7 +508,7 @@ export namespace Resource {
             .head()
             .chain((value) => value.toResource())
             .chain((_resource) =>
-              LabelStub.fromRdf({
+              Label.fromRdf({
                 ..._context,
                 ignoreRdfType: true,
                 languageIn: _languageIn,
@@ -693,7 +692,7 @@ export namespace Resource {
     const prefLabel = _prefLabelEither.unsafeCoerce();
     const _prefLabelXlEither: purify.Either<
       rdfjsResource.Resource.ValueError,
-      readonly LabelStub[]
+      readonly Label[]
     > = purify.Either.of([
       ..._resource
         .values(
@@ -706,7 +705,7 @@ export namespace Resource {
             .head()
             .chain((value) => value.toResource())
             .chain((_resource) =>
-              LabelStub.fromRdf({
+              Label.fromRdf({
                 ..._context,
                 ignoreRdfType: true,
                 languageIn: _languageIn,
@@ -808,9 +807,7 @@ export namespace Resource {
               this.variable("AltLabelXl"),
             ).chainObject(
               (_object) =>
-                new LabelStub.SparqlGraphPatterns(_object, {
-                  ignoreRdfType: true,
-                }),
+                new Label.SparqlGraphPatterns(_object, { ignoreRdfType: true }),
             ),
           ),
         ),
@@ -881,9 +878,7 @@ export namespace Resource {
               this.variable("HiddenLabelXl"),
             ).chainObject(
               (_object) =>
-                new LabelStub.SparqlGraphPatterns(_object, {
-                  ignoreRdfType: true,
-                }),
+                new Label.SparqlGraphPatterns(_object, { ignoreRdfType: true }),
             ),
           ),
         ),
@@ -952,9 +947,7 @@ export namespace Resource {
               this.variable("PrefLabelXl"),
             ).chainObject(
               (_object) =>
-                new LabelStub.SparqlGraphPatterns(_object, {
-                  ignoreRdfType: true,
-                }),
+                new Label.SparqlGraphPatterns(_object, { ignoreRdfType: true }),
             ),
           ),
         ),
@@ -973,142 +966,23 @@ export namespace Resource {
     }
   }
 }
-export class Label {
-  private _identifier: (rdfjs.BlankNode | rdfjs.NamedNode) | undefined;
+export interface Label {
+  readonly identifier: rdfjs.BlankNode | rdfjs.NamedNode;
   readonly literalForm: purify.NonEmptyList<rdfjs.Literal>;
-  readonly type = "Label";
-
-  constructor(parameters: {
-    readonly identifier?: rdfjs.BlankNode | rdfjs.NamedNode;
-    readonly literalForm: purify.NonEmptyList<rdfjs.Literal>;
-  }) {
-    this._identifier = parameters.identifier;
-    this.literalForm = parameters.literalForm;
-  }
-
-  get identifier(): rdfjs.BlankNode | rdfjs.NamedNode {
-    if (typeof this._identifier === "undefined") {
-      this._identifier = dataFactory.blankNode();
-    }
-    return this._identifier;
-  }
-
-  equals(other: Label): purifyHelpers.Equatable.EqualsResult {
-    return purifyHelpers.Equatable.booleanEquals(
-      this.identifier,
-      other.identifier,
-    )
-      .mapLeft((propertyValuesUnequal) => ({
-        left: this,
-        right: other,
-        propertyName: "identifier",
-        propertyValuesUnequal,
-        type: "Property" as const,
-      }))
-      .chain(() =>
-        ((left, right) =>
-          purifyHelpers.Arrays.equals(
-            left,
-            right,
-            purifyHelpers.Equatable.booleanEquals,
-          ))(this.literalForm, other.literalForm).mapLeft(
-          (propertyValuesUnequal) => ({
-            left: this,
-            right: other,
-            propertyName: "literalForm",
-            propertyValuesUnequal,
-            type: "Property" as const,
-          }),
-        ),
-      )
-      .chain(() =>
-        purifyHelpers.Equatable.strictEquals(this.type, other.type).mapLeft(
-          (propertyValuesUnequal) => ({
-            left: this,
-            right: other,
-            propertyName: "type",
-            propertyValuesUnequal,
-            type: "Property" as const,
-          }),
-        ),
-      );
-  }
-
-  hash<
-    HasherT extends {
-      update: (message: string | number[] | ArrayBuffer | Uint8Array) => void;
-    },
-  >(_hasher: HasherT): HasherT {
-    for (const _item0 of this.literalForm) {
-      _hasher.update(_item0.termType);
-      _hasher.update(_item0.value);
-    }
-
-    return _hasher;
-  }
-
-  toJson(): {
-    readonly "@id": string;
-    readonly literalForm: readonly {
-      "@language": string | undefined;
-      "@type": string | undefined;
-      "@value": string;
-    }[];
-    readonly type: string;
-  } {
-    return JSON.parse(
-      JSON.stringify({
-        "@id": this.identifier.value,
-        literalForm: this.literalForm.map((_item) => ({
-          "@language": _item.language.length > 0 ? _item.language : undefined,
-          "@type":
-            _item.datatype.value !== "http://www.w3.org/2001/XMLSchema#string"
-              ? _item.datatype.value
-              : undefined,
-          "@value": _item.value,
-        })),
-        type: this.type,
-      } satisfies ReturnType<Label["toJson"]>),
-    );
-  }
-
-  toRdf({
-    ignoreRdfType,
-    mutateGraph,
-    resourceSet,
-  }: {
-    ignoreRdfType?: boolean;
-    mutateGraph: rdfjsResource.MutableResource.MutateGraph;
-    resourceSet: rdfjsResource.MutableResourceSet;
-  }): rdfjsResource.MutableResource {
-    const _resource = resourceSet.mutableResource({
-      identifier: this.identifier,
-      mutateGraph,
-    });
-    if (!ignoreRdfType) {
-      _resource.add(
-        _resource.dataFactory.namedNode(
-          "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        ),
-        _resource.dataFactory.namedNode(
-          "http://www.w3.org/2008/05/skos-xl#Label",
-        ),
-      );
-    }
-
-    _resource.add(
-      dataFactory.namedNode("http://www.w3.org/2008/05/skos-xl#literalForm"),
-      this.literalForm.map((_item) => _item),
-    );
-    return _resource;
-  }
-
-  toString(): string {
-    return JSON.stringify(this.toJson());
-  }
+  readonly type: "Label";
 }
 
 export namespace Label {
+  export function create(parameters: {
+    readonly identifier: rdfjs.BlankNode | rdfjs.NamedNode;
+    readonly literalForm: purify.NonEmptyList<rdfjs.Literal>;
+  }): Label {
+    const identifier = parameters.identifier;
+    const literalForm = parameters.literalForm;
+    const type = "Label" as const;
+    return { identifier, literalForm, type };
+  }
+
   export function fromRdf({
     ignoreRdfType: _ignoreRdfType,
     languageIn: _languageIn,
@@ -1185,7 +1059,8 @@ export namespace Label {
     }
 
     const literalForm = _literalFormEither.unsafeCoerce();
-    return purify.Either.of(new Label({ identifier, literalForm }));
+    const type = "Label" as const;
+    return purify.Either.of({ identifier, literalForm, type });
   }
 
   export class SparqlGraphPatterns extends sparqlBuilder.ResourceGraphPatterns {
@@ -1576,7 +1451,7 @@ export namespace Concept {
             _item
               .toValues()
               .head()
-              .chain((value) => value.toResource())
+              .chain((value) => value.toNamedResource())
               .chain((_resource) =>
                 ConceptStub.fromRdf({
                   ..._context,
@@ -1608,7 +1483,7 @@ export namespace Concept {
             _item
               .toValues()
               .head()
-              .chain((value) => value.toResource())
+              .chain((value) => value.toNamedResource())
               .chain((_resource) =>
                 ConceptStub.fromRdf({
                   ..._context,
@@ -1640,7 +1515,7 @@ export namespace Concept {
             _item
               .toValues()
               .head()
-              .chain((value) => value.toResource())
+              .chain((value) => value.toNamedResource())
               .chain((_resource) =>
                 ConceptStub.fromRdf({
                   ..._context,
@@ -1672,7 +1547,7 @@ export namespace Concept {
             _item
               .toValues()
               .head()
-              .chain((value) => value.toResource())
+              .chain((value) => value.toNamedResource())
               .chain((_resource) =>
                 ConceptStub.fromRdf({
                   ..._context,
@@ -1704,7 +1579,7 @@ export namespace Concept {
             _item
               .toValues()
               .head()
-              .chain((value) => value.toResource())
+              .chain((value) => value.toNamedResource())
               .chain((_resource) =>
                 ConceptStub.fromRdf({
                   ..._context,
@@ -1737,7 +1612,7 @@ export namespace Concept {
             _item
               .toValues()
               .head()
-              .chain((value) => value.toResource())
+              .chain((value) => value.toNamedResource())
               .chain((_resource) =>
                 ConceptSchemeStub.fromRdf({
                   ..._context,
@@ -1769,7 +1644,7 @@ export namespace Concept {
             _item
               .toValues()
               .head()
-              .chain((value) => value.toResource())
+              .chain((value) => value.toNamedResource())
               .chain((_resource) =>
                 ConceptStub.fromRdf({
                   ..._context,
@@ -1801,7 +1676,7 @@ export namespace Concept {
             _item
               .toValues()
               .head()
-              .chain((value) => value.toResource())
+              .chain((value) => value.toNamedResource())
               .chain((_resource) =>
                 ConceptStub.fromRdf({
                   ..._context,
@@ -1833,7 +1708,7 @@ export namespace Concept {
             _item
               .toValues()
               .head()
-              .chain((value) => value.toResource())
+              .chain((value) => value.toNamedResource())
               .chain((_resource) =>
                 ConceptStub.fromRdf({
                   ..._context,
@@ -1865,7 +1740,7 @@ export namespace Concept {
             _item
               .toValues()
               .head()
-              .chain((value) => value.toResource())
+              .chain((value) => value.toNamedResource())
               .chain((_resource) =>
                 ConceptStub.fromRdf({
                   ..._context,
@@ -1897,7 +1772,7 @@ export namespace Concept {
             _item
               .toValues()
               .head()
-              .chain((value) => value.toResource())
+              .chain((value) => value.toNamedResource())
               .chain((_resource) =>
                 ConceptStub.fromRdf({
                   ..._context,
@@ -1929,7 +1804,7 @@ export namespace Concept {
             _item
               .toValues()
               .head()
-              .chain((value) => value.toResource())
+              .chain((value) => value.toNamedResource())
               .chain((_resource) =>
                 ConceptStub.fromRdf({
                   ..._context,
@@ -1961,7 +1836,7 @@ export namespace Concept {
             _item
               .toValues()
               .head()
-              .chain((value) => value.toResource())
+              .chain((value) => value.toNamedResource())
               .chain((_resource) =>
                 ConceptStub.fromRdf({
                   ..._context,
@@ -1993,7 +1868,7 @@ export namespace Concept {
             _item
               .toValues()
               .head()
-              .chain((value) => value.toResource())
+              .chain((value) => value.toNamedResource())
               .chain((_resource) =>
                 ConceptSchemeStub.fromRdf({
                   ..._context,
@@ -2320,7 +2195,7 @@ export namespace Concept {
   }
 }
 export interface ResourceStub {
-  readonly identifier: rdfjs.BlankNode | rdfjs.NamedNode;
+  readonly identifier: rdfjs.NamedNode;
   readonly prefLabel: readonly rdfjs.Literal[];
   readonly prefLabelXl: readonly LabelStub[];
   readonly type: "ConceptSchemeStub" | "ConceptStub";
@@ -2328,7 +2203,7 @@ export interface ResourceStub {
 
 export namespace ResourceStub {
   export function create(parameters: {
-    readonly identifier: rdfjs.BlankNode | rdfjs.NamedNode;
+    readonly identifier: rdfjs.NamedNode;
     readonly prefLabel?: readonly rdfjs.Literal[];
     readonly prefLabelXl?: readonly LabelStub[];
   }): Omit<ResourceStub, "type"> {
@@ -2364,11 +2239,11 @@ export namespace ResourceStub {
     [_index: string]: any;
     ignoreRdfType?: boolean;
     languageIn?: readonly string[];
-    resource: rdfjsResource.Resource;
+    resource: rdfjsResource.Resource<rdfjs.NamedNode>;
   }): purify.Either<
     rdfjsResource.Resource.ValueError,
     {
-      identifier: rdfjs.BlankNode | rdfjs.NamedNode;
+      identifier: rdfjs.NamedNode;
       prefLabel: readonly rdfjs.Literal[];
       prefLabelXl: readonly LabelStub[];
     }
@@ -2485,15 +2360,15 @@ export namespace ResourceStub {
   }
 }
 export interface ConceptStub extends ResourceStub {
-  readonly identifier: rdfjs.BlankNode | rdfjs.NamedNode;
+  readonly identifier: rdfjs.NamedNode;
   readonly type: "ConceptStub";
 }
 
 export namespace ConceptStub {
   export function create(
-    parameters: {
-      readonly identifier: rdfjs.BlankNode | rdfjs.NamedNode;
-    } & Parameters<typeof ResourceStub.create>[0],
+    parameters: { readonly identifier: rdfjs.NamedNode } & Parameters<
+      typeof ResourceStub.create
+    >[0],
   ): ConceptStub {
     const identifier = parameters.identifier;
     const type = "ConceptStub" as const;
@@ -2510,7 +2385,7 @@ export namespace ConceptStub {
     [_index: string]: any;
     ignoreRdfType?: boolean;
     languageIn?: readonly string[];
-    resource: rdfjsResource.Resource;
+    resource: rdfjsResource.Resource<rdfjs.NamedNode>;
   }): purify.Either<rdfjsResource.Resource.ValueError, ConceptStub> {
     return ResourceStub.fromRdf({
       ..._context,
@@ -2727,7 +2602,7 @@ export namespace ConceptScheme {
             _item
               .toValues()
               .head()
-              .chain((value) => value.toResource())
+              .chain((value) => value.toNamedResource())
               .chain((_resource) =>
                 ConceptStub.fromRdf({
                   ..._context,
@@ -2951,15 +2826,15 @@ export namespace ConceptScheme {
   }
 }
 export interface ConceptSchemeStub extends ResourceStub {
-  readonly identifier: rdfjs.BlankNode | rdfjs.NamedNode;
+  readonly identifier: rdfjs.NamedNode;
   readonly type: "ConceptSchemeStub";
 }
 
 export namespace ConceptSchemeStub {
   export function create(
-    parameters: {
-      readonly identifier: rdfjs.BlankNode | rdfjs.NamedNode;
-    } & Parameters<typeof ResourceStub.create>[0],
+    parameters: { readonly identifier: rdfjs.NamedNode } & Parameters<
+      typeof ResourceStub.create
+    >[0],
   ): ConceptSchemeStub {
     const identifier = parameters.identifier;
     const type = "ConceptSchemeStub" as const;
@@ -2976,7 +2851,7 @@ export namespace ConceptSchemeStub {
     [_index: string]: any;
     ignoreRdfType?: boolean;
     languageIn?: readonly string[];
-    resource: rdfjsResource.Resource;
+    resource: rdfjsResource.Resource<rdfjs.NamedNode>;
   }): purify.Either<rdfjsResource.Resource.ValueError, ConceptSchemeStub> {
     return ResourceStub.fromRdf({
       ..._context,

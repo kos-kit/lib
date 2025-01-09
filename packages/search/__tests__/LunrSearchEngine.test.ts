@@ -7,7 +7,7 @@ describe("LunrSearchEngine", () => {
   behavesLikeSearchEngine(() =>
     LunrSearchEngine.create({
       conceptsLimit: 10,
-      languageTag: "en",
+      languageIn: "en",
       kos: testKosFactory("en"),
     }),
   );

@@ -1,4 +1,10 @@
-import { Kos, Label, LanguageTag } from "@kos-kit/generated-models";
+import {
+  Kos,
+  LanguageTag,
+  Resource,
+  resourceLabels,
+  resourcePrefLabel,
+} from "@kos-kit/generated-models";
 import lunr, { Index } from "lunr";
 import * as rdfjsResource from "rdfjs-resource";
 import { LunrIndexCompactor } from "./LunrIndexCompactor.js";
@@ -14,16 +20,16 @@ export class LunrSearchEngine implements SearchEngine {
   private constructor(
     private readonly documents: Record<string, Record<string, string>>, // type -> identifier -> prefLabel
     private readonly index: Index,
-    private readonly languageTag: LanguageTag,
+    private readonly languageIn: readonly LanguageTag[],
   ) {}
 
   static async create({
     conceptsLimit,
-    languageTag,
+    languageIn,
     kos,
   }: {
     conceptsLimit?: number;
-    languageTag: LanguageTag;
+    languageIn: readonly LanguageTag[];
     kos: Kos;
   }): Promise<LunrSearchEngine> {
     interface IndexDocument {
@@ -37,8 +43,10 @@ export class LunrSearchEngine implements SearchEngine {
       model: Resource,
       type: SearchResult["type"],
     ): IndexDocument | null => {
-      const prefLabels = model.labels({ types: [Label.Type.PREFERRED] });
-      if (prefLabels.length === 0) {
+      const prefLabel = resourcePrefLabel(model, { languageIn })
+        .map((_) => _.literalForm)
+        .extract();
+      if (!prefLabel) {
         return null;
       }
 
@@ -48,11 +56,10 @@ export class LunrSearchEngine implements SearchEngine {
 
       return {
         identifier: identifierString,
-        joinedLabels: model
-          .labels()
-          .map((label) => label.literalForm.value)
+        joinedLabels: Object.values(resourceLabels(model))
+          .flatMap((labels) => labels.map((label) => label.literalForm.value))
           .join(" "),
-        prefLabel: prefLabels[0].literalForm.value,
+        prefLabel: prefLabel.value,
         type,
       };
     };
@@ -61,36 +68,37 @@ export class LunrSearchEngine implements SearchEngine {
 
     if (conceptsLimit != null) {
       // Don't index all concepts in the set, in testing
-      for (const concept of await kos.conceptsByQuery({
+      for (const conceptStub of await kos.conceptStubs({
         limit: conceptsLimit,
         offset: 0,
         query: { type: "All" },
       })) {
-        (await concept.resolve()).ifRight((concept) =>
+        (await kos.concept(conceptStub.identifier)).ifRight((concept) =>
           indexDocuments.push(toIndexDocument(concept, "Concept")),
         );
       }
     } else {
       // Index all concepts in the set
-      for (const concept of await kos.conceptsByQuery({
+      for (const conceptStub of await kos.conceptStubs({
         limit: null,
         offset: 0,
         query: { type: "All" },
       })) {
-        (await concept.resolve()).ifRight((concept) =>
+        (await kos.concept(conceptStub.identifier)).ifRight((concept) =>
           indexDocuments.push(toIndexDocument(concept, "Concept")),
         );
       }
     }
 
     // Index concept schemes
-    for (const conceptScheme of await kos.conceptSchemesByQuery({
+    for (const conceptSchemeStub of await kos.conceptSchemeStubs({
       limit: null,
       offset: 0,
       query: { type: "All" },
     })) {
-      (await conceptScheme.resolve()).ifRight((conceptScheme) =>
-        indexDocuments.push(toIndexDocument(conceptScheme, "ConceptScheme")),
+      (await kos.conceptScheme(conceptSchemeStub.identifier)).ifRight(
+        (conceptScheme) =>
+          indexDocuments.push(toIndexDocument(conceptScheme, "ConceptScheme")),
       );
     }
 
@@ -116,7 +124,7 @@ export class LunrSearchEngine implements SearchEngine {
       }
     });
 
-    return new LunrSearchEngine(compactIndexDocuments, index, languageTag);
+    return new LunrSearchEngine(compactIndexDocuments, index, languageIn);
   }
 
   static fromJson(json: SearchEngineJson) {
@@ -139,9 +147,9 @@ export class LunrSearchEngine implements SearchEngine {
     offset: number;
     query: string;
   }): Promise<SearchResults> {
-    if (languageTag !== this.languageTag) {
+    if (!this.languageIn.some((languageIn) => languageIn === languageTag)) {
       throw new RangeError(
-        `expected language tag '${this.languageTag}', actual '${this.languageTag}`,
+        `expected language tag '${this.languageIn}', actual '${this.languageIn}`,
       );
     }
 
@@ -175,7 +183,7 @@ export class LunrSearchEngine implements SearchEngine {
     return {
       documents: this.documents,
       index: lunrIndexCompactor.compactLunrIndex(this.index),
-      languageTag: this.languageTag,
+      languageTag: this.languageIn,
       type: "Lunr",
     };
   }

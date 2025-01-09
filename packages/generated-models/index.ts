@@ -9,5 +9,7 @@ export * from "./LanguageTag.js";
 export * from "./RdfjsDatasetKos.js";
 export * from "./ModelFactory.js";
 export * from "./ModelFactories.js";
+export * from "./resourceLabels.js";
+export * from "./resourcePrefLabel.js";
 export * from "./SemanticRelationProperty.js";
 export * from "./SparqlKos.js";
