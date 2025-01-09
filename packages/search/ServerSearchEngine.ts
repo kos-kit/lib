@@ -1,8 +1,8 @@
 import {
-  Label,
   LanguageTag,
   ModelFactories,
   RdfjsDatasetKos,
+  resourcePrefLabel,
 } from "@kos-kit/generated-models";
 import { Parser, Store } from "n3";
 import { Resource } from "rdfjs-resource";
@@ -39,9 +39,10 @@ export class ServerSearchEngine implements SearchEngine {
     const parser = new Parser({ format: "N-Triples" });
     const store = new Store();
     store.addQuads(parser.parse(await response.text()));
+    const languageIn = [params.languageTag, ""];
     const kos = new RdfjsDatasetKos({
       dataset: store,
-      languageIn: [params.languageTag, ""],
+      languageIn,
       modelFactories: ModelFactories.default_,
     });
 
@@ -52,14 +53,14 @@ export class ServerSearchEngine implements SearchEngine {
       offset: 0,
       query: { type: "All" },
     })) {
-      (await conceptStub.resolve()).ifRight((concept) => {
-        const prefLabels = concept.labels({ types: [Label.Type.PREFERRED] });
-        if (prefLabels.length === 0) {
+      kos.conceptSync(conceptStub.identifier).ifRight((concept) => {
+        const prefLabel = resourcePrefLabel(concept, { languageIn }).extract();
+        if (!prefLabel) {
           return;
         }
         page.push({
           identifier: Resource.Identifier.toString(concept.identifier),
-          prefLabel: prefLabels[0].literalForm.value,
+          prefLabel: prefLabel.literalForm.value,
           type: "Concept",
         });
       });
@@ -70,19 +71,21 @@ export class ServerSearchEngine implements SearchEngine {
       offset: 0,
       query: { type: "All" },
     }))
-      (await conceptSchemeStub.resolve()).ifRight((conceptScheme) => {
-        const prefLabels = conceptScheme.labels({
-          types: [Label.Type.PREFERRED],
+      kos
+        .conceptSchemeSync(conceptSchemeStub.identifier)
+        .ifRight((conceptScheme) => {
+          const prefLabel = resourcePrefLabel(conceptScheme, {
+            languageIn,
+          }).extract();
+          if (!prefLabel) {
+            return;
+          }
+          page.push({
+            identifier: Resource.Identifier.toString(conceptScheme.identifier),
+            prefLabel: prefLabel.literalForm.value,
+            type: "ConceptScheme",
+          });
         });
-        if (prefLabels.length === 0) {
-          return;
-        }
-        page.push({
-          identifier: Resource.Identifier.toString(conceptScheme.identifier),
-          prefLabel: prefLabels[0].literalForm.value,
-          type: "ConceptScheme",
-        });
-      });
 
     return { page, total };
   }
