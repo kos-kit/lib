@@ -11,5 +11,6 @@ export * from "./ModelFactory.js";
 export * from "./ModelFactories.js";
 export * from "./resourceLabels.js";
 export * from "./resourcePrefLabel.js";
+export * from "./resourceStubPrefLabel.js";
 export * from "./SemanticRelationProperty.js";
 export * from "./SparqlKos.js";

@@ -1,23 +1,23 @@
 import { Literal } from "@rdfjs/types";
 import { Maybe } from "purify-ts";
-import { Label, LanguageTag, Resource } from "./index.js";
+import { LanguageTag, ResourceStub } from "./index.js";
 
-export function resourcePrefLabel(
-  resource: Resource,
+export function resourceStubPrefLabel(
+  resourceStub: ResourceStub,
   options?: { languageIn?: readonly LanguageTag[] },
-): Maybe<{ label: Label | null; literalForm: Literal }> {
+): Maybe<Literal> {
   const languageIn = new Set(options?.languageIn ?? []);
 
-  for (const literalForm of resource.prefLabel) {
+  for (const literalForm of resourceStub.prefLabel) {
     if (languageIn.size === 0 || languageIn.has(literalForm.language)) {
-      return Maybe.of({ label: null, literalForm });
+      return Maybe.of(literalForm);
     }
   }
 
-  for (const prefLabelXl of resource.prefLabelXl) {
+  for (const prefLabelXl of resourceStub.prefLabelXl) {
     for (const literalForm of prefLabelXl.literalForm) {
       if (languageIn.size === 0 || languageIn.has(literalForm.language)) {
-        return Maybe.of({ label: prefLabelXl, literalForm });
+        return Maybe.of(literalForm);
       }
     }
   }
