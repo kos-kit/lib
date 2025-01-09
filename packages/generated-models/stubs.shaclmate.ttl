@@ -1,0 +1,55 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix kos-kit: <http://kos-kit.github.io/ns#> .
+@prefix dash: <http://datashapes.org/dash#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix shaclmate: <http://minorg.github.io/shaclmate/ns#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix skos-xl: <http://www.w3.org/2008/05/skos-xl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<http://kos-kit.github.io/ns#>
+    shaclmate:tsFeatureInclude shaclmate:_TsFeature_Create, shaclmate:_TsFeature_FromRdf, shaclmate:_TsFeature_SparqlGraphPatterns ;
+    shaclmate:tsObjectDeclarationType shaclmate:_TsObjectDeclarationType_Interface ;
+    a owl:Ontology .
+
+kos-kit:ConceptSchemeStub
+    shaclmate:fromRdfType skos:ConceptScheme ;
+    shaclmate:name "ConceptSchemeStub" ;
+    a owl:Class, sh:NodeShape ;
+    rdfs:subClassOf kos-kit:ResourceStub .
+
+kos-kit:ConceptStub
+    shaclmate:fromRdfType skos:Concept ;
+    shaclmate:name "ConceptStub" ;
+    a owl:Class, sh:NodeShape ;
+    rdfs:subClassOf kos-kit:ResourceStub .
+
+kos-kit:LabelStub
+    shaclmate:fromRdfType skos-xl:Label ;
+    shaclmate:name "LabelStub" ;
+    a owl:Class, sh:NodeShape ;
+    sh:nodeKind sh:BlankNodeOrIRI ;
+    sh:property [
+        sh:minCount 1 ;
+        sh:name "literalForm" ;
+        sh:path skos-xl:literalForm ;
+        sh:xone dash:StringOrLangString
+    ] .
+
+kos-kit:ResourceStub
+    shaclmate:abstract true ;
+    shaclmate:name "ResourceStub" ;
+    a owl:Class, sh:NodeShape ;
+    sh:nodeKind sh:IRI ;
+    sh:property [
+        sh:name "prefLabel" ;
+        sh:path skos:prefLabel ;
+        sh:xone dash:StringOrLangString
+    ], [
+        sh:name "prefLabelXl" ;
+        sh:node kos-kit:LabelStub ;
+        sh:path skos-xl:prefLabel
+    ] .

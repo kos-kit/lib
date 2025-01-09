@@ -4,6 +4,295 @@ import { DataFactory as dataFactory } from "n3";
 import * as purify from "purify-ts";
 import * as rdfLiteral from "rdf-literal";
 import * as rdfjsResource from "rdfjs-resource";
+export interface LabelStub {
+  readonly identifier: rdfjs.BlankNode | rdfjs.NamedNode;
+  readonly literalForm: purify.NonEmptyList<rdfjs.Literal>;
+  readonly type: "LabelStub";
+}
+
+export namespace LabelStub {
+  export function create(parameters: {
+    readonly identifier: rdfjs.BlankNode | rdfjs.NamedNode;
+    readonly literalForm: purify.NonEmptyList<rdfjs.Literal>;
+  }): LabelStub {
+    const identifier = parameters.identifier;
+    const literalForm = parameters.literalForm;
+    const type = "LabelStub" as const;
+    return { identifier, literalForm, type };
+  }
+
+  export function fromRdf({
+    ignoreRdfType: _ignoreRdfType,
+    languageIn: _languageIn,
+    resource: _resource,
+    // @ts-ignore
+    ..._context
+  }: {
+    [_index: string]: any;
+    ignoreRdfType?: boolean;
+    languageIn?: readonly string[];
+    resource: rdfjsResource.Resource;
+  }): purify.Either<rdfjsResource.Resource.ValueError, LabelStub> {
+    if (
+      !_ignoreRdfType &&
+      !_resource.isInstanceOf(
+        dataFactory.namedNode("http://www.w3.org/2008/05/skos-xl#Label"),
+      )
+    ) {
+      return purify.Left(
+        new rdfjsResource.Resource.ValueError({
+          focusResource: _resource,
+          message: `${rdfjsResource.Resource.Identifier.toString(_resource.identifier)} has unexpected RDF type`,
+          predicate: dataFactory.namedNode(
+            "http://www.w3.org/2008/05/skos-xl#Label",
+          ),
+        }),
+      );
+    }
+
+    const identifier = _resource.identifier;
+    const _literalFormEither: purify.Either<
+      rdfjsResource.Resource.ValueError,
+      purify.NonEmptyList<rdfjs.Literal>
+    > = purify.NonEmptyList.fromArray([
+      ..._resource
+        .values(
+          dataFactory.namedNode(
+            "http://www.w3.org/2008/05/skos-xl#literalForm",
+          ),
+          { unique: true },
+        )
+        .flatMap((_item) =>
+          _item
+            .toValues()
+            .filter((_value) => {
+              const _languageInOrDefault = _languageIn ?? [];
+              if (_languageInOrDefault.length === 0) {
+                return true;
+              }
+              const _valueLiteral = _value.toLiteral().toMaybe().extract();
+              if (typeof _valueLiteral === "undefined") {
+                return false;
+              }
+              return _languageInOrDefault.some(
+                (_languageIn) => _languageIn === _valueLiteral.language,
+              );
+            })
+            .head()
+            .chain((_value) => _value.toLiteral())
+            .toMaybe()
+            .toList(),
+        ),
+    ]).toEither(
+      new rdfjsResource.Resource.ValueError({
+        focusResource: _resource,
+        message: `${rdfjsResource.Resource.Identifier.toString(_resource.identifier)} is empty`,
+        predicate: dataFactory.namedNode(
+          "http://www.w3.org/2008/05/skos-xl#literalForm",
+        ),
+      }),
+    );
+    if (_literalFormEither.isLeft()) {
+      return _literalFormEither;
+    }
+
+    const literalForm = _literalFormEither.unsafeCoerce();
+    const type = "LabelStub" as const;
+    return purify.Either.of({ identifier, literalForm, type });
+  }
+
+  export class SparqlGraphPatterns extends sparqlBuilder.ResourceGraphPatterns {
+    constructor(
+      subject: sparqlBuilder.ResourceGraphPatterns.SubjectParameter,
+      _options?: { ignoreRdfType?: boolean },
+    ) {
+      super(subject);
+      if (!_options?.ignoreRdfType) {
+        this.add(
+          ...new sparqlBuilder.RdfTypeGraphPatterns(
+            this.subject,
+            dataFactory.namedNode("http://www.w3.org/2008/05/skos-xl#Label"),
+          ),
+        );
+      }
+
+      this.add(
+        sparqlBuilder.GraphPattern.basic(
+          this.subject,
+          dataFactory.namedNode(
+            "http://www.w3.org/2008/05/skos-xl#literalForm",
+          ),
+          this.variable("LiteralForm"),
+        ),
+      );
+    }
+  }
+}
+export interface ResourceStub {
+  readonly identifier: rdfjs.NamedNode;
+  readonly prefLabel: readonly rdfjs.Literal[];
+  readonly prefLabelXl: readonly LabelStub[];
+  readonly type: "ConceptSchemeStub" | "ConceptStub";
+}
+
+export namespace ResourceStub {
+  export function create(parameters: {
+    readonly identifier: rdfjs.NamedNode;
+    readonly prefLabel?: readonly rdfjs.Literal[];
+    readonly prefLabelXl?: readonly LabelStub[];
+  }): Omit<ResourceStub, "type"> {
+    const identifier = parameters.identifier;
+    let prefLabel: readonly rdfjs.Literal[];
+    if (typeof parameters.prefLabel === "undefined") {
+      prefLabel = [];
+    } else if (Array.isArray(parameters.prefLabel)) {
+      prefLabel = parameters.prefLabel;
+    } else {
+      prefLabel = parameters.prefLabel as never;
+    }
+
+    let prefLabelXl: readonly LabelStub[];
+    if (typeof parameters.prefLabelXl === "undefined") {
+      prefLabelXl = [];
+    } else if (Array.isArray(parameters.prefLabelXl)) {
+      prefLabelXl = parameters.prefLabelXl;
+    } else {
+      prefLabelXl = parameters.prefLabelXl as never;
+    }
+
+    return { identifier, prefLabel, prefLabelXl };
+  }
+
+  export function fromRdf({
+    ignoreRdfType: _ignoreRdfType,
+    languageIn: _languageIn,
+    resource: _resource,
+    // @ts-ignore
+    ..._context
+  }: {
+    [_index: string]: any;
+    ignoreRdfType?: boolean;
+    languageIn?: readonly string[];
+    resource: rdfjsResource.Resource<rdfjs.NamedNode>;
+  }): purify.Either<
+    rdfjsResource.Resource.ValueError,
+    {
+      identifier: rdfjs.NamedNode;
+      prefLabel: readonly rdfjs.Literal[];
+      prefLabelXl: readonly LabelStub[];
+    }
+  > {
+    const identifier = _resource.identifier;
+    const _prefLabelEither: purify.Either<
+      rdfjsResource.Resource.ValueError,
+      readonly rdfjs.Literal[]
+    > = purify.Either.of([
+      ..._resource
+        .values(
+          dataFactory.namedNode(
+            "http://www.w3.org/2004/02/skos/core#prefLabel",
+          ),
+          { unique: true },
+        )
+        .flatMap((_item) =>
+          _item
+            .toValues()
+            .filter((_value) => {
+              const _languageInOrDefault = _languageIn ?? [];
+              if (_languageInOrDefault.length === 0) {
+                return true;
+              }
+              const _valueLiteral = _value.toLiteral().toMaybe().extract();
+              if (typeof _valueLiteral === "undefined") {
+                return false;
+              }
+              return _languageInOrDefault.some(
+                (_languageIn) => _languageIn === _valueLiteral.language,
+              );
+            })
+            .head()
+            .chain((_value) => _value.toLiteral())
+            .toMaybe()
+            .toList(),
+        ),
+    ]);
+    if (_prefLabelEither.isLeft()) {
+      return _prefLabelEither;
+    }
+
+    const prefLabel = _prefLabelEither.unsafeCoerce();
+    const _prefLabelXlEither: purify.Either<
+      rdfjsResource.Resource.ValueError,
+      readonly LabelStub[]
+    > = purify.Either.of([
+      ..._resource
+        .values(
+          dataFactory.namedNode("http://www.w3.org/2008/05/skos-xl#prefLabel"),
+          { unique: true },
+        )
+        .flatMap((_item) =>
+          _item
+            .toValues()
+            .head()
+            .chain((value) => value.toResource())
+            .chain((_resource) =>
+              LabelStub.fromRdf({
+                ..._context,
+                ignoreRdfType: true,
+                languageIn: _languageIn,
+                resource: _resource,
+              }),
+            )
+            .toMaybe()
+            .toList(),
+        ),
+    ]);
+    if (_prefLabelXlEither.isLeft()) {
+      return _prefLabelXlEither;
+    }
+
+    const prefLabelXl = _prefLabelXlEither.unsafeCoerce();
+    return purify.Either.of({ identifier, prefLabel, prefLabelXl });
+  }
+
+  export class SparqlGraphPatterns extends sparqlBuilder.ResourceGraphPatterns {
+    constructor(
+      subject: sparqlBuilder.ResourceGraphPatterns.SubjectParameter,
+      _options?: { ignoreRdfType?: boolean },
+    ) {
+      super(subject);
+      this.add(
+        sparqlBuilder.GraphPattern.optional(
+          sparqlBuilder.GraphPattern.basic(
+            this.subject,
+            dataFactory.namedNode(
+              "http://www.w3.org/2004/02/skos/core#prefLabel",
+            ),
+            this.variable("PrefLabel"),
+          ),
+        ),
+      );
+      this.add(
+        sparqlBuilder.GraphPattern.optional(
+          sparqlBuilder.GraphPattern.group(
+            sparqlBuilder.GraphPattern.basic(
+              this.subject,
+              dataFactory.namedNode(
+                "http://www.w3.org/2008/05/skos-xl#prefLabel",
+              ),
+              this.variable("PrefLabelXl"),
+            ).chainObject(
+              (_object) =>
+                new LabelStub.SparqlGraphPatterns(_object, {
+                  ignoreRdfType: true,
+                }),
+            ),
+          ),
+        ),
+      );
+    }
+  }
+}
 export interface Resource {
   readonly altLabel: readonly rdfjs.Literal[];
   readonly altLabelXl: readonly Label[];
@@ -966,21 +1255,116 @@ export namespace Resource {
     }
   }
 }
-export interface Label {
-  readonly identifier: rdfjs.BlankNode | rdfjs.NamedNode;
-  readonly literalForm: purify.NonEmptyList<rdfjs.Literal>;
-  readonly type: "Label";
+export interface ConceptScheme extends Resource {
+  readonly hasTopConcept: readonly ConceptStub[];
+  readonly identifier: rdfjs.NamedNode;
+  readonly license: purify.Maybe<rdfjs.NamedNode | rdfjs.Literal>;
+  readonly rights: purify.Maybe<rdfjs.Literal>;
+  readonly rightsHolder: purify.Maybe<rdfjs.Literal>;
+  readonly type: "ConceptScheme";
 }
 
-export namespace Label {
-  export function create(parameters: {
-    readonly identifier: rdfjs.BlankNode | rdfjs.NamedNode;
-    readonly literalForm: purify.NonEmptyList<rdfjs.Literal>;
-  }): Label {
+export namespace ConceptScheme {
+  export function create(
+    parameters: {
+      readonly hasTopConcept?: readonly ConceptStub[];
+      readonly identifier: rdfjs.NamedNode;
+      readonly license?:
+        | (rdfjs.NamedNode | rdfjs.Literal)
+        | purify.Maybe<rdfjs.NamedNode | rdfjs.Literal>;
+      readonly rights?:
+        | rdfjs.Literal
+        | Date
+        | boolean
+        | number
+        | purify.Maybe<rdfjs.Literal>
+        | string;
+      readonly rightsHolder?:
+        | rdfjs.Literal
+        | Date
+        | boolean
+        | number
+        | purify.Maybe<rdfjs.Literal>
+        | string;
+    } & Parameters<typeof Resource.create>[0],
+  ): ConceptScheme {
+    let hasTopConcept: readonly ConceptStub[];
+    if (typeof parameters.hasTopConcept === "undefined") {
+      hasTopConcept = [];
+    } else if (Array.isArray(parameters.hasTopConcept)) {
+      hasTopConcept = parameters.hasTopConcept;
+    } else {
+      hasTopConcept = parameters.hasTopConcept as never;
+    }
+
     const identifier = parameters.identifier;
-    const literalForm = parameters.literalForm;
-    const type = "Label" as const;
-    return { identifier, literalForm, type };
+    let license: purify.Maybe<rdfjs.NamedNode | rdfjs.Literal>;
+    if (purify.Maybe.isMaybe(parameters.license)) {
+      license = parameters.license;
+    } else if (typeof parameters.license === "object") {
+      license = purify.Maybe.of(parameters.license);
+    } else if (typeof parameters.license === "undefined") {
+      license = purify.Maybe.empty();
+    } else {
+      license = parameters.license as never;
+    }
+
+    let rights: purify.Maybe<rdfjs.Literal>;
+    if (purify.Maybe.isMaybe(parameters.rights)) {
+      rights = parameters.rights;
+    } else if (typeof parameters.rights === "boolean") {
+      rights = purify.Maybe.of(rdfLiteral.toRdf(parameters.rights));
+    } else if (
+      typeof parameters.rights === "object" &&
+      parameters.rights instanceof Date
+    ) {
+      rights = purify.Maybe.of(rdfLiteral.toRdf(parameters.rights));
+    } else if (typeof parameters.rights === "number") {
+      rights = purify.Maybe.of(rdfLiteral.toRdf(parameters.rights));
+    } else if (typeof parameters.rights === "string") {
+      rights = purify.Maybe.of(dataFactory.literal(parameters.rights));
+    } else if (typeof parameters.rights === "object") {
+      rights = purify.Maybe.of(parameters.rights);
+    } else if (typeof parameters.rights === "undefined") {
+      rights = purify.Maybe.empty();
+    } else {
+      rights = parameters.rights as never;
+    }
+
+    let rightsHolder: purify.Maybe<rdfjs.Literal>;
+    if (purify.Maybe.isMaybe(parameters.rightsHolder)) {
+      rightsHolder = parameters.rightsHolder;
+    } else if (typeof parameters.rightsHolder === "boolean") {
+      rightsHolder = purify.Maybe.of(rdfLiteral.toRdf(parameters.rightsHolder));
+    } else if (
+      typeof parameters.rightsHolder === "object" &&
+      parameters.rightsHolder instanceof Date
+    ) {
+      rightsHolder = purify.Maybe.of(rdfLiteral.toRdf(parameters.rightsHolder));
+    } else if (typeof parameters.rightsHolder === "number") {
+      rightsHolder = purify.Maybe.of(rdfLiteral.toRdf(parameters.rightsHolder));
+    } else if (typeof parameters.rightsHolder === "string") {
+      rightsHolder = purify.Maybe.of(
+        dataFactory.literal(parameters.rightsHolder),
+      );
+    } else if (typeof parameters.rightsHolder === "object") {
+      rightsHolder = purify.Maybe.of(parameters.rightsHolder);
+    } else if (typeof parameters.rightsHolder === "undefined") {
+      rightsHolder = purify.Maybe.empty();
+    } else {
+      rightsHolder = parameters.rightsHolder as never;
+    }
+
+    const type = "ConceptScheme" as const;
+    return {
+      ...Resource.create(parameters),
+      hasTopConcept,
+      identifier,
+      license,
+      rights,
+      rightsHolder,
+      type,
+    };
   }
 
   export function fromRdf({
@@ -993,118 +1377,284 @@ export namespace Label {
     [_index: string]: any;
     ignoreRdfType?: boolean;
     languageIn?: readonly string[];
-    resource: rdfjsResource.Resource;
-  }): purify.Either<rdfjsResource.Resource.ValueError, Label> {
-    if (
-      !_ignoreRdfType &&
-      !_resource.isInstanceOf(
-        dataFactory.namedNode("http://www.w3.org/2008/05/skos-xl#Label"),
-      )
-    ) {
-      return purify.Left(
-        new rdfjsResource.Resource.ValueError({
-          focusResource: _resource,
-          message: `${rdfjsResource.Resource.Identifier.toString(_resource.identifier)} has unexpected RDF type`,
-          predicate: dataFactory.namedNode(
-            "http://www.w3.org/2008/05/skos-xl#Label",
-          ),
-        }),
-      );
-    }
-
-    const identifier = _resource.identifier;
-    const _literalFormEither: purify.Either<
-      rdfjsResource.Resource.ValueError,
-      purify.NonEmptyList<rdfjs.Literal>
-    > = purify.NonEmptyList.fromArray([
-      ..._resource
-        .values(
+    resource: rdfjsResource.Resource<rdfjs.NamedNode>;
+  }): purify.Either<rdfjsResource.Resource.ValueError, ConceptScheme> {
+    return Resource.fromRdf({
+      ..._context,
+      ignoreRdfType: true,
+      languageIn: _languageIn,
+      resource: _resource,
+    }).chain((_super) => {
+      if (
+        !_ignoreRdfType &&
+        !_resource.isInstanceOf(
           dataFactory.namedNode(
-            "http://www.w3.org/2008/05/skos-xl#literalForm",
+            "http://www.w3.org/2004/02/skos/core#ConceptScheme",
           ),
-          { unique: true },
         )
-        .flatMap((_item) =>
-          _item
-            .toValues()
-            .filter((_value) => {
-              const _languageInOrDefault = _languageIn ?? [];
-              if (_languageInOrDefault.length === 0) {
-                return true;
-              }
-              const _valueLiteral = _value.toLiteral().toMaybe().extract();
-              if (typeof _valueLiteral === "undefined") {
-                return false;
-              }
-              return _languageInOrDefault.some(
-                (_languageIn) => _languageIn === _valueLiteral.language,
-              );
+      ) {
+        return purify.Left(
+          new rdfjsResource.Resource.ValueError({
+            focusResource: _resource,
+            message: `${rdfjsResource.Resource.Identifier.toString(_resource.identifier)} has unexpected RDF type`,
+            predicate: dataFactory.namedNode(
+              "http://www.w3.org/2004/02/skos/core#ConceptScheme",
+            ),
+          }),
+        );
+      }
+      const _hasTopConceptEither: purify.Either<
+        rdfjsResource.Resource.ValueError,
+        readonly ConceptStub[]
+      > = purify.Either.of([
+        ..._resource
+          .values(
+            dataFactory.namedNode(
+              "http://www.w3.org/2004/02/skos/core#hasTopConcept",
+            ),
+            { unique: true },
+          )
+          .flatMap((_item) =>
+            _item
+              .toValues()
+              .head()
+              .chain((value) => value.toNamedResource())
+              .chain((_resource) =>
+                ConceptStub.fromRdf({
+                  ..._context,
+                  ignoreRdfType: true,
+                  languageIn: _languageIn,
+                  resource: _resource,
+                }),
+              )
+              .toMaybe()
+              .toList(),
+          ),
+      ]);
+      if (_hasTopConceptEither.isLeft()) {
+        return _hasTopConceptEither;
+      }
+      const hasTopConcept = _hasTopConceptEither.unsafeCoerce();
+      const identifier = _resource.identifier;
+      const _licenseEither: purify.Either<
+        rdfjsResource.Resource.ValueError,
+        purify.Maybe<rdfjs.NamedNode | rdfjs.Literal>
+      > = purify.Either.of(
+        (
+          _resource
+            .values(dataFactory.namedNode("http://purl.org/dc/terms/license"), {
+              unique: true,
             })
             .head()
-            .chain((_value) => _value.toLiteral())
-            .toMaybe()
-            .toList(),
-        ),
-    ]).toEither(
-      new rdfjsResource.Resource.ValueError({
-        focusResource: _resource,
-        message: `${rdfjsResource.Resource.Identifier.toString(_resource.identifier)} is empty`,
-        predicate: dataFactory.namedNode(
-          "http://www.w3.org/2008/05/skos-xl#literalForm",
-        ),
-      }),
-    );
-    if (_literalFormEither.isLeft()) {
-      return _literalFormEither;
-    }
-
-    const literalForm = _literalFormEither.unsafeCoerce();
-    const type = "Label" as const;
-    return purify.Either.of({ identifier, literalForm, type });
+            .chain((_value) => _value.toIri()) as purify.Either<
+            rdfjsResource.Resource.ValueError,
+            rdfjs.NamedNode | rdfjs.Literal
+          >
+        )
+          .altLazy(
+            () =>
+              _resource
+                .values(
+                  dataFactory.namedNode("http://purl.org/dc/terms/license"),
+                  { unique: true },
+                )
+                .filter((_value) => {
+                  const _languageInOrDefault = _languageIn ?? [];
+                  if (_languageInOrDefault.length === 0) {
+                    return true;
+                  }
+                  const _valueLiteral = _value.toLiteral().toMaybe().extract();
+                  if (typeof _valueLiteral === "undefined") {
+                    return false;
+                  }
+                  return _languageInOrDefault.some(
+                    (_languageIn) => _languageIn === _valueLiteral.language,
+                  );
+                })
+                .head()
+                .chain((_value) => _value.toLiteral()) as purify.Either<
+                rdfjsResource.Resource.ValueError,
+                rdfjs.NamedNode | rdfjs.Literal
+              >,
+          )
+          .toMaybe(),
+      );
+      if (_licenseEither.isLeft()) {
+        return _licenseEither;
+      }
+      const license = _licenseEither.unsafeCoerce();
+      const _rightsEither: purify.Either<
+        rdfjsResource.Resource.ValueError,
+        purify.Maybe<rdfjs.Literal>
+      > = purify.Either.of(
+        _resource
+          .values(dataFactory.namedNode("http://purl.org/dc/terms/rights"), {
+            unique: true,
+          })
+          .filter((_value) => {
+            const _languageInOrDefault = _languageIn ?? [];
+            if (_languageInOrDefault.length === 0) {
+              return true;
+            }
+            const _valueLiteral = _value.toLiteral().toMaybe().extract();
+            if (typeof _valueLiteral === "undefined") {
+              return false;
+            }
+            return _languageInOrDefault.some(
+              (_languageIn) => _languageIn === _valueLiteral.language,
+            );
+          })
+          .head()
+          .chain((_value) => _value.toLiteral())
+          .toMaybe(),
+      );
+      if (_rightsEither.isLeft()) {
+        return _rightsEither;
+      }
+      const rights = _rightsEither.unsafeCoerce();
+      const _rightsHolderEither: purify.Either<
+        rdfjsResource.Resource.ValueError,
+        purify.Maybe<rdfjs.Literal>
+      > = purify.Either.of(
+        _resource
+          .values(
+            dataFactory.namedNode("http://purl.org/dc/terms/rightsHolder"),
+            { unique: true },
+          )
+          .filter((_value) => {
+            const _languageInOrDefault = _languageIn ?? [];
+            if (_languageInOrDefault.length === 0) {
+              return true;
+            }
+            const _valueLiteral = _value.toLiteral().toMaybe().extract();
+            if (typeof _valueLiteral === "undefined") {
+              return false;
+            }
+            return _languageInOrDefault.some(
+              (_languageIn) => _languageIn === _valueLiteral.language,
+            );
+          })
+          .head()
+          .chain((_value) => _value.toLiteral())
+          .toMaybe(),
+      );
+      if (_rightsHolderEither.isLeft()) {
+        return _rightsHolderEither;
+      }
+      const rightsHolder = _rightsHolderEither.unsafeCoerce();
+      const type = "ConceptScheme" as const;
+      return purify.Either.of({
+        altLabel: _super.altLabel,
+        altLabelXl: _super.altLabelXl,
+        changeNote: _super.changeNote,
+        definition: _super.definition,
+        editorialNote: _super.editorialNote,
+        example: _super.example,
+        hiddenLabel: _super.hiddenLabel,
+        hiddenLabelXl: _super.hiddenLabelXl,
+        historyNote: _super.historyNote,
+        identifier,
+        modified: _super.modified,
+        notation: _super.notation,
+        note: _super.note,
+        prefLabel: _super.prefLabel,
+        prefLabelXl: _super.prefLabelXl,
+        scopeNote: _super.scopeNote,
+        hasTopConcept,
+        license,
+        rights,
+        rightsHolder,
+        type,
+      });
+    });
   }
 
-  export class SparqlGraphPatterns extends sparqlBuilder.ResourceGraphPatterns {
+  export class SparqlGraphPatterns extends Resource.SparqlGraphPatterns {
     constructor(
       subject: sparqlBuilder.ResourceGraphPatterns.SubjectParameter,
       _options?: { ignoreRdfType?: boolean },
     ) {
-      super(subject);
+      super(subject, { ignoreRdfType: true });
       if (!_options?.ignoreRdfType) {
         this.add(
           ...new sparqlBuilder.RdfTypeGraphPatterns(
             this.subject,
-            dataFactory.namedNode("http://www.w3.org/2008/05/skos-xl#Label"),
+            dataFactory.namedNode(
+              "http://www.w3.org/2004/02/skos/core#ConceptScheme",
+            ),
           ),
         );
       }
 
       this.add(
-        sparqlBuilder.GraphPattern.basic(
-          this.subject,
-          dataFactory.namedNode(
-            "http://www.w3.org/2008/05/skos-xl#literalForm",
+        sparqlBuilder.GraphPattern.optional(
+          sparqlBuilder.GraphPattern.group(
+            sparqlBuilder.GraphPattern.basic(
+              this.subject,
+              dataFactory.namedNode(
+                "http://www.w3.org/2004/02/skos/core#hasTopConcept",
+              ),
+              this.variable("HasTopConcept"),
+            ).chainObject(
+              (_object) =>
+                new ConceptStub.SparqlGraphPatterns(_object, {
+                  ignoreRdfType: true,
+                }),
+            ),
           ),
-          this.variable("LiteralForm"),
+        ),
+      );
+      this.add(
+        sparqlBuilder.GraphPattern.optional(
+          sparqlBuilder.GraphPattern.union(
+            sparqlBuilder.GraphPattern.basic(
+              this.subject,
+              dataFactory.namedNode("http://purl.org/dc/terms/license"),
+              this.variable("License"),
+            ),
+            sparqlBuilder.GraphPattern.basic(
+              this.subject,
+              dataFactory.namedNode("http://purl.org/dc/terms/license"),
+              this.variable("License"),
+            ),
+          ),
+        ),
+      );
+      this.add(
+        sparqlBuilder.GraphPattern.optional(
+          sparqlBuilder.GraphPattern.basic(
+            this.subject,
+            dataFactory.namedNode("http://purl.org/dc/terms/rights"),
+            this.variable("Rights"),
+          ),
+        ),
+      );
+      this.add(
+        sparqlBuilder.GraphPattern.optional(
+          sparqlBuilder.GraphPattern.basic(
+            this.subject,
+            dataFactory.namedNode("http://purl.org/dc/terms/rightsHolder"),
+            this.variable("RightsHolder"),
+          ),
         ),
       );
     }
   }
 }
-export interface LabelStub {
-  readonly identifier: rdfjs.BlankNode | rdfjs.NamedNode;
-  readonly literalForm: purify.NonEmptyList<rdfjs.Literal>;
-  readonly type: "LabelStub";
+export interface ConceptSchemeStub extends ResourceStub {
+  readonly identifier: rdfjs.NamedNode;
+  readonly type: "ConceptSchemeStub";
 }
 
-export namespace LabelStub {
-  export function create(parameters: {
-    readonly identifier: rdfjs.BlankNode | rdfjs.NamedNode;
-    readonly literalForm: purify.NonEmptyList<rdfjs.Literal>;
-  }): LabelStub {
+export namespace ConceptSchemeStub {
+  export function create(
+    parameters: { readonly identifier: rdfjs.NamedNode } & Parameters<
+      typeof ResourceStub.create
+    >[0],
+  ): ConceptSchemeStub {
     const identifier = parameters.identifier;
-    const literalForm = parameters.literalForm;
-    const type = "LabelStub" as const;
-    return { identifier, literalForm, type };
+    const type = "ConceptSchemeStub" as const;
+    return { ...ResourceStub.create(parameters), identifier, type };
   }
 
   export function fromRdf({
@@ -1117,100 +1667,139 @@ export namespace LabelStub {
     [_index: string]: any;
     ignoreRdfType?: boolean;
     languageIn?: readonly string[];
-    resource: rdfjsResource.Resource;
-  }): purify.Either<rdfjsResource.Resource.ValueError, LabelStub> {
-    if (
-      !_ignoreRdfType &&
-      !_resource.isInstanceOf(
-        dataFactory.namedNode("http://www.w3.org/2008/05/skos-xl#Label"),
-      )
-    ) {
-      return purify.Left(
-        new rdfjsResource.Resource.ValueError({
-          focusResource: _resource,
-          message: `${rdfjsResource.Resource.Identifier.toString(_resource.identifier)} has unexpected RDF type`,
-          predicate: dataFactory.namedNode(
-            "http://www.w3.org/2008/05/skos-xl#Label",
-          ),
-        }),
-      );
-    }
-
-    const identifier = _resource.identifier;
-    const _literalFormEither: purify.Either<
-      rdfjsResource.Resource.ValueError,
-      purify.NonEmptyList<rdfjs.Literal>
-    > = purify.NonEmptyList.fromArray([
-      ..._resource
-        .values(
+    resource: rdfjsResource.Resource<rdfjs.NamedNode>;
+  }): purify.Either<rdfjsResource.Resource.ValueError, ConceptSchemeStub> {
+    return ResourceStub.fromRdf({
+      ..._context,
+      ignoreRdfType: true,
+      languageIn: _languageIn,
+      resource: _resource,
+    }).chain((_super) => {
+      if (
+        !_ignoreRdfType &&
+        !_resource.isInstanceOf(
           dataFactory.namedNode(
-            "http://www.w3.org/2008/05/skos-xl#literalForm",
+            "http://www.w3.org/2004/02/skos/core#ConceptScheme",
           ),
-          { unique: true },
         )
-        .flatMap((_item) =>
-          _item
-            .toValues()
-            .filter((_value) => {
-              const _languageInOrDefault = _languageIn ?? [];
-              if (_languageInOrDefault.length === 0) {
-                return true;
-              }
-              const _valueLiteral = _value.toLiteral().toMaybe().extract();
-              if (typeof _valueLiteral === "undefined") {
-                return false;
-              }
-              return _languageInOrDefault.some(
-                (_languageIn) => _languageIn === _valueLiteral.language,
-              );
-            })
-            .head()
-            .chain((_value) => _value.toLiteral())
-            .toMaybe()
-            .toList(),
-        ),
-    ]).toEither(
-      new rdfjsResource.Resource.ValueError({
-        focusResource: _resource,
-        message: `${rdfjsResource.Resource.Identifier.toString(_resource.identifier)} is empty`,
-        predicate: dataFactory.namedNode(
-          "http://www.w3.org/2008/05/skos-xl#literalForm",
-        ),
-      }),
-    );
-    if (_literalFormEither.isLeft()) {
-      return _literalFormEither;
-    }
-
-    const literalForm = _literalFormEither.unsafeCoerce();
-    const type = "LabelStub" as const;
-    return purify.Either.of({ identifier, literalForm, type });
+      ) {
+        return purify.Left(
+          new rdfjsResource.Resource.ValueError({
+            focusResource: _resource,
+            message: `${rdfjsResource.Resource.Identifier.toString(_resource.identifier)} has unexpected RDF type`,
+            predicate: dataFactory.namedNode(
+              "http://www.w3.org/2004/02/skos/core#ConceptScheme",
+            ),
+          }),
+        );
+      }
+      const identifier = _resource.identifier;
+      const type = "ConceptSchemeStub" as const;
+      return purify.Either.of({
+        identifier,
+        prefLabel: _super.prefLabel,
+        prefLabelXl: _super.prefLabelXl,
+        type,
+      });
+    });
   }
 
-  export class SparqlGraphPatterns extends sparqlBuilder.ResourceGraphPatterns {
+  export class SparqlGraphPatterns extends ResourceStub.SparqlGraphPatterns {
     constructor(
       subject: sparqlBuilder.ResourceGraphPatterns.SubjectParameter,
       _options?: { ignoreRdfType?: boolean },
     ) {
-      super(subject);
+      super(subject, { ignoreRdfType: true });
       if (!_options?.ignoreRdfType) {
         this.add(
           ...new sparqlBuilder.RdfTypeGraphPatterns(
             this.subject,
-            dataFactory.namedNode("http://www.w3.org/2008/05/skos-xl#Label"),
+            dataFactory.namedNode(
+              "http://www.w3.org/2004/02/skos/core#ConceptScheme",
+            ),
           ),
         );
       }
+    }
+  }
+}
+export interface ConceptStub extends ResourceStub {
+  readonly identifier: rdfjs.NamedNode;
+  readonly type: "ConceptStub";
+}
 
-      this.add(
-        sparqlBuilder.GraphPattern.basic(
-          this.subject,
-          dataFactory.namedNode(
-            "http://www.w3.org/2008/05/skos-xl#literalForm",
+export namespace ConceptStub {
+  export function create(
+    parameters: { readonly identifier: rdfjs.NamedNode } & Parameters<
+      typeof ResourceStub.create
+    >[0],
+  ): ConceptStub {
+    const identifier = parameters.identifier;
+    const type = "ConceptStub" as const;
+    return { ...ResourceStub.create(parameters), identifier, type };
+  }
+
+  export function fromRdf({
+    ignoreRdfType: _ignoreRdfType,
+    languageIn: _languageIn,
+    resource: _resource,
+    // @ts-ignore
+    ..._context
+  }: {
+    [_index: string]: any;
+    ignoreRdfType?: boolean;
+    languageIn?: readonly string[];
+    resource: rdfjsResource.Resource<rdfjs.NamedNode>;
+  }): purify.Either<rdfjsResource.Resource.ValueError, ConceptStub> {
+    return ResourceStub.fromRdf({
+      ..._context,
+      ignoreRdfType: true,
+      languageIn: _languageIn,
+      resource: _resource,
+    }).chain((_super) => {
+      if (
+        !_ignoreRdfType &&
+        !_resource.isInstanceOf(
+          dataFactory.namedNode("http://www.w3.org/2004/02/skos/core#Concept"),
+        )
+      ) {
+        return purify.Left(
+          new rdfjsResource.Resource.ValueError({
+            focusResource: _resource,
+            message: `${rdfjsResource.Resource.Identifier.toString(_resource.identifier)} has unexpected RDF type`,
+            predicate: dataFactory.namedNode(
+              "http://www.w3.org/2004/02/skos/core#Concept",
+            ),
+          }),
+        );
+      }
+      const identifier = _resource.identifier;
+      const type = "ConceptStub" as const;
+      return purify.Either.of({
+        identifier,
+        prefLabel: _super.prefLabel,
+        prefLabelXl: _super.prefLabelXl,
+        type,
+      });
+    });
+  }
+
+  export class SparqlGraphPatterns extends ResourceStub.SparqlGraphPatterns {
+    constructor(
+      subject: sparqlBuilder.ResourceGraphPatterns.SubjectParameter,
+      _options?: { ignoreRdfType?: boolean },
+    ) {
+      super(subject, { ignoreRdfType: true });
+      if (!_options?.ignoreRdfType) {
+        this.add(
+          ...new sparqlBuilder.RdfTypeGraphPatterns(
+            this.subject,
+            dataFactory.namedNode(
+              "http://www.w3.org/2004/02/skos/core#Concept",
+            ),
           ),
-          this.variable("LiteralForm"),
-        ),
-      );
+        );
+      }
     }
   }
 }
@@ -2194,39 +2783,21 @@ export namespace Concept {
     }
   }
 }
-export interface ResourceStub {
-  readonly identifier: rdfjs.NamedNode;
-  readonly prefLabel: readonly rdfjs.Literal[];
-  readonly prefLabelXl: readonly LabelStub[];
-  readonly type: "ConceptSchemeStub" | "ConceptStub";
+export interface Label {
+  readonly identifier: rdfjs.BlankNode | rdfjs.NamedNode;
+  readonly literalForm: purify.NonEmptyList<rdfjs.Literal>;
+  readonly type: "Label";
 }
 
-export namespace ResourceStub {
+export namespace Label {
   export function create(parameters: {
-    readonly identifier: rdfjs.NamedNode;
-    readonly prefLabel?: readonly rdfjs.Literal[];
-    readonly prefLabelXl?: readonly LabelStub[];
-  }): Omit<ResourceStub, "type"> {
+    readonly identifier: rdfjs.BlankNode | rdfjs.NamedNode;
+    readonly literalForm: purify.NonEmptyList<rdfjs.Literal>;
+  }): Label {
     const identifier = parameters.identifier;
-    let prefLabel: readonly rdfjs.Literal[];
-    if (typeof parameters.prefLabel === "undefined") {
-      prefLabel = [];
-    } else if (Array.isArray(parameters.prefLabel)) {
-      prefLabel = parameters.prefLabel;
-    } else {
-      prefLabel = parameters.prefLabel as never;
-    }
-
-    let prefLabelXl: readonly LabelStub[];
-    if (typeof parameters.prefLabelXl === "undefined") {
-      prefLabelXl = [];
-    } else if (Array.isArray(parameters.prefLabelXl)) {
-      prefLabelXl = parameters.prefLabelXl;
-    } else {
-      prefLabelXl = parameters.prefLabelXl as never;
-    }
-
-    return { identifier, prefLabel, prefLabelXl };
+    const literalForm = parameters.literalForm;
+    const type = "Label" as const;
+    return { identifier, literalForm, type };
   }
 
   export function fromRdf({
@@ -2239,24 +2810,34 @@ export namespace ResourceStub {
     [_index: string]: any;
     ignoreRdfType?: boolean;
     languageIn?: readonly string[];
-    resource: rdfjsResource.Resource<rdfjs.NamedNode>;
-  }): purify.Either<
-    rdfjsResource.Resource.ValueError,
-    {
-      identifier: rdfjs.NamedNode;
-      prefLabel: readonly rdfjs.Literal[];
-      prefLabelXl: readonly LabelStub[];
+    resource: rdfjsResource.Resource;
+  }): purify.Either<rdfjsResource.Resource.ValueError, Label> {
+    if (
+      !_ignoreRdfType &&
+      !_resource.isInstanceOf(
+        dataFactory.namedNode("http://www.w3.org/2008/05/skos-xl#Label"),
+      )
+    ) {
+      return purify.Left(
+        new rdfjsResource.Resource.ValueError({
+          focusResource: _resource,
+          message: `${rdfjsResource.Resource.Identifier.toString(_resource.identifier)} has unexpected RDF type`,
+          predicate: dataFactory.namedNode(
+            "http://www.w3.org/2008/05/skos-xl#Label",
+          ),
+        }),
+      );
     }
-  > {
+
     const identifier = _resource.identifier;
-    const _prefLabelEither: purify.Either<
+    const _literalFormEither: purify.Either<
       rdfjsResource.Resource.ValueError,
-      readonly rdfjs.Literal[]
-    > = purify.Either.of([
+      purify.NonEmptyList<rdfjs.Literal>
+    > = purify.NonEmptyList.fromArray([
       ..._resource
         .values(
           dataFactory.namedNode(
-            "http://www.w3.org/2004/02/skos/core#prefLabel",
+            "http://www.w3.org/2008/05/skos-xl#literalForm",
           ),
           { unique: true },
         )
@@ -2281,44 +2862,22 @@ export namespace ResourceStub {
             .toMaybe()
             .toList(),
         ),
-    ]);
-    if (_prefLabelEither.isLeft()) {
-      return _prefLabelEither;
-    }
-
-    const prefLabel = _prefLabelEither.unsafeCoerce();
-    const _prefLabelXlEither: purify.Either<
-      rdfjsResource.Resource.ValueError,
-      readonly LabelStub[]
-    > = purify.Either.of([
-      ..._resource
-        .values(
-          dataFactory.namedNode("http://www.w3.org/2008/05/skos-xl#prefLabel"),
-          { unique: true },
-        )
-        .flatMap((_item) =>
-          _item
-            .toValues()
-            .head()
-            .chain((value) => value.toResource())
-            .chain((_resource) =>
-              LabelStub.fromRdf({
-                ..._context,
-                ignoreRdfType: true,
-                languageIn: _languageIn,
-                resource: _resource,
-              }),
-            )
-            .toMaybe()
-            .toList(),
+    ]).toEither(
+      new rdfjsResource.Resource.ValueError({
+        focusResource: _resource,
+        message: `${rdfjsResource.Resource.Identifier.toString(_resource.identifier)} is empty`,
+        predicate: dataFactory.namedNode(
+          "http://www.w3.org/2008/05/skos-xl#literalForm",
         ),
-    ]);
-    if (_prefLabelXlEither.isLeft()) {
-      return _prefLabelXlEither;
+      }),
+    );
+    if (_literalFormEither.isLeft()) {
+      return _literalFormEither;
     }
 
-    const prefLabelXl = _prefLabelXlEither.unsafeCoerce();
-    return purify.Either.of({ identifier, prefLabel, prefLabelXl });
+    const literalForm = _literalFormEither.unsafeCoerce();
+    const type = "Label" as const;
+    return purify.Either.of({ identifier, literalForm, type });
   }
 
   export class SparqlGraphPatterns extends sparqlBuilder.ResourceGraphPatterns {
@@ -2327,583 +2886,24 @@ export namespace ResourceStub {
       _options?: { ignoreRdfType?: boolean },
     ) {
       super(subject);
-      this.add(
-        sparqlBuilder.GraphPattern.optional(
-          sparqlBuilder.GraphPattern.basic(
-            this.subject,
-            dataFactory.namedNode(
-              "http://www.w3.org/2004/02/skos/core#prefLabel",
-            ),
-            this.variable("PrefLabel"),
-          ),
-        ),
-      );
-      this.add(
-        sparqlBuilder.GraphPattern.optional(
-          sparqlBuilder.GraphPattern.group(
-            sparqlBuilder.GraphPattern.basic(
-              this.subject,
-              dataFactory.namedNode(
-                "http://www.w3.org/2008/05/skos-xl#prefLabel",
-              ),
-              this.variable("PrefLabelXl"),
-            ).chainObject(
-              (_object) =>
-                new LabelStub.SparqlGraphPatterns(_object, {
-                  ignoreRdfType: true,
-                }),
-            ),
-          ),
-        ),
-      );
-    }
-  }
-}
-export interface ConceptStub extends ResourceStub {
-  readonly identifier: rdfjs.NamedNode;
-  readonly type: "ConceptStub";
-}
-
-export namespace ConceptStub {
-  export function create(
-    parameters: { readonly identifier: rdfjs.NamedNode } & Parameters<
-      typeof ResourceStub.create
-    >[0],
-  ): ConceptStub {
-    const identifier = parameters.identifier;
-    const type = "ConceptStub" as const;
-    return { ...ResourceStub.create(parameters), identifier, type };
-  }
-
-  export function fromRdf({
-    ignoreRdfType: _ignoreRdfType,
-    languageIn: _languageIn,
-    resource: _resource,
-    // @ts-ignore
-    ..._context
-  }: {
-    [_index: string]: any;
-    ignoreRdfType?: boolean;
-    languageIn?: readonly string[];
-    resource: rdfjsResource.Resource<rdfjs.NamedNode>;
-  }): purify.Either<rdfjsResource.Resource.ValueError, ConceptStub> {
-    return ResourceStub.fromRdf({
-      ..._context,
-      ignoreRdfType: true,
-      languageIn: _languageIn,
-      resource: _resource,
-    }).chain((_super) => {
-      if (
-        !_ignoreRdfType &&
-        !_resource.isInstanceOf(
-          dataFactory.namedNode("http://www.w3.org/2004/02/skos/core#Concept"),
-        )
-      ) {
-        return purify.Left(
-          new rdfjsResource.Resource.ValueError({
-            focusResource: _resource,
-            message: `${rdfjsResource.Resource.Identifier.toString(_resource.identifier)} has unexpected RDF type`,
-            predicate: dataFactory.namedNode(
-              "http://www.w3.org/2004/02/skos/core#Concept",
-            ),
-          }),
-        );
-      }
-      const identifier = _resource.identifier;
-      const type = "ConceptStub" as const;
-      return purify.Either.of({
-        identifier,
-        prefLabel: _super.prefLabel,
-        prefLabelXl: _super.prefLabelXl,
-        type,
-      });
-    });
-  }
-
-  export class SparqlGraphPatterns extends ResourceStub.SparqlGraphPatterns {
-    constructor(
-      subject: sparqlBuilder.ResourceGraphPatterns.SubjectParameter,
-      _options?: { ignoreRdfType?: boolean },
-    ) {
-      super(subject, { ignoreRdfType: true });
       if (!_options?.ignoreRdfType) {
         this.add(
           ...new sparqlBuilder.RdfTypeGraphPatterns(
             this.subject,
-            dataFactory.namedNode(
-              "http://www.w3.org/2004/02/skos/core#Concept",
-            ),
+            dataFactory.namedNode("http://www.w3.org/2008/05/skos-xl#Label"),
           ),
         );
       }
-    }
-  }
-}
-export interface ConceptScheme extends Resource {
-  readonly hasTopConcept: readonly ConceptStub[];
-  readonly identifier: rdfjs.NamedNode;
-  readonly license: purify.Maybe<rdfjs.NamedNode | rdfjs.Literal>;
-  readonly rights: purify.Maybe<rdfjs.Literal>;
-  readonly rightsHolder: purify.Maybe<rdfjs.Literal>;
-  readonly type: "ConceptScheme";
-}
 
-export namespace ConceptScheme {
-  export function create(
-    parameters: {
-      readonly hasTopConcept?: readonly ConceptStub[];
-      readonly identifier: rdfjs.NamedNode;
-      readonly license?:
-        | (rdfjs.NamedNode | rdfjs.Literal)
-        | purify.Maybe<rdfjs.NamedNode | rdfjs.Literal>;
-      readonly rights?:
-        | rdfjs.Literal
-        | Date
-        | boolean
-        | number
-        | purify.Maybe<rdfjs.Literal>
-        | string;
-      readonly rightsHolder?:
-        | rdfjs.Literal
-        | Date
-        | boolean
-        | number
-        | purify.Maybe<rdfjs.Literal>
-        | string;
-    } & Parameters<typeof Resource.create>[0],
-  ): ConceptScheme {
-    let hasTopConcept: readonly ConceptStub[];
-    if (typeof parameters.hasTopConcept === "undefined") {
-      hasTopConcept = [];
-    } else if (Array.isArray(parameters.hasTopConcept)) {
-      hasTopConcept = parameters.hasTopConcept;
-    } else {
-      hasTopConcept = parameters.hasTopConcept as never;
-    }
-
-    const identifier = parameters.identifier;
-    let license: purify.Maybe<rdfjs.NamedNode | rdfjs.Literal>;
-    if (purify.Maybe.isMaybe(parameters.license)) {
-      license = parameters.license;
-    } else if (typeof parameters.license === "object") {
-      license = purify.Maybe.of(parameters.license);
-    } else if (typeof parameters.license === "undefined") {
-      license = purify.Maybe.empty();
-    } else {
-      license = parameters.license as never;
-    }
-
-    let rights: purify.Maybe<rdfjs.Literal>;
-    if (purify.Maybe.isMaybe(parameters.rights)) {
-      rights = parameters.rights;
-    } else if (typeof parameters.rights === "boolean") {
-      rights = purify.Maybe.of(rdfLiteral.toRdf(parameters.rights));
-    } else if (
-      typeof parameters.rights === "object" &&
-      parameters.rights instanceof Date
-    ) {
-      rights = purify.Maybe.of(rdfLiteral.toRdf(parameters.rights));
-    } else if (typeof parameters.rights === "number") {
-      rights = purify.Maybe.of(rdfLiteral.toRdf(parameters.rights));
-    } else if (typeof parameters.rights === "string") {
-      rights = purify.Maybe.of(dataFactory.literal(parameters.rights));
-    } else if (typeof parameters.rights === "object") {
-      rights = purify.Maybe.of(parameters.rights);
-    } else if (typeof parameters.rights === "undefined") {
-      rights = purify.Maybe.empty();
-    } else {
-      rights = parameters.rights as never;
-    }
-
-    let rightsHolder: purify.Maybe<rdfjs.Literal>;
-    if (purify.Maybe.isMaybe(parameters.rightsHolder)) {
-      rightsHolder = parameters.rightsHolder;
-    } else if (typeof parameters.rightsHolder === "boolean") {
-      rightsHolder = purify.Maybe.of(rdfLiteral.toRdf(parameters.rightsHolder));
-    } else if (
-      typeof parameters.rightsHolder === "object" &&
-      parameters.rightsHolder instanceof Date
-    ) {
-      rightsHolder = purify.Maybe.of(rdfLiteral.toRdf(parameters.rightsHolder));
-    } else if (typeof parameters.rightsHolder === "number") {
-      rightsHolder = purify.Maybe.of(rdfLiteral.toRdf(parameters.rightsHolder));
-    } else if (typeof parameters.rightsHolder === "string") {
-      rightsHolder = purify.Maybe.of(
-        dataFactory.literal(parameters.rightsHolder),
-      );
-    } else if (typeof parameters.rightsHolder === "object") {
-      rightsHolder = purify.Maybe.of(parameters.rightsHolder);
-    } else if (typeof parameters.rightsHolder === "undefined") {
-      rightsHolder = purify.Maybe.empty();
-    } else {
-      rightsHolder = parameters.rightsHolder as never;
-    }
-
-    const type = "ConceptScheme" as const;
-    return {
-      ...Resource.create(parameters),
-      hasTopConcept,
-      identifier,
-      license,
-      rights,
-      rightsHolder,
-      type,
-    };
-  }
-
-  export function fromRdf({
-    ignoreRdfType: _ignoreRdfType,
-    languageIn: _languageIn,
-    resource: _resource,
-    // @ts-ignore
-    ..._context
-  }: {
-    [_index: string]: any;
-    ignoreRdfType?: boolean;
-    languageIn?: readonly string[];
-    resource: rdfjsResource.Resource<rdfjs.NamedNode>;
-  }): purify.Either<rdfjsResource.Resource.ValueError, ConceptScheme> {
-    return Resource.fromRdf({
-      ..._context,
-      ignoreRdfType: true,
-      languageIn: _languageIn,
-      resource: _resource,
-    }).chain((_super) => {
-      if (
-        !_ignoreRdfType &&
-        !_resource.isInstanceOf(
+      this.add(
+        sparqlBuilder.GraphPattern.basic(
+          this.subject,
           dataFactory.namedNode(
-            "http://www.w3.org/2004/02/skos/core#ConceptScheme",
+            "http://www.w3.org/2008/05/skos-xl#literalForm",
           ),
-        )
-      ) {
-        return purify.Left(
-          new rdfjsResource.Resource.ValueError({
-            focusResource: _resource,
-            message: `${rdfjsResource.Resource.Identifier.toString(_resource.identifier)} has unexpected RDF type`,
-            predicate: dataFactory.namedNode(
-              "http://www.w3.org/2004/02/skos/core#ConceptScheme",
-            ),
-          }),
-        );
-      }
-      const _hasTopConceptEither: purify.Either<
-        rdfjsResource.Resource.ValueError,
-        readonly ConceptStub[]
-      > = purify.Either.of([
-        ..._resource
-          .values(
-            dataFactory.namedNode(
-              "http://www.w3.org/2004/02/skos/core#hasTopConcept",
-            ),
-            { unique: true },
-          )
-          .flatMap((_item) =>
-            _item
-              .toValues()
-              .head()
-              .chain((value) => value.toNamedResource())
-              .chain((_resource) =>
-                ConceptStub.fromRdf({
-                  ..._context,
-                  ignoreRdfType: true,
-                  languageIn: _languageIn,
-                  resource: _resource,
-                }),
-              )
-              .toMaybe()
-              .toList(),
-          ),
-      ]);
-      if (_hasTopConceptEither.isLeft()) {
-        return _hasTopConceptEither;
-      }
-      const hasTopConcept = _hasTopConceptEither.unsafeCoerce();
-      const identifier = _resource.identifier;
-      const _licenseEither: purify.Either<
-        rdfjsResource.Resource.ValueError,
-        purify.Maybe<rdfjs.NamedNode | rdfjs.Literal>
-      > = purify.Either.of(
-        (
-          _resource
-            .values(dataFactory.namedNode("http://purl.org/dc/terms/license"), {
-              unique: true,
-            })
-            .head()
-            .chain((_value) => _value.toIri()) as purify.Either<
-            rdfjsResource.Resource.ValueError,
-            rdfjs.NamedNode | rdfjs.Literal
-          >
-        )
-          .altLazy(
-            () =>
-              _resource
-                .values(
-                  dataFactory.namedNode("http://purl.org/dc/terms/license"),
-                  { unique: true },
-                )
-                .filter((_value) => {
-                  const _languageInOrDefault = _languageIn ?? [];
-                  if (_languageInOrDefault.length === 0) {
-                    return true;
-                  }
-                  const _valueLiteral = _value.toLiteral().toMaybe().extract();
-                  if (typeof _valueLiteral === "undefined") {
-                    return false;
-                  }
-                  return _languageInOrDefault.some(
-                    (_languageIn) => _languageIn === _valueLiteral.language,
-                  );
-                })
-                .head()
-                .chain((_value) => _value.toLiteral()) as purify.Either<
-                rdfjsResource.Resource.ValueError,
-                rdfjs.NamedNode | rdfjs.Literal
-              >,
-          )
-          .toMaybe(),
-      );
-      if (_licenseEither.isLeft()) {
-        return _licenseEither;
-      }
-      const license = _licenseEither.unsafeCoerce();
-      const _rightsEither: purify.Either<
-        rdfjsResource.Resource.ValueError,
-        purify.Maybe<rdfjs.Literal>
-      > = purify.Either.of(
-        _resource
-          .values(dataFactory.namedNode("http://purl.org/dc/terms/rights"), {
-            unique: true,
-          })
-          .filter((_value) => {
-            const _languageInOrDefault = _languageIn ?? [];
-            if (_languageInOrDefault.length === 0) {
-              return true;
-            }
-            const _valueLiteral = _value.toLiteral().toMaybe().extract();
-            if (typeof _valueLiteral === "undefined") {
-              return false;
-            }
-            return _languageInOrDefault.some(
-              (_languageIn) => _languageIn === _valueLiteral.language,
-            );
-          })
-          .head()
-          .chain((_value) => _value.toLiteral())
-          .toMaybe(),
-      );
-      if (_rightsEither.isLeft()) {
-        return _rightsEither;
-      }
-      const rights = _rightsEither.unsafeCoerce();
-      const _rightsHolderEither: purify.Either<
-        rdfjsResource.Resource.ValueError,
-        purify.Maybe<rdfjs.Literal>
-      > = purify.Either.of(
-        _resource
-          .values(
-            dataFactory.namedNode("http://purl.org/dc/terms/rightsHolder"),
-            { unique: true },
-          )
-          .filter((_value) => {
-            const _languageInOrDefault = _languageIn ?? [];
-            if (_languageInOrDefault.length === 0) {
-              return true;
-            }
-            const _valueLiteral = _value.toLiteral().toMaybe().extract();
-            if (typeof _valueLiteral === "undefined") {
-              return false;
-            }
-            return _languageInOrDefault.some(
-              (_languageIn) => _languageIn === _valueLiteral.language,
-            );
-          })
-          .head()
-          .chain((_value) => _value.toLiteral())
-          .toMaybe(),
-      );
-      if (_rightsHolderEither.isLeft()) {
-        return _rightsHolderEither;
-      }
-      const rightsHolder = _rightsHolderEither.unsafeCoerce();
-      const type = "ConceptScheme" as const;
-      return purify.Either.of({
-        altLabel: _super.altLabel,
-        altLabelXl: _super.altLabelXl,
-        changeNote: _super.changeNote,
-        definition: _super.definition,
-        editorialNote: _super.editorialNote,
-        example: _super.example,
-        hiddenLabel: _super.hiddenLabel,
-        hiddenLabelXl: _super.hiddenLabelXl,
-        historyNote: _super.historyNote,
-        identifier,
-        modified: _super.modified,
-        notation: _super.notation,
-        note: _super.note,
-        prefLabel: _super.prefLabel,
-        prefLabelXl: _super.prefLabelXl,
-        scopeNote: _super.scopeNote,
-        hasTopConcept,
-        license,
-        rights,
-        rightsHolder,
-        type,
-      });
-    });
-  }
-
-  export class SparqlGraphPatterns extends Resource.SparqlGraphPatterns {
-    constructor(
-      subject: sparqlBuilder.ResourceGraphPatterns.SubjectParameter,
-      _options?: { ignoreRdfType?: boolean },
-    ) {
-      super(subject, { ignoreRdfType: true });
-      if (!_options?.ignoreRdfType) {
-        this.add(
-          ...new sparqlBuilder.RdfTypeGraphPatterns(
-            this.subject,
-            dataFactory.namedNode(
-              "http://www.w3.org/2004/02/skos/core#ConceptScheme",
-            ),
-          ),
-        );
-      }
-
-      this.add(
-        sparqlBuilder.GraphPattern.optional(
-          sparqlBuilder.GraphPattern.group(
-            sparqlBuilder.GraphPattern.basic(
-              this.subject,
-              dataFactory.namedNode(
-                "http://www.w3.org/2004/02/skos/core#hasTopConcept",
-              ),
-              this.variable("HasTopConcept"),
-            ).chainObject(
-              (_object) =>
-                new ConceptStub.SparqlGraphPatterns(_object, {
-                  ignoreRdfType: true,
-                }),
-            ),
-          ),
+          this.variable("LiteralForm"),
         ),
       );
-      this.add(
-        sparqlBuilder.GraphPattern.optional(
-          sparqlBuilder.GraphPattern.union(
-            sparqlBuilder.GraphPattern.basic(
-              this.subject,
-              dataFactory.namedNode("http://purl.org/dc/terms/license"),
-              this.variable("License"),
-            ),
-            sparqlBuilder.GraphPattern.basic(
-              this.subject,
-              dataFactory.namedNode("http://purl.org/dc/terms/license"),
-              this.variable("License"),
-            ),
-          ),
-        ),
-      );
-      this.add(
-        sparqlBuilder.GraphPattern.optional(
-          sparqlBuilder.GraphPattern.basic(
-            this.subject,
-            dataFactory.namedNode("http://purl.org/dc/terms/rights"),
-            this.variable("Rights"),
-          ),
-        ),
-      );
-      this.add(
-        sparqlBuilder.GraphPattern.optional(
-          sparqlBuilder.GraphPattern.basic(
-            this.subject,
-            dataFactory.namedNode("http://purl.org/dc/terms/rightsHolder"),
-            this.variable("RightsHolder"),
-          ),
-        ),
-      );
-    }
-  }
-}
-export interface ConceptSchemeStub extends ResourceStub {
-  readonly identifier: rdfjs.NamedNode;
-  readonly type: "ConceptSchemeStub";
-}
-
-export namespace ConceptSchemeStub {
-  export function create(
-    parameters: { readonly identifier: rdfjs.NamedNode } & Parameters<
-      typeof ResourceStub.create
-    >[0],
-  ): ConceptSchemeStub {
-    const identifier = parameters.identifier;
-    const type = "ConceptSchemeStub" as const;
-    return { ...ResourceStub.create(parameters), identifier, type };
-  }
-
-  export function fromRdf({
-    ignoreRdfType: _ignoreRdfType,
-    languageIn: _languageIn,
-    resource: _resource,
-    // @ts-ignore
-    ..._context
-  }: {
-    [_index: string]: any;
-    ignoreRdfType?: boolean;
-    languageIn?: readonly string[];
-    resource: rdfjsResource.Resource<rdfjs.NamedNode>;
-  }): purify.Either<rdfjsResource.Resource.ValueError, ConceptSchemeStub> {
-    return ResourceStub.fromRdf({
-      ..._context,
-      ignoreRdfType: true,
-      languageIn: _languageIn,
-      resource: _resource,
-    }).chain((_super) => {
-      if (
-        !_ignoreRdfType &&
-        !_resource.isInstanceOf(
-          dataFactory.namedNode(
-            "http://www.w3.org/2004/02/skos/core#ConceptScheme",
-          ),
-        )
-      ) {
-        return purify.Left(
-          new rdfjsResource.Resource.ValueError({
-            focusResource: _resource,
-            message: `${rdfjsResource.Resource.Identifier.toString(_resource.identifier)} has unexpected RDF type`,
-            predicate: dataFactory.namedNode(
-              "http://www.w3.org/2004/02/skos/core#ConceptScheme",
-            ),
-          }),
-        );
-      }
-      const identifier = _resource.identifier;
-      const type = "ConceptSchemeStub" as const;
-      return purify.Either.of({
-        identifier,
-        prefLabel: _super.prefLabel,
-        prefLabelXl: _super.prefLabelXl,
-        type,
-      });
-    });
-  }
-
-  export class SparqlGraphPatterns extends ResourceStub.SparqlGraphPatterns {
-    constructor(
-      subject: sparqlBuilder.ResourceGraphPatterns.SubjectParameter,
-      _options?: { ignoreRdfType?: boolean },
-    ) {
-      super(subject, { ignoreRdfType: true });
-      if (!_options?.ignoreRdfType) {
-        this.add(
-          ...new sparqlBuilder.RdfTypeGraphPatterns(
-            this.subject,
-            dataFactory.namedNode(
-              "http://www.w3.org/2004/02/skos/core#ConceptScheme",
-            ),
-          ),
-        );
-      }
     }
   }
 }
