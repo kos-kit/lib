@@ -1,6 +1,7 @@
 import { NamedNode } from "@rdfjs/types";
 import { skos } from "@tpluscode/rdf-ns-builders";
 import { Maybe } from "purify-ts";
+import { iriToTranslationKey } from "./iriToTranslationKey.js";
 
 export class SemanticRelationProperty {
   static readonly BROADER = new SemanticRelationProperty({
@@ -63,7 +64,18 @@ export class SemanticRelationProperty {
     identifier: skos.relatedMatch,
   });
 
-  readonly identifier: NamedNode;
+  readonly identifier: NamedNode<
+    | "http://www.w3.org/2004/02/skos/core#broader"
+    | "http://www.w3.org/2004/02/skos/core#broaderTransitive"
+    | "http://www.w3.org/2004/02/skos/core#broadMatch"
+    | "http://www.w3.org/2004/02/skos/core#closeMatch"
+    | "http://www.w3.org/2004/02/skos/core#exactMatch"
+    | "http://www.w3.org/2004/02/skos/core#narrower"
+    | "http://www.w3.org/2004/02/skos/core#narrowerTransitive"
+    | "http://www.w3.org/2004/02/skos/core#narrowMatch"
+    | "http://www.w3.org/2004/02/skos/core#related"
+    | "http://www.w3.org/2004/02/skos/core#relatedMatch"
+  >;
   readonly mapping: boolean;
   private readonly inverseIdentifier: Maybe<NamedNode>;
 
@@ -72,8 +84,8 @@ export class SemanticRelationProperty {
     inverseIdentifier,
     mapping,
   }: {
-    identifier: NamedNode;
-    inverseIdentifier: Maybe<NamedNode>;
+    identifier: SemanticRelationProperty["identifier"];
+    inverseIdentifier: SemanticRelationProperty["inverseIdentifier"];
     mapping: boolean;
   }) {
     this.identifier = identifier;
@@ -90,8 +102,8 @@ export class SemanticRelationProperty {
     );
   }
 
-  equals(other: SemanticRelationProperty): boolean {
-    return this.identifier.equals(other.identifier);
+  get translationKey(): string {
+    return iriToTranslationKey(this.identifier);
   }
 }
 

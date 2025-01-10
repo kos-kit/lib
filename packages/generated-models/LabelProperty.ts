@@ -1,38 +1,22 @@
 import { NamedNode } from "@rdfjs/types";
-import { skos, skosxl } from "@tpluscode/rdf-ns-builders";
+import { skos } from "@tpluscode/rdf-ns-builders";
+import { iriToTranslationKey } from "./iriToTranslationKey.js";
 
 export class LabelProperty {
-  static readonly ALT = new LabelProperty({
-    skosIdentifier: skos.altLabel,
-    skosXlIdentifier: skosxl.altLabel,
-  });
+  static readonly ALT = new LabelProperty(skos.altLabel);
+  static readonly HIDDEN = new LabelProperty(skos.hiddenLabel);
+  static readonly PREF = new LabelProperty(skos.prefLabel);
 
-  static readonly HIDDEN = new LabelProperty({
-    skosIdentifier: skos.hiddenLabel,
-    skosXlIdentifier: skosxl.hiddenLabel,
-  });
+  private constructor(
+    readonly identifier: NamedNode<
+      | "http://www.w3.org/2004/02/skos/core#altLabel"
+      | "http://www.w3.org/2004/02/skos/core#hiddenLabel"
+      | "http://www.w3.org/2004/02/skos/core#prefLabel"
+    >,
+  ) {}
 
-  static readonly PREF = new LabelProperty({
-    skosIdentifier: skos.prefLabel,
-    skosXlIdentifier: skosxl.prefLabel,
-  });
-
-  readonly skosIdentifier: NamedNode;
-  readonly skosXlIdentifier: NamedNode;
-
-  private constructor({
-    skosIdentifier,
-    skosXlIdentifier,
-  }: {
-    skosIdentifier: NamedNode;
-    skosXlIdentifier: NamedNode;
-  }) {
-    this.skosIdentifier = skosIdentifier;
-    this.skosXlIdentifier = skosXlIdentifier;
-  }
-
-  equals(other: LabelProperty): boolean {
-    return this.skosIdentifier.equals(other.skosIdentifier);
+  get translationKey(): string {
+    return iriToTranslationKey(this.identifier);
   }
 }
 
