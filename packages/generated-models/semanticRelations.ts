@@ -8,7 +8,7 @@ import {
 export function semanticRelations(
   concept: Concept,
 ): readonly [SemanticRelationProperty, readonly ConceptStub[]][] {
-  const getSemanticallyRelatedConceptStubs = (
+  const getSemanticallyRelatedConcepts = (
     semanticRelationProperty: SemanticRelationProperty,
   ): readonly ConceptStub[] => {
     switch (semanticRelationProperty.identifier.value) {
@@ -36,7 +36,7 @@ export function semanticRelations(
   };
 
   return semanticRelationProperties.flatMap((semanticRelationProperty) => {
-    const conceptStubs = getSemanticallyRelatedConceptStubs(
+    const conceptStubs = getSemanticallyRelatedConcepts(
       semanticRelationProperty,
     );
     if (conceptStubs.length > 0) {

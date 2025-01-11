@@ -109,6 +109,37 @@ export const behavesLikeUnescoThesaurusKos = (
     expect(conceptSchemeIdentifiers).not.toHaveLength(0);
   });
 
+  it("UNESCO thesaurus KOS: conceptSchemeStub", async () => {
+    const expectedConceptSchemeStubs = await kos.conceptSchemeStubs({
+      limit: 1,
+      offset: 0,
+      query: { type: "All" },
+    });
+    expect(expectedConceptSchemeStubs).toHaveLength(1);
+    const expectedConceptSchemeStub = expectedConceptSchemeStubs[0];
+    expect(expectedConceptSchemeStub.prefLabel).toHaveLength(1);
+    const expectedPrefLabel = expectedConceptSchemeStub.prefLabel[0];
+    expect(expectedPrefLabel.language).toStrictEqual("en");
+    expect(expectedPrefLabel.value).toStrictEqual("UNESCO Thesaurus");
+
+    const actualConceptSchemeStub = (
+      await kos.conceptSchemeStub(expectedConceptSchemeStub.identifier)
+    ).unsafeCoerce();
+    expect(
+      actualConceptSchemeStub.identifier.equals(
+        expectedConceptSchemeStub.identifier,
+      ),
+    ).toStrictEqual(true);
+    expect(
+      actualConceptSchemeStub.identifier.equals(
+        expectedConceptSchemeStub.identifier,
+      ),
+    ).toStrictEqual(true);
+    const actualPrefLabel = expectedConceptSchemeStub.prefLabel[0];
+    expect(actualPrefLabel.language).toStrictEqual("en");
+    expect(actualPrefLabel.value).toStrictEqual("UNESCO Thesaurus");
+  });
+
   it("UNESCO thesaurus KOS: conceptSchemeStubs", async () => {
     const conceptSchemeStubs = await kos.conceptSchemeStubs({
       limit: null,
@@ -125,6 +156,33 @@ export const behavesLikeUnescoThesaurusKos = (
 
   it("UNESCO thesaurus KOS: conceptSchemesCount", async () => {
     expect(await kos.conceptSchemesCount({ type: "All" })).toStrictEqual(1);
+  });
+
+  it("UNESCO thesaurus KOS: conceptStub", async () => {
+    const expectedConceptStubs = await kos.conceptStubs({
+      limit: 1,
+      offset: 0,
+      query: { type: "All" },
+    });
+    expect(expectedConceptStubs).toHaveLength(1);
+    const expectedConceptStub = expectedConceptStubs[0];
+    expect(expectedConceptStub.prefLabel).toHaveLength(1);
+    const expectedPrefLabel = expectedConceptStub.prefLabel[0];
+    expect(expectedPrefLabel.language).toStrictEqual("en");
+    expect(expectedPrefLabel.value).toStrictEqual("Right to education");
+
+    const actualConceptStub = (
+      await kos.conceptStub(expectedConceptStub.identifier)
+    ).unsafeCoerce();
+    expect(
+      actualConceptStub.identifier.equals(expectedConceptStub.identifier),
+    ).toStrictEqual(true);
+    expect(
+      actualConceptStub.identifier.equals(expectedConceptStub.identifier),
+    ).toStrictEqual(true);
+    const actualPrefLabel = expectedConceptStub.prefLabel[0];
+    expect(actualPrefLabel.language).toStrictEqual("en");
+    expect(actualPrefLabel.value).toStrictEqual("Right to education");
   });
 
   it("UNESCO thesaurus KOS: conceptStubs", async () => {

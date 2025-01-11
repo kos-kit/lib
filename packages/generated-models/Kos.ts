@@ -31,6 +31,10 @@ export interface Kos<
     query: ConceptSchemesQuery;
   }): Promise<readonly Identifier[]>;
 
+  conceptSchemeStub(
+    identifier: Identifier,
+  ): Promise<Either<Error, ConceptSchemeStubT>>;
+
   conceptSchemeStubs(kwds: {
     limit: number | null;
     offset: number;
@@ -38,6 +42,8 @@ export interface Kos<
   }): Promise<readonly ConceptSchemeStubT[]>;
 
   conceptSchemesCount(query: ConceptSchemesQuery): Promise<number>;
+
+  conceptStub(identifier: Identifier): Promise<Either<Error, ConceptStubT>>;
 
   conceptStubs(kwds: {
     limit: number | null;

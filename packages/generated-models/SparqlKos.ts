@@ -131,6 +131,17 @@ ${offset > 0 ? `OFFSET ${offset}` : ""}
     );
   }
 
+  async conceptSchemeStub(
+    identifier: Identifier,
+  ): Promise<Either<Error, ConceptSchemeStubT>> {
+    return (
+      await this.modelsByIdentifiers({
+        identifiers: [identifier],
+        modelFactory: this.modelFactories.conceptSchemeStub,
+      })
+    )[0];
+  }
+
   async conceptSchemeStubs(parameters: {
     limit: number | null;
     offset: number;
@@ -164,6 +175,17 @@ ${this.conceptSchemesQueryToWhereGraphPatterns(query).join("\n")}
 }`),
       "count",
     );
+  }
+
+  async conceptStub(
+    identifier: Identifier,
+  ): Promise<Either<Error, ConceptStubT>> {
+    return (
+      await this.modelsByIdentifiers({
+        identifiers: [identifier],
+        modelFactory: this.modelFactories.conceptStub,
+      })
+    )[0];
   }
 
   async conceptStubs(parameters: {

@@ -179,6 +179,19 @@ export class RdfjsDatasetKos<
     );
   }
 
+  async conceptSchemeStub(
+      identifier: Identifier,
+  ): Promise<Either<Error, ConceptSchemeStubT>> {
+    return this.conceptSchemeStubSync(identifier);
+  }
+
+  conceptSchemeStubSync(identifier: Identifier): Either<Error, ConceptSchemeStubT> {
+    return this.modelFactories.conceptSchemeStub.fromRdf({
+      languageIn: this.languageIn,
+      resource: this.resourceSet.namedResource(identifier),
+    });
+  }
+
   async conceptSchemeStubs(parameters: {
     limit: number | null;
     offset: number;
@@ -233,6 +246,19 @@ export class RdfjsDatasetKos<
       count++;
     }
     return count;
+  }
+
+  async conceptStub(
+    identifier: Identifier,
+  ): Promise<Either<Error, ConceptStubT>> {
+    return this.conceptStubSync(identifier);
+  }
+
+  conceptStubSync(identifier: Identifier): Either<Error, ConceptStubT> {
+    return this.modelFactories.conceptStub.fromRdf({
+      languageIn: this.languageIn,
+      resource: this.resourceSet.namedResource(identifier),
+    });
   }
 
   async conceptStubs(parameters: {
