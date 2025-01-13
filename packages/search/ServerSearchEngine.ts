@@ -40,10 +40,9 @@ export class ServerSearchEngine implements SearchEngine {
     const parser = new Parser({ format: "N-Triples" });
     const store = new Store();
     store.addQuads(parser.parse(await response.text()));
-    const languageIn = [params.languageTag, ""];
     const kos = new RdfjsDatasetKos({
       dataset: store,
-      languageIn,
+      languageIn: [params.languageTag, ""],
       modelFactories: ModelFactories.default_,
     });
 

@@ -20,16 +20,16 @@ export class LunrSearchEngine implements SearchEngine {
   private constructor(
     private readonly documents: Record<string, Record<string, string>>, // type -> identifier -> prefLabel
     private readonly index: Index,
-    private readonly languageIn: readonly LanguageTag[],
+    private readonly languageTag: LanguageTag,
   ) {}
 
   static async create({
     conceptsLimit,
-    languageIn,
+    languageTag,
     kos,
   }: {
     conceptsLimit?: number;
-    languageIn: readonly LanguageTag[];
+    languageTag: LanguageTag;
     kos: Kos;
   }): Promise<LunrSearchEngine> {
     interface IndexDocument {
@@ -128,7 +128,7 @@ export class LunrSearchEngine implements SearchEngine {
       }
     });
 
-    return new LunrSearchEngine(compactIndexDocuments, index, languageIn);
+    return new LunrSearchEngine(compactIndexDocuments, index, languageTag);
   }
 
   static fromJson(json: SearchEngineJson) {
@@ -151,9 +151,9 @@ export class LunrSearchEngine implements SearchEngine {
     offset: number;
     query: string;
   }): Promise<SearchResults> {
-    if (!this.languageIn.some((languageIn) => languageIn === languageTag)) {
+    if (this.languageTag !== languageTag) {
       throw new RangeError(
-        `expected language tag '${this.languageIn}', actual '${this.languageIn}`,
+        `expected language tag '${this.languageTag}', actual '${languageTag}`,
       );
     }
 
@@ -187,7 +187,7 @@ export class LunrSearchEngine implements SearchEngine {
     return {
       documents: this.documents,
       index: lunrIndexCompactor.compactLunrIndex(this.index),
-      languageTag: this.languageIn,
+      languageTag: this.languageTag,
       type: "Lunr",
     };
   }

@@ -34,12 +34,12 @@ describe("LunrSearchEngine", () => {
   behavesLikeSearchEngine(() =>
     LunrSearchEngine.create({
       conceptsLimit: 10,
-      languageIn: ["en"],
       kos: new RdfjsDatasetKos({
         dataset: unescoThesaurusDataset,
         languageIn: ["en", ""],
         modelFactories: ModelFactories.default_,
       }),
+      languageTag: "en",
     }),
   );
 });
