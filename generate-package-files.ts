@@ -11,8 +11,7 @@ type PackageName =
   | "rdfjs-dataset-models"
   | "search"
   | "sparql-builder"
-  | "sparql-client"
-  | "sparql-models";
+  | "sparql-client";
 
 interface Package {
   devDependencies?: Record<string, string>;
@@ -136,27 +135,6 @@ const packages: readonly Package[] = [
       n3: externalDependencyVersions.n3,
     },
     name: "sparql-client",
-  },
-  {
-    devDependencies: {
-      "@types/n3": externalDependencyVersions["@types/n3"],
-      n3: externalDependencyVersions.n3,
-    },
-    externalDependencies: {
-      "@rdfjs/types": externalDependencyVersions["@rdfjs/types"],
-      "@tpluscode/rdf-ns-builders":
-        externalDependencyVersions["@tpluscode/rdf-ns-builders"],
-      pino: externalDependencyVersions["pino"],
-      "purify-ts": externalDependencyVersions["purify-ts"],
-      "rdfjs-resource": externalDependencyVersions["rdfjs-resource"],
-    },
-    internalDependencies: [
-      "models",
-      "rdfjs-dataset-models",
-      "sparql-builder",
-      "sparql-client",
-    ],
-    name: "sparql-models",
   },
 ];
 

@@ -62,10 +62,3 @@ jobs:
           name: sparql-client
           json-final-path: ./packages/sparql-client/coverage/coverage-final.json
           json-summary-path: ./packages/sparql-client/coverage/coverage-summary.json
-      - if: always()
-        uses: davelosert/vitest-coverage-report-action@v2
-        with:
-          file-coverage-mode: all
-          name: sparql-models
-          json-final-path: ./packages/sparql-models/coverage/coverage-final.json
-          json-summary-path: ./packages/sparql-models/coverage/coverage-summary.json

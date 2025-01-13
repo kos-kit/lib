@@ -37,7 +37,6 @@
     "watch:search": "npm run watch -w @kos-kit/search",
     "watch:sparql-builder": "npm run watch -w @kos-kit/sparql-builder",
     "watch:sparql-client": "npm run watch -w @kos-kit/sparql-client",
-    "watch:sparql-models": "npm run watch -w @kos-kit/sparql-models",
     "watch:noEmit": "run-p watch:noEmit:*",
     "watch:noEmit:generated-models": "npm run watch:noEmit -w @kos-kit/generated-models",
     "watch:noEmit:models": "npm run watch:noEmit -w @kos-kit/models",
@@ -45,8 +44,7 @@
     "watch:noEmit:rdfjs-dataset-models": "npm run watch:noEmit -w @kos-kit/rdfjs-dataset-models",
     "watch:noEmit:search": "npm run watch:noEmit -w @kos-kit/search",
     "watch:noEmit:sparql-builder": "npm run watch:noEmit -w @kos-kit/sparql-builder",
-    "watch:noEmit:sparql-client": "npm run watch:noEmit -w @kos-kit/sparql-client",
-    "watch:noEmit:sparql-models": "npm run watch:noEmit -w @kos-kit/sparql-models"
+    "watch:noEmit:sparql-client": "npm run watch:noEmit -w @kos-kit/sparql-client"
   },
   "workspaces": [
     "packages/generated-models",
@@ -55,7 +53,6 @@
     "packages/rdfjs-dataset-models",
     "packages/search",
     "packages/sparql-builder",
-    "packages/sparql-client",
-    "packages/sparql-models"
+    "packages/sparql-client"
   ]
 }
