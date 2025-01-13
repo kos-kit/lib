@@ -20,6 +20,8 @@
   "scripts": {
     "build": "npm run build --workspaces",
     "check": "npm run check --workspaces",
+    "check:write": "npm run check:write --workspaces",
+    "check:write:unsafe": "npm run check:write --workspaces",
     "clean": "npm run clean --workspaces",
     "generate-package-files": "tsx generate-package-files.ts",
     "link": "npm link --workspaces",
@@ -32,27 +34,21 @@
     "watch": "run-p watch:*",
     "watch:models": "npm run watch -w @kos-kit/models",
     "watch:next-utils": "npm run watch -w @kos-kit/next-utils",
-    "watch:rdfjs-dataset-models": "npm run watch -w @kos-kit/rdfjs-dataset-models",
     "watch:search": "npm run watch -w @kos-kit/search",
     "watch:sparql-builder": "npm run watch -w @kos-kit/sparql-builder",
     "watch:sparql-client": "npm run watch -w @kos-kit/sparql-client",
-    "watch:sparql-models": "npm run watch -w @kos-kit/sparql-models",
     "watch:noEmit": "run-p watch:noEmit:*",
     "watch:noEmit:models": "npm run watch:noEmit -w @kos-kit/models",
     "watch:noEmit:next-utils": "npm run watch:noEmit -w @kos-kit/next-utils",
-    "watch:noEmit:rdfjs-dataset-models": "npm run watch:noEmit -w @kos-kit/rdfjs-dataset-models",
     "watch:noEmit:search": "npm run watch:noEmit -w @kos-kit/search",
     "watch:noEmit:sparql-builder": "npm run watch:noEmit -w @kos-kit/sparql-builder",
-    "watch:noEmit:sparql-client": "npm run watch:noEmit -w @kos-kit/sparql-client",
-    "watch:noEmit:sparql-models": "npm run watch:noEmit -w @kos-kit/sparql-models"
+    "watch:noEmit:sparql-client": "npm run watch:noEmit -w @kos-kit/sparql-client"
   },
   "workspaces": [
     "packages/models",
     "packages/next-utils",
-    "packages/rdfjs-dataset-models",
     "packages/search",
     "packages/sparql-builder",
-    "packages/sparql-client",
-    "packages/sparql-models"
+    "packages/sparql-client"
   ]
 }

@@ -1,4 +1,4 @@
-import { Identifier } from "./Identifier.js";
+import { Identifier } from "./index.js";
 
 export type ConceptSchemesQuery =
   | // All concept schemes

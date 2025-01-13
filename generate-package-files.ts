@@ -2,16 +2,14 @@ import fs from "node:fs";
 import path from "node:path";
 import { stringify as stringifyYaml } from "yaml";
 
-const VERSION = "2.0.107";
+const VERSION = "2.0.108";
 
 type PackageName =
-  | "rdfjs-dataset-models"
   | "models"
   | "next-utils"
   | "search"
   | "sparql-builder"
-  | "sparql-client"
-  | "sparql-models";
+  | "sparql-client";
 
 interface Package {
   devDependencies?: Record<string, string>;
@@ -44,10 +42,12 @@ const packages: readonly Package[] = [
         externalDependencyVersions["@tpluscode/rdf-ns-builders"],
       "@types/rdfjs__term-set":
         externalDependencyVersions["@types/rdfjs__term-set"],
+      "js-sha256": "^0.11.0",
       pino: externalDependencyVersions["pino"],
       "purify-ts": externalDependencyVersions["purify-ts"],
       "purify-ts-helpers": externalDependencyVersions["purify-ts-helpers"],
     },
+    internalDependencies: ["sparql-builder", "sparql-client"],
     name: "models",
   },
   {
@@ -69,29 +69,14 @@ const packages: readonly Package[] = [
     name: "next-utils",
   },
   {
-    devDependencies: {
-      "@types/n3": externalDependencyVersions["@types/n3"],
-      n3: externalDependencyVersions.n3,
-    },
-    externalDependencies: {
-      "@rdfjs/term-set": externalDependencyVersions["@rdfjs/term-set"],
-      "@rdfjs/types": externalDependencyVersions["@rdfjs/types"],
-      "@types/rdfjs__term-set":
-        externalDependencyVersions["@types/rdfjs__term-set"],
-      pino: externalDependencyVersions["pino"],
-      "purify-ts": externalDependencyVersions["purify-ts"],
-      "rdfjs-resource": externalDependencyVersions["rdfjs-resource"],
-    },
-    name: "rdfjs-dataset-models",
-  },
-  {
     externalDependencies: {
       "@rdfjs/types": externalDependencyVersions["@rdfjs/types"],
       "@types/lunr": "^2.3.7",
       lunr: "^2.3.9",
+      "purify-ts": externalDependencyVersions["purify-ts"],
       "rdfjs-resource": externalDependencyVersions["rdfjs-resource"],
     },
-    internalDependencies: ["rdfjs-dataset-models", "models"],
+    internalDependencies: ["models"],
     name: "search",
   },
   {
@@ -119,27 +104,6 @@ const packages: readonly Package[] = [
     },
     name: "sparql-client",
   },
-  {
-    devDependencies: {
-      "@types/n3": externalDependencyVersions["@types/n3"],
-      n3: externalDependencyVersions.n3,
-    },
-    externalDependencies: {
-      "@rdfjs/types": externalDependencyVersions["@rdfjs/types"],
-      "@tpluscode/rdf-ns-builders":
-        externalDependencyVersions["@tpluscode/rdf-ns-builders"],
-      pino: externalDependencyVersions["pino"],
-      "purify-ts": externalDependencyVersions["purify-ts"],
-      "rdfjs-resource": externalDependencyVersions["rdfjs-resource"],
-    },
-    internalDependencies: [
-      "models",
-      "rdfjs-dataset-models",
-      "sparql-builder",
-      "sparql-client",
-    ],
-    name: "sparql-models",
-  },
 ];
 
 for (const package_ of packages) {
@@ -163,7 +127,7 @@ for (const package_ of packages) {
     ) {
       continue;
     }
-    for (const fileNameGlob of ["*.js", "*.d.ts"]) {
+    for (const fileNameGlob of ["*.js", "*.d.ts", "*.ttl"]) {
       files.add(
         path.join(
           path.relative(packageDirectoryPath, dirent.parentPath),
@@ -259,6 +223,8 @@ fs.writeFileSync(
       scripts: {
         build: "npm run build --workspaces",
         check: "npm run check --workspaces",
+        "check:write": "npm run check:write --workspaces",
+        "check:write:unsafe": "npm run check:write --workspaces",
         clean: "npm run clean --workspaces",
         "generate-package-files": "tsx generate-package-files.ts",
         link: "npm link --workspaces",

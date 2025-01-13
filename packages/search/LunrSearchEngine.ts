@@ -1,5 +1,6 @@
-import { Kos, Label, LanguageTag, Resource } from "@kos-kit/models";
+import { Kos, KosResource, LanguageTag, labels } from "@kos-kit/models";
 import lunr, { Index } from "lunr";
+import { List } from "purify-ts";
 import * as rdfjsResource from "rdfjs-resource";
 import { LunrIndexCompactor } from "./LunrIndexCompactor.js";
 import { SearchEngine } from "./SearchEngine.js";
@@ -24,7 +25,7 @@ export class LunrSearchEngine implements SearchEngine {
   }: {
     conceptsLimit?: number;
     languageTag: LanguageTag;
-    kos: Kos<any, any, any>;
+    kos: Kos;
   }): Promise<LunrSearchEngine> {
     interface IndexDocument {
       readonly identifier: string;
@@ -34,25 +35,30 @@ export class LunrSearchEngine implements SearchEngine {
     }
 
     const toIndexDocument = (
-      model: Resource<any>,
+      kosResource: KosResource,
       type: SearchResult["type"],
     ): IndexDocument | null => {
-      const prefLabels = model.labels({ types: [Label.Type.PREFERRED] });
-      if (prefLabels.length === 0) {
+      const kosResourceLabels = labels(kosResource);
+      const prefLabel = kosResourceLabels.preferred
+        .chain((_) => List.head(_.literalForm))
+        .extract();
+      if (!prefLabel) {
         return null;
       }
 
       const identifierString = rdfjsResource.Resource.Identifier.toString(
-        model.identifier,
+        kosResource.identifier,
       );
 
       return {
         identifier: identifierString,
-        joinedLabels: model
-          .labels()
-          .map((label) => label.literalForm.value)
+        joinedLabels: kosResourceLabels.preferred
+          .toList()
+          .concat(kosResourceLabels.alternative)
+          .concat(kosResourceLabels.hidden)
+          .flatMap((label) => label.literalForm.map((literal) => literal.value))
           .join(" "),
-        prefLabel: prefLabels[0].literalForm.value,
+        prefLabel: prefLabel.value,
         type,
       };
     };
@@ -61,36 +67,37 @@ export class LunrSearchEngine implements SearchEngine {
 
     if (conceptsLimit != null) {
       // Don't index all concepts in the set, in testing
-      for (const concept of await kos.conceptsByQuery({
+      for (const conceptStub of await kos.conceptStubs({
         limit: conceptsLimit,
         offset: 0,
         query: { type: "All" },
       })) {
-        (await concept.resolve()).ifRight((concept) =>
+        (await kos.concept(conceptStub.identifier)).ifRight((concept) =>
           indexDocuments.push(toIndexDocument(concept, "Concept")),
         );
       }
     } else {
       // Index all concepts in the set
-      for (const concept of await kos.conceptsByQuery({
+      for (const conceptStub of await kos.conceptStubs({
         limit: null,
         offset: 0,
         query: { type: "All" },
       })) {
-        (await concept.resolve()).ifRight((concept) =>
+        (await kos.concept(conceptStub.identifier)).ifRight((concept) =>
           indexDocuments.push(toIndexDocument(concept, "Concept")),
         );
       }
     }
 
     // Index concept schemes
-    for (const conceptScheme of await kos.conceptSchemesByQuery({
+    for (const conceptSchemeStub of await kos.conceptSchemeStubs({
       limit: null,
       offset: 0,
       query: { type: "All" },
     })) {
-      (await conceptScheme.resolve()).ifRight((conceptScheme) =>
-        indexDocuments.push(toIndexDocument(conceptScheme, "ConceptScheme")),
+      (await kos.conceptScheme(conceptSchemeStub.identifier)).ifRight(
+        (conceptScheme) =>
+          indexDocuments.push(toIndexDocument(conceptScheme, "ConceptScheme")),
       );
     }
 
@@ -139,9 +146,9 @@ export class LunrSearchEngine implements SearchEngine {
     offset: number;
     query: string;
   }): Promise<SearchResults> {
-    if (languageTag !== this.languageTag) {
+    if (this.languageTag !== languageTag) {
       throw new RangeError(
-        `expected language tag '${this.languageTag}', actual '${this.languageTag}`,
+        `expected language tag '${this.languageTag}', actual '${languageTag}`,
       );
     }
 

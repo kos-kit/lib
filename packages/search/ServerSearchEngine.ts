@@ -1,6 +1,11 @@
-import { Label, LanguageTag, LanguageTagSet } from "@kos-kit/models";
-import * as mem from "@kos-kit/rdfjs-dataset-models";
+import {
+  LanguageTag,
+  ModelFactories,
+  RdfjsDatasetKos,
+  labels,
+} from "@kos-kit/models";
 import { Parser, Store } from "n3";
+import { List } from "purify-ts";
 import { Resource } from "rdfjs-resource";
 import { SearchEngine } from "./SearchEngine.js";
 import { SearchEngineJson } from "./SearchEngineJson.js";
@@ -35,48 +40,47 @@ export class ServerSearchEngine implements SearchEngine {
     const parser = new Parser({ format: "N-Triples" });
     const store = new Store();
     store.addQuads(parser.parse(await response.text()));
-    const kos = new mem.DefaultKos({
+    const kos = new RdfjsDatasetKos({
       dataset: store,
-      includeLanguageTags: new LanguageTagSet(params.languageTag, ""),
+      languageIn: [params.languageTag, ""],
+      modelFactories: ModelFactories.default_,
     });
 
     const page: SearchResult[] = [];
 
-    for (const concept of await kos.conceptsByQuery({
+    for (const conceptStub of kos.conceptStubsSync({
       limit: null,
       offset: 0,
       query: { type: "All" },
     })) {
-      (await concept.resolve()).ifRight((concept) => {
-        const prefLabels = concept.labels({ types: [Label.Type.PREFERRED] });
-        if (prefLabels.length === 0) {
-          return;
-        }
-        page.push({
-          identifier: Resource.Identifier.toString(concept.identifier),
-          prefLabel: prefLabels[0].literalForm.value,
-          type: "Concept",
-        });
+      const prefLabel = labels(conceptStub)
+        .preferred.chain((_) => List.head(_.literalForm))
+        .extract();
+      if (!prefLabel) {
+        continue;
+      }
+      page.push({
+        identifier: Resource.Identifier.toString(conceptStub.identifier),
+        prefLabel: prefLabel.value,
+        type: "Concept",
       });
     }
 
-    for (const conceptScheme of await kos.conceptSchemesByQuery({
+    for (const conceptSchemeStub of kos.conceptSchemeStubsSync({
       limit: null,
       offset: 0,
       query: { type: "All" },
     })) {
-      (await conceptScheme.resolve()).ifRight((conceptScheme) => {
-        const prefLabels = conceptScheme.labels({
-          types: [Label.Type.PREFERRED],
-        });
-        if (prefLabels.length === 0) {
-          return;
-        }
-        page.push({
-          identifier: Resource.Identifier.toString(conceptScheme.identifier),
-          prefLabel: prefLabels[0].literalForm.value,
-          type: "ConceptScheme",
-        });
+      const prefLabel = labels(conceptSchemeStub)
+        .preferred.chain((_) => List.head(_.literalForm))
+        .extract();
+      if (!prefLabel) {
+        continue;
+      }
+      page.push({
+        identifier: Resource.Identifier.toString(conceptSchemeStub.identifier),
+        prefLabel: prefLabel.value,
+        type: "ConceptScheme",
       });
     }
 

@@ -1,59 +1,55 @@
-import { Concept } from "./Concept.js";
-import { ConceptScheme } from "./ConceptScheme.js";
-import { ConceptSchemesQuery } from "./ConceptSchemesQuery.js";
-import { ConceptsQuery } from "./ConceptsQuery.js";
-import { Identifier } from "./Identifier.js";
-import { Label } from "./Label.js";
-import { LanguageTagSet } from "./LanguageTagSet.js";
-import { Stub } from "./Stub.js";
-import { StubSequence } from "./StubSequence.js";
+import { Either } from "purify-ts";
+import {
+  Concept,
+  ConceptScheme,
+  ConceptSchemeStub,
+  ConceptSchemesQuery,
+  ConceptStub,
+  ConceptsQuery,
+  Identifier,
+} from "./index.js";
 
 export interface Kos<
-  ConceptT extends Concept<ConceptT, ConceptSchemeT, LabelT>,
-  ConceptSchemeT extends ConceptScheme<ConceptT, LabelT>,
-  LabelT extends Label,
+  ConceptT extends Concept = Concept,
+  ConceptSchemeT extends ConceptScheme = ConceptScheme,
+  ConceptSchemeStubT extends ConceptSchemeStub = ConceptSchemeStub,
+  ConceptStubT extends ConceptStub = ConceptStub,
 > {
-  readonly includeLanguageTags: LanguageTagSet;
+  concept(identifier: Identifier): Promise<Either<Error, ConceptT>>;
 
-  concept(identifier: Identifier): Stub<ConceptT>;
-
-  conceptScheme(identifier: Identifier): Stub<ConceptSchemeT>;
-
-  conceptSchemes(kwds: {
-    limit: number | null;
-    offset: number;
-  }): Promise<StubSequence<ConceptSchemeT>>;
-
-  conceptSchemesByIdentifiers(
-    identifiers: readonly Identifier[],
-  ): StubSequence<ConceptSchemeT>;
-
-  conceptSchemesByQuery(kwds: {
-    limit: number | null;
-    offset: number;
-    query: ConceptSchemesQuery;
-  }): Promise<StubSequence<ConceptSchemeT>>;
-
-  conceptSchemesCount(): Promise<number>;
-
-  conceptSchemesCountByQuery(query: ConceptSchemesQuery): Promise<number>;
-
-  concepts(kwds: {
-    limit: number | null;
-    offset: number;
-  }): Promise<StubSequence<ConceptT>>;
-
-  conceptsByIdentifiers(
-    identifiers: readonly Identifier[],
-  ): StubSequence<ConceptT>;
-
-  conceptsByQuery(kwds: {
+  conceptIdentifiers(kwds: {
     limit: number | null;
     offset: number;
     query: ConceptsQuery;
-  }): Promise<StubSequence<ConceptT>>;
+  }): Promise<readonly Identifier[]>;
 
-  conceptsCount(): Promise<number>;
+  conceptScheme(identifier: Identifier): Promise<Either<Error, ConceptSchemeT>>;
 
-  conceptsCountByQuery(query: ConceptsQuery): Promise<number>;
+  conceptSchemeIdentifiers(kwds: {
+    limit: number | null;
+    offset: number;
+    query: ConceptSchemesQuery;
+  }): Promise<readonly Identifier[]>;
+
+  conceptSchemeStub(
+    identifier: Identifier,
+  ): Promise<Either<Error, ConceptSchemeStubT>>;
+
+  conceptSchemeStubs(kwds: {
+    limit: number | null;
+    offset: number;
+    query: ConceptSchemesQuery;
+  }): Promise<readonly ConceptSchemeStubT[]>;
+
+  conceptSchemesCount(query: ConceptSchemesQuery): Promise<number>;
+
+  conceptStub(identifier: Identifier): Promise<Either<Error, ConceptStubT>>;
+
+  conceptStubs(kwds: {
+    limit: number | null;
+    offset: number;
+    query: ConceptsQuery;
+  }): Promise<readonly ConceptStubT[]>;
+
+  conceptsCount(query: ConceptsQuery): Promise<number>;
 }

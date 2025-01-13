@@ -24,16 +24,16 @@ jobs:
         uses: davelosert/vitest-coverage-report-action@v2
         with:
           file-coverage-mode: all
-          name: next-utils
-          json-final-path: ./packages/next-utils/coverage/coverage-final.json
-          json-summary-path: ./packages/next-utils/coverage/coverage-summary.json
+          name: models
+          json-final-path: ./packages/models/coverage/coverage-final.json
+          json-summary-path: ./packages/models/coverage/coverage-summary.json
       - if: always()
         uses: davelosert/vitest-coverage-report-action@v2
         with:
           file-coverage-mode: all
-          name: rdfjs-dataset-models
-          json-final-path: ./packages/rdfjs-dataset-models/coverage/coverage-final.json
-          json-summary-path: ./packages/rdfjs-dataset-models/coverage/coverage-summary.json
+          name: next-utils
+          json-final-path: ./packages/next-utils/coverage/coverage-final.json
+          json-summary-path: ./packages/next-utils/coverage/coverage-summary.json
       - if: always()
         uses: davelosert/vitest-coverage-report-action@v2
         with:
@@ -55,10 +55,3 @@ jobs:
           name: sparql-client
           json-final-path: ./packages/sparql-client/coverage/coverage-final.json
           json-summary-path: ./packages/sparql-client/coverage/coverage-summary.json
-      - if: always()
-        uses: davelosert/vitest-coverage-report-action@v2
-        with:
-          file-coverage-mode: all
-          name: sparql-models
-          json-final-path: ./packages/sparql-models/coverage/coverage-final.json
-          json-summary-path: ./packages/sparql-models/coverage/coverage-summary.json

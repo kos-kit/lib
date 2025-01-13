@@ -1,5 +1,4 @@
-import { Identifier } from "./Identifier.js";
-import { SemanticRelation } from "./SemanticRelation.js";
+import { Identifier, SemanticRelationProperty } from "./index.js";
 
 export type ConceptsQuery =
   | {
@@ -17,7 +16,7 @@ export type ConceptsQuery =
       // Object concepts that are semantic relations of the given subject concept
       // i.e. if semanticRelationProperty is skos:broader, then
       // (subjectConceptIdentifier, skos:broader, ?otherConcept)
-      readonly semanticRelationType: SemanticRelation.Type;
+      readonly semanticRelationProperty: SemanticRelationProperty;
       readonly subjectConceptIdentifier: Identifier;
       readonly type: "ObjectsOfSemanticRelation";
     }
@@ -25,7 +24,7 @@ export type ConceptsQuery =
       // Subject concepts that are semantic relations of the given object concept
       // i.e. if semanticRelationProperty is skos:broader, then
       // (?otherConcept, skos:broader, objectConceptIdentifier)
-      readonly semanticRelationType: SemanticRelation.Type;
+      readonly semanticRelationProperty: SemanticRelationProperty;
       readonly objectConceptIdentifier: Identifier;
       readonly type: "SubjectsOfSemanticRelation";
     }

@@ -1,0 +1,199 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix kos-kit: <http://kos-kit.github.io/ns#> .
+@prefix dash: <http://datashapes.org/dash#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix shaclmate: <http://minorg.github.io/shaclmate/ns#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix skos-xl: <http://www.w3.org/2008/05/skos-xl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<http://kos-kit.github.io/ns#>
+    shaclmate:tsFeatureInclude shaclmate:_TsFeature_Create, shaclmate:_TsFeature_FromRdf, shaclmate:_TsFeature_SparqlGraphPatterns ;
+    shaclmate:tsObjectDeclarationType shaclmate:_TsObjectDeclarationType_Interface ;
+    a owl:Ontology .
+
+kos-kit:KosResource
+    shaclmate:abstract true ;
+    shaclmate:name "KosResource" ;
+    a owl:Class, sh:NodeShape ;
+    sh:nodeKind sh:IRI ;
+    sh:property [
+        sh:name "scopeNote" ;
+        sh:path skos:scopeNote ;
+        sh:xone dash:StringOrLangString
+    ], [
+        sh:name "definition" ;
+        sh:path skos:definition ;
+        sh:xone dash:StringOrLangString
+    ], [
+        sh:name "editorialNote" ;
+        sh:path skos:editorialNote ;
+        sh:xone dash:StringOrLangString
+    ], [
+        sh:name "example" ;
+        sh:path skos:example ;
+        sh:xone dash:StringOrLangString
+    ], [
+        sh:name "hiddenLabel" ;
+        sh:path skos:hiddenLabel ;
+        sh:xone dash:StringOrLangString
+    ], [
+        sh:datatype xsd:dateTime ;
+        sh:maxCount 1 ;
+        sh:name "modified" ;
+        sh:path dcterms:modified
+    ], [
+        sh:name "hiddenLabelXl" ;
+        sh:node skos-xl:Label ;
+        sh:path skos-xl:hiddenLabel
+    ], [
+        sh:name "historyNote" ;
+        sh:path skos:historyNote ;
+        sh:xone dash:StringOrLangString
+    ], [
+        sh:name "altLabel" ;
+        sh:path skos:altLabel ;
+        sh:xone dash:StringOrLangString
+    ], [
+        sh:datatype rdf:langString ;
+        sh:name "notation" ;
+        sh:path skos:notation
+    ], [
+        sh:name "note" ;
+        sh:path skos:notation ;
+        sh:xone dash:StringOrLangString
+    ], [
+        sh:name "prefLabel" ;
+        sh:path skos:prefLabel ;
+        sh:xone dash:StringOrLangString
+    ], [
+        sh:name "prefLabelXl" ;
+        sh:node skos-xl:Label ;
+        sh:path skos-xl:prefLabel
+    ], [
+        sh:name "altLabelXl" ;
+        sh:node skos-xl:Label ;
+        sh:path skos-xl:altLabel
+    ], [
+        sh:name "changeNote" ;
+        sh:path skos:changeNote ;
+        sh:xone dash:StringOrLangString
+    ] .
+
+<http://www.w3.org/2004/02/skos/core#>
+    shaclmate:tsFeatureInclude shaclmate:_TsFeature_Create, shaclmate:_TsFeature_FromRdf, shaclmate:_TsFeature_SparqlGraphPatterns ;
+    shaclmate:tsObjectDeclarationType shaclmate:_TsObjectDeclarationType_Interface ;
+    a owl:Ontology .
+
+skos:Concept
+    shaclmate:name "Concept" ;
+    a owl:Class, sh:NodeShape ;
+    rdfs:subClassOf kos-kit:KosResource ;
+    sh:property [
+        sh:name "broader" ;
+        sh:node kos-kit:ConceptStub ;
+        sh:path skos:broader
+    ], [
+        sh:name "broaderTransitive" ;
+        sh:node kos-kit:ConceptStub ;
+        sh:path skos:broaderTransitive
+    ], [
+        sh:name "broadMatch" ;
+        sh:node kos-kit:ConceptStub ;
+        sh:path skos:broadMatch
+    ], [
+        sh:name "closeMatch" ;
+        sh:node kos-kit:ConceptStub ;
+        sh:path skos:closeMatch
+    ], [
+        sh:name "exactMatch" ;
+        sh:node kos-kit:ConceptStub ;
+        sh:path skos:exactMatch
+    ], [
+        sh:name "inScheme" ;
+        sh:node kos-kit:ConceptSchemeStub ;
+        sh:path skos:inScheme
+    ], [
+        sh:name "mappingRelation" ;
+        sh:node kos-kit:ConceptStub ;
+        sh:path skos:mappingRelation
+    ], [
+        sh:name "narrower" ;
+        sh:node kos-kit:ConceptStub ;
+        sh:path skos:narrower
+    ], [
+        sh:name "narrowerTransitive" ;
+        sh:node kos-kit:ConceptStub ;
+        sh:path skos:narrowerTransitive
+    ], [
+        sh:name "narrowMatch" ;
+        sh:node kos-kit:ConceptStub ;
+        sh:path skos:narrowMatch
+    ], [
+        sh:name "related" ;
+        sh:node kos-kit:ConceptStub ;
+        sh:path skos:related
+    ], [
+        sh:name "relatedMatch" ;
+        sh:node kos-kit:ConceptStub ;
+        sh:path skos:relatedMatch
+    ], [
+        sh:name "semanticRelation" ;
+        sh:node kos-kit:ConceptStub ;
+        sh:path skos:semanticRelation
+    ], [
+        sh:name "topConceptOf" ;
+        sh:node kos-kit:ConceptSchemeStub ;
+        sh:path skos:topConceptOf
+    ] .
+
+skos:ConceptScheme
+    shaclmate:name "ConceptScheme" ;
+    a owl:Class, sh:NodeShape ;
+    rdfs:subClassOf kos-kit:KosResource ;
+    sh:property [
+        sh:name "hasTopConcept" ;
+        sh:node kos-kit:ConceptStub ;
+        sh:path skos:hasTopConcept
+    ], [
+        sh:maxCount 1 ;
+        sh:name "license" ;
+        sh:path dcterms:license ;
+        sh:xone ([
+                sh:nodeKind sh:IRI
+            ]
+            [
+                sh:nodeKind sh:Literal
+            ]
+        )
+    ], [
+        sh:maxCount 1 ;
+        sh:name "rights" ;
+        sh:nodeKind sh:Literal ;
+        sh:path dcterms:rights
+    ], [
+        sh:maxCount 1 ;
+        sh:name "rightsHolder" ;
+        sh:nodeKind sh:Literal ;
+        sh:path dcterms:rightsHolder
+    ] .
+
+<http://www.w3.org/2008/05/skos-xl#>
+    shaclmate:tsFeatureInclude shaclmate:_TsFeature_Create, shaclmate:_TsFeature_FromRdf, shaclmate:_TsFeature_SparqlGraphPatterns ;
+    shaclmate:tsObjectDeclarationType shaclmate:_TsObjectDeclarationType_Interface ;
+    a owl:Ontology .
+
+skos-xl:Label
+    shaclmate:name "Label" ;
+    a owl:Class, sh:NodeShape ;
+    sh:nodeKind sh:BlankNodeOrIRI ;
+    sh:property [
+        sh:minCount 1 ;
+        sh:name "literalForm" ;
+        sh:path skos-xl:literalForm ;
+        sh:xone dash:StringOrLangString
+    ] .
+

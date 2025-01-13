@@ -1,15 +1,16 @@
 {
   "dependencies": {
-    "@kos-kit/rdfjs-dataset-models": "2.0.107",
-    "@kos-kit/models": "2.0.107",
+    "@kos-kit/models": "2.0.108",
     "@rdfjs/types": "^1.1.0",
     "@types/lunr": "^2.3.7",
     "lunr": "^2.3.9",
+    "purify-ts": "~2.1.0",
     "rdfjs-resource": "1.0.14"
   },
   "files": [
     "*.d.ts",
-    "*.js"
+    "*.js",
+    "*.ttl"
   ],
   "main": "index.js",
   "license": "Apache-2.0",
@@ -41,5 +42,5 @@
   },
   "type": "module",
   "types": "index.d.ts",
-  "version": "2.0.107"
+  "version": "2.0.108"
 }

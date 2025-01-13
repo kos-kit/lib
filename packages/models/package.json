@@ -1,9 +1,12 @@
 {
   "dependencies": {
+    "@kos-kit/sparql-builder": "2.0.108",
+    "@kos-kit/sparql-client": "2.0.108",
     "@rdfjs/term-set": "^2.0.3",
     "@rdfjs/types": "^1.1.0",
     "@tpluscode/rdf-ns-builders": "^4.3.0",
     "@types/rdfjs__term-set": "^2.0.9",
+    "js-sha256": "^0.11.0",
     "pino": "^9.1.0",
     "purify-ts": "~2.1.0",
     "purify-ts-helpers": "1.0.7"
@@ -11,8 +14,7 @@
   "files": [
     "*.d.ts",
     "*.js",
-    "abc/*.d.ts",
-    "abc/*.js"
+    "*.ttl"
   ],
   "main": "index.js",
   "license": "Apache-2.0",
@@ -44,5 +46,5 @@
   },
   "type": "module",
   "types": "index.d.ts",
-  "version": "2.0.107"
+  "version": "2.0.108"
 }
