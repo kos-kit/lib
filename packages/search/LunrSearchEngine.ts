@@ -1,9 +1,4 @@
-import {
-  Kos,
-  KosResource,
-  LanguageTag,
-  labels,
-} from "@kos-kit/models";
+import { Kos, KosResource, LanguageTag, labels } from "@kos-kit/models";
 import lunr, { Index } from "lunr";
 import { List } from "purify-ts";
 import * as rdfjsResource from "rdfjs-resource";
