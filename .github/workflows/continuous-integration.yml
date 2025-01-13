@@ -24,9 +24,9 @@ jobs:
         uses: davelosert/vitest-coverage-report-action@v2
         with:
           file-coverage-mode: all
-          name: generated-models
-          json-final-path: ./packages/generated-models/coverage/coverage-final.json
-          json-summary-path: ./packages/generated-models/coverage/coverage-summary.json
+          name: models
+          json-final-path: ./packages/models/coverage/coverage-final.json
+          json-summary-path: ./packages/models/coverage/coverage-summary.json
       - if: always()
         uses: davelosert/vitest-coverage-report-action@v2
         with:

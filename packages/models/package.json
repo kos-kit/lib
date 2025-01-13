@@ -18,7 +18,7 @@
   ],
   "main": "index.js",
   "license": "Apache-2.0",
-  "name": "@kos-kit/generated-models",
+  "name": "@kos-kit/models",
   "scripts": {
     "build": "tsc -b",
     "check": "biome check",
@@ -36,7 +36,7 @@
     "test": "biome check && vitest run",
     "test:coverage": "biome check && vitest run --coverage",
     "test:watch": "vitest watch",
-    "unlink": "npm unlink -g @kos-kit/generated-models",
+    "unlink": "npm unlink -g @kos-kit/models",
     "watch": "tsc -w --preserveWatchOutput",
     "watch:noEmit": "tsc -w --noEmit --preserveWatchOutput"
   },

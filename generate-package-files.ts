@@ -5,7 +5,7 @@ import { stringify as stringifyYaml } from "yaml";
 const VERSION = "2.0.107";
 
 type PackageName =
-  | "generated-models"
+  | "models"
   | "next-utils"
   | "search"
   | "sparql-builder"
@@ -48,7 +48,7 @@ const packages: readonly Package[] = [
       "purify-ts-helpers": externalDependencyVersions["purify-ts-helpers"],
     },
     internalDependencies: ["sparql-builder", "sparql-client"],
-    name: "generated-models",
+    name: "models",
   },
   {
     externalDependencies: {
@@ -76,7 +76,7 @@ const packages: readonly Package[] = [
       "purify-ts": externalDependencyVersions["purify-ts"],
       "rdfjs-resource": externalDependencyVersions["rdfjs-resource"],
     },
-    internalDependencies: ["generated-models"],
+    internalDependencies: ["models"],
     name: "search",
   },
   {

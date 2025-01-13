@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { ModelFactories, RdfjsDatasetKos } from "@kos-kit/generated-models";
+import { ModelFactories, RdfjsDatasetKos } from "@kos-kit/models";
 import { Parser, Store } from "n3";
 import { describe } from "vitest";
 import { LunrSearchEngine } from "../LunrSearchEngine.js";

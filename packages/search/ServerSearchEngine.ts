@@ -3,7 +3,7 @@ import {
   ModelFactories,
   RdfjsDatasetKos,
   labels,
-} from "@kos-kit/generated-models";
+} from "@kos-kit/models";
 import { Parser, Store } from "n3";
 import { List } from "purify-ts";
 import { Resource } from "rdfjs-resource";
