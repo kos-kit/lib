@@ -2,9 +2,10 @@ import {
   LanguageTag,
   ModelFactories,
   RdfjsDatasetKos,
-  kosResourcePrefLabel,
+  labels,
 } from "@kos-kit/generated-models";
 import { Parser, Store } from "n3";
+import { List } from "purify-ts";
 import { Resource } from "rdfjs-resource";
 import { SearchEngine } from "./SearchEngine.js";
 import { SearchEngineJson } from "./SearchEngineJson.js";
@@ -53,18 +54,16 @@ export class ServerSearchEngine implements SearchEngine {
       offset: 0,
       query: { type: "All" },
     })) {
-      kos.conceptSync(conceptStub.identifier).ifRight((concept) => {
-        const prefLabel = kosResourcePrefLabel(concept, {
-          languageIn,
-        }).extract();
-        if (!prefLabel) {
-          return;
-        }
-        page.push({
-          identifier: Resource.Identifier.toString(concept.identifier),
-          prefLabel: prefLabel.literalForm.value,
-          type: "Concept",
-        });
+      const prefLabel = labels(conceptStub)
+        .preferred.chain((_) => List.head(_.literalForm))
+        .extract();
+      if (!prefLabel) {
+        continue;
+      }
+      page.push({
+        identifier: Resource.Identifier.toString(conceptStub.identifier),
+        prefLabel: prefLabel.value,
+        type: "Concept",
       });
     }
 
@@ -72,22 +71,19 @@ export class ServerSearchEngine implements SearchEngine {
       limit: null,
       offset: 0,
       query: { type: "All" },
-    }))
-      kos
-        .conceptSchemeSync(conceptSchemeStub.identifier)
-        .ifRight((conceptScheme) => {
-          const prefLabel = kosResourcePrefLabel(conceptScheme, {
-            languageIn,
-          }).extract();
-          if (!prefLabel) {
-            return;
-          }
-          page.push({
-            identifier: Resource.Identifier.toString(conceptScheme.identifier),
-            prefLabel: prefLabel.literalForm.value,
-            type: "ConceptScheme",
-          });
-        });
+    })) {
+      const prefLabel = labels(conceptSchemeStub)
+        .preferred.chain((_) => List.head(_.literalForm))
+        .extract();
+      if (!prefLabel) {
+        continue;
+      }
+      page.push({
+        identifier: Resource.Identifier.toString(conceptSchemeStub.identifier),
+        prefLabel: prefLabel.value,
+        type: "ConceptScheme",
+      });
+    }
 
     return { page, total };
   }

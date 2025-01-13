@@ -105,6 +105,10 @@ export class SemanticRelationProperty {
   get translationKey(): string {
     return iriToTranslationKey(this.identifier);
   }
+
+  equals(other: SemanticRelationProperty): boolean {
+    return this.identifier.equals(other.identifier);
+  }
 }
 
 // https://www.w3.org/TR/skos-reference/#L4160

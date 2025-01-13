@@ -4,6 +4,7 @@
     "@rdfjs/types": "^1.1.0",
     "@types/lunr": "^2.3.7",
     "lunr": "^2.3.9",
+    "purify-ts": "~2.1.0",
     "rdfjs-resource": "1.0.14"
   },
   "files": [

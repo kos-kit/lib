@@ -106,6 +106,7 @@ const packages: readonly Package[] = [
       "@rdfjs/types": externalDependencyVersions["@rdfjs/types"],
       "@types/lunr": "^2.3.7",
       lunr: "^2.3.9",
+      "purify-ts": externalDependencyVersions["purify-ts"],
       "rdfjs-resource": externalDependencyVersions["rdfjs-resource"],
     },
     internalDependencies: ["generated-models"],

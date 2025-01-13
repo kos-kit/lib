@@ -2,10 +2,10 @@ import {
   Kos,
   KosResource,
   LanguageTag,
-  kosResourceLabels,
-  kosResourcePrefLabel,
+  labels,
 } from "@kos-kit/generated-models";
 import lunr, { Index } from "lunr";
+import { List } from "purify-ts";
 import * as rdfjsResource from "rdfjs-resource";
 import { LunrIndexCompactor } from "./LunrIndexCompactor.js";
 import { SearchEngine } from "./SearchEngine.js";
@@ -40,24 +40,28 @@ export class LunrSearchEngine implements SearchEngine {
     }
 
     const toIndexDocument = (
-      model: KosResource,
+      kosResource: KosResource,
       type: SearchResult["type"],
     ): IndexDocument | null => {
-      const prefLabel = kosResourcePrefLabel(model, { languageIn })
-        .map((_) => _.literalForm)
+      const kosResourceLabels = labels(kosResource);
+      const prefLabel = kosResourceLabels.preferred
+        .chain((_) => List.head(_.literalForm))
         .extract();
       if (!prefLabel) {
         return null;
       }
 
       const identifierString = rdfjsResource.Resource.Identifier.toString(
-        model.identifier,
+        kosResource.identifier,
       );
 
       return {
         identifier: identifierString,
-        joinedLabels: Object.values(kosResourceLabels(model))
-          .flatMap((labels) => labels.map((label) => label.literalForm.value))
+        joinedLabels: kosResourceLabels.preferred
+          .toList()
+          .concat(kosResourceLabels.alternative)
+          .concat(kosResourceLabels.hidden)
+          .flatMap((label) => label.literalForm.map((literal) => literal.value))
           .join(" "),
         prefLabel: prefLabel.value,
         type,
