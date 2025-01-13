@@ -1,10 +1,10 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { LanguageTag } from "@kos-kit/models";
 import { OxigraphSparqlClient } from "@kos-kit/sparql-client";
 import * as oxigraph from "oxigraph";
 import { describe } from "vitest";
+import { LanguageTag } from "../LanguageTag.js";
 import { ModelFactories } from "../ModelFactories.js";
 import { SparqlKos } from "../SparqlKos.js";
 import { OxigraphDatasetCore } from "./OxigraphDatasetCore.js";

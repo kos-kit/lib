@@ -1,10 +1,10 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { LanguageTag } from "@kos-kit/models";
 import { DatasetCore } from "@rdfjs/types";
 import { Parser, Store } from "n3";
 import { describe } from "vitest";
+import {LanguageTag} from "../LanguageTag.js";
 import { ModelFactories } from "../ModelFactories.js";
 import { RdfjsDatasetKos } from "../RdfjsDatasetKos.js";
 import { behavesLikeSyntheticKos } from "./behavesLikeSyntheticKos.js";
