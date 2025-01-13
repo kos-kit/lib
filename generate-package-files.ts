@@ -8,7 +8,6 @@ type PackageName =
   | "generated-models"
   | "models"
   | "next-utils"
-  | "rdfjs-dataset-models"
   | "search"
   | "sparql-builder"
   | "sparql-client";
@@ -83,22 +82,6 @@ const packages: readonly Package[] = [
       "unbzip2-stream": "^1.4.3",
     },
     name: "next-utils",
-  },
-  {
-    devDependencies: {
-      "@types/n3": externalDependencyVersions["@types/n3"],
-      n3: externalDependencyVersions.n3,
-    },
-    externalDependencies: {
-      "@rdfjs/term-set": externalDependencyVersions["@rdfjs/term-set"],
-      "@rdfjs/types": externalDependencyVersions["@rdfjs/types"],
-      "@types/rdfjs__term-set":
-        externalDependencyVersions["@types/rdfjs__term-set"],
-      pino: externalDependencyVersions["pino"],
-      "purify-ts": externalDependencyVersions["purify-ts"],
-      "rdfjs-resource": externalDependencyVersions["rdfjs-resource"],
-    },
-    name: "rdfjs-dataset-models",
   },
   {
     externalDependencies: {

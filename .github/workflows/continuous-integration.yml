@@ -38,13 +38,6 @@ jobs:
         uses: davelosert/vitest-coverage-report-action@v2
         with:
           file-coverage-mode: all
-          name: rdfjs-dataset-models
-          json-final-path: ./packages/rdfjs-dataset-models/coverage/coverage-final.json
-          json-summary-path: ./packages/rdfjs-dataset-models/coverage/coverage-summary.json
-      - if: always()
-        uses: davelosert/vitest-coverage-report-action@v2
-        with:
-          file-coverage-mode: all
           name: search
           json-final-path: ./packages/search/coverage/coverage-final.json
           json-summary-path: ./packages/search/coverage/coverage-summary.json
