@@ -4,10 +4,6 @@ import {
   RdfTypeGraphPatterns,
 } from "@kos-kit/sparql-builder";
 import { SparqlQueryClient } from "@kos-kit/sparql-client";
-import {
-  mapBindingsToCount,
-  mapBindingsToIdentifiers,
-} from "@kos-kit/sparql-models";
 import { DatasetCoreFactory } from "@rdfjs/types";
 import { skos } from "@tpluscode/rdf-ns-builders";
 import { Either } from "purify-ts";
@@ -24,6 +20,8 @@ import {
   Identifier,
   Kos,
   LanguageTag,
+  mapBindingsToCount,
+  mapBindingsToIdentifiers,
 } from "./index.js";
 
 export class SparqlKos<
