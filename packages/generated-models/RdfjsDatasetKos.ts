@@ -180,12 +180,14 @@ export class RdfjsDatasetKos<
   }
 
   async conceptSchemeStub(
-      identifier: Identifier,
+    identifier: Identifier,
   ): Promise<Either<Error, ConceptSchemeStubT>> {
     return this.conceptSchemeStubSync(identifier);
   }
 
-  conceptSchemeStubSync(identifier: Identifier): Either<Error, ConceptSchemeStubT> {
+  conceptSchemeStubSync(
+    identifier: Identifier,
+  ): Either<Error, ConceptSchemeStubT> {
     return this.modelFactories.conceptSchemeStub.fromRdf({
       languageIn: this.languageIn,
       resource: this.resourceSet.namedResource(identifier),
