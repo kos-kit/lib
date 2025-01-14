@@ -29,7 +29,7 @@ const externalDependencyVersions = {
   n3: "^1.21.3",
   pino: "^9.1.0",
   "purify-ts": "~2.1.0",
-  "purify-ts-helpers": "1.0.7",
+  "purify-ts-helpers": "1.0.8",
   "rdfjs-resource": "1.0.14",
 };
 
