@@ -8,11 +8,11 @@ import { ModelFactories } from "./ModelFactories.js";
 import { ModelFactory } from "./ModelFactory.js";
 import {
   Concept,
+  ConceptQuery,
   ConceptScheme,
+  ConceptSchemeQuery,
   ConceptSchemeStub,
-  ConceptSchemesQuery,
   ConceptStub,
-  ConceptsQuery,
   Identifier,
   Kos,
   LanguageTag,
@@ -96,7 +96,7 @@ export class SparqlKos<
   }: {
     limit: number | null;
     offset: number;
-    query: ConceptsQuery;
+    query: ConceptQuery;
   }): Promise<readonly Identifier[]> {
     return mapBindingsToIdentifiers(
       await this.sparqlQueryClient.queryBindings(
@@ -134,7 +134,7 @@ export class SparqlKos<
   }: {
     limit: number | null;
     offset: number;
-    query: ConceptSchemesQuery;
+    query: ConceptSchemeQuery;
   }): Promise<readonly Identifier[]> {
     return mapBindingsToIdentifiers(
       await this.sparqlQueryClient.queryBindings(
@@ -168,7 +168,7 @@ export class SparqlKos<
   async conceptSchemeStubs(parameters: {
     limit: number | null;
     offset: number;
-    query: ConceptSchemesQuery;
+    query: ConceptSchemeQuery;
   }): Promise<readonly ConceptSchemeStubT[]> {
     const identifiers = await this.conceptSchemeIdentifiers(parameters);
     const modelEithers = await this.modelsByIdentifiers({
@@ -189,7 +189,7 @@ export class SparqlKos<
     );
   }
 
-  async conceptSchemesCount(query: ConceptSchemesQuery): Promise<number> {
+  async conceptSchemesCount(query: ConceptSchemeQuery): Promise<number> {
     return mapBindingsToCount(
       await this.sparqlQueryClient.queryBindings(
         this.sparqlGenerator.stringify({
@@ -229,7 +229,7 @@ export class SparqlKos<
   async conceptStubs(parameters: {
     limit: number | null;
     offset: number;
-    query: ConceptsQuery;
+    query: ConceptQuery;
   }): Promise<readonly ConceptStubT[]> {
     const identifiers = await this.conceptIdentifiers(parameters);
     const modelEithers = await this.modelsByIdentifiers({
@@ -248,7 +248,7 @@ export class SparqlKos<
     );
   }
 
-  async conceptsCount(query: ConceptsQuery): Promise<number> {
+  async conceptsCount(query: ConceptQuery): Promise<number> {
     return mapBindingsToCount(
       await this.sparqlQueryClient.queryBindings(
         this.sparqlGenerator.stringify({
@@ -275,7 +275,7 @@ export class SparqlKos<
   }
 
   private conceptSchemesQueryToWhereGraphPatterns(
-    query: ConceptSchemesQuery,
+    query: ConceptSchemeQuery,
   ): readonly sparqljs.Pattern[] {
     if (query.type === "All") {
       // rdf:type/rdfs:subClassOf* skos:ConceptScheme
@@ -335,7 +335,7 @@ export class SparqlKos<
   }
 
   private conceptsQueryToWhereGraphPatterns(
-    query: ConceptsQuery,
+    query: ConceptQuery,
   ): readonly sparqljs.Pattern[] {
     if (query.type === "All") {
       // rdf:type/rdfs:subClassOf* skos:ConceptScheme

@@ -1,6 +1,6 @@
 import { Identifier } from "./index.js";
 
-export type ConceptSchemesQuery =
+export type ConceptSchemeQuery =
   | // All concept schemes
   { readonly type: "All" }
   // Concept schemes that have the given concept in them
