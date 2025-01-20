@@ -31,7 +31,7 @@ export namespace ModelFactories {
     },
     conceptScheme: {
       fromRdf: ConceptScheme.fromRdf,
-      sparqlConstructQueryString: ConceptSchemeStub.sparqlConstructQueryString,
+      sparqlConstructQueryString: ConceptScheme.sparqlConstructQueryString,
     },
     conceptSchemeStub: {
       fromIdentifier: (identifier) => ConceptSchemeStub.create({ identifier }),

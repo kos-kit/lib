@@ -12,7 +12,7 @@ import { OxigraphDatasetCore } from "./OxigraphDatasetCore.js";
 import { behavesLikeSyntheticKos } from "./behavesLikeSyntheticKos.js";
 import { behavesLikeUnescoThesaurusKos } from "./behavesLikeUnescoThesaurusKos.js";
 
-describe("SparqlKos", () => {
+describe("SparqlKos", async () => {
   const syntheticStore = new oxigraph.Store();
   syntheticStore.load(
     fs
@@ -30,6 +30,7 @@ describe("SparqlKos", () => {
       .toString(),
     { format: "ttl" },
   );
+  // const syntheticStoreString = syntheticStore.dump({ format: "trig" });
 
   const kosFactoryFactory =
     (store: oxigraph.Store) => (languageIn: LanguageTag) =>

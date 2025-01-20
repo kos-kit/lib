@@ -481,8 +481,8 @@ export class SparqlKos<
 
     const quads = await this.sparqlQueryClient.queryQuads(constructQueryString);
 
-    const quadsString = quads.map((quad) => quad.toString()).join("\n");
-    console.log(quadsString);
+    // const quadsString = quads.map((quad) => quad.toString()).join("\n");
+    // console.log(quadsString);
 
     return identifiers.map((identifier) =>
       modelFactory.fromRdf({
