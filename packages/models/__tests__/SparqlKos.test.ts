@@ -2,6 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { OxigraphSparqlClient } from "@kos-kit/sparql-client";
+import * as N3 from "n3";
 import * as oxigraph from "oxigraph";
 import { describe } from "vitest";
 import { LanguageTag } from "../LanguageTag.js";
@@ -33,6 +34,7 @@ describe("SparqlKos", () => {
   const kosFactoryFactory =
     (store: oxigraph.Store) => (languageIn: LanguageTag) =>
       new SparqlKos({
+        dataFactory: N3.DataFactory,
         datasetCoreFactory: {
           dataset: (quads) =>
             new OxigraphDatasetCore(new oxigraph.Store(quads)),
@@ -68,6 +70,7 @@ describe("SparqlKos", () => {
   behavesLikeUnescoThesaurusKos(
     (languageIn: LanguageTag) =>
       new SparqlKos({
+        dataFactory: N3.DataFactory,
         datasetCoreFactory: {
           dataset: (quads) =>
             new OxigraphDatasetCore(new oxigraph.Store(quads)),

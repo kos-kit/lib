@@ -1,13 +1,9 @@
-import {
-  ConstructQueryBuilder,
-  GraphPattern,
-  RdfTypeGraphPatterns,
-} from "@kos-kit/sparql-builder";
 import { SparqlQueryClient } from "@kos-kit/sparql-client";
-import { DatasetCoreFactory } from "@rdfjs/types";
+import { DataFactory, DatasetCoreFactory, Variable } from "@rdfjs/types";
 import { skos } from "@tpluscode/rdf-ns-builders";
 import { Either } from "purify-ts";
 import { Resource } from "rdfjs-resource";
+import sparqljs from "sparqljs";
 import { ModelFactories } from "./ModelFactories.js";
 import { ModelFactory } from "./ModelFactory.js";
 import {
@@ -23,6 +19,7 @@ import {
   mapBindingsToCount,
   mapBindingsToIdentifiers,
 } from "./index.js";
+import { sparqlRdfTypePattern } from "./sparqlRdfTypePattern.js";
 
 export class SparqlKos<
   ConceptT extends Concept = Concept,
@@ -31,6 +28,9 @@ export class SparqlKos<
   ConceptStubT extends ConceptStub = ConceptStub,
 > implements Kos<ConceptT, ConceptSchemeT, ConceptSchemeStubT, ConceptStubT>
 {
+  private readonly conceptSchemeVariable: Variable;
+  private readonly conceptVariable: Variable;
+  private readonly countVariable: Variable;
   private readonly datasetCoreFactory: DatasetCoreFactory;
   private readonly languageIn: readonly LanguageTag[];
   private readonly modelFactories: ModelFactories<
@@ -39,14 +39,17 @@ export class SparqlKos<
     ConceptSchemeStubT,
     ConceptStubT
   >;
+  private readonly sparqlGenerator: sparqljs.SparqlGenerator;
   private readonly sparqlQueryClient: SparqlQueryClient;
 
   constructor({
+    dataFactory,
     datasetCoreFactory,
     languageIn,
     modelFactories,
     sparqlQueryClient,
   }: {
+    dataFactory: DataFactory;
     datasetCoreFactory: DatasetCoreFactory;
     languageIn: readonly LanguageTag[];
     modelFactories: ModelFactories<
@@ -57,9 +60,13 @@ export class SparqlKos<
     >;
     sparqlQueryClient: SparqlQueryClient;
   }) {
+    this.conceptVariable = dataFactory.variable!("concept");
+    this.conceptSchemeVariable = dataFactory.variable!("conceptScheme");
+    this.countVariable = dataFactory.variable!("count");
     this.datasetCoreFactory = datasetCoreFactory;
     this.languageIn = languageIn;
     this.modelFactories = modelFactories;
+    this.sparqlGenerator = new sparqljs.Generator();
     this.sparqlQueryClient = sparqlQueryClient;
   }
 
@@ -68,6 +75,7 @@ export class SparqlKos<
       await this.modelsByIdentifiers({
         identifiers: [identifier],
         modelFactory: this.modelFactories.concept,
+        subject: this.conceptVariable,
       })
     )[0];
   }
@@ -82,16 +90,20 @@ export class SparqlKos<
     query: ConceptsQuery;
   }): Promise<readonly Identifier[]> {
     return mapBindingsToIdentifiers(
-      await this.sparqlQueryClient.queryBindings(`\
-SELECT DISTINCT ?concept
-WHERE {
-${this.conceptsQueryToWhereGraphPatterns(query).join("\n")}
-}
-ORDER BY ?concept
-${limit !== null && limit > 0 ? `LIMIT ${limit}` : ""}
-${offset > 0 ? `OFFSET ${offset}` : ""}
-`),
-      "concept",
+      await this.sparqlQueryClient.queryBindings(
+        this.sparqlGenerator.stringify({
+          distinct: true,
+          limit: limit ?? undefined,
+          offset,
+          order: [{ expression: this.conceptVariable }],
+          prefixes: {},
+          queryType: "SELECT",
+          type: "query",
+          variables: [this.conceptVariable],
+          where: this.conceptsQueryToWhereGraphPatterns(query).concat(),
+        }),
+      ),
+      this.conceptVariable.value,
     );
   }
 
@@ -102,6 +114,7 @@ ${offset > 0 ? `OFFSET ${offset}` : ""}
       await this.modelsByIdentifiers({
         identifiers: [identifier],
         modelFactory: this.modelFactories.conceptScheme,
+        subject: this.conceptSchemeVariable,
       })
     )[0];
   }
@@ -116,16 +129,20 @@ ${offset > 0 ? `OFFSET ${offset}` : ""}
     query: ConceptSchemesQuery;
   }): Promise<readonly Identifier[]> {
     return mapBindingsToIdentifiers(
-      await this.sparqlQueryClient.queryBindings(`\
-SELECT DISTINCT ?conceptScheme
-WHERE {
-${this.conceptSchemesQueryToWhereGraphPatterns(query).join("\n")}
-}
-ORDER BY ?conceptScheme
-${limit !== null && limit > 0 ? `LIMIT ${limit}` : ""}
-${offset > 0 ? `OFFSET ${offset}` : ""}
-`),
-      "conceptScheme",
+      await this.sparqlQueryClient.queryBindings(
+        this.sparqlGenerator.stringify({
+          distinct: true,
+          limit: limit ?? undefined,
+          offset,
+          order: [{ expression: this.conceptSchemeVariable }],
+          prefixes: {},
+          queryType: "SELECT",
+          type: "query",
+          variables: [this.conceptSchemeVariable],
+          where: this.conceptSchemesQueryToWhereGraphPatterns(query).concat(),
+        }),
+      ),
+      this.conceptSchemeVariable.value,
     );
   }
 
@@ -136,6 +153,7 @@ ${offset > 0 ? `OFFSET ${offset}` : ""}
       await this.modelsByIdentifiers({
         identifiers: [identifier],
         modelFactory: this.modelFactories.conceptSchemeStub,
+        subject: this.conceptSchemeVariable,
       })
     )[0];
   }
@@ -149,6 +167,7 @@ ${offset > 0 ? `OFFSET ${offset}` : ""}
     const modelEithers = await this.modelsByIdentifiers({
       identifiers: identifiers,
       modelFactory: this.modelFactories.conceptSchemeStub,
+      subject: this.conceptSchemeVariable,
     });
     if (modelEithers.length !== identifiers.length) {
       throw new Error("should never happen");
@@ -166,12 +185,27 @@ ${offset > 0 ? `OFFSET ${offset}` : ""}
 
   async conceptSchemesCount(query: ConceptSchemesQuery): Promise<number> {
     return mapBindingsToCount(
-      await this.sparqlQueryClient.queryBindings(`\
-SELECT (COUNT(DISTINCT ?conceptScheme) AS ?count)
-WHERE {
-${this.conceptSchemesQueryToWhereGraphPatterns(query).join("\n")}
-}`),
-      "count",
+      await this.sparqlQueryClient.queryBindings(
+        this.sparqlGenerator.stringify({
+          distinct: true,
+          prefixes: {},
+          queryType: "SELECT",
+          type: "query",
+          variables: [
+            {
+              expression: {
+                aggregation: "COUNT",
+                distinct: true,
+                expression: this.conceptSchemeVariable,
+                type: "aggregate",
+              },
+              variable: this.countVariable,
+            },
+          ],
+          where: this.conceptSchemesQueryToWhereGraphPatterns(query).concat(),
+        }),
+      ),
+      this.countVariable.value,
     );
   }
 
@@ -182,6 +216,7 @@ ${this.conceptSchemesQueryToWhereGraphPatterns(query).join("\n")}
       await this.modelsByIdentifiers({
         identifiers: [identifier],
         modelFactory: this.modelFactories.conceptStub,
+        subject: this.conceptVariable,
       })
     )[0];
   }
@@ -195,6 +230,7 @@ ${this.conceptSchemesQueryToWhereGraphPatterns(query).join("\n")}
     const modelEithers = await this.modelsByIdentifiers({
       identifiers: identifiers,
       modelFactory: this.modelFactories.conceptStub,
+      subject: this.conceptVariable,
     });
     if (modelEithers.length !== identifiers.length) {
       throw new Error("should never happen");
@@ -210,114 +246,203 @@ ${this.conceptSchemesQueryToWhereGraphPatterns(query).join("\n")}
 
   async conceptsCount(query: ConceptsQuery): Promise<number> {
     return mapBindingsToCount(
-      await this.sparqlQueryClient.queryBindings(`\
-SELECT (COUNT(DISTINCT ?concept) AS ?count)
-WHERE {
-${this.conceptsQueryToWhereGraphPatterns(query).join("\n")}
-}`),
-      "count",
+      await this.sparqlQueryClient.queryBindings(
+        this.sparqlGenerator.stringify({
+          distinct: true,
+          prefixes: {},
+          queryType: "SELECT",
+          type: "query",
+          variables: [
+            {
+              expression: {
+                aggregation: "COUNT",
+                distinct: true,
+                expression: this.conceptVariable,
+                type: "aggregate",
+              },
+              variable: this.countVariable,
+            },
+          ],
+          where: this.conceptsQueryToWhereGraphPatterns(query).concat(),
+        }),
+      ),
+      this.countVariable.value,
     );
   }
 
   private conceptSchemesQueryToWhereGraphPatterns(
     query: ConceptSchemesQuery,
-  ): string[] {
+  ): readonly sparqljs.Pattern[] {
     if (query.type === "All") {
+      // rdf:type/rdfs:subClassOf* skos:ConceptScheme
       return [
-        new RdfTypeGraphPatterns(
-          GraphPattern.variable("conceptScheme"),
-          skos.ConceptScheme,
-        ).toWhereString(),
+        sparqlRdfTypePattern({
+          rdfType: skos.ConceptScheme,
+          subject: this.conceptSchemeVariable,
+        }),
       ];
     }
 
-    const whereGraphPatterns: string[] = [
-      `VALUES ?concept { ${Identifier.toString(query.conceptIdentifier)} }`,
-      // skos:topConceptOf's range is skos:ConceptScheme, so we don't have to check the rdf:type
-      `{ ?concept <${skos.topConceptOf.value}> ?conceptScheme . }`,
-      "UNION",
-      // skos:hasTopConcept's domain is skos:ConceptScheme, so we don't have to check the rdf:type
-      `{ ?conceptScheme <${skos.hasTopConcept.value}> ?concept . }`,
+    // Query type HasConcept or HasTopConcept
+    const unionPatterns: sparqljs.Pattern[] = [
+      {
+        // skos:topConceptOf's range is skos:ConceptScheme, so we don't have to check the rdf:type
+        triples: [
+          {
+            subject: query.conceptIdentifier,
+            predicate: skos.topConceptOf,
+            object: this.conceptSchemeVariable,
+          },
+        ],
+        type: "bgp",
+      },
+      {
+        // skos:hasTopConcept's domain is skos:ConceptScheme, so we don't have to check the rdf:type
+        triples: [
+          {
+            subject: this.conceptSchemeVariable,
+            predicate: skos.hasTopConcept,
+            object: query.conceptIdentifier,
+          },
+        ],
+        type: "bgp",
+      },
     ];
 
     if (query.type === "HasConcept") {
-      whereGraphPatterns.push(
-        "UNION",
-        // skos:inScheme has an open domain, so we have to check the concept's rdf:type
-        `{ ?concept <${skos.inScheme.value}> ?conceptScheme . }`,
-      );
+      unionPatterns.push({
+        triples: [
+          {
+            subject: query.conceptIdentifier,
+            predicate: skos.inScheme,
+            object: this.conceptSchemeVariable,
+          },
+        ],
+        type: "bgp",
+      });
     }
 
-    return whereGraphPatterns;
+    return [
+      {
+        patterns: unionPatterns,
+        type: "union",
+      },
+    ];
   }
 
   private conceptsQueryToWhereGraphPatterns(
     query: ConceptsQuery,
-  ): readonly string[] {
+  ): readonly sparqljs.Pattern[] {
     if (query.type === "All") {
-      return new RdfTypeGraphPatterns(
-        GraphPattern.variable("concept"),
-        skos.Concept,
-      ).toWhereStrings();
+      // rdf:type/rdfs:subClassOf* skos:ConceptScheme
+      return [
+        sparqlRdfTypePattern({
+          rdfType: skos.Concept,
+          subject: this.conceptVariable,
+        }),
+      ];
     }
 
     if (query.type === "InScheme" || query.type === "TopConceptOf") {
-      const whereGraphPatterns: string[] = [];
-
-      const conceptSchemeIdentifierString = Identifier.toString(
-        query.conceptSchemeIdentifier,
-      );
+      const unionPatterns: sparqljs.Pattern[] = [];
 
       if (query.type === "InScheme") {
         if (query.conceptIdentifier) {
-          whereGraphPatterns.push(
-            // Put the VALUES pattern first
-            `VALUES ?concept { ${Identifier.toString(
-              query.conceptIdentifier,
-            )} }`,
-            `{ ?concept <${skos.inScheme.value}> ${conceptSchemeIdentifierString} }`,
-            "UNION",
-          );
+          unionPatterns.push({
+            triples: [
+              {
+                subject: query.conceptIdentifier,
+                predicate: skos.inScheme,
+                object: query.conceptSchemeIdentifier,
+              },
+            ],
+            type: "bgp",
+          });
         } else {
-          whereGraphPatterns.push(
-            // skos:inScheme has an open domain, so we have to check the concept's rdf:type
-            `{ ?concept <${
-              skos.inScheme.value
-            }> ${conceptSchemeIdentifierString} . ${new RdfTypeGraphPatterns(
-              GraphPattern.variable("concept"),
-              skos.Concept,
-            ).toWhereString()} }`,
-            "UNION",
+          // skos:inScheme has an open domain, so we have to check the concept's rdf:type
+          unionPatterns.push(
+            {
+              triples: [
+                {
+                  subject: this.conceptVariable,
+                  predicate: skos.inScheme,
+                  object: query.conceptSchemeIdentifier,
+                },
+              ],
+              type: "bgp",
+            },
+            sparqlRdfTypePattern({
+              subject: this.conceptVariable,
+              rdfType: skos.ConceptScheme,
+            }),
           );
+          // `{ ?concept <${
+          //   skos.inScheme.value
+          // }> ${conceptSchemeIdentifierString} . ${new RdfTypeGraphPatterns(
+          //   GraphPattern.variable("concept"),
+          //   skos.Concept,
+          // ).toWhereString()} }`,
+          // "UNION",
         }
       }
 
-      whereGraphPatterns.push(
-        // skos:topConceptOf's domain is skos:Concept, so we don't have to check the rdf:type
-        `{ ?concept <${skos.topConceptOf.value}> ${conceptSchemeIdentifierString} }`,
-        "UNION",
-        // skos:hasTopConcept's range is skos:Concept, so we don't have to check the rdf:type
-        `{ ${conceptSchemeIdentifierString} <${skos.hasTopConcept.value}> ?concept }`,
+      unionPatterns.push(
+        {
+          // skos:topConceptOf's domain is skos:Concept, so we don't have to check the rdf:type
+          triples: [
+            {
+              subject: this.conceptVariable,
+              predicate: skos.topConceptOf,
+              object: query.conceptSchemeIdentifier,
+            },
+          ],
+          type: "bgp",
+        },
+        {
+          // skos:hasTopConcept's range is skos:Concept, so we don't have to check the rdf:type
+          triples: [
+            {
+              subject: query.conceptSchemeIdentifier,
+              predicate: skos.hasTopConcept,
+              object: this.conceptVariable,
+            },
+          ],
+          type: "bgp",
+        },
       );
 
-      return whereGraphPatterns;
+      return [{ patterns: unionPatterns, type: "union" }];
     }
 
     if (query.type === "ObjectsOfSemanticRelation") {
       return [
         // The semantic relations have a range of skos:Concept, so no need to check the rdf:type
-        `${Identifier.toString(query.subjectConceptIdentifier)} <${
-          query.semanticRelationProperty.identifier.value
-        }> ?concept`,
+        {
+          triples: [
+            {
+              subject: query.subjectConceptIdentifier,
+              predicate: query.semanticRelationProperty.identifier,
+              object: this.conceptVariable,
+            },
+          ],
+          type: "bgp",
+        },
       ];
     }
 
     if (query.type === "SubjectsOfSemanticRelation") {
       return [
         // The semantic relations have a domain of skos:Concept, so no need to check the rdf:type
-        `?concept <${
-          query.semanticRelationProperty.identifier.value
-        }> ${Identifier.toString(query.objectConceptIdentifier)}`,
+        {
+          triples: [
+            {
+              subject: this.conceptVariable,
+              predicate: query.semanticRelationProperty.identifier,
+              object: query.objectConceptIdentifier,
+            },
+          ],
+          type: "bgp",
+        },
       ];
     }
 
@@ -327,22 +452,26 @@ ${this.conceptsQueryToWhereGraphPatterns(query).join("\n")}
   private async modelsByIdentifiers<ModelT>({
     identifiers,
     modelFactory,
+    subject,
   }: {
     identifiers: readonly Identifier[];
     modelFactory: ModelFactory<ModelT>;
+    subject: Variable;
   }): Promise<readonly Either<Resource.ValueError, ModelT>[]> {
     if (identifiers.length === 0) {
       return [];
     }
 
-    const subjectVariable = GraphPattern.variable("subject");
-    const constructQuery = new ConstructQueryBuilder({
-      includeLanguageTags: this.languageIn,
-    })
-      .addGraphPatterns(new modelFactory.SparqlGraphPatterns(subjectVariable))
-      .addValues(subjectVariable, ...identifiers)
-      .build();
-    const quads = await this.sparqlQueryClient.queryQuads(constructQuery);
+    const constructQueryString = modelFactory.sparqlConstructQueryString({
+      subject,
+      values: identifiers.map((identifier) => {
+        const valuePatternRow: sparqljs.ValuePatternRow = {};
+        valuePatternRow[`?${subject.value}`] = identifier;
+        return valuePatternRow;
+      }),
+    });
+
+    const quads = await this.sparqlQueryClient.queryQuads(constructQueryString);
 
     // const quadsString = quads.map((quad) => quad.toString()).join("\n");
     // console.log(quadsString);

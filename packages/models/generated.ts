@@ -1,9 +1,10 @@
-import * as sparqlBuilder from "@kos-kit/sparql-builder";
 import type * as rdfjs from "@rdfjs/types";
 import { DataFactory as dataFactory } from "n3";
 import * as purify from "purify-ts";
+import * as purifyHelpers from "purify-ts-helpers";
 import * as rdfLiteral from "rdf-literal";
 import * as rdfjsResource from "rdfjs-resource";
+import * as sparqljs from "sparqljs";
 export interface LabelStub {
   readonly identifier: rdfjs.BlankNode | rdfjs.NamedNode;
   readonly literalForm: purify.NonEmptyList<rdfjs.Literal>;
@@ -21,7 +22,7 @@ export namespace LabelStub {
     return { identifier, literalForm, type };
   }
 
-  export function fromRdf({
+  export function propertiesFromRdf({
     ignoreRdfType: _ignoreRdfType,
     languageIn: _languageIn,
     resource: _resource,
@@ -32,7 +33,14 @@ export namespace LabelStub {
     ignoreRdfType?: boolean;
     languageIn?: readonly string[];
     resource: rdfjsResource.Resource;
-  }): purify.Either<rdfjsResource.Resource.ValueError, LabelStub> {
+  }): purify.Either<
+    rdfjsResource.Resource.ValueError,
+    {
+      identifier: rdfjs.BlankNode | rdfjs.NamedNode;
+      literalForm: purify.NonEmptyList<rdfjs.Literal>;
+      type: "LabelStub";
+    }
+  > {
     if (
       !_ignoreRdfType &&
       !_resource.isInstanceOf(
@@ -101,31 +109,125 @@ export namespace LabelStub {
     return purify.Either.of({ identifier, literalForm, type });
   }
 
-  export class SparqlGraphPatterns extends sparqlBuilder.ResourceGraphPatterns {
-    constructor(
-      subject: sparqlBuilder.ResourceGraphPatterns.SubjectParameter,
-      _options?: { ignoreRdfType?: boolean },
-    ) {
-      super(subject);
-      if (!_options?.ignoreRdfType) {
-        this.add(
-          ...new sparqlBuilder.RdfTypeGraphPatterns(
-            this.subject,
-            dataFactory.namedNode("http://www.w3.org/2008/05/skos-xl#Label"),
-          ),
-        );
-      }
+  export function fromRdf(
+    parameters: Parameters<typeof LabelStub.propertiesFromRdf>[0],
+  ): purify.Either<rdfjsResource.Resource.ValueError, LabelStub> {
+    return LabelStub.propertiesFromRdf(parameters);
+  }
 
-      this.add(
-        sparqlBuilder.GraphPattern.basic(
-          this.subject,
-          dataFactory.namedNode(
-            "http://www.w3.org/2008/05/skos-xl#literalForm",
-          ),
-          this.variable("LiteralForm"),
+  export function sparqlConstructQuery(
+    parameters?: {
+      prefixes?: { [prefix: string]: string };
+      subject: rdfjs.Variable;
+    } & Omit<
+      sparqljs.ConstructQuery,
+      "prefixes" | "queryType" | "template" | "type" | "where"
+    >,
+  ): sparqljs.ConstructQuery {
+    const subject = parameters?.subject ?? dataFactory.variable("labelStub");
+    return {
+      ...parameters,
+      prefixes: parameters?.prefixes ?? {},
+      queryType: "CONSTRUCT",
+      template: LabelStub.sparqlConstructTemplateTriples({ subject }).concat(),
+      type: "query",
+      where: LabelStub.sparqlWherePatterns({ subject }).concat(),
+    };
+  }
+
+  export function sparqlConstructQueryString(
+    parameters?: { subject: rdfjs.Variable } & Omit<
+      sparqljs.ConstructQuery,
+      "prefixes" | "queryType" | "template" | "type" | "where"
+    > &
+      sparqljs.GeneratorOptions,
+  ): string {
+    return new sparqljs.Generator(parameters).stringify(
+      LabelStub.sparqlConstructQuery(parameters),
+    );
+  }
+
+  export function sparqlConstructTemplateTriples({
+    ignoreRdfType,
+    subject,
+    variablePrefix: variablePrefixParameter,
+  }: {
+    ignoreRdfType?: boolean;
+    subject: rdfjs.Variable;
+    variablePrefix?: string;
+  }): readonly sparqljs.Triple[] {
+    const variablePrefix = variablePrefixParameter ?? subject.value;
+    return [
+      ...(ignoreRdfType
+        ? []
+        : [
+            {
+              subject,
+              predicate: dataFactory.namedNode(
+                "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+              ),
+              object: dataFactory.variable(`${variablePrefix}RdfType`),
+            },
+          ]),
+      {
+        object: dataFactory.variable(`${variablePrefix}LiteralForm`),
+        predicate: dataFactory.namedNode(
+          "http://www.w3.org/2008/05/skos-xl#literalForm",
         ),
-      );
-    }
+        subject,
+      },
+    ];
+  }
+
+  export function sparqlWherePatterns({
+    ignoreRdfType,
+    subject,
+    variablePrefix: variablePrefixParameter,
+  }: {
+    ignoreRdfType?: boolean;
+    subject: rdfjs.Variable;
+    variablePrefix?: string;
+  }): readonly sparqljs.Pattern[] {
+    const variablePrefix = variablePrefixParameter ?? subject.value;
+    return [
+      ...(ignoreRdfType
+        ? []
+        : [
+            {
+              triples: [
+                {
+                  subject,
+                  predicate: dataFactory.namedNode(
+                    "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+                  ),
+                  object: dataFactory.namedNode(
+                    "http://www.w3.org/2008/05/skos-xl#Label",
+                  ),
+                },
+                {
+                  subject,
+                  predicate: dataFactory.namedNode(
+                    "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+                  ),
+                  object: dataFactory.variable(`${variablePrefix}RdfType`),
+                },
+              ],
+              type: "bgp" as const,
+            },
+          ]),
+      {
+        triples: [
+          {
+            object: dataFactory.variable(`${variablePrefix}LiteralForm`),
+            predicate: dataFactory.namedNode(
+              "http://www.w3.org/2008/05/skos-xl#literalForm",
+            ),
+            subject,
+          },
+        ],
+        type: "bgp",
+      },
+    ];
   }
 }
 export interface KosResourceStub {
@@ -163,7 +265,7 @@ export namespace KosResourceStub {
     return { identifier, prefLabel, prefLabelXl };
   }
 
-  export function fromRdf({
+  export function propertiesFromRdf({
     ignoreRdfType: _ignoreRdfType,
     languageIn: _languageIn,
     resource: _resource,
@@ -255,42 +357,126 @@ export namespace KosResourceStub {
     return purify.Either.of({ identifier, prefLabel, prefLabelXl });
   }
 
-  export class SparqlGraphPatterns extends sparqlBuilder.ResourceGraphPatterns {
-    constructor(
-      subject: sparqlBuilder.ResourceGraphPatterns.SubjectParameter,
-      _options?: { ignoreRdfType?: boolean },
-    ) {
-      super(subject);
-      this.add(
-        sparqlBuilder.GraphPattern.optional(
-          sparqlBuilder.GraphPattern.basic(
-            this.subject,
-            dataFactory.namedNode(
-              "http://www.w3.org/2004/02/skos/core#prefLabel",
-            ),
-            this.variable("PrefLabel"),
-          ),
+  export function sparqlConstructQuery(
+    parameters?: {
+      prefixes?: { [prefix: string]: string };
+      subject: rdfjs.Variable;
+    } & Omit<
+      sparqljs.ConstructQuery,
+      "prefixes" | "queryType" | "template" | "type" | "where"
+    >,
+  ): sparqljs.ConstructQuery {
+    const subject =
+      parameters?.subject ?? dataFactory.variable("kosResourceStub");
+    return {
+      ...parameters,
+      prefixes: parameters?.prefixes ?? {},
+      queryType: "CONSTRUCT",
+      template: KosResourceStub.sparqlConstructTemplateTriples({
+        subject,
+      }).concat(),
+      type: "query",
+      where: KosResourceStub.sparqlWherePatterns({ subject }).concat(),
+    };
+  }
+
+  export function sparqlConstructQueryString(
+    parameters?: { subject: rdfjs.Variable } & Omit<
+      sparqljs.ConstructQuery,
+      "prefixes" | "queryType" | "template" | "type" | "where"
+    > &
+      sparqljs.GeneratorOptions,
+  ): string {
+    return new sparqljs.Generator(parameters).stringify(
+      KosResourceStub.sparqlConstructQuery(parameters),
+    );
+  }
+
+  export function sparqlConstructTemplateTriples({
+    subject,
+    variablePrefix: variablePrefixParameter,
+  }: {
+    ignoreRdfType?: boolean;
+    subject: rdfjs.Variable;
+    variablePrefix?: string;
+  }): readonly sparqljs.Triple[] {
+    const variablePrefix = variablePrefixParameter ?? subject.value;
+    return [
+      {
+        object: dataFactory.variable(`${variablePrefix}PrefLabel`),
+        predicate: dataFactory.namedNode(
+          "http://www.w3.org/2004/02/skos/core#prefLabel",
         ),
-      );
-      this.add(
-        sparqlBuilder.GraphPattern.optional(
-          sparqlBuilder.GraphPattern.group(
-            sparqlBuilder.GraphPattern.basic(
-              this.subject,
-              dataFactory.namedNode(
-                "http://www.w3.org/2008/05/skos-xl#prefLabel",
-              ),
-              this.variable("PrefLabelXl"),
-            ).chainObject(
-              (_object) =>
-                new LabelStub.SparqlGraphPatterns(_object, {
-                  ignoreRdfType: true,
-                }),
-            ),
-          ),
+        subject,
+      },
+      {
+        object: dataFactory.variable(`${variablePrefix}PrefLabelXl`),
+        predicate: dataFactory.namedNode(
+          "http://www.w3.org/2008/05/skos-xl#prefLabel",
         ),
-      );
-    }
+        subject,
+      },
+      ...LabelStub.sparqlConstructTemplateTriples({
+        subject: dataFactory.variable(`${variablePrefix}PrefLabelXl`),
+        variablePrefix: `${variablePrefix}PrefLabelXl`,
+      }),
+    ];
+  }
+
+  export function sparqlWherePatterns({
+    subject,
+    variablePrefix: variablePrefixParameter,
+  }: {
+    ignoreRdfType?: boolean;
+    subject: rdfjs.Variable;
+    variablePrefix?: string;
+  }): readonly sparqljs.Pattern[] {
+    const variablePrefix = variablePrefixParameter ?? subject.value;
+    return [
+      {
+        patterns: [
+          {
+            triples: [
+              {
+                object: dataFactory.variable(`${variablePrefix}PrefLabel`),
+                predicate: dataFactory.namedNode(
+                  "http://www.w3.org/2004/02/skos/core#prefLabel",
+                ),
+                subject,
+              },
+            ],
+            type: "bgp",
+          },
+        ],
+        type: "optional",
+      },
+      {
+        patterns: [
+          {
+            triples: [
+              {
+                object: dataFactory.variable(`${variablePrefix}PrefLabelXl`),
+                predicate: dataFactory.namedNode(
+                  "http://www.w3.org/2008/05/skos-xl#prefLabel",
+                ),
+                subject,
+              },
+            ],
+            type: "bgp",
+          },
+          {
+            patterns: [
+              ...LabelStub.sparqlWherePatterns({
+                subject: dataFactory.variable(`${variablePrefix}PrefLabelXl`),
+                variablePrefix: `${variablePrefix}PrefLabelXl`,
+              }),
+            ],
+            type: "optional",
+          },
+        ],
+        type: "optional",
+      },
+    ];
   }
 }
 export interface KosResource {
@@ -493,7 +679,7 @@ export namespace KosResource {
     };
   }
 
-  export function fromRdf({
+  export function propertiesFromRdf({
     ignoreRdfType: _ignoreRdfType,
     languageIn: _languageIn,
     resource: _resource,
@@ -1068,191 +1254,461 @@ export namespace KosResource {
     });
   }
 
-  export class SparqlGraphPatterns extends sparqlBuilder.ResourceGraphPatterns {
-    constructor(
-      subject: sparqlBuilder.ResourceGraphPatterns.SubjectParameter,
-      _options?: { ignoreRdfType?: boolean },
-    ) {
-      super(subject);
-      this.add(
-        sparqlBuilder.GraphPattern.optional(
-          sparqlBuilder.GraphPattern.basic(
-            this.subject,
-            dataFactory.namedNode(
-              "http://www.w3.org/2004/02/skos/core#altLabel",
-            ),
-            this.variable("AltLabel"),
-          ),
+  export function sparqlConstructQuery(
+    parameters?: {
+      prefixes?: { [prefix: string]: string };
+      subject: rdfjs.Variable;
+    } & Omit<
+      sparqljs.ConstructQuery,
+      "prefixes" | "queryType" | "template" | "type" | "where"
+    >,
+  ): sparqljs.ConstructQuery {
+    const subject = parameters?.subject ?? dataFactory.variable("kosResource");
+    return {
+      ...parameters,
+      prefixes: parameters?.prefixes ?? {},
+      queryType: "CONSTRUCT",
+      template: KosResource.sparqlConstructTemplateTriples({
+        subject,
+      }).concat(),
+      type: "query",
+      where: KosResource.sparqlWherePatterns({ subject }).concat(),
+    };
+  }
+
+  export function sparqlConstructQueryString(
+    parameters?: { subject: rdfjs.Variable } & Omit<
+      sparqljs.ConstructQuery,
+      "prefixes" | "queryType" | "template" | "type" | "where"
+    > &
+      sparqljs.GeneratorOptions,
+  ): string {
+    return new sparqljs.Generator(parameters).stringify(
+      KosResource.sparqlConstructQuery(parameters),
+    );
+  }
+
+  export function sparqlConstructTemplateTriples({
+    subject,
+    variablePrefix: variablePrefixParameter,
+  }: {
+    ignoreRdfType?: boolean;
+    subject: rdfjs.Variable;
+    variablePrefix?: string;
+  }): readonly sparqljs.Triple[] {
+    const variablePrefix = variablePrefixParameter ?? subject.value;
+    return [
+      {
+        object: dataFactory.variable(`${variablePrefix}AltLabel`),
+        predicate: dataFactory.namedNode(
+          "http://www.w3.org/2004/02/skos/core#altLabel",
         ),
-      );
-      this.add(
-        sparqlBuilder.GraphPattern.optional(
-          sparqlBuilder.GraphPattern.group(
-            sparqlBuilder.GraphPattern.basic(
-              this.subject,
-              dataFactory.namedNode(
-                "http://www.w3.org/2008/05/skos-xl#altLabel",
-              ),
-              this.variable("AltLabelXl"),
-            ).chainObject(
-              (_object) =>
-                new Label.SparqlGraphPatterns(_object, { ignoreRdfType: true }),
-            ),
-          ),
+        subject,
+      },
+      {
+        object: dataFactory.variable(`${variablePrefix}AltLabelXl`),
+        predicate: dataFactory.namedNode(
+          "http://www.w3.org/2008/05/skos-xl#altLabel",
         ),
-      );
-      this.add(
-        sparqlBuilder.GraphPattern.optional(
-          sparqlBuilder.GraphPattern.basic(
-            this.subject,
-            dataFactory.namedNode(
-              "http://www.w3.org/2004/02/skos/core#changeNote",
-            ),
-            this.variable("ChangeNote"),
-          ),
+        subject,
+      },
+      ...Label.sparqlConstructTemplateTriples({
+        subject: dataFactory.variable(`${variablePrefix}AltLabelXl`),
+        variablePrefix: `${variablePrefix}AltLabelXl`,
+      }),
+      {
+        object: dataFactory.variable(`${variablePrefix}ChangeNote`),
+        predicate: dataFactory.namedNode(
+          "http://www.w3.org/2004/02/skos/core#changeNote",
         ),
-      );
-      this.add(
-        sparqlBuilder.GraphPattern.optional(
-          sparqlBuilder.GraphPattern.basic(
-            this.subject,
-            dataFactory.namedNode(
-              "http://www.w3.org/2004/02/skos/core#definition",
-            ),
-            this.variable("Definition"),
-          ),
+        subject,
+      },
+      {
+        object: dataFactory.variable(`${variablePrefix}Definition`),
+        predicate: dataFactory.namedNode(
+          "http://www.w3.org/2004/02/skos/core#definition",
         ),
-      );
-      this.add(
-        sparqlBuilder.GraphPattern.optional(
-          sparqlBuilder.GraphPattern.basic(
-            this.subject,
-            dataFactory.namedNode(
-              "http://www.w3.org/2004/02/skos/core#editorialNote",
-            ),
-            this.variable("EditorialNote"),
-          ),
+        subject,
+      },
+      {
+        object: dataFactory.variable(`${variablePrefix}EditorialNote`),
+        predicate: dataFactory.namedNode(
+          "http://www.w3.org/2004/02/skos/core#editorialNote",
         ),
-      );
-      this.add(
-        sparqlBuilder.GraphPattern.optional(
-          sparqlBuilder.GraphPattern.basic(
-            this.subject,
-            dataFactory.namedNode(
-              "http://www.w3.org/2004/02/skos/core#example",
-            ),
-            this.variable("Example"),
-          ),
+        subject,
+      },
+      {
+        object: dataFactory.variable(`${variablePrefix}Example`),
+        predicate: dataFactory.namedNode(
+          "http://www.w3.org/2004/02/skos/core#example",
         ),
-      );
-      this.add(
-        sparqlBuilder.GraphPattern.optional(
-          sparqlBuilder.GraphPattern.basic(
-            this.subject,
-            dataFactory.namedNode(
-              "http://www.w3.org/2004/02/skos/core#hiddenLabel",
-            ),
-            this.variable("HiddenLabel"),
-          ),
+        subject,
+      },
+      {
+        object: dataFactory.variable(`${variablePrefix}HiddenLabel`),
+        predicate: dataFactory.namedNode(
+          "http://www.w3.org/2004/02/skos/core#hiddenLabel",
         ),
-      );
-      this.add(
-        sparqlBuilder.GraphPattern.optional(
-          sparqlBuilder.GraphPattern.group(
-            sparqlBuilder.GraphPattern.basic(
-              this.subject,
-              dataFactory.namedNode(
-                "http://www.w3.org/2008/05/skos-xl#hiddenLabel",
-              ),
-              this.variable("HiddenLabelXl"),
-            ).chainObject(
-              (_object) =>
-                new Label.SparqlGraphPatterns(_object, { ignoreRdfType: true }),
-            ),
-          ),
+        subject,
+      },
+      {
+        object: dataFactory.variable(`${variablePrefix}HiddenLabelXl`),
+        predicate: dataFactory.namedNode(
+          "http://www.w3.org/2008/05/skos-xl#hiddenLabel",
         ),
-      );
-      this.add(
-        sparqlBuilder.GraphPattern.optional(
-          sparqlBuilder.GraphPattern.basic(
-            this.subject,
-            dataFactory.namedNode(
-              "http://www.w3.org/2004/02/skos/core#historyNote",
-            ),
-            this.variable("HistoryNote"),
-          ),
+        subject,
+      },
+      ...Label.sparqlConstructTemplateTriples({
+        subject: dataFactory.variable(`${variablePrefix}HiddenLabelXl`),
+        variablePrefix: `${variablePrefix}HiddenLabelXl`,
+      }),
+      {
+        object: dataFactory.variable(`${variablePrefix}HistoryNote`),
+        predicate: dataFactory.namedNode(
+          "http://www.w3.org/2004/02/skos/core#historyNote",
         ),
-      );
-      this.add(
-        sparqlBuilder.GraphPattern.optional(
-          sparqlBuilder.GraphPattern.basic(
-            this.subject,
-            dataFactory.namedNode("http://purl.org/dc/terms/modified"),
-            this.variable("Modified"),
-          ),
+        subject,
+      },
+      {
+        object: dataFactory.variable(`${variablePrefix}Modified`),
+        predicate: dataFactory.namedNode("http://purl.org/dc/terms/modified"),
+        subject,
+      },
+      {
+        object: dataFactory.variable(`${variablePrefix}Notation`),
+        predicate: dataFactory.namedNode(
+          "http://www.w3.org/2004/02/skos/core#notation",
         ),
-      );
-      this.add(
-        sparqlBuilder.GraphPattern.optional(
-          sparqlBuilder.GraphPattern.basic(
-            this.subject,
-            dataFactory.namedNode(
-              "http://www.w3.org/2004/02/skos/core#notation",
-            ),
-            this.variable("Notation"),
-          ),
+        subject,
+      },
+      {
+        object: dataFactory.variable(`${variablePrefix}Note`),
+        predicate: dataFactory.namedNode(
+          "http://www.w3.org/2004/02/skos/core#notation",
         ),
-      );
-      this.add(
-        sparqlBuilder.GraphPattern.optional(
-          sparqlBuilder.GraphPattern.basic(
-            this.subject,
-            dataFactory.namedNode(
-              "http://www.w3.org/2004/02/skos/core#notation",
-            ),
-            this.variable("Note"),
-          ),
+        subject,
+      },
+      {
+        object: dataFactory.variable(`${variablePrefix}PrefLabel`),
+        predicate: dataFactory.namedNode(
+          "http://www.w3.org/2004/02/skos/core#prefLabel",
         ),
-      );
-      this.add(
-        sparqlBuilder.GraphPattern.optional(
-          sparqlBuilder.GraphPattern.basic(
-            this.subject,
-            dataFactory.namedNode(
-              "http://www.w3.org/2004/02/skos/core#prefLabel",
-            ),
-            this.variable("PrefLabel"),
-          ),
+        subject,
+      },
+      {
+        object: dataFactory.variable(`${variablePrefix}PrefLabelXl`),
+        predicate: dataFactory.namedNode(
+          "http://www.w3.org/2008/05/skos-xl#prefLabel",
         ),
-      );
-      this.add(
-        sparqlBuilder.GraphPattern.optional(
-          sparqlBuilder.GraphPattern.group(
-            sparqlBuilder.GraphPattern.basic(
-              this.subject,
-              dataFactory.namedNode(
-                "http://www.w3.org/2008/05/skos-xl#prefLabel",
-              ),
-              this.variable("PrefLabelXl"),
-            ).chainObject(
-              (_object) =>
-                new Label.SparqlGraphPatterns(_object, { ignoreRdfType: true }),
-            ),
-          ),
+        subject,
+      },
+      ...Label.sparqlConstructTemplateTriples({
+        subject: dataFactory.variable(`${variablePrefix}PrefLabelXl`),
+        variablePrefix: `${variablePrefix}PrefLabelXl`,
+      }),
+      {
+        object: dataFactory.variable(`${variablePrefix}ScopeNote`),
+        predicate: dataFactory.namedNode(
+          "http://www.w3.org/2004/02/skos/core#scopeNote",
         ),
-      );
-      this.add(
-        sparqlBuilder.GraphPattern.optional(
-          sparqlBuilder.GraphPattern.basic(
-            this.subject,
-            dataFactory.namedNode(
-              "http://www.w3.org/2004/02/skos/core#scopeNote",
-            ),
-            this.variable("ScopeNote"),
-          ),
-        ),
-      );
-    }
+        subject,
+      },
+    ];
+  }
+
+  export function sparqlWherePatterns({
+    subject,
+    variablePrefix: variablePrefixParameter,
+  }: {
+    ignoreRdfType?: boolean;
+    subject: rdfjs.Variable;
+    variablePrefix?: string;
+  }): readonly sparqljs.Pattern[] {
+    const variablePrefix = variablePrefixParameter ?? subject.value;
+    return [
+      {
+        patterns: [
+          {
+            triples: [
+              {
+                object: dataFactory.variable(`${variablePrefix}AltLabel`),
+                predicate: dataFactory.namedNode(
+                  "http://www.w3.org/2004/02/skos/core#altLabel",
+                ),
+                subject,
+              },
+            ],
+            type: "bgp",
+          },
+        ],
+        type: "optional",
+      },
+      {
+        patterns: [
+          {
+            triples: [
+              {
+                object: dataFactory.variable(`${variablePrefix}AltLabelXl`),
+                predicate: dataFactory.namedNode(
+                  "http://www.w3.org/2008/05/skos-xl#altLabel",
+                ),
+                subject,
+              },
+            ],
+            type: "bgp",
+          },
+          {
+            patterns: [
+              ...Label.sparqlWherePatterns({
+                subject: dataFactory.variable(`${variablePrefix}AltLabelXl`),
+                variablePrefix: `${variablePrefix}AltLabelXl`,
+              }),
+            ],
+            type: "optional",
+          },
+        ],
+        type: "optional",
+      },
+      {
+        patterns: [
+          {
+            triples: [
+              {
+                object: dataFactory.variable(`${variablePrefix}ChangeNote`),
+                predicate: dataFactory.namedNode(
+                  "http://www.w3.org/2004/02/skos/core#changeNote",
+                ),
+                subject,
+              },
+            ],
+            type: "bgp",
+          },
+        ],
+        type: "optional",
+      },
+      {
+        patterns: [
+          {
+            triples: [
+              {
+                object: dataFactory.variable(`${variablePrefix}Definition`),
+                predicate: dataFactory.namedNode(
+                  "http://www.w3.org/2004/02/skos/core#definition",
+                ),
+                subject,
+              },
+            ],
+            type: "bgp",
+          },
+        ],
+        type: "optional",
+      },
+      {
+        patterns: [
+          {
+            triples: [
+              {
+                object: dataFactory.variable(`${variablePrefix}EditorialNote`),
+                predicate: dataFactory.namedNode(
+                  "http://www.w3.org/2004/02/skos/core#editorialNote",
+                ),
+                subject,
+              },
+            ],
+            type: "bgp",
+          },
+        ],
+        type: "optional",
+      },
+      {
+        patterns: [
+          {
+            triples: [
+              {
+                object: dataFactory.variable(`${variablePrefix}Example`),
+                predicate: dataFactory.namedNode(
+                  "http://www.w3.org/2004/02/skos/core#example",
+                ),
+                subject,
+              },
+            ],
+            type: "bgp",
+          },
+        ],
+        type: "optional",
+      },
+      {
+        patterns: [
+          {
+            triples: [
+              {
+                object: dataFactory.variable(`${variablePrefix}HiddenLabel`),
+                predicate: dataFactory.namedNode(
+                  "http://www.w3.org/2004/02/skos/core#hiddenLabel",
+                ),
+                subject,
+              },
+            ],
+            type: "bgp",
+          },
+        ],
+        type: "optional",
+      },
+      {
+        patterns: [
+          {
+            triples: [
+              {
+                object: dataFactory.variable(`${variablePrefix}HiddenLabelXl`),
+                predicate: dataFactory.namedNode(
+                  "http://www.w3.org/2008/05/skos-xl#hiddenLabel",
+                ),
+                subject,
+              },
+            ],
+            type: "bgp",
+          },
+          {
+            patterns: [
+              ...Label.sparqlWherePatterns({
+                subject: dataFactory.variable(`${variablePrefix}HiddenLabelXl`),
+                variablePrefix: `${variablePrefix}HiddenLabelXl`,
+              }),
+            ],
+            type: "optional",
+          },
+        ],
+        type: "optional",
+      },
+      {
+        patterns: [
+          {
+            triples: [
+              {
+                object: dataFactory.variable(`${variablePrefix}HistoryNote`),
+                predicate: dataFactory.namedNode(
+                  "http://www.w3.org/2004/02/skos/core#historyNote",
+                ),
+                subject,
+              },
+            ],
+            type: "bgp",
+          },
+        ],
+        type: "optional",
+      },
+      {
+        patterns: [
+          {
+            triples: [
+              {
+                object: dataFactory.variable(`${variablePrefix}Modified`),
+                predicate: dataFactory.namedNode(
+                  "http://purl.org/dc/terms/modified",
+                ),
+                subject,
+              },
+            ],
+            type: "bgp",
+          },
+        ],
+        type: "optional",
+      },
+      {
+        patterns: [
+          {
+            triples: [
+              {
+                object: dataFactory.variable(`${variablePrefix}Notation`),
+                predicate: dataFactory.namedNode(
+                  "http://www.w3.org/2004/02/skos/core#notation",
+                ),
+                subject,
+              },
+            ],
+            type: "bgp",
+          },
+        ],
+        type: "optional",
+      },
+      {
+        patterns: [
+          {
+            triples: [
+              {
+                object: dataFactory.variable(`${variablePrefix}Note`),
+                predicate: dataFactory.namedNode(
+                  "http://www.w3.org/2004/02/skos/core#notation",
+                ),
+                subject,
+              },
+            ],
+            type: "bgp",
+          },
+        ],
+        type: "optional",
+      },
+      {
+        patterns: [
+          {
+            triples: [
+              {
+                object: dataFactory.variable(`${variablePrefix}PrefLabel`),
+                predicate: dataFactory.namedNode(
+                  "http://www.w3.org/2004/02/skos/core#prefLabel",
+                ),
+                subject,
+              },
+            ],
+            type: "bgp",
+          },
+        ],
+        type: "optional",
+      },
+      {
+        patterns: [
+          {
+            triples: [
+              {
+                object: dataFactory.variable(`${variablePrefix}PrefLabelXl`),
+                predicate: dataFactory.namedNode(
+                  "http://www.w3.org/2008/05/skos-xl#prefLabel",
+                ),
+                subject,
+              },
+            ],
+            type: "bgp",
+          },
+          {
+            patterns: [
+              ...Label.sparqlWherePatterns({
+                subject: dataFactory.variable(`${variablePrefix}PrefLabelXl`),
+                variablePrefix: `${variablePrefix}PrefLabelXl`,
+              }),
+            ],
+            type: "optional",
+          },
+        ],
+        type: "optional",
+      },
+      {
+        patterns: [
+          {
+            triples: [
+              {
+                object: dataFactory.variable(`${variablePrefix}ScopeNote`),
+                predicate: dataFactory.namedNode(
+                  "http://www.w3.org/2004/02/skos/core#scopeNote",
+                ),
+                subject,
+              },
+            ],
+            type: "bgp",
+          },
+        ],
+        type: "optional",
+      },
+    ];
   }
 }
 export interface ConceptScheme extends KosResource {
@@ -1271,7 +1727,11 @@ export namespace ConceptScheme {
       readonly identifier: rdfjs.NamedNode;
       readonly license?:
         | (rdfjs.NamedNode | rdfjs.Literal)
-        | purify.Maybe<rdfjs.NamedNode | rdfjs.Literal>;
+        | Date
+        | boolean
+        | number
+        | purify.Maybe<rdfjs.NamedNode | rdfjs.Literal>
+        | string;
       readonly rights?:
         | rdfjs.Literal
         | Date
@@ -1301,6 +1761,17 @@ export namespace ConceptScheme {
     let license: purify.Maybe<rdfjs.NamedNode | rdfjs.Literal>;
     if (purify.Maybe.isMaybe(parameters.license)) {
       license = parameters.license;
+    } else if (typeof parameters.license === "boolean") {
+      license = purify.Maybe.of(rdfLiteral.toRdf(parameters.license));
+    } else if (
+      typeof parameters.license === "object" &&
+      parameters.license instanceof Date
+    ) {
+      license = purify.Maybe.of(rdfLiteral.toRdf(parameters.license));
+    } else if (typeof parameters.license === "number") {
+      license = purify.Maybe.of(rdfLiteral.toRdf(parameters.license));
+    } else if (typeof parameters.license === "string") {
+      license = purify.Maybe.of(dataFactory.literal(parameters.license));
     } else if (typeof parameters.license === "object") {
       license = purify.Maybe.of(parameters.license);
     } else if (typeof parameters.license === "undefined") {
@@ -1367,7 +1838,7 @@ export namespace ConceptScheme {
     };
   }
 
-  export function fromRdf({
+  export function propertiesFromRdf({
     ignoreRdfType: _ignoreRdfType,
     languageIn: _languageIn,
     resource: _resource,
@@ -1378,267 +1849,410 @@ export namespace ConceptScheme {
     ignoreRdfType?: boolean;
     languageIn?: readonly string[];
     resource: rdfjsResource.Resource<rdfjs.NamedNode>;
-  }): purify.Either<rdfjsResource.Resource.ValueError, ConceptScheme> {
-    return KosResource.fromRdf({
+  }): purify.Either<
+    rdfjsResource.Resource.ValueError,
+    {
+      hasTopConcept: readonly ConceptStub[];
+      identifier: rdfjs.NamedNode;
+      license: purify.Maybe<rdfjs.NamedNode | rdfjs.Literal>;
+      rights: purify.Maybe<rdfjs.Literal>;
+      rightsHolder: purify.Maybe<rdfjs.Literal>;
+      type: "ConceptScheme";
+    } & purifyHelpers.Eithers.UnwrapR<
+      ReturnType<typeof KosResource.propertiesFromRdf>
+    >
+  > {
+    const _super0Either = KosResource.propertiesFromRdf({
       ..._context,
       ignoreRdfType: true,
       languageIn: _languageIn,
       resource: _resource,
-    }).chain((_super) => {
-      if (
-        !_ignoreRdfType &&
-        !_resource.isInstanceOf(
-          dataFactory.namedNode(
+    });
+    if (_super0Either.isLeft()) {
+      return _super0Either;
+    }
+
+    const _super0 = _super0Either.unsafeCoerce();
+    if (
+      !_ignoreRdfType &&
+      !_resource.isInstanceOf(
+        dataFactory.namedNode(
+          "http://www.w3.org/2004/02/skos/core#ConceptScheme",
+        ),
+      )
+    ) {
+      return purify.Left(
+        new rdfjsResource.Resource.ValueError({
+          focusResource: _resource,
+          message: `${rdfjsResource.Resource.Identifier.toString(_resource.identifier)} has unexpected RDF type`,
+          predicate: dataFactory.namedNode(
             "http://www.w3.org/2004/02/skos/core#ConceptScheme",
           ),
-        )
-      ) {
-        return purify.Left(
-          new rdfjsResource.Resource.ValueError({
-            focusResource: _resource,
-            message: `${rdfjsResource.Resource.Identifier.toString(_resource.identifier)} has unexpected RDF type`,
-            predicate: dataFactory.namedNode(
-              "http://www.w3.org/2004/02/skos/core#ConceptScheme",
-            ),
-          }),
-        );
-      }
-      const _hasTopConceptEither: purify.Either<
-        rdfjsResource.Resource.ValueError,
-        readonly ConceptStub[]
-      > = purify.Either.of([
-        ..._resource
-          .values(
-            dataFactory.namedNode(
-              "http://www.w3.org/2004/02/skos/core#hasTopConcept",
-            ),
-            { unique: true },
-          )
-          .flatMap((_item) =>
-            _item
-              .toValues()
-              .head()
-              .chain((value) => value.toNamedResource())
-              .chain((_resource) =>
-                ConceptStub.fromRdf({
-                  ..._context,
-                  ignoreRdfType: true,
-                  languageIn: _languageIn,
-                  resource: _resource,
-                }),
-              )
-              .toMaybe()
-              .toList(),
+        }),
+      );
+    }
+
+    const _hasTopConceptEither: purify.Either<
+      rdfjsResource.Resource.ValueError,
+      readonly ConceptStub[]
+    > = purify.Either.of([
+      ..._resource
+        .values(
+          dataFactory.namedNode(
+            "http://www.w3.org/2004/02/skos/core#hasTopConcept",
           ),
-      ]);
-      if (_hasTopConceptEither.isLeft()) {
-        return _hasTopConceptEither;
-      }
-      const hasTopConcept = _hasTopConceptEither.unsafeCoerce();
-      const identifier = _resource.identifier;
-      const _licenseEither: purify.Either<
-        rdfjsResource.Resource.ValueError,
-        purify.Maybe<rdfjs.NamedNode | rdfjs.Literal>
-      > = purify.Either.of(
-        (
-          _resource
-            .values(dataFactory.namedNode("http://purl.org/dc/terms/license"), {
-              unique: true,
-            })
-            .head()
-            .chain((_value) => _value.toIri()) as purify.Either<
-            rdfjsResource.Resource.ValueError,
-            rdfjs.NamedNode | rdfjs.Literal
-          >
+          { unique: true },
         )
-          .altLazy(
-            () =>
-              _resource
-                .values(
-                  dataFactory.namedNode("http://purl.org/dc/terms/license"),
-                  { unique: true },
-                )
-                .filter((_value) => {
-                  const _languageInOrDefault = _languageIn ?? [];
-                  if (_languageInOrDefault.length === 0) {
-                    return true;
-                  }
-                  const _valueLiteral = _value.toLiteral().toMaybe().extract();
-                  if (typeof _valueLiteral === "undefined") {
-                    return false;
-                  }
-                  return _languageInOrDefault.some(
-                    (_languageIn) => _languageIn === _valueLiteral.language,
-                  );
-                })
-                .head()
-                .chain((_value) => _value.toLiteral()) as purify.Either<
-                rdfjsResource.Resource.ValueError,
-                rdfjs.NamedNode | rdfjs.Literal
-              >,
-          )
-          .toMaybe(),
-      );
-      if (_licenseEither.isLeft()) {
-        return _licenseEither;
-      }
-      const license = _licenseEither.unsafeCoerce();
-      const _rightsEither: purify.Either<
-        rdfjsResource.Resource.ValueError,
-        purify.Maybe<rdfjs.Literal>
-      > = purify.Either.of(
-        _resource
-          .values(dataFactory.namedNode("http://purl.org/dc/terms/rights"), {
-            unique: true,
-          })
-          .filter((_value) => {
-            const _languageInOrDefault = _languageIn ?? [];
-            if (_languageInOrDefault.length === 0) {
-              return true;
+        .flatMap((_item) =>
+          _item
+            .toValues()
+            .head()
+            .chain((value) => value.toNamedResource())
+            .chain((_resource) =>
+              ConceptStub.fromRdf({
+                ..._context,
+                ignoreRdfType: true,
+                languageIn: _languageIn,
+                resource: _resource,
+              }),
+            )
+            .toMaybe()
+            .toList(),
+        ),
+    ]);
+    if (_hasTopConceptEither.isLeft()) {
+      return _hasTopConceptEither;
+    }
+
+    const hasTopConcept = _hasTopConceptEither.unsafeCoerce();
+    const identifier = _resource.identifier;
+    const _licenseEither: purify.Either<
+      rdfjsResource.Resource.ValueError,
+      purify.Maybe<rdfjs.NamedNode | rdfjs.Literal>
+    > = purify.Either.of(
+      _resource
+        .values(dataFactory.namedNode("http://purl.org/dc/terms/license"), {
+          unique: true,
+        })
+        .head()
+        .chain((_value) =>
+          purify.Either.of(_value.toTerm()).chain((term) => {
+            switch (term.termType) {
+              case "NamedNode":
+              case "Literal":
+                return purify.Either.of(term);
+              default:
+                return purify.Left(
+                  new rdfjsResource.Resource.MistypedValueError({
+                    actualValue: term,
+                    expectedValueType: "(rdfjs.NamedNode | rdfjs.Literal)",
+                    focusResource: _resource,
+                    predicate: dataFactory.namedNode(
+                      "http://purl.org/dc/terms/license",
+                    ),
+                  }),
+                );
             }
-            const _valueLiteral = _value.toLiteral().toMaybe().extract();
-            if (typeof _valueLiteral === "undefined") {
-              return false;
-            }
-            return _languageInOrDefault.some(
-              (_languageIn) => _languageIn === _valueLiteral.language,
-            );
-          })
-          .head()
-          .chain((_value) => _value.toLiteral())
-          .toMaybe(),
-      );
-      if (_rightsEither.isLeft()) {
-        return _rightsEither;
-      }
-      const rights = _rightsEither.unsafeCoerce();
-      const _rightsHolderEither: purify.Either<
-        rdfjsResource.Resource.ValueError,
-        purify.Maybe<rdfjs.Literal>
-      > = purify.Either.of(
-        _resource
-          .values(
-            dataFactory.namedNode("http://purl.org/dc/terms/rightsHolder"),
-            { unique: true },
-          )
-          .filter((_value) => {
-            const _languageInOrDefault = _languageIn ?? [];
-            if (_languageInOrDefault.length === 0) {
-              return true;
-            }
-            const _valueLiteral = _value.toLiteral().toMaybe().extract();
-            if (typeof _valueLiteral === "undefined") {
-              return false;
-            }
-            return _languageInOrDefault.some(
-              (_languageIn) => _languageIn === _valueLiteral.language,
-            );
-          })
-          .head()
-          .chain((_value) => _value.toLiteral())
-          .toMaybe(),
-      );
-      if (_rightsHolderEither.isLeft()) {
-        return _rightsHolderEither;
-      }
-      const rightsHolder = _rightsHolderEither.unsafeCoerce();
-      const type = "ConceptScheme" as const;
-      return purify.Either.of({
-        altLabel: _super.altLabel,
-        altLabelXl: _super.altLabelXl,
-        changeNote: _super.changeNote,
-        definition: _super.definition,
-        editorialNote: _super.editorialNote,
-        example: _super.example,
-        hiddenLabel: _super.hiddenLabel,
-        hiddenLabelXl: _super.hiddenLabelXl,
-        historyNote: _super.historyNote,
-        identifier,
-        modified: _super.modified,
-        notation: _super.notation,
-        note: _super.note,
-        prefLabel: _super.prefLabel,
-        prefLabelXl: _super.prefLabelXl,
-        scopeNote: _super.scopeNote,
-        hasTopConcept,
-        license,
-        rights,
-        rightsHolder,
-        type,
-      });
+          }),
+        )
+        .toMaybe(),
+    );
+    if (_licenseEither.isLeft()) {
+      return _licenseEither;
+    }
+
+    const license = _licenseEither.unsafeCoerce();
+    const _rightsEither: purify.Either<
+      rdfjsResource.Resource.ValueError,
+      purify.Maybe<rdfjs.Literal>
+    > = purify.Either.of(
+      _resource
+        .values(dataFactory.namedNode("http://purl.org/dc/terms/rights"), {
+          unique: true,
+        })
+        .filter((_value) => {
+          const _languageInOrDefault = _languageIn ?? [];
+          if (_languageInOrDefault.length === 0) {
+            return true;
+          }
+          const _valueLiteral = _value.toLiteral().toMaybe().extract();
+          if (typeof _valueLiteral === "undefined") {
+            return false;
+          }
+          return _languageInOrDefault.some(
+            (_languageIn) => _languageIn === _valueLiteral.language,
+          );
+        })
+        .head()
+        .chain((_value) => _value.toLiteral())
+        .toMaybe(),
+    );
+    if (_rightsEither.isLeft()) {
+      return _rightsEither;
+    }
+
+    const rights = _rightsEither.unsafeCoerce();
+    const _rightsHolderEither: purify.Either<
+      rdfjsResource.Resource.ValueError,
+      purify.Maybe<rdfjs.Literal>
+    > = purify.Either.of(
+      _resource
+        .values(
+          dataFactory.namedNode("http://purl.org/dc/terms/rightsHolder"),
+          { unique: true },
+        )
+        .filter((_value) => {
+          const _languageInOrDefault = _languageIn ?? [];
+          if (_languageInOrDefault.length === 0) {
+            return true;
+          }
+          const _valueLiteral = _value.toLiteral().toMaybe().extract();
+          if (typeof _valueLiteral === "undefined") {
+            return false;
+          }
+          return _languageInOrDefault.some(
+            (_languageIn) => _languageIn === _valueLiteral.language,
+          );
+        })
+        .head()
+        .chain((_value) => _value.toLiteral())
+        .toMaybe(),
+    );
+    if (_rightsHolderEither.isLeft()) {
+      return _rightsHolderEither;
+    }
+
+    const rightsHolder = _rightsHolderEither.unsafeCoerce();
+    const type = "ConceptScheme" as const;
+    return purify.Either.of({
+      ..._super0,
+      hasTopConcept,
+      identifier,
+      license,
+      rights,
+      rightsHolder,
+      type,
     });
   }
 
-  export class SparqlGraphPatterns extends KosResource.SparqlGraphPatterns {
-    constructor(
-      subject: sparqlBuilder.ResourceGraphPatterns.SubjectParameter,
-      _options?: { ignoreRdfType?: boolean },
-    ) {
-      super(subject, { ignoreRdfType: true });
-      if (!_options?.ignoreRdfType) {
-        this.add(
-          ...new sparqlBuilder.RdfTypeGraphPatterns(
-            this.subject,
-            dataFactory.namedNode(
-              "http://www.w3.org/2004/02/skos/core#ConceptScheme",
-            ),
-          ),
-        );
-      }
+  export function fromRdf(
+    parameters: Parameters<typeof ConceptScheme.propertiesFromRdf>[0],
+  ): purify.Either<rdfjsResource.Resource.ValueError, ConceptScheme> {
+    return ConceptScheme.propertiesFromRdf(parameters);
+  }
 
-      this.add(
-        sparqlBuilder.GraphPattern.optional(
-          sparqlBuilder.GraphPattern.group(
-            sparqlBuilder.GraphPattern.basic(
-              this.subject,
-              dataFactory.namedNode(
-                "http://www.w3.org/2004/02/skos/core#hasTopConcept",
+  export function sparqlConstructQuery(
+    parameters?: {
+      prefixes?: { [prefix: string]: string };
+      subject: rdfjs.Variable;
+    } & Omit<
+      sparqljs.ConstructQuery,
+      "prefixes" | "queryType" | "template" | "type" | "where"
+    >,
+  ): sparqljs.ConstructQuery {
+    const subject =
+      parameters?.subject ?? dataFactory.variable("conceptScheme");
+    return {
+      ...parameters,
+      prefixes: parameters?.prefixes ?? {},
+      queryType: "CONSTRUCT",
+      template: ConceptScheme.sparqlConstructTemplateTriples({
+        subject,
+      }).concat(),
+      type: "query",
+      where: ConceptScheme.sparqlWherePatterns({ subject }).concat(),
+    };
+  }
+
+  export function sparqlConstructQueryString(
+    parameters?: { subject: rdfjs.Variable } & Omit<
+      sparqljs.ConstructQuery,
+      "prefixes" | "queryType" | "template" | "type" | "where"
+    > &
+      sparqljs.GeneratorOptions,
+  ): string {
+    return new sparqljs.Generator(parameters).stringify(
+      ConceptScheme.sparqlConstructQuery(parameters),
+    );
+  }
+
+  export function sparqlConstructTemplateTriples({
+    ignoreRdfType,
+    subject,
+    variablePrefix: variablePrefixParameter,
+  }: {
+    ignoreRdfType?: boolean;
+    subject: rdfjs.Variable;
+    variablePrefix?: string;
+  }): readonly sparqljs.Triple[] {
+    const variablePrefix = variablePrefixParameter ?? subject.value;
+    return [
+      ...KosResource.sparqlConstructTemplateTriples({
+        ignoreRdfType: true,
+        subject,
+        variablePrefix,
+      }),
+      ...(ignoreRdfType
+        ? []
+        : [
+            {
+              subject,
+              predicate: dataFactory.namedNode(
+                "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
               ),
-              this.variable("HasTopConcept"),
-            ).chainObject(
-              (_object) =>
-                new ConceptStub.SparqlGraphPatterns(_object, {
-                  ignoreRdfType: true,
-                }),
-            ),
-          ),
+              object: dataFactory.variable(`${variablePrefix}RdfType`),
+            },
+          ]),
+      {
+        object: dataFactory.variable(`${variablePrefix}HasTopConcept`),
+        predicate: dataFactory.namedNode(
+          "http://www.w3.org/2004/02/skos/core#hasTopConcept",
         ),
-      );
-      this.add(
-        sparqlBuilder.GraphPattern.optional(
-          sparqlBuilder.GraphPattern.union(
-            sparqlBuilder.GraphPattern.basic(
-              this.subject,
-              dataFactory.namedNode("http://purl.org/dc/terms/license"),
-              this.variable("License"),
-            ),
-            sparqlBuilder.GraphPattern.basic(
-              this.subject,
-              dataFactory.namedNode("http://purl.org/dc/terms/license"),
-              this.variable("License"),
-            ),
-          ),
+        subject,
+      },
+      ...ConceptStub.sparqlConstructTemplateTriples({
+        subject: dataFactory.variable(`${variablePrefix}HasTopConcept`),
+        variablePrefix: `${variablePrefix}HasTopConcept`,
+      }),
+      {
+        object: dataFactory.variable(`${variablePrefix}License`),
+        predicate: dataFactory.namedNode("http://purl.org/dc/terms/license"),
+        subject,
+      },
+      {
+        object: dataFactory.variable(`${variablePrefix}Rights`),
+        predicate: dataFactory.namedNode("http://purl.org/dc/terms/rights"),
+        subject,
+      },
+      {
+        object: dataFactory.variable(`${variablePrefix}RightsHolder`),
+        predicate: dataFactory.namedNode(
+          "http://purl.org/dc/terms/rightsHolder",
         ),
-      );
-      this.add(
-        sparqlBuilder.GraphPattern.optional(
-          sparqlBuilder.GraphPattern.basic(
-            this.subject,
-            dataFactory.namedNode("http://purl.org/dc/terms/rights"),
-            this.variable("Rights"),
-          ),
-        ),
-      );
-      this.add(
-        sparqlBuilder.GraphPattern.optional(
-          sparqlBuilder.GraphPattern.basic(
-            this.subject,
-            dataFactory.namedNode("http://purl.org/dc/terms/rightsHolder"),
-            this.variable("RightsHolder"),
-          ),
-        ),
-      );
-    }
+        subject,
+      },
+    ];
+  }
+
+  export function sparqlWherePatterns({
+    ignoreRdfType,
+    subject,
+    variablePrefix: variablePrefixParameter,
+  }: {
+    ignoreRdfType?: boolean;
+    subject: rdfjs.Variable;
+    variablePrefix?: string;
+  }): readonly sparqljs.Pattern[] {
+    const variablePrefix = variablePrefixParameter ?? subject.value;
+    return [
+      ...KosResource.sparqlWherePatterns({
+        ignoreRdfType: true,
+        subject,
+        variablePrefix,
+      }),
+      ...(ignoreRdfType
+        ? []
+        : [
+            {
+              triples: [
+                {
+                  subject,
+                  predicate: dataFactory.namedNode(
+                    "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+                  ),
+                  object: dataFactory.namedNode(
+                    "http://www.w3.org/2004/02/skos/core#ConceptScheme",
+                  ),
+                },
+                {
+                  subject,
+                  predicate: dataFactory.namedNode(
+                    "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+                  ),
+                  object: dataFactory.variable(`${variablePrefix}RdfType`),
+                },
+              ],
+              type: "bgp" as const,
+            },
+          ]),
+      {
+        patterns: [
+          {
+            triples: [
+              {
+                object: dataFactory.variable(`${variablePrefix}HasTopConcept`),
+                predicate: dataFactory.namedNode(
+                  "http://www.w3.org/2004/02/skos/core#hasTopConcept",
+                ),
+                subject,
+              },
+            ],
+            type: "bgp",
+          },
+          {
+            patterns: [
+              ...ConceptStub.sparqlWherePatterns({
+                subject: dataFactory.variable(`${variablePrefix}HasTopConcept`),
+                variablePrefix: `${variablePrefix}HasTopConcept`,
+              }),
+            ],
+            type: "optional",
+          },
+        ],
+        type: "optional",
+      },
+      {
+        patterns: [
+          {
+            triples: [
+              {
+                object: dataFactory.variable(`${variablePrefix}License`),
+                predicate: dataFactory.namedNode(
+                  "http://purl.org/dc/terms/license",
+                ),
+                subject,
+              },
+            ],
+            type: "bgp",
+          },
+        ],
+        type: "optional",
+      },
+      {
+        patterns: [
+          {
+            triples: [
+              {
+                object: dataFactory.variable(`${variablePrefix}Rights`),
+                predicate: dataFactory.namedNode(
+                  "http://purl.org/dc/terms/rights",
+                ),
+                subject,
+              },
+            ],
+            type: "bgp",
+          },
+        ],
+        type: "optional",
+      },
+      {
+        patterns: [
+          {
+            triples: [
+              {
+                object: dataFactory.variable(`${variablePrefix}RightsHolder`),
+                predicate: dataFactory.namedNode(
+                  "http://purl.org/dc/terms/rightsHolder",
+                ),
+                subject,
+              },
+            ],
+            type: "bgp",
+          },
+        ],
+        type: "optional",
+      },
+    ];
   }
 }
 export interface ConceptSchemeStub extends KosResourceStub {
@@ -1657,7 +2271,7 @@ export namespace ConceptSchemeStub {
     return { ...KosResourceStub.create(parameters), identifier, type };
   }
 
-  export function fromRdf({
+  export function propertiesFromRdf({
     ignoreRdfType: _ignoreRdfType,
     languageIn: _languageIn,
     resource: _resource,
@@ -1668,59 +2282,163 @@ export namespace ConceptSchemeStub {
     ignoreRdfType?: boolean;
     languageIn?: readonly string[];
     resource: rdfjsResource.Resource<rdfjs.NamedNode>;
-  }): purify.Either<rdfjsResource.Resource.ValueError, ConceptSchemeStub> {
-    return KosResourceStub.fromRdf({
+  }): purify.Either<
+    rdfjsResource.Resource.ValueError,
+    {
+      identifier: rdfjs.NamedNode;
+      type: "ConceptSchemeStub";
+    } & purifyHelpers.Eithers.UnwrapR<
+      ReturnType<typeof KosResourceStub.propertiesFromRdf>
+    >
+  > {
+    const _super0Either = KosResourceStub.propertiesFromRdf({
       ..._context,
       ignoreRdfType: true,
       languageIn: _languageIn,
       resource: _resource,
-    }).chain((_super) => {
-      if (
-        !_ignoreRdfType &&
-        !_resource.isInstanceOf(
-          dataFactory.namedNode(
+    });
+    if (_super0Either.isLeft()) {
+      return _super0Either;
+    }
+
+    const _super0 = _super0Either.unsafeCoerce();
+    if (
+      !_ignoreRdfType &&
+      !_resource.isInstanceOf(
+        dataFactory.namedNode(
+          "http://www.w3.org/2004/02/skos/core#ConceptScheme",
+        ),
+      )
+    ) {
+      return purify.Left(
+        new rdfjsResource.Resource.ValueError({
+          focusResource: _resource,
+          message: `${rdfjsResource.Resource.Identifier.toString(_resource.identifier)} has unexpected RDF type`,
+          predicate: dataFactory.namedNode(
             "http://www.w3.org/2004/02/skos/core#ConceptScheme",
           ),
-        )
-      ) {
-        return purify.Left(
-          new rdfjsResource.Resource.ValueError({
-            focusResource: _resource,
-            message: `${rdfjsResource.Resource.Identifier.toString(_resource.identifier)} has unexpected RDF type`,
-            predicate: dataFactory.namedNode(
-              "http://www.w3.org/2004/02/skos/core#ConceptScheme",
-            ),
-          }),
-        );
-      }
-      const identifier = _resource.identifier;
-      const type = "ConceptSchemeStub" as const;
-      return purify.Either.of({
-        identifier,
-        prefLabel: _super.prefLabel,
-        prefLabelXl: _super.prefLabelXl,
-        type,
-      });
-    });
+        }),
+      );
+    }
+
+    const identifier = _resource.identifier;
+    const type = "ConceptSchemeStub" as const;
+    return purify.Either.of({ ..._super0, identifier, type });
   }
 
-  export class SparqlGraphPatterns extends KosResourceStub.SparqlGraphPatterns {
-    constructor(
-      subject: sparqlBuilder.ResourceGraphPatterns.SubjectParameter,
-      _options?: { ignoreRdfType?: boolean },
-    ) {
-      super(subject, { ignoreRdfType: true });
-      if (!_options?.ignoreRdfType) {
-        this.add(
-          ...new sparqlBuilder.RdfTypeGraphPatterns(
-            this.subject,
-            dataFactory.namedNode(
-              "http://www.w3.org/2004/02/skos/core#ConceptScheme",
-            ),
-          ),
-        );
-      }
-    }
+  export function fromRdf(
+    parameters: Parameters<typeof ConceptSchemeStub.propertiesFromRdf>[0],
+  ): purify.Either<rdfjsResource.Resource.ValueError, ConceptSchemeStub> {
+    return ConceptSchemeStub.propertiesFromRdf(parameters);
+  }
+
+  export function sparqlConstructQuery(
+    parameters?: {
+      prefixes?: { [prefix: string]: string };
+      subject: rdfjs.Variable;
+    } & Omit<
+      sparqljs.ConstructQuery,
+      "prefixes" | "queryType" | "template" | "type" | "where"
+    >,
+  ): sparqljs.ConstructQuery {
+    const subject =
+      parameters?.subject ?? dataFactory.variable("conceptSchemeStub");
+    return {
+      ...parameters,
+      prefixes: parameters?.prefixes ?? {},
+      queryType: "CONSTRUCT",
+      template: ConceptSchemeStub.sparqlConstructTemplateTriples({
+        subject,
+      }).concat(),
+      type: "query",
+      where: ConceptSchemeStub.sparqlWherePatterns({ subject }).concat(),
+    };
+  }
+
+  export function sparqlConstructQueryString(
+    parameters?: { subject: rdfjs.Variable } & Omit<
+      sparqljs.ConstructQuery,
+      "prefixes" | "queryType" | "template" | "type" | "where"
+    > &
+      sparqljs.GeneratorOptions,
+  ): string {
+    return new sparqljs.Generator(parameters).stringify(
+      ConceptSchemeStub.sparqlConstructQuery(parameters),
+    );
+  }
+
+  export function sparqlConstructTemplateTriples({
+    ignoreRdfType,
+    subject,
+    variablePrefix: variablePrefixParameter,
+  }: {
+    ignoreRdfType?: boolean;
+    subject: rdfjs.Variable;
+    variablePrefix?: string;
+  }): readonly sparqljs.Triple[] {
+    const variablePrefix = variablePrefixParameter ?? subject.value;
+    return [
+      ...KosResourceStub.sparqlConstructTemplateTriples({
+        ignoreRdfType: true,
+        subject,
+        variablePrefix,
+      }),
+      ...(ignoreRdfType
+        ? []
+        : [
+            {
+              subject,
+              predicate: dataFactory.namedNode(
+                "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+              ),
+              object: dataFactory.variable(`${variablePrefix}RdfType`),
+            },
+          ]),
+    ];
+  }
+
+  export function sparqlWherePatterns({
+    ignoreRdfType,
+    subject,
+    variablePrefix: variablePrefixParameter,
+  }: {
+    ignoreRdfType?: boolean;
+    subject: rdfjs.Variable;
+    variablePrefix?: string;
+  }): readonly sparqljs.Pattern[] {
+    const variablePrefix = variablePrefixParameter ?? subject.value;
+    return [
+      ...KosResourceStub.sparqlWherePatterns({
+        ignoreRdfType: true,
+        subject,
+        variablePrefix,
+      }),
+      ...(ignoreRdfType
+        ? []
+        : [
+            {
+              triples: [
+                {
+                  subject,
+                  predicate: dataFactory.namedNode(
+                    "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+                  ),
+                  object: dataFactory.namedNode(
+                    "http://www.w3.org/2004/02/skos/core#ConceptScheme",
+                  ),
+                },
+                {
+                  subject,
+                  predicate: dataFactory.namedNode(
+                    "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+                  ),
+                  object: dataFactory.variable(`${variablePrefix}RdfType`),
+                },
+              ],
+              type: "bgp" as const,
+            },
+          ]),
+    ];
   }
 }
 export interface ConceptStub extends KosResourceStub {
@@ -1739,7 +2457,7 @@ export namespace ConceptStub {
     return { ...KosResourceStub.create(parameters), identifier, type };
   }
 
-  export function fromRdf({
+  export function propertiesFromRdf({
     ignoreRdfType: _ignoreRdfType,
     languageIn: _languageIn,
     resource: _resource,
@@ -1750,57 +2468,160 @@ export namespace ConceptStub {
     ignoreRdfType?: boolean;
     languageIn?: readonly string[];
     resource: rdfjsResource.Resource<rdfjs.NamedNode>;
-  }): purify.Either<rdfjsResource.Resource.ValueError, ConceptStub> {
-    return KosResourceStub.fromRdf({
+  }): purify.Either<
+    rdfjsResource.Resource.ValueError,
+    {
+      identifier: rdfjs.NamedNode;
+      type: "ConceptStub";
+    } & purifyHelpers.Eithers.UnwrapR<
+      ReturnType<typeof KosResourceStub.propertiesFromRdf>
+    >
+  > {
+    const _super0Either = KosResourceStub.propertiesFromRdf({
       ..._context,
       ignoreRdfType: true,
       languageIn: _languageIn,
       resource: _resource,
-    }).chain((_super) => {
-      if (
-        !_ignoreRdfType &&
-        !_resource.isInstanceOf(
-          dataFactory.namedNode("http://www.w3.org/2004/02/skos/core#Concept"),
-        )
-      ) {
-        return purify.Left(
-          new rdfjsResource.Resource.ValueError({
-            focusResource: _resource,
-            message: `${rdfjsResource.Resource.Identifier.toString(_resource.identifier)} has unexpected RDF type`,
-            predicate: dataFactory.namedNode(
-              "http://www.w3.org/2004/02/skos/core#Concept",
-            ),
-          }),
-        );
-      }
-      const identifier = _resource.identifier;
-      const type = "ConceptStub" as const;
-      return purify.Either.of({
-        identifier,
-        prefLabel: _super.prefLabel,
-        prefLabelXl: _super.prefLabelXl,
-        type,
-      });
     });
+    if (_super0Either.isLeft()) {
+      return _super0Either;
+    }
+
+    const _super0 = _super0Either.unsafeCoerce();
+    if (
+      !_ignoreRdfType &&
+      !_resource.isInstanceOf(
+        dataFactory.namedNode("http://www.w3.org/2004/02/skos/core#Concept"),
+      )
+    ) {
+      return purify.Left(
+        new rdfjsResource.Resource.ValueError({
+          focusResource: _resource,
+          message: `${rdfjsResource.Resource.Identifier.toString(_resource.identifier)} has unexpected RDF type`,
+          predicate: dataFactory.namedNode(
+            "http://www.w3.org/2004/02/skos/core#Concept",
+          ),
+        }),
+      );
+    }
+
+    const identifier = _resource.identifier;
+    const type = "ConceptStub" as const;
+    return purify.Either.of({ ..._super0, identifier, type });
   }
 
-  export class SparqlGraphPatterns extends KosResourceStub.SparqlGraphPatterns {
-    constructor(
-      subject: sparqlBuilder.ResourceGraphPatterns.SubjectParameter,
-      _options?: { ignoreRdfType?: boolean },
-    ) {
-      super(subject, { ignoreRdfType: true });
-      if (!_options?.ignoreRdfType) {
-        this.add(
-          ...new sparqlBuilder.RdfTypeGraphPatterns(
-            this.subject,
-            dataFactory.namedNode(
-              "http://www.w3.org/2004/02/skos/core#Concept",
-            ),
-          ),
-        );
-      }
-    }
+  export function fromRdf(
+    parameters: Parameters<typeof ConceptStub.propertiesFromRdf>[0],
+  ): purify.Either<rdfjsResource.Resource.ValueError, ConceptStub> {
+    return ConceptStub.propertiesFromRdf(parameters);
+  }
+
+  export function sparqlConstructQuery(
+    parameters?: {
+      prefixes?: { [prefix: string]: string };
+      subject: rdfjs.Variable;
+    } & Omit<
+      sparqljs.ConstructQuery,
+      "prefixes" | "queryType" | "template" | "type" | "where"
+    >,
+  ): sparqljs.ConstructQuery {
+    const subject = parameters?.subject ?? dataFactory.variable("conceptStub");
+    return {
+      ...parameters,
+      prefixes: parameters?.prefixes ?? {},
+      queryType: "CONSTRUCT",
+      template: ConceptStub.sparqlConstructTemplateTriples({
+        subject,
+      }).concat(),
+      type: "query",
+      where: ConceptStub.sparqlWherePatterns({ subject }).concat(),
+    };
+  }
+
+  export function sparqlConstructQueryString(
+    parameters?: { subject: rdfjs.Variable } & Omit<
+      sparqljs.ConstructQuery,
+      "prefixes" | "queryType" | "template" | "type" | "where"
+    > &
+      sparqljs.GeneratorOptions,
+  ): string {
+    return new sparqljs.Generator(parameters).stringify(
+      ConceptStub.sparqlConstructQuery(parameters),
+    );
+  }
+
+  export function sparqlConstructTemplateTriples({
+    ignoreRdfType,
+    subject,
+    variablePrefix: variablePrefixParameter,
+  }: {
+    ignoreRdfType?: boolean;
+    subject: rdfjs.Variable;
+    variablePrefix?: string;
+  }): readonly sparqljs.Triple[] {
+    const variablePrefix = variablePrefixParameter ?? subject.value;
+    return [
+      ...KosResourceStub.sparqlConstructTemplateTriples({
+        ignoreRdfType: true,
+        subject,
+        variablePrefix,
+      }),
+      ...(ignoreRdfType
+        ? []
+        : [
+            {
+              subject,
+              predicate: dataFactory.namedNode(
+                "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+              ),
+              object: dataFactory.variable(`${variablePrefix}RdfType`),
+            },
+          ]),
+    ];
+  }
+
+  export function sparqlWherePatterns({
+    ignoreRdfType,
+    subject,
+    variablePrefix: variablePrefixParameter,
+  }: {
+    ignoreRdfType?: boolean;
+    subject: rdfjs.Variable;
+    variablePrefix?: string;
+  }): readonly sparqljs.Pattern[] {
+    const variablePrefix = variablePrefixParameter ?? subject.value;
+    return [
+      ...KosResourceStub.sparqlWherePatterns({
+        ignoreRdfType: true,
+        subject,
+        variablePrefix,
+      }),
+      ...(ignoreRdfType
+        ? []
+        : [
+            {
+              triples: [
+                {
+                  subject,
+                  predicate: dataFactory.namedNode(
+                    "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+                  ),
+                  object: dataFactory.namedNode(
+                    "http://www.w3.org/2004/02/skos/core#Concept",
+                  ),
+                },
+                {
+                  subject,
+                  predicate: dataFactory.namedNode(
+                    "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+                  ),
+                  object: dataFactory.variable(`${variablePrefix}RdfType`),
+                },
+              ],
+              type: "bgp" as const,
+            },
+          ]),
+    ];
   }
 }
 export interface Concept extends KosResource {
@@ -1991,7 +2812,7 @@ export namespace Concept {
     };
   }
 
-  export function fromRdf({
+  export function propertiesFromRdf({
     ignoreRdfType: _ignoreRdfType,
     languageIn: _languageIn,
     resource: _resource,
@@ -2002,785 +2823,1178 @@ export namespace Concept {
     ignoreRdfType?: boolean;
     languageIn?: readonly string[];
     resource: rdfjsResource.Resource<rdfjs.NamedNode>;
-  }): purify.Either<rdfjsResource.Resource.ValueError, Concept> {
-    return KosResource.fromRdf({
+  }): purify.Either<
+    rdfjsResource.Resource.ValueError,
+    {
+      broader: readonly ConceptStub[];
+      broaderTransitive: readonly ConceptStub[];
+      broadMatch: readonly ConceptStub[];
+      closeMatch: readonly ConceptStub[];
+      exactMatch: readonly ConceptStub[];
+      identifier: rdfjs.NamedNode;
+      inScheme: readonly ConceptSchemeStub[];
+      mappingRelation: readonly ConceptStub[];
+      narrower: readonly ConceptStub[];
+      narrowerTransitive: readonly ConceptStub[];
+      narrowMatch: readonly ConceptStub[];
+      related: readonly ConceptStub[];
+      relatedMatch: readonly ConceptStub[];
+      semanticRelation: readonly ConceptStub[];
+      topConceptOf: readonly ConceptSchemeStub[];
+      type: "Concept";
+    } & purifyHelpers.Eithers.UnwrapR<
+      ReturnType<typeof KosResource.propertiesFromRdf>
+    >
+  > {
+    const _super0Either = KosResource.propertiesFromRdf({
       ..._context,
       ignoreRdfType: true,
       languageIn: _languageIn,
       resource: _resource,
-    }).chain((_super) => {
-      if (
-        !_ignoreRdfType &&
-        !_resource.isInstanceOf(
-          dataFactory.namedNode("http://www.w3.org/2004/02/skos/core#Concept"),
+    });
+    if (_super0Either.isLeft()) {
+      return _super0Either;
+    }
+
+    const _super0 = _super0Either.unsafeCoerce();
+    if (
+      !_ignoreRdfType &&
+      !_resource.isInstanceOf(
+        dataFactory.namedNode("http://www.w3.org/2004/02/skos/core#Concept"),
+      )
+    ) {
+      return purify.Left(
+        new rdfjsResource.Resource.ValueError({
+          focusResource: _resource,
+          message: `${rdfjsResource.Resource.Identifier.toString(_resource.identifier)} has unexpected RDF type`,
+          predicate: dataFactory.namedNode(
+            "http://www.w3.org/2004/02/skos/core#Concept",
+          ),
+        }),
+      );
+    }
+
+    const _broaderEither: purify.Either<
+      rdfjsResource.Resource.ValueError,
+      readonly ConceptStub[]
+    > = purify.Either.of([
+      ..._resource
+        .values(
+          dataFactory.namedNode("http://www.w3.org/2004/02/skos/core#broader"),
+          { unique: true },
         )
-      ) {
-        return purify.Left(
-          new rdfjsResource.Resource.ValueError({
-            focusResource: _resource,
-            message: `${rdfjsResource.Resource.Identifier.toString(_resource.identifier)} has unexpected RDF type`,
-            predicate: dataFactory.namedNode(
-              "http://www.w3.org/2004/02/skos/core#Concept",
-            ),
-          }),
-        );
-      }
-      const _broaderEither: purify.Either<
-        rdfjsResource.Resource.ValueError,
-        readonly ConceptStub[]
-      > = purify.Either.of([
-        ..._resource
-          .values(
-            dataFactory.namedNode(
-              "http://www.w3.org/2004/02/skos/core#broader",
-            ),
-            { unique: true },
-          )
-          .flatMap((_item) =>
-            _item
-              .toValues()
-              .head()
-              .chain((value) => value.toNamedResource())
-              .chain((_resource) =>
-                ConceptStub.fromRdf({
-                  ..._context,
-                  ignoreRdfType: true,
-                  languageIn: _languageIn,
-                  resource: _resource,
-                }),
-              )
-              .toMaybe()
-              .toList(),
+        .flatMap((_item) =>
+          _item
+            .toValues()
+            .head()
+            .chain((value) => value.toNamedResource())
+            .chain((_resource) =>
+              ConceptStub.fromRdf({
+                ..._context,
+                ignoreRdfType: true,
+                languageIn: _languageIn,
+                resource: _resource,
+              }),
+            )
+            .toMaybe()
+            .toList(),
+        ),
+    ]);
+    if (_broaderEither.isLeft()) {
+      return _broaderEither;
+    }
+
+    const broader = _broaderEither.unsafeCoerce();
+    const _broaderTransitiveEither: purify.Either<
+      rdfjsResource.Resource.ValueError,
+      readonly ConceptStub[]
+    > = purify.Either.of([
+      ..._resource
+        .values(
+          dataFactory.namedNode(
+            "http://www.w3.org/2004/02/skos/core#broaderTransitive",
           ),
-      ]);
-      if (_broaderEither.isLeft()) {
-        return _broaderEither;
-      }
-      const broader = _broaderEither.unsafeCoerce();
-      const _broaderTransitiveEither: purify.Either<
-        rdfjsResource.Resource.ValueError,
-        readonly ConceptStub[]
-      > = purify.Either.of([
-        ..._resource
-          .values(
-            dataFactory.namedNode(
-              "http://www.w3.org/2004/02/skos/core#broaderTransitive",
-            ),
-            { unique: true },
-          )
-          .flatMap((_item) =>
-            _item
-              .toValues()
-              .head()
-              .chain((value) => value.toNamedResource())
-              .chain((_resource) =>
-                ConceptStub.fromRdf({
-                  ..._context,
-                  ignoreRdfType: true,
-                  languageIn: _languageIn,
-                  resource: _resource,
-                }),
-              )
-              .toMaybe()
-              .toList(),
+          { unique: true },
+        )
+        .flatMap((_item) =>
+          _item
+            .toValues()
+            .head()
+            .chain((value) => value.toNamedResource())
+            .chain((_resource) =>
+              ConceptStub.fromRdf({
+                ..._context,
+                ignoreRdfType: true,
+                languageIn: _languageIn,
+                resource: _resource,
+              }),
+            )
+            .toMaybe()
+            .toList(),
+        ),
+    ]);
+    if (_broaderTransitiveEither.isLeft()) {
+      return _broaderTransitiveEither;
+    }
+
+    const broaderTransitive = _broaderTransitiveEither.unsafeCoerce();
+    const _broadMatchEither: purify.Either<
+      rdfjsResource.Resource.ValueError,
+      readonly ConceptStub[]
+    > = purify.Either.of([
+      ..._resource
+        .values(
+          dataFactory.namedNode(
+            "http://www.w3.org/2004/02/skos/core#broadMatch",
           ),
-      ]);
-      if (_broaderTransitiveEither.isLeft()) {
-        return _broaderTransitiveEither;
-      }
-      const broaderTransitive = _broaderTransitiveEither.unsafeCoerce();
-      const _broadMatchEither: purify.Either<
-        rdfjsResource.Resource.ValueError,
-        readonly ConceptStub[]
-      > = purify.Either.of([
-        ..._resource
-          .values(
-            dataFactory.namedNode(
-              "http://www.w3.org/2004/02/skos/core#broadMatch",
-            ),
-            { unique: true },
-          )
-          .flatMap((_item) =>
-            _item
-              .toValues()
-              .head()
-              .chain((value) => value.toNamedResource())
-              .chain((_resource) =>
-                ConceptStub.fromRdf({
-                  ..._context,
-                  ignoreRdfType: true,
-                  languageIn: _languageIn,
-                  resource: _resource,
-                }),
-              )
-              .toMaybe()
-              .toList(),
+          { unique: true },
+        )
+        .flatMap((_item) =>
+          _item
+            .toValues()
+            .head()
+            .chain((value) => value.toNamedResource())
+            .chain((_resource) =>
+              ConceptStub.fromRdf({
+                ..._context,
+                ignoreRdfType: true,
+                languageIn: _languageIn,
+                resource: _resource,
+              }),
+            )
+            .toMaybe()
+            .toList(),
+        ),
+    ]);
+    if (_broadMatchEither.isLeft()) {
+      return _broadMatchEither;
+    }
+
+    const broadMatch = _broadMatchEither.unsafeCoerce();
+    const _closeMatchEither: purify.Either<
+      rdfjsResource.Resource.ValueError,
+      readonly ConceptStub[]
+    > = purify.Either.of([
+      ..._resource
+        .values(
+          dataFactory.namedNode(
+            "http://www.w3.org/2004/02/skos/core#closeMatch",
           ),
-      ]);
-      if (_broadMatchEither.isLeft()) {
-        return _broadMatchEither;
-      }
-      const broadMatch = _broadMatchEither.unsafeCoerce();
-      const _closeMatchEither: purify.Either<
-        rdfjsResource.Resource.ValueError,
-        readonly ConceptStub[]
-      > = purify.Either.of([
-        ..._resource
-          .values(
-            dataFactory.namedNode(
-              "http://www.w3.org/2004/02/skos/core#closeMatch",
-            ),
-            { unique: true },
-          )
-          .flatMap((_item) =>
-            _item
-              .toValues()
-              .head()
-              .chain((value) => value.toNamedResource())
-              .chain((_resource) =>
-                ConceptStub.fromRdf({
-                  ..._context,
-                  ignoreRdfType: true,
-                  languageIn: _languageIn,
-                  resource: _resource,
-                }),
-              )
-              .toMaybe()
-              .toList(),
+          { unique: true },
+        )
+        .flatMap((_item) =>
+          _item
+            .toValues()
+            .head()
+            .chain((value) => value.toNamedResource())
+            .chain((_resource) =>
+              ConceptStub.fromRdf({
+                ..._context,
+                ignoreRdfType: true,
+                languageIn: _languageIn,
+                resource: _resource,
+              }),
+            )
+            .toMaybe()
+            .toList(),
+        ),
+    ]);
+    if (_closeMatchEither.isLeft()) {
+      return _closeMatchEither;
+    }
+
+    const closeMatch = _closeMatchEither.unsafeCoerce();
+    const _exactMatchEither: purify.Either<
+      rdfjsResource.Resource.ValueError,
+      readonly ConceptStub[]
+    > = purify.Either.of([
+      ..._resource
+        .values(
+          dataFactory.namedNode(
+            "http://www.w3.org/2004/02/skos/core#exactMatch",
           ),
-      ]);
-      if (_closeMatchEither.isLeft()) {
-        return _closeMatchEither;
-      }
-      const closeMatch = _closeMatchEither.unsafeCoerce();
-      const _exactMatchEither: purify.Either<
-        rdfjsResource.Resource.ValueError,
-        readonly ConceptStub[]
-      > = purify.Either.of([
-        ..._resource
-          .values(
-            dataFactory.namedNode(
-              "http://www.w3.org/2004/02/skos/core#exactMatch",
-            ),
-            { unique: true },
-          )
-          .flatMap((_item) =>
-            _item
-              .toValues()
-              .head()
-              .chain((value) => value.toNamedResource())
-              .chain((_resource) =>
-                ConceptStub.fromRdf({
-                  ..._context,
-                  ignoreRdfType: true,
-                  languageIn: _languageIn,
-                  resource: _resource,
-                }),
-              )
-              .toMaybe()
-              .toList(),
+          { unique: true },
+        )
+        .flatMap((_item) =>
+          _item
+            .toValues()
+            .head()
+            .chain((value) => value.toNamedResource())
+            .chain((_resource) =>
+              ConceptStub.fromRdf({
+                ..._context,
+                ignoreRdfType: true,
+                languageIn: _languageIn,
+                resource: _resource,
+              }),
+            )
+            .toMaybe()
+            .toList(),
+        ),
+    ]);
+    if (_exactMatchEither.isLeft()) {
+      return _exactMatchEither;
+    }
+
+    const exactMatch = _exactMatchEither.unsafeCoerce();
+    const identifier = _resource.identifier;
+    const _inSchemeEither: purify.Either<
+      rdfjsResource.Resource.ValueError,
+      readonly ConceptSchemeStub[]
+    > = purify.Either.of([
+      ..._resource
+        .values(
+          dataFactory.namedNode("http://www.w3.org/2004/02/skos/core#inScheme"),
+          { unique: true },
+        )
+        .flatMap((_item) =>
+          _item
+            .toValues()
+            .head()
+            .chain((value) => value.toNamedResource())
+            .chain((_resource) =>
+              ConceptSchemeStub.fromRdf({
+                ..._context,
+                ignoreRdfType: true,
+                languageIn: _languageIn,
+                resource: _resource,
+              }),
+            )
+            .toMaybe()
+            .toList(),
+        ),
+    ]);
+    if (_inSchemeEither.isLeft()) {
+      return _inSchemeEither;
+    }
+
+    const inScheme = _inSchemeEither.unsafeCoerce();
+    const _mappingRelationEither: purify.Either<
+      rdfjsResource.Resource.ValueError,
+      readonly ConceptStub[]
+    > = purify.Either.of([
+      ..._resource
+        .values(
+          dataFactory.namedNode(
+            "http://www.w3.org/2004/02/skos/core#mappingRelation",
           ),
-      ]);
-      if (_exactMatchEither.isLeft()) {
-        return _exactMatchEither;
-      }
-      const exactMatch = _exactMatchEither.unsafeCoerce();
-      const identifier = _resource.identifier;
-      const _inSchemeEither: purify.Either<
-        rdfjsResource.Resource.ValueError,
-        readonly ConceptSchemeStub[]
-      > = purify.Either.of([
-        ..._resource
-          .values(
-            dataFactory.namedNode(
-              "http://www.w3.org/2004/02/skos/core#inScheme",
-            ),
-            { unique: true },
-          )
-          .flatMap((_item) =>
-            _item
-              .toValues()
-              .head()
-              .chain((value) => value.toNamedResource())
-              .chain((_resource) =>
-                ConceptSchemeStub.fromRdf({
-                  ..._context,
-                  ignoreRdfType: true,
-                  languageIn: _languageIn,
-                  resource: _resource,
-                }),
-              )
-              .toMaybe()
-              .toList(),
+          { unique: true },
+        )
+        .flatMap((_item) =>
+          _item
+            .toValues()
+            .head()
+            .chain((value) => value.toNamedResource())
+            .chain((_resource) =>
+              ConceptStub.fromRdf({
+                ..._context,
+                ignoreRdfType: true,
+                languageIn: _languageIn,
+                resource: _resource,
+              }),
+            )
+            .toMaybe()
+            .toList(),
+        ),
+    ]);
+    if (_mappingRelationEither.isLeft()) {
+      return _mappingRelationEither;
+    }
+
+    const mappingRelation = _mappingRelationEither.unsafeCoerce();
+    const _narrowerEither: purify.Either<
+      rdfjsResource.Resource.ValueError,
+      readonly ConceptStub[]
+    > = purify.Either.of([
+      ..._resource
+        .values(
+          dataFactory.namedNode("http://www.w3.org/2004/02/skos/core#narrower"),
+          { unique: true },
+        )
+        .flatMap((_item) =>
+          _item
+            .toValues()
+            .head()
+            .chain((value) => value.toNamedResource())
+            .chain((_resource) =>
+              ConceptStub.fromRdf({
+                ..._context,
+                ignoreRdfType: true,
+                languageIn: _languageIn,
+                resource: _resource,
+              }),
+            )
+            .toMaybe()
+            .toList(),
+        ),
+    ]);
+    if (_narrowerEither.isLeft()) {
+      return _narrowerEither;
+    }
+
+    const narrower = _narrowerEither.unsafeCoerce();
+    const _narrowerTransitiveEither: purify.Either<
+      rdfjsResource.Resource.ValueError,
+      readonly ConceptStub[]
+    > = purify.Either.of([
+      ..._resource
+        .values(
+          dataFactory.namedNode(
+            "http://www.w3.org/2004/02/skos/core#narrowerTransitive",
           ),
-      ]);
-      if (_inSchemeEither.isLeft()) {
-        return _inSchemeEither;
-      }
-      const inScheme = _inSchemeEither.unsafeCoerce();
-      const _mappingRelationEither: purify.Either<
-        rdfjsResource.Resource.ValueError,
-        readonly ConceptStub[]
-      > = purify.Either.of([
-        ..._resource
-          .values(
-            dataFactory.namedNode(
-              "http://www.w3.org/2004/02/skos/core#mappingRelation",
-            ),
-            { unique: true },
-          )
-          .flatMap((_item) =>
-            _item
-              .toValues()
-              .head()
-              .chain((value) => value.toNamedResource())
-              .chain((_resource) =>
-                ConceptStub.fromRdf({
-                  ..._context,
-                  ignoreRdfType: true,
-                  languageIn: _languageIn,
-                  resource: _resource,
-                }),
-              )
-              .toMaybe()
-              .toList(),
+          { unique: true },
+        )
+        .flatMap((_item) =>
+          _item
+            .toValues()
+            .head()
+            .chain((value) => value.toNamedResource())
+            .chain((_resource) =>
+              ConceptStub.fromRdf({
+                ..._context,
+                ignoreRdfType: true,
+                languageIn: _languageIn,
+                resource: _resource,
+              }),
+            )
+            .toMaybe()
+            .toList(),
+        ),
+    ]);
+    if (_narrowerTransitiveEither.isLeft()) {
+      return _narrowerTransitiveEither;
+    }
+
+    const narrowerTransitive = _narrowerTransitiveEither.unsafeCoerce();
+    const _narrowMatchEither: purify.Either<
+      rdfjsResource.Resource.ValueError,
+      readonly ConceptStub[]
+    > = purify.Either.of([
+      ..._resource
+        .values(
+          dataFactory.namedNode(
+            "http://www.w3.org/2004/02/skos/core#narrowMatch",
           ),
-      ]);
-      if (_mappingRelationEither.isLeft()) {
-        return _mappingRelationEither;
-      }
-      const mappingRelation = _mappingRelationEither.unsafeCoerce();
-      const _narrowerEither: purify.Either<
-        rdfjsResource.Resource.ValueError,
-        readonly ConceptStub[]
-      > = purify.Either.of([
-        ..._resource
-          .values(
-            dataFactory.namedNode(
-              "http://www.w3.org/2004/02/skos/core#narrower",
-            ),
-            { unique: true },
-          )
-          .flatMap((_item) =>
-            _item
-              .toValues()
-              .head()
-              .chain((value) => value.toNamedResource())
-              .chain((_resource) =>
-                ConceptStub.fromRdf({
-                  ..._context,
-                  ignoreRdfType: true,
-                  languageIn: _languageIn,
-                  resource: _resource,
-                }),
-              )
-              .toMaybe()
-              .toList(),
+          { unique: true },
+        )
+        .flatMap((_item) =>
+          _item
+            .toValues()
+            .head()
+            .chain((value) => value.toNamedResource())
+            .chain((_resource) =>
+              ConceptStub.fromRdf({
+                ..._context,
+                ignoreRdfType: true,
+                languageIn: _languageIn,
+                resource: _resource,
+              }),
+            )
+            .toMaybe()
+            .toList(),
+        ),
+    ]);
+    if (_narrowMatchEither.isLeft()) {
+      return _narrowMatchEither;
+    }
+
+    const narrowMatch = _narrowMatchEither.unsafeCoerce();
+    const _relatedEither: purify.Either<
+      rdfjsResource.Resource.ValueError,
+      readonly ConceptStub[]
+    > = purify.Either.of([
+      ..._resource
+        .values(
+          dataFactory.namedNode("http://www.w3.org/2004/02/skos/core#related"),
+          { unique: true },
+        )
+        .flatMap((_item) =>
+          _item
+            .toValues()
+            .head()
+            .chain((value) => value.toNamedResource())
+            .chain((_resource) =>
+              ConceptStub.fromRdf({
+                ..._context,
+                ignoreRdfType: true,
+                languageIn: _languageIn,
+                resource: _resource,
+              }),
+            )
+            .toMaybe()
+            .toList(),
+        ),
+    ]);
+    if (_relatedEither.isLeft()) {
+      return _relatedEither;
+    }
+
+    const related = _relatedEither.unsafeCoerce();
+    const _relatedMatchEither: purify.Either<
+      rdfjsResource.Resource.ValueError,
+      readonly ConceptStub[]
+    > = purify.Either.of([
+      ..._resource
+        .values(
+          dataFactory.namedNode(
+            "http://www.w3.org/2004/02/skos/core#relatedMatch",
           ),
-      ]);
-      if (_narrowerEither.isLeft()) {
-        return _narrowerEither;
-      }
-      const narrower = _narrowerEither.unsafeCoerce();
-      const _narrowerTransitiveEither: purify.Either<
-        rdfjsResource.Resource.ValueError,
-        readonly ConceptStub[]
-      > = purify.Either.of([
-        ..._resource
-          .values(
-            dataFactory.namedNode(
-              "http://www.w3.org/2004/02/skos/core#narrowerTransitive",
-            ),
-            { unique: true },
-          )
-          .flatMap((_item) =>
-            _item
-              .toValues()
-              .head()
-              .chain((value) => value.toNamedResource())
-              .chain((_resource) =>
-                ConceptStub.fromRdf({
-                  ..._context,
-                  ignoreRdfType: true,
-                  languageIn: _languageIn,
-                  resource: _resource,
-                }),
-              )
-              .toMaybe()
-              .toList(),
+          { unique: true },
+        )
+        .flatMap((_item) =>
+          _item
+            .toValues()
+            .head()
+            .chain((value) => value.toNamedResource())
+            .chain((_resource) =>
+              ConceptStub.fromRdf({
+                ..._context,
+                ignoreRdfType: true,
+                languageIn: _languageIn,
+                resource: _resource,
+              }),
+            )
+            .toMaybe()
+            .toList(),
+        ),
+    ]);
+    if (_relatedMatchEither.isLeft()) {
+      return _relatedMatchEither;
+    }
+
+    const relatedMatch = _relatedMatchEither.unsafeCoerce();
+    const _semanticRelationEither: purify.Either<
+      rdfjsResource.Resource.ValueError,
+      readonly ConceptStub[]
+    > = purify.Either.of([
+      ..._resource
+        .values(
+          dataFactory.namedNode(
+            "http://www.w3.org/2004/02/skos/core#semanticRelation",
           ),
-      ]);
-      if (_narrowerTransitiveEither.isLeft()) {
-        return _narrowerTransitiveEither;
-      }
-      const narrowerTransitive = _narrowerTransitiveEither.unsafeCoerce();
-      const _narrowMatchEither: purify.Either<
-        rdfjsResource.Resource.ValueError,
-        readonly ConceptStub[]
-      > = purify.Either.of([
-        ..._resource
-          .values(
-            dataFactory.namedNode(
-              "http://www.w3.org/2004/02/skos/core#narrowMatch",
-            ),
-            { unique: true },
-          )
-          .flatMap((_item) =>
-            _item
-              .toValues()
-              .head()
-              .chain((value) => value.toNamedResource())
-              .chain((_resource) =>
-                ConceptStub.fromRdf({
-                  ..._context,
-                  ignoreRdfType: true,
-                  languageIn: _languageIn,
-                  resource: _resource,
-                }),
-              )
-              .toMaybe()
-              .toList(),
+          { unique: true },
+        )
+        .flatMap((_item) =>
+          _item
+            .toValues()
+            .head()
+            .chain((value) => value.toNamedResource())
+            .chain((_resource) =>
+              ConceptStub.fromRdf({
+                ..._context,
+                ignoreRdfType: true,
+                languageIn: _languageIn,
+                resource: _resource,
+              }),
+            )
+            .toMaybe()
+            .toList(),
+        ),
+    ]);
+    if (_semanticRelationEither.isLeft()) {
+      return _semanticRelationEither;
+    }
+
+    const semanticRelation = _semanticRelationEither.unsafeCoerce();
+    const _topConceptOfEither: purify.Either<
+      rdfjsResource.Resource.ValueError,
+      readonly ConceptSchemeStub[]
+    > = purify.Either.of([
+      ..._resource
+        .values(
+          dataFactory.namedNode(
+            "http://www.w3.org/2004/02/skos/core#topConceptOf",
           ),
-      ]);
-      if (_narrowMatchEither.isLeft()) {
-        return _narrowMatchEither;
-      }
-      const narrowMatch = _narrowMatchEither.unsafeCoerce();
-      const _relatedEither: purify.Either<
-        rdfjsResource.Resource.ValueError,
-        readonly ConceptStub[]
-      > = purify.Either.of([
-        ..._resource
-          .values(
-            dataFactory.namedNode(
-              "http://www.w3.org/2004/02/skos/core#related",
-            ),
-            { unique: true },
-          )
-          .flatMap((_item) =>
-            _item
-              .toValues()
-              .head()
-              .chain((value) => value.toNamedResource())
-              .chain((_resource) =>
-                ConceptStub.fromRdf({
-                  ..._context,
-                  ignoreRdfType: true,
-                  languageIn: _languageIn,
-                  resource: _resource,
-                }),
-              )
-              .toMaybe()
-              .toList(),
-          ),
-      ]);
-      if (_relatedEither.isLeft()) {
-        return _relatedEither;
-      }
-      const related = _relatedEither.unsafeCoerce();
-      const _relatedMatchEither: purify.Either<
-        rdfjsResource.Resource.ValueError,
-        readonly ConceptStub[]
-      > = purify.Either.of([
-        ..._resource
-          .values(
-            dataFactory.namedNode(
-              "http://www.w3.org/2004/02/skos/core#relatedMatch",
-            ),
-            { unique: true },
-          )
-          .flatMap((_item) =>
-            _item
-              .toValues()
-              .head()
-              .chain((value) => value.toNamedResource())
-              .chain((_resource) =>
-                ConceptStub.fromRdf({
-                  ..._context,
-                  ignoreRdfType: true,
-                  languageIn: _languageIn,
-                  resource: _resource,
-                }),
-              )
-              .toMaybe()
-              .toList(),
-          ),
-      ]);
-      if (_relatedMatchEither.isLeft()) {
-        return _relatedMatchEither;
-      }
-      const relatedMatch = _relatedMatchEither.unsafeCoerce();
-      const _semanticRelationEither: purify.Either<
-        rdfjsResource.Resource.ValueError,
-        readonly ConceptStub[]
-      > = purify.Either.of([
-        ..._resource
-          .values(
-            dataFactory.namedNode(
-              "http://www.w3.org/2004/02/skos/core#semanticRelation",
-            ),
-            { unique: true },
-          )
-          .flatMap((_item) =>
-            _item
-              .toValues()
-              .head()
-              .chain((value) => value.toNamedResource())
-              .chain((_resource) =>
-                ConceptStub.fromRdf({
-                  ..._context,
-                  ignoreRdfType: true,
-                  languageIn: _languageIn,
-                  resource: _resource,
-                }),
-              )
-              .toMaybe()
-              .toList(),
-          ),
-      ]);
-      if (_semanticRelationEither.isLeft()) {
-        return _semanticRelationEither;
-      }
-      const semanticRelation = _semanticRelationEither.unsafeCoerce();
-      const _topConceptOfEither: purify.Either<
-        rdfjsResource.Resource.ValueError,
-        readonly ConceptSchemeStub[]
-      > = purify.Either.of([
-        ..._resource
-          .values(
-            dataFactory.namedNode(
-              "http://www.w3.org/2004/02/skos/core#topConceptOf",
-            ),
-            { unique: true },
-          )
-          .flatMap((_item) =>
-            _item
-              .toValues()
-              .head()
-              .chain((value) => value.toNamedResource())
-              .chain((_resource) =>
-                ConceptSchemeStub.fromRdf({
-                  ..._context,
-                  ignoreRdfType: true,
-                  languageIn: _languageIn,
-                  resource: _resource,
-                }),
-              )
-              .toMaybe()
-              .toList(),
-          ),
-      ]);
-      if (_topConceptOfEither.isLeft()) {
-        return _topConceptOfEither;
-      }
-      const topConceptOf = _topConceptOfEither.unsafeCoerce();
-      const type = "Concept" as const;
-      return purify.Either.of({
-        altLabel: _super.altLabel,
-        altLabelXl: _super.altLabelXl,
-        changeNote: _super.changeNote,
-        definition: _super.definition,
-        editorialNote: _super.editorialNote,
-        example: _super.example,
-        hiddenLabel: _super.hiddenLabel,
-        hiddenLabelXl: _super.hiddenLabelXl,
-        historyNote: _super.historyNote,
-        identifier,
-        modified: _super.modified,
-        notation: _super.notation,
-        note: _super.note,
-        prefLabel: _super.prefLabel,
-        prefLabelXl: _super.prefLabelXl,
-        scopeNote: _super.scopeNote,
-        broader,
-        broaderTransitive,
-        broadMatch,
-        closeMatch,
-        exactMatch,
-        inScheme,
-        mappingRelation,
-        narrower,
-        narrowerTransitive,
-        narrowMatch,
-        related,
-        relatedMatch,
-        semanticRelation,
-        topConceptOf,
-        type,
-      });
+          { unique: true },
+        )
+        .flatMap((_item) =>
+          _item
+            .toValues()
+            .head()
+            .chain((value) => value.toNamedResource())
+            .chain((_resource) =>
+              ConceptSchemeStub.fromRdf({
+                ..._context,
+                ignoreRdfType: true,
+                languageIn: _languageIn,
+                resource: _resource,
+              }),
+            )
+            .toMaybe()
+            .toList(),
+        ),
+    ]);
+    if (_topConceptOfEither.isLeft()) {
+      return _topConceptOfEither;
+    }
+
+    const topConceptOf = _topConceptOfEither.unsafeCoerce();
+    const type = "Concept" as const;
+    return purify.Either.of({
+      ..._super0,
+      broader,
+      broaderTransitive,
+      broadMatch,
+      closeMatch,
+      exactMatch,
+      identifier,
+      inScheme,
+      mappingRelation,
+      narrower,
+      narrowerTransitive,
+      narrowMatch,
+      related,
+      relatedMatch,
+      semanticRelation,
+      topConceptOf,
+      type,
     });
   }
 
-  export class SparqlGraphPatterns extends KosResource.SparqlGraphPatterns {
-    constructor(
-      subject: sparqlBuilder.ResourceGraphPatterns.SubjectParameter,
-      _options?: { ignoreRdfType?: boolean },
-    ) {
-      super(subject, { ignoreRdfType: true });
-      if (!_options?.ignoreRdfType) {
-        this.add(
-          ...new sparqlBuilder.RdfTypeGraphPatterns(
-            this.subject,
-            dataFactory.namedNode(
-              "http://www.w3.org/2004/02/skos/core#Concept",
-            ),
-          ),
-        );
-      }
+  export function fromRdf(
+    parameters: Parameters<typeof Concept.propertiesFromRdf>[0],
+  ): purify.Either<rdfjsResource.Resource.ValueError, Concept> {
+    return Concept.propertiesFromRdf(parameters);
+  }
 
-      this.add(
-        sparqlBuilder.GraphPattern.optional(
-          sparqlBuilder.GraphPattern.group(
-            sparqlBuilder.GraphPattern.basic(
-              this.subject,
-              dataFactory.namedNode(
-                "http://www.w3.org/2004/02/skos/core#broader",
+  export function sparqlConstructQuery(
+    parameters?: {
+      prefixes?: { [prefix: string]: string };
+      subject: rdfjs.Variable;
+    } & Omit<
+      sparqljs.ConstructQuery,
+      "prefixes" | "queryType" | "template" | "type" | "where"
+    >,
+  ): sparqljs.ConstructQuery {
+    const subject = parameters?.subject ?? dataFactory.variable("concept");
+    return {
+      ...parameters,
+      prefixes: parameters?.prefixes ?? {},
+      queryType: "CONSTRUCT",
+      template: Concept.sparqlConstructTemplateTriples({ subject }).concat(),
+      type: "query",
+      where: Concept.sparqlWherePatterns({ subject }).concat(),
+    };
+  }
+
+  export function sparqlConstructQueryString(
+    parameters?: { subject: rdfjs.Variable } & Omit<
+      sparqljs.ConstructQuery,
+      "prefixes" | "queryType" | "template" | "type" | "where"
+    > &
+      sparqljs.GeneratorOptions,
+  ): string {
+    return new sparqljs.Generator(parameters).stringify(
+      Concept.sparqlConstructQuery(parameters),
+    );
+  }
+
+  export function sparqlConstructTemplateTriples({
+    ignoreRdfType,
+    subject,
+    variablePrefix: variablePrefixParameter,
+  }: {
+    ignoreRdfType?: boolean;
+    subject: rdfjs.Variable;
+    variablePrefix?: string;
+  }): readonly sparqljs.Triple[] {
+    const variablePrefix = variablePrefixParameter ?? subject.value;
+    return [
+      ...KosResource.sparqlConstructTemplateTriples({
+        ignoreRdfType: true,
+        subject,
+        variablePrefix,
+      }),
+      ...(ignoreRdfType
+        ? []
+        : [
+            {
+              subject,
+              predicate: dataFactory.namedNode(
+                "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
               ),
-              this.variable("Broader"),
-            ).chainObject(
-              (_object) =>
-                new ConceptStub.SparqlGraphPatterns(_object, {
-                  ignoreRdfType: true,
-                }),
-            ),
-          ),
+              object: dataFactory.variable(`${variablePrefix}RdfType`),
+            },
+          ]),
+      {
+        object: dataFactory.variable(`${variablePrefix}Broader`),
+        predicate: dataFactory.namedNode(
+          "http://www.w3.org/2004/02/skos/core#broader",
         ),
-      );
-      this.add(
-        sparqlBuilder.GraphPattern.optional(
-          sparqlBuilder.GraphPattern.group(
-            sparqlBuilder.GraphPattern.basic(
-              this.subject,
-              dataFactory.namedNode(
-                "http://www.w3.org/2004/02/skos/core#broaderTransitive",
-              ),
-              this.variable("BroaderTransitive"),
-            ).chainObject(
-              (_object) =>
-                new ConceptStub.SparqlGraphPatterns(_object, {
-                  ignoreRdfType: true,
-                }),
-            ),
-          ),
+        subject,
+      },
+      ...ConceptStub.sparqlConstructTemplateTriples({
+        subject: dataFactory.variable(`${variablePrefix}Broader`),
+        variablePrefix: `${variablePrefix}Broader`,
+      }),
+      {
+        object: dataFactory.variable(`${variablePrefix}BroaderTransitive`),
+        predicate: dataFactory.namedNode(
+          "http://www.w3.org/2004/02/skos/core#broaderTransitive",
         ),
-      );
-      this.add(
-        sparqlBuilder.GraphPattern.optional(
-          sparqlBuilder.GraphPattern.group(
-            sparqlBuilder.GraphPattern.basic(
-              this.subject,
-              dataFactory.namedNode(
-                "http://www.w3.org/2004/02/skos/core#broadMatch",
-              ),
-              this.variable("BroadMatch"),
-            ).chainObject(
-              (_object) =>
-                new ConceptStub.SparqlGraphPatterns(_object, {
-                  ignoreRdfType: true,
-                }),
-            ),
-          ),
+        subject,
+      },
+      ...ConceptStub.sparqlConstructTemplateTriples({
+        subject: dataFactory.variable(`${variablePrefix}BroaderTransitive`),
+        variablePrefix: `${variablePrefix}BroaderTransitive`,
+      }),
+      {
+        object: dataFactory.variable(`${variablePrefix}BroadMatch`),
+        predicate: dataFactory.namedNode(
+          "http://www.w3.org/2004/02/skos/core#broadMatch",
         ),
-      );
-      this.add(
-        sparqlBuilder.GraphPattern.optional(
-          sparqlBuilder.GraphPattern.group(
-            sparqlBuilder.GraphPattern.basic(
-              this.subject,
-              dataFactory.namedNode(
-                "http://www.w3.org/2004/02/skos/core#closeMatch",
-              ),
-              this.variable("CloseMatch"),
-            ).chainObject(
-              (_object) =>
-                new ConceptStub.SparqlGraphPatterns(_object, {
-                  ignoreRdfType: true,
-                }),
-            ),
-          ),
+        subject,
+      },
+      ...ConceptStub.sparqlConstructTemplateTriples({
+        subject: dataFactory.variable(`${variablePrefix}BroadMatch`),
+        variablePrefix: `${variablePrefix}BroadMatch`,
+      }),
+      {
+        object: dataFactory.variable(`${variablePrefix}CloseMatch`),
+        predicate: dataFactory.namedNode(
+          "http://www.w3.org/2004/02/skos/core#closeMatch",
         ),
-      );
-      this.add(
-        sparqlBuilder.GraphPattern.optional(
-          sparqlBuilder.GraphPattern.group(
-            sparqlBuilder.GraphPattern.basic(
-              this.subject,
-              dataFactory.namedNode(
-                "http://www.w3.org/2004/02/skos/core#exactMatch",
-              ),
-              this.variable("ExactMatch"),
-            ).chainObject(
-              (_object) =>
-                new ConceptStub.SparqlGraphPatterns(_object, {
-                  ignoreRdfType: true,
-                }),
-            ),
-          ),
+        subject,
+      },
+      ...ConceptStub.sparqlConstructTemplateTriples({
+        subject: dataFactory.variable(`${variablePrefix}CloseMatch`),
+        variablePrefix: `${variablePrefix}CloseMatch`,
+      }),
+      {
+        object: dataFactory.variable(`${variablePrefix}ExactMatch`),
+        predicate: dataFactory.namedNode(
+          "http://www.w3.org/2004/02/skos/core#exactMatch",
         ),
-      );
-      this.add(
-        sparqlBuilder.GraphPattern.optional(
-          sparqlBuilder.GraphPattern.group(
-            sparqlBuilder.GraphPattern.basic(
-              this.subject,
-              dataFactory.namedNode(
-                "http://www.w3.org/2004/02/skos/core#inScheme",
-              ),
-              this.variable("InScheme"),
-            ).chainObject(
-              (_object) =>
-                new ConceptSchemeStub.SparqlGraphPatterns(_object, {
-                  ignoreRdfType: true,
-                }),
-            ),
-          ),
+        subject,
+      },
+      ...ConceptStub.sparqlConstructTemplateTriples({
+        subject: dataFactory.variable(`${variablePrefix}ExactMatch`),
+        variablePrefix: `${variablePrefix}ExactMatch`,
+      }),
+      {
+        object: dataFactory.variable(`${variablePrefix}InScheme`),
+        predicate: dataFactory.namedNode(
+          "http://www.w3.org/2004/02/skos/core#inScheme",
         ),
-      );
-      this.add(
-        sparqlBuilder.GraphPattern.optional(
-          sparqlBuilder.GraphPattern.group(
-            sparqlBuilder.GraphPattern.basic(
-              this.subject,
-              dataFactory.namedNode(
-                "http://www.w3.org/2004/02/skos/core#mappingRelation",
-              ),
-              this.variable("MappingRelation"),
-            ).chainObject(
-              (_object) =>
-                new ConceptStub.SparqlGraphPatterns(_object, {
-                  ignoreRdfType: true,
-                }),
-            ),
-          ),
+        subject,
+      },
+      ...ConceptSchemeStub.sparqlConstructTemplateTriples({
+        subject: dataFactory.variable(`${variablePrefix}InScheme`),
+        variablePrefix: `${variablePrefix}InScheme`,
+      }),
+      {
+        object: dataFactory.variable(`${variablePrefix}MappingRelation`),
+        predicate: dataFactory.namedNode(
+          "http://www.w3.org/2004/02/skos/core#mappingRelation",
         ),
-      );
-      this.add(
-        sparqlBuilder.GraphPattern.optional(
-          sparqlBuilder.GraphPattern.group(
-            sparqlBuilder.GraphPattern.basic(
-              this.subject,
-              dataFactory.namedNode(
-                "http://www.w3.org/2004/02/skos/core#narrower",
-              ),
-              this.variable("Narrower"),
-            ).chainObject(
-              (_object) =>
-                new ConceptStub.SparqlGraphPatterns(_object, {
-                  ignoreRdfType: true,
-                }),
-            ),
-          ),
+        subject,
+      },
+      ...ConceptStub.sparqlConstructTemplateTriples({
+        subject: dataFactory.variable(`${variablePrefix}MappingRelation`),
+        variablePrefix: `${variablePrefix}MappingRelation`,
+      }),
+      {
+        object: dataFactory.variable(`${variablePrefix}Narrower`),
+        predicate: dataFactory.namedNode(
+          "http://www.w3.org/2004/02/skos/core#narrower",
         ),
-      );
-      this.add(
-        sparqlBuilder.GraphPattern.optional(
-          sparqlBuilder.GraphPattern.group(
-            sparqlBuilder.GraphPattern.basic(
-              this.subject,
-              dataFactory.namedNode(
-                "http://www.w3.org/2004/02/skos/core#narrowerTransitive",
-              ),
-              this.variable("NarrowerTransitive"),
-            ).chainObject(
-              (_object) =>
-                new ConceptStub.SparqlGraphPatterns(_object, {
-                  ignoreRdfType: true,
-                }),
-            ),
-          ),
+        subject,
+      },
+      ...ConceptStub.sparqlConstructTemplateTriples({
+        subject: dataFactory.variable(`${variablePrefix}Narrower`),
+        variablePrefix: `${variablePrefix}Narrower`,
+      }),
+      {
+        object: dataFactory.variable(`${variablePrefix}NarrowerTransitive`),
+        predicate: dataFactory.namedNode(
+          "http://www.w3.org/2004/02/skos/core#narrowerTransitive",
         ),
-      );
-      this.add(
-        sparqlBuilder.GraphPattern.optional(
-          sparqlBuilder.GraphPattern.group(
-            sparqlBuilder.GraphPattern.basic(
-              this.subject,
-              dataFactory.namedNode(
-                "http://www.w3.org/2004/02/skos/core#narrowMatch",
-              ),
-              this.variable("NarrowMatch"),
-            ).chainObject(
-              (_object) =>
-                new ConceptStub.SparqlGraphPatterns(_object, {
-                  ignoreRdfType: true,
-                }),
-            ),
-          ),
+        subject,
+      },
+      ...ConceptStub.sparqlConstructTemplateTriples({
+        subject: dataFactory.variable(`${variablePrefix}NarrowerTransitive`),
+        variablePrefix: `${variablePrefix}NarrowerTransitive`,
+      }),
+      {
+        object: dataFactory.variable(`${variablePrefix}NarrowMatch`),
+        predicate: dataFactory.namedNode(
+          "http://www.w3.org/2004/02/skos/core#narrowMatch",
         ),
-      );
-      this.add(
-        sparqlBuilder.GraphPattern.optional(
-          sparqlBuilder.GraphPattern.group(
-            sparqlBuilder.GraphPattern.basic(
-              this.subject,
-              dataFactory.namedNode(
-                "http://www.w3.org/2004/02/skos/core#related",
-              ),
-              this.variable("Related"),
-            ).chainObject(
-              (_object) =>
-                new ConceptStub.SparqlGraphPatterns(_object, {
-                  ignoreRdfType: true,
-                }),
-            ),
-          ),
+        subject,
+      },
+      ...ConceptStub.sparqlConstructTemplateTriples({
+        subject: dataFactory.variable(`${variablePrefix}NarrowMatch`),
+        variablePrefix: `${variablePrefix}NarrowMatch`,
+      }),
+      {
+        object: dataFactory.variable(`${variablePrefix}Related`),
+        predicate: dataFactory.namedNode(
+          "http://www.w3.org/2004/02/skos/core#related",
         ),
-      );
-      this.add(
-        sparqlBuilder.GraphPattern.optional(
-          sparqlBuilder.GraphPattern.group(
-            sparqlBuilder.GraphPattern.basic(
-              this.subject,
-              dataFactory.namedNode(
-                "http://www.w3.org/2004/02/skos/core#relatedMatch",
-              ),
-              this.variable("RelatedMatch"),
-            ).chainObject(
-              (_object) =>
-                new ConceptStub.SparqlGraphPatterns(_object, {
-                  ignoreRdfType: true,
-                }),
-            ),
-          ),
+        subject,
+      },
+      ...ConceptStub.sparqlConstructTemplateTriples({
+        subject: dataFactory.variable(`${variablePrefix}Related`),
+        variablePrefix: `${variablePrefix}Related`,
+      }),
+      {
+        object: dataFactory.variable(`${variablePrefix}RelatedMatch`),
+        predicate: dataFactory.namedNode(
+          "http://www.w3.org/2004/02/skos/core#relatedMatch",
         ),
-      );
-      this.add(
-        sparqlBuilder.GraphPattern.optional(
-          sparqlBuilder.GraphPattern.group(
-            sparqlBuilder.GraphPattern.basic(
-              this.subject,
-              dataFactory.namedNode(
-                "http://www.w3.org/2004/02/skos/core#semanticRelation",
-              ),
-              this.variable("SemanticRelation"),
-            ).chainObject(
-              (_object) =>
-                new ConceptStub.SparqlGraphPatterns(_object, {
-                  ignoreRdfType: true,
-                }),
-            ),
-          ),
+        subject,
+      },
+      ...ConceptStub.sparqlConstructTemplateTriples({
+        subject: dataFactory.variable(`${variablePrefix}RelatedMatch`),
+        variablePrefix: `${variablePrefix}RelatedMatch`,
+      }),
+      {
+        object: dataFactory.variable(`${variablePrefix}SemanticRelation`),
+        predicate: dataFactory.namedNode(
+          "http://www.w3.org/2004/02/skos/core#semanticRelation",
         ),
-      );
-      this.add(
-        sparqlBuilder.GraphPattern.optional(
-          sparqlBuilder.GraphPattern.group(
-            sparqlBuilder.GraphPattern.basic(
-              this.subject,
-              dataFactory.namedNode(
-                "http://www.w3.org/2004/02/skos/core#topConceptOf",
-              ),
-              this.variable("TopConceptOf"),
-            ).chainObject(
-              (_object) =>
-                new ConceptSchemeStub.SparqlGraphPatterns(_object, {
-                  ignoreRdfType: true,
-                }),
-            ),
-          ),
+        subject,
+      },
+      ...ConceptStub.sparqlConstructTemplateTriples({
+        subject: dataFactory.variable(`${variablePrefix}SemanticRelation`),
+        variablePrefix: `${variablePrefix}SemanticRelation`,
+      }),
+      {
+        object: dataFactory.variable(`${variablePrefix}TopConceptOf`),
+        predicate: dataFactory.namedNode(
+          "http://www.w3.org/2004/02/skos/core#topConceptOf",
         ),
-      );
-    }
+        subject,
+      },
+      ...ConceptSchemeStub.sparqlConstructTemplateTriples({
+        subject: dataFactory.variable(`${variablePrefix}TopConceptOf`),
+        variablePrefix: `${variablePrefix}TopConceptOf`,
+      }),
+    ];
+  }
+
+  export function sparqlWherePatterns({
+    ignoreRdfType,
+    subject,
+    variablePrefix: variablePrefixParameter,
+  }: {
+    ignoreRdfType?: boolean;
+    subject: rdfjs.Variable;
+    variablePrefix?: string;
+  }): readonly sparqljs.Pattern[] {
+    const variablePrefix = variablePrefixParameter ?? subject.value;
+    return [
+      ...KosResource.sparqlWherePatterns({
+        ignoreRdfType: true,
+        subject,
+        variablePrefix,
+      }),
+      ...(ignoreRdfType
+        ? []
+        : [
+            {
+              triples: [
+                {
+                  subject,
+                  predicate: dataFactory.namedNode(
+                    "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+                  ),
+                  object: dataFactory.namedNode(
+                    "http://www.w3.org/2004/02/skos/core#Concept",
+                  ),
+                },
+                {
+                  subject,
+                  predicate: dataFactory.namedNode(
+                    "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+                  ),
+                  object: dataFactory.variable(`${variablePrefix}RdfType`),
+                },
+              ],
+              type: "bgp" as const,
+            },
+          ]),
+      {
+        patterns: [
+          {
+            triples: [
+              {
+                object: dataFactory.variable(`${variablePrefix}Broader`),
+                predicate: dataFactory.namedNode(
+                  "http://www.w3.org/2004/02/skos/core#broader",
+                ),
+                subject,
+              },
+            ],
+            type: "bgp",
+          },
+          {
+            patterns: [
+              ...ConceptStub.sparqlWherePatterns({
+                subject: dataFactory.variable(`${variablePrefix}Broader`),
+                variablePrefix: `${variablePrefix}Broader`,
+              }),
+            ],
+            type: "optional",
+          },
+        ],
+        type: "optional",
+      },
+      {
+        patterns: [
+          {
+            triples: [
+              {
+                object: dataFactory.variable(
+                  `${variablePrefix}BroaderTransitive`,
+                ),
+                predicate: dataFactory.namedNode(
+                  "http://www.w3.org/2004/02/skos/core#broaderTransitive",
+                ),
+                subject,
+              },
+            ],
+            type: "bgp",
+          },
+          {
+            patterns: [
+              ...ConceptStub.sparqlWherePatterns({
+                subject: dataFactory.variable(
+                  `${variablePrefix}BroaderTransitive`,
+                ),
+                variablePrefix: `${variablePrefix}BroaderTransitive`,
+              }),
+            ],
+            type: "optional",
+          },
+        ],
+        type: "optional",
+      },
+      {
+        patterns: [
+          {
+            triples: [
+              {
+                object: dataFactory.variable(`${variablePrefix}BroadMatch`),
+                predicate: dataFactory.namedNode(
+                  "http://www.w3.org/2004/02/skos/core#broadMatch",
+                ),
+                subject,
+              },
+            ],
+            type: "bgp",
+          },
+          {
+            patterns: [
+              ...ConceptStub.sparqlWherePatterns({
+                subject: dataFactory.variable(`${variablePrefix}BroadMatch`),
+                variablePrefix: `${variablePrefix}BroadMatch`,
+              }),
+            ],
+            type: "optional",
+          },
+        ],
+        type: "optional",
+      },
+      {
+        patterns: [
+          {
+            triples: [
+              {
+                object: dataFactory.variable(`${variablePrefix}CloseMatch`),
+                predicate: dataFactory.namedNode(
+                  "http://www.w3.org/2004/02/skos/core#closeMatch",
+                ),
+                subject,
+              },
+            ],
+            type: "bgp",
+          },
+          {
+            patterns: [
+              ...ConceptStub.sparqlWherePatterns({
+                subject: dataFactory.variable(`${variablePrefix}CloseMatch`),
+                variablePrefix: `${variablePrefix}CloseMatch`,
+              }),
+            ],
+            type: "optional",
+          },
+        ],
+        type: "optional",
+      },
+      {
+        patterns: [
+          {
+            triples: [
+              {
+                object: dataFactory.variable(`${variablePrefix}ExactMatch`),
+                predicate: dataFactory.namedNode(
+                  "http://www.w3.org/2004/02/skos/core#exactMatch",
+                ),
+                subject,
+              },
+            ],
+            type: "bgp",
+          },
+          {
+            patterns: [
+              ...ConceptStub.sparqlWherePatterns({
+                subject: dataFactory.variable(`${variablePrefix}ExactMatch`),
+                variablePrefix: `${variablePrefix}ExactMatch`,
+              }),
+            ],
+            type: "optional",
+          },
+        ],
+        type: "optional",
+      },
+      {
+        patterns: [
+          {
+            triples: [
+              {
+                object: dataFactory.variable(`${variablePrefix}InScheme`),
+                predicate: dataFactory.namedNode(
+                  "http://www.w3.org/2004/02/skos/core#inScheme",
+                ),
+                subject,
+              },
+            ],
+            type: "bgp",
+          },
+          {
+            patterns: [
+              ...ConceptSchemeStub.sparqlWherePatterns({
+                subject: dataFactory.variable(`${variablePrefix}InScheme`),
+                variablePrefix: `${variablePrefix}InScheme`,
+              }),
+            ],
+            type: "optional",
+          },
+        ],
+        type: "optional",
+      },
+      {
+        patterns: [
+          {
+            triples: [
+              {
+                object: dataFactory.variable(
+                  `${variablePrefix}MappingRelation`,
+                ),
+                predicate: dataFactory.namedNode(
+                  "http://www.w3.org/2004/02/skos/core#mappingRelation",
+                ),
+                subject,
+              },
+            ],
+            type: "bgp",
+          },
+          {
+            patterns: [
+              ...ConceptStub.sparqlWherePatterns({
+                subject: dataFactory.variable(
+                  `${variablePrefix}MappingRelation`,
+                ),
+                variablePrefix: `${variablePrefix}MappingRelation`,
+              }),
+            ],
+            type: "optional",
+          },
+        ],
+        type: "optional",
+      },
+      {
+        patterns: [
+          {
+            triples: [
+              {
+                object: dataFactory.variable(`${variablePrefix}Narrower`),
+                predicate: dataFactory.namedNode(
+                  "http://www.w3.org/2004/02/skos/core#narrower",
+                ),
+                subject,
+              },
+            ],
+            type: "bgp",
+          },
+          {
+            patterns: [
+              ...ConceptStub.sparqlWherePatterns({
+                subject: dataFactory.variable(`${variablePrefix}Narrower`),
+                variablePrefix: `${variablePrefix}Narrower`,
+              }),
+            ],
+            type: "optional",
+          },
+        ],
+        type: "optional",
+      },
+      {
+        patterns: [
+          {
+            triples: [
+              {
+                object: dataFactory.variable(
+                  `${variablePrefix}NarrowerTransitive`,
+                ),
+                predicate: dataFactory.namedNode(
+                  "http://www.w3.org/2004/02/skos/core#narrowerTransitive",
+                ),
+                subject,
+              },
+            ],
+            type: "bgp",
+          },
+          {
+            patterns: [
+              ...ConceptStub.sparqlWherePatterns({
+                subject: dataFactory.variable(
+                  `${variablePrefix}NarrowerTransitive`,
+                ),
+                variablePrefix: `${variablePrefix}NarrowerTransitive`,
+              }),
+            ],
+            type: "optional",
+          },
+        ],
+        type: "optional",
+      },
+      {
+        patterns: [
+          {
+            triples: [
+              {
+                object: dataFactory.variable(`${variablePrefix}NarrowMatch`),
+                predicate: dataFactory.namedNode(
+                  "http://www.w3.org/2004/02/skos/core#narrowMatch",
+                ),
+                subject,
+              },
+            ],
+            type: "bgp",
+          },
+          {
+            patterns: [
+              ...ConceptStub.sparqlWherePatterns({
+                subject: dataFactory.variable(`${variablePrefix}NarrowMatch`),
+                variablePrefix: `${variablePrefix}NarrowMatch`,
+              }),
+            ],
+            type: "optional",
+          },
+        ],
+        type: "optional",
+      },
+      {
+        patterns: [
+          {
+            triples: [
+              {
+                object: dataFactory.variable(`${variablePrefix}Related`),
+                predicate: dataFactory.namedNode(
+                  "http://www.w3.org/2004/02/skos/core#related",
+                ),
+                subject,
+              },
+            ],
+            type: "bgp",
+          },
+          {
+            patterns: [
+              ...ConceptStub.sparqlWherePatterns({
+                subject: dataFactory.variable(`${variablePrefix}Related`),
+                variablePrefix: `${variablePrefix}Related`,
+              }),
+            ],
+            type: "optional",
+          },
+        ],
+        type: "optional",
+      },
+      {
+        patterns: [
+          {
+            triples: [
+              {
+                object: dataFactory.variable(`${variablePrefix}RelatedMatch`),
+                predicate: dataFactory.namedNode(
+                  "http://www.w3.org/2004/02/skos/core#relatedMatch",
+                ),
+                subject,
+              },
+            ],
+            type: "bgp",
+          },
+          {
+            patterns: [
+              ...ConceptStub.sparqlWherePatterns({
+                subject: dataFactory.variable(`${variablePrefix}RelatedMatch`),
+                variablePrefix: `${variablePrefix}RelatedMatch`,
+              }),
+            ],
+            type: "optional",
+          },
+        ],
+        type: "optional",
+      },
+      {
+        patterns: [
+          {
+            triples: [
+              {
+                object: dataFactory.variable(
+                  `${variablePrefix}SemanticRelation`,
+                ),
+                predicate: dataFactory.namedNode(
+                  "http://www.w3.org/2004/02/skos/core#semanticRelation",
+                ),
+                subject,
+              },
+            ],
+            type: "bgp",
+          },
+          {
+            patterns: [
+              ...ConceptStub.sparqlWherePatterns({
+                subject: dataFactory.variable(
+                  `${variablePrefix}SemanticRelation`,
+                ),
+                variablePrefix: `${variablePrefix}SemanticRelation`,
+              }),
+            ],
+            type: "optional",
+          },
+        ],
+        type: "optional",
+      },
+      {
+        patterns: [
+          {
+            triples: [
+              {
+                object: dataFactory.variable(`${variablePrefix}TopConceptOf`),
+                predicate: dataFactory.namedNode(
+                  "http://www.w3.org/2004/02/skos/core#topConceptOf",
+                ),
+                subject,
+              },
+            ],
+            type: "bgp",
+          },
+          {
+            patterns: [
+              ...ConceptSchemeStub.sparqlWherePatterns({
+                subject: dataFactory.variable(`${variablePrefix}TopConceptOf`),
+                variablePrefix: `${variablePrefix}TopConceptOf`,
+              }),
+            ],
+            type: "optional",
+          },
+        ],
+        type: "optional",
+      },
+    ];
   }
 }
 export interface Label {
@@ -2800,7 +4014,7 @@ export namespace Label {
     return { identifier, literalForm, type };
   }
 
-  export function fromRdf({
+  export function propertiesFromRdf({
     ignoreRdfType: _ignoreRdfType,
     languageIn: _languageIn,
     resource: _resource,
@@ -2811,7 +4025,14 @@ export namespace Label {
     ignoreRdfType?: boolean;
     languageIn?: readonly string[];
     resource: rdfjsResource.Resource;
-  }): purify.Either<rdfjsResource.Resource.ValueError, Label> {
+  }): purify.Either<
+    rdfjsResource.Resource.ValueError,
+    {
+      identifier: rdfjs.BlankNode | rdfjs.NamedNode;
+      literalForm: purify.NonEmptyList<rdfjs.Literal>;
+      type: "Label";
+    }
+  > {
     if (
       !_ignoreRdfType &&
       !_resource.isInstanceOf(
@@ -2880,30 +4101,124 @@ export namespace Label {
     return purify.Either.of({ identifier, literalForm, type });
   }
 
-  export class SparqlGraphPatterns extends sparqlBuilder.ResourceGraphPatterns {
-    constructor(
-      subject: sparqlBuilder.ResourceGraphPatterns.SubjectParameter,
-      _options?: { ignoreRdfType?: boolean },
-    ) {
-      super(subject);
-      if (!_options?.ignoreRdfType) {
-        this.add(
-          ...new sparqlBuilder.RdfTypeGraphPatterns(
-            this.subject,
-            dataFactory.namedNode("http://www.w3.org/2008/05/skos-xl#Label"),
-          ),
-        );
-      }
+  export function fromRdf(
+    parameters: Parameters<typeof Label.propertiesFromRdf>[0],
+  ): purify.Either<rdfjsResource.Resource.ValueError, Label> {
+    return Label.propertiesFromRdf(parameters);
+  }
 
-      this.add(
-        sparqlBuilder.GraphPattern.basic(
-          this.subject,
-          dataFactory.namedNode(
-            "http://www.w3.org/2008/05/skos-xl#literalForm",
-          ),
-          this.variable("LiteralForm"),
+  export function sparqlConstructQuery(
+    parameters?: {
+      prefixes?: { [prefix: string]: string };
+      subject: rdfjs.Variable;
+    } & Omit<
+      sparqljs.ConstructQuery,
+      "prefixes" | "queryType" | "template" | "type" | "where"
+    >,
+  ): sparqljs.ConstructQuery {
+    const subject = parameters?.subject ?? dataFactory.variable("label");
+    return {
+      ...parameters,
+      prefixes: parameters?.prefixes ?? {},
+      queryType: "CONSTRUCT",
+      template: Label.sparqlConstructTemplateTriples({ subject }).concat(),
+      type: "query",
+      where: Label.sparqlWherePatterns({ subject }).concat(),
+    };
+  }
+
+  export function sparqlConstructQueryString(
+    parameters?: { subject: rdfjs.Variable } & Omit<
+      sparqljs.ConstructQuery,
+      "prefixes" | "queryType" | "template" | "type" | "where"
+    > &
+      sparqljs.GeneratorOptions,
+  ): string {
+    return new sparqljs.Generator(parameters).stringify(
+      Label.sparqlConstructQuery(parameters),
+    );
+  }
+
+  export function sparqlConstructTemplateTriples({
+    ignoreRdfType,
+    subject,
+    variablePrefix: variablePrefixParameter,
+  }: {
+    ignoreRdfType?: boolean;
+    subject: rdfjs.Variable;
+    variablePrefix?: string;
+  }): readonly sparqljs.Triple[] {
+    const variablePrefix = variablePrefixParameter ?? subject.value;
+    return [
+      ...(ignoreRdfType
+        ? []
+        : [
+            {
+              subject,
+              predicate: dataFactory.namedNode(
+                "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+              ),
+              object: dataFactory.variable(`${variablePrefix}RdfType`),
+            },
+          ]),
+      {
+        object: dataFactory.variable(`${variablePrefix}LiteralForm`),
+        predicate: dataFactory.namedNode(
+          "http://www.w3.org/2008/05/skos-xl#literalForm",
         ),
-      );
-    }
+        subject,
+      },
+    ];
+  }
+
+  export function sparqlWherePatterns({
+    ignoreRdfType,
+    subject,
+    variablePrefix: variablePrefixParameter,
+  }: {
+    ignoreRdfType?: boolean;
+    subject: rdfjs.Variable;
+    variablePrefix?: string;
+  }): readonly sparqljs.Pattern[] {
+    const variablePrefix = variablePrefixParameter ?? subject.value;
+    return [
+      ...(ignoreRdfType
+        ? []
+        : [
+            {
+              triples: [
+                {
+                  subject,
+                  predicate: dataFactory.namedNode(
+                    "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+                  ),
+                  object: dataFactory.namedNode(
+                    "http://www.w3.org/2008/05/skos-xl#Label",
+                  ),
+                },
+                {
+                  subject,
+                  predicate: dataFactory.namedNode(
+                    "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+                  ),
+                  object: dataFactory.variable(`${variablePrefix}RdfType`),
+                },
+              ],
+              type: "bgp" as const,
+            },
+          ]),
+      {
+        triples: [
+          {
+            object: dataFactory.variable(`${variablePrefix}LiteralForm`),
+            predicate: dataFactory.namedNode(
+              "http://www.w3.org/2008/05/skos-xl#literalForm",
+            ),
+            subject,
+          },
+        ],
+        type: "bgp",
+      },
+    ];
   }
 }

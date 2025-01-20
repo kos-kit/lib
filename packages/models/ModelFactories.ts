@@ -27,21 +27,21 @@ export namespace ModelFactories {
   export const default_: ModelFactories = {
     concept: {
       fromRdf: Concept.fromRdf,
-      SparqlGraphPatterns: Concept.SparqlGraphPatterns,
+      sparqlConstructQueryString: Concept.sparqlConstructQueryString,
     },
     conceptScheme: {
       fromRdf: ConceptScheme.fromRdf,
-      SparqlGraphPatterns: ConceptScheme.SparqlGraphPatterns,
+      sparqlConstructQueryString: ConceptSchemeStub.sparqlConstructQueryString,
     },
     conceptSchemeStub: {
       fromIdentifier: (identifier) => ConceptSchemeStub.create({ identifier }),
       fromRdf: ConceptSchemeStub.fromRdf,
-      SparqlGraphPatterns: ConceptSchemeStub.SparqlGraphPatterns,
+      sparqlConstructQueryString: ConceptSchemeStub.sparqlConstructQueryString,
     },
     conceptStub: {
       fromIdentifier: (identifier) => ConceptStub.create({ identifier }),
       fromRdf: ConceptStub.fromRdf,
-      SparqlGraphPatterns: ConceptStub.SparqlGraphPatterns,
+      sparqlConstructQueryString: ConceptStub.sparqlConstructQueryString,
     },
   };
 }
