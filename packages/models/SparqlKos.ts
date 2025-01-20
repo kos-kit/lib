@@ -109,7 +109,7 @@ export class SparqlKos<
           queryType: "SELECT",
           type: "query",
           variables: [this.conceptVariable],
-          where: this.conceptsQueryToWhereGraphPatterns(query).concat(),
+          where: this.conceptQueryToWhereGraphPatterns(query).concat(),
         }),
       ),
       this.conceptVariable.value,
@@ -147,7 +147,7 @@ export class SparqlKos<
           queryType: "SELECT",
           type: "query",
           variables: [this.conceptSchemeVariable],
-          where: this.conceptSchemesQueryToWhereGraphPatterns(query).concat(),
+          where: this.conceptSchemeQueryToWhereGraphPatterns(query).concat(),
         }),
       ),
       this.conceptSchemeVariable.value,
@@ -208,7 +208,7 @@ export class SparqlKos<
               variable: this.countVariable,
             },
           ],
-          where: this.conceptSchemesQueryToWhereGraphPatterns(query).concat(),
+          where: this.conceptSchemeQueryToWhereGraphPatterns(query).concat(),
         }),
       ),
       this.countVariable.value,
@@ -267,74 +267,14 @@ export class SparqlKos<
               variable: this.countVariable,
             },
           ],
-          where: this.conceptsQueryToWhereGraphPatterns(query).concat(),
+          where: this.conceptQueryToWhereGraphPatterns(query).concat(),
         }),
       ),
       this.countVariable.value,
     );
   }
 
-  private conceptSchemesQueryToWhereGraphPatterns(
-    query: ConceptSchemeQuery,
-  ): readonly sparqljs.Pattern[] {
-    if (query.type === "All") {
-      // rdf:type/rdfs:subClassOf* skos:ConceptScheme
-      return [
-        sparqlRdfTypePattern({
-          rdfType: skos.ConceptScheme,
-          subject: this.conceptSchemeVariable,
-        }),
-      ];
-    }
-
-    // Query type HasConcept or HasTopConcept
-    const unionPatterns: sparqljs.Pattern[] = [
-      {
-        // skos:topConceptOf's range is skos:ConceptScheme, so we don't have to check the rdf:type
-        triples: [
-          {
-            subject: query.conceptIdentifier,
-            predicate: skos.topConceptOf,
-            object: this.conceptSchemeVariable,
-          },
-        ],
-        type: "bgp",
-      },
-      {
-        // skos:hasTopConcept's domain is skos:ConceptScheme, so we don't have to check the rdf:type
-        triples: [
-          {
-            subject: this.conceptSchemeVariable,
-            predicate: skos.hasTopConcept,
-            object: query.conceptIdentifier,
-          },
-        ],
-        type: "bgp",
-      },
-    ];
-
-    if (query.type === "HasConcept") {
-      unionPatterns.push({
-        triples: [
-          {
-            subject: query.conceptIdentifier,
-            predicate: skos.inScheme,
-            object: this.conceptSchemeVariable,
-          },
-        ],
-        type: "bgp",
-      });
-    }
-
-    return [
-      {
-        patterns: unionPatterns,
-        type: "union",
-      },
-    ];
-  }
-
-  private conceptsQueryToWhereGraphPatterns(
+  private conceptQueryToWhereGraphPatterns(
     query: ConceptQuery,
   ): readonly sparqljs.Pattern[] {
     if (query.type === "All") {
@@ -451,6 +391,66 @@ export class SparqlKos<
     }
 
     throw new RangeError("should never reach this code");
+  }
+
+  private conceptSchemeQueryToWhereGraphPatterns(
+    query: ConceptSchemeQuery,
+  ): readonly sparqljs.Pattern[] {
+    if (query.type === "All") {
+      // rdf:type/rdfs:subClassOf* skos:ConceptScheme
+      return [
+        sparqlRdfTypePattern({
+          rdfType: skos.ConceptScheme,
+          subject: this.conceptSchemeVariable,
+        }),
+      ];
+    }
+
+    // Query type HasConcept or HasTopConcept
+    const unionPatterns: sparqljs.Pattern[] = [
+      {
+        // skos:topConceptOf's range is skos:ConceptScheme, so we don't have to check the rdf:type
+        triples: [
+          {
+            subject: query.conceptIdentifier,
+            predicate: skos.topConceptOf,
+            object: this.conceptSchemeVariable,
+          },
+        ],
+        type: "bgp",
+      },
+      {
+        // skos:hasTopConcept's domain is skos:ConceptScheme, so we don't have to check the rdf:type
+        triples: [
+          {
+            subject: this.conceptSchemeVariable,
+            predicate: skos.hasTopConcept,
+            object: query.conceptIdentifier,
+          },
+        ],
+        type: "bgp",
+      },
+    ];
+
+    if (query.type === "HasConcept") {
+      unionPatterns.push({
+        triples: [
+          {
+            subject: query.conceptIdentifier,
+            predicate: skos.inScheme,
+            object: this.conceptSchemeVariable,
+          },
+        ],
+        type: "bgp",
+      });
+    }
+
+    return [
+      {
+        patterns: unionPatterns,
+        type: "union",
+      },
+    ];
   }
 
   private async modelsByIdentifiers<ModelT>({
