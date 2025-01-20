@@ -2,14 +2,9 @@ import fs from "node:fs";
 import path from "node:path";
 import { stringify as stringifyYaml } from "yaml";
 
-const VERSION = "2.0.109";
+const VERSION = "2.0.110";
 
-type PackageName =
-  | "models"
-  | "next-utils"
-  | "search"
-  | "sparql-builder"
-  | "sparql-client";
+type PackageName = "models" | "next-utils" | "search" | "sparql-client";
 
 interface Package {
   devDependencies?: Record<string, string>;
@@ -25,7 +20,7 @@ const externalDependencyVersions = {
   "@tpluscode/rdf-ns-builders": "^4.3.0",
   "@types/n3": "^1.21.1",
   "@types/rdfjs__term-set": "^2.0.9",
-  oxigraph: "^0.4.0",
+  oxigraph: "0.4.7",
   n3: "^1.21.3",
   pino: "^9.1.0",
   "purify-ts": "~2.1.0",
@@ -42,12 +37,14 @@ const packages: readonly Package[] = [
         externalDependencyVersions["@tpluscode/rdf-ns-builders"],
       "@types/rdfjs__term-set":
         externalDependencyVersions["@types/rdfjs__term-set"],
+      "@types/sparqljs": "3.1.12",
       "js-sha256": "^0.11.0",
       pino: externalDependencyVersions["pino"],
       "purify-ts": externalDependencyVersions["purify-ts"],
       "purify-ts-helpers": externalDependencyVersions["purify-ts-helpers"],
+      sparqljs: "3.7.3",
     },
-    internalDependencies: ["sparql-builder", "sparql-client"],
+    internalDependencies: ["sparql-client"],
     name: "models",
   },
   {
@@ -78,18 +75,6 @@ const packages: readonly Package[] = [
     },
     internalDependencies: ["models"],
     name: "search",
-  },
-  {
-    devDependencies: {
-      "@kos-kit/sparql-client": VERSION,
-      oxigraph: externalDependencyVersions["oxigraph"],
-    },
-    externalDependencies: {
-      "@rdfjs/types": externalDependencyVersions["@rdfjs/types"],
-      "@tpluscode/rdf-ns-builders":
-        externalDependencyVersions["@tpluscode/rdf-ns-builders"],
-    },
-    name: "sparql-builder",
   },
   {
     devDependencies: {

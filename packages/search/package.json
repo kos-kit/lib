@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "@kos-kit/models": "2.0.109",
+    "@kos-kit/models": "2.0.110",
     "@rdfjs/types": "^1.1.0",
     "@types/lunr": "^2.3.7",
     "lunr": "^2.3.9",
@@ -42,5 +42,5 @@
   },
   "type": "module",
   "types": "index.d.ts",
-  "version": "2.0.109"
+  "version": "2.0.110"
 }

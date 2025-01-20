@@ -6,7 +6,7 @@
     "n3": "^1.21.3"
   },
   "devDependencies": {
-    "oxigraph": "^0.4.0",
+    "oxigraph": "0.4.7",
     "vitest-fetch-mock": "^0.3.0"
   },
   "files": [
@@ -44,5 +44,5 @@
   },
   "type": "module",
   "types": "index.d.ts",
-  "version": "2.0.109"
+  "version": "2.0.110"
 }

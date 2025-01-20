@@ -11,7 +11,7 @@
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
 <http://kos-kit.github.io/ns#>
-    shaclmate:tsFeatureInclude shaclmate:_TsFeature_Create, shaclmate:_TsFeature_FromRdf, shaclmate:_TsFeature_SparqlGraphPatterns ;
+    shaclmate:tsFeatureInclude shaclmate:_TsFeature_Create, shaclmate:_TsFeature_FromRdf, shaclmate:_TsFeature_Sparql ;
     shaclmate:tsObjectDeclarationType shaclmate:_TsObjectDeclarationType_Interface ;
     a owl:Ontology .
 
@@ -23,6 +23,14 @@ kos-kit:KosResource
     sh:property [
         sh:name "scopeNote" ;
         sh:path skos:scopeNote ;
+        sh:xone dash:StringOrLangString
+    ], [
+        sh:name "altLabelXl" ;
+        sh:node skos-xl:Label ;
+        sh:path skos-xl:altLabel
+    ], [
+        sh:name "changeNote" ;
+        sh:path skos:changeNote ;
         sh:xone dash:StringOrLangString
     ], [
         sh:name "definition" ;
@@ -73,18 +81,10 @@ kos-kit:KosResource
         sh:name "prefLabelXl" ;
         sh:node skos-xl:Label ;
         sh:path skos-xl:prefLabel
-    ], [
-        sh:name "altLabelXl" ;
-        sh:node skos-xl:Label ;
-        sh:path skos-xl:altLabel
-    ], [
-        sh:name "changeNote" ;
-        sh:path skos:changeNote ;
-        sh:xone dash:StringOrLangString
     ] .
 
 <http://www.w3.org/2004/02/skos/core#>
-    shaclmate:tsFeatureInclude shaclmate:_TsFeature_Create, shaclmate:_TsFeature_FromRdf, shaclmate:_TsFeature_SparqlGraphPatterns ;
+    shaclmate:tsFeatureInclude shaclmate:_TsFeature_Create, shaclmate:_TsFeature_FromRdf, shaclmate:_TsFeature_Sparql ;
     shaclmate:tsObjectDeclarationType shaclmate:_TsObjectDeclarationType_Interface ;
     a owl:Ontology .
 
@@ -182,7 +182,7 @@ skos:ConceptScheme
     ] .
 
 <http://www.w3.org/2008/05/skos-xl#>
-    shaclmate:tsFeatureInclude shaclmate:_TsFeature_Create, shaclmate:_TsFeature_FromRdf, shaclmate:_TsFeature_SparqlGraphPatterns ;
+    shaclmate:tsFeatureInclude shaclmate:_TsFeature_Create, shaclmate:_TsFeature_FromRdf, shaclmate:_TsFeature_Sparql ;
     shaclmate:tsObjectDeclarationType shaclmate:_TsObjectDeclarationType_Interface ;
     a owl:Ontology .
 
