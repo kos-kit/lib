@@ -25,15 +25,6 @@ kos-kit:KosResource
         sh:path skos:scopeNote ;
         sh:xone dash:StringOrLangString
     ], [
-        sh:datatype xsd:dateTime ;
-        sh:maxCount 1 ;
-        sh:name "modified" ;
-        sh:path dcterms:modified
-    ], [
-        sh:name "hiddenLabelXl" ;
-        sh:node skos-xl:Label ;
-        sh:path skos-xl:hiddenLabel
-    ], [
         sh:name "historyNote" ;
         sh:path skos:historyNote ;
         sh:xone dash:StringOrLangString
@@ -81,6 +72,15 @@ kos-kit:KosResource
         sh:name "hiddenLabel" ;
         sh:path skos:hiddenLabel ;
         sh:xone dash:StringOrLangString
+    ], [
+        sh:datatype xsd:dateTime ;
+        sh:maxCount 1 ;
+        sh:name "modified" ;
+        sh:path dcterms:modified
+    ], [
+        sh:name "hiddenLabelXl" ;
+        sh:node skos-xl:Label ;
+        sh:path skos-xl:hiddenLabel
     ] .
 
 <http://www.w3.org/2004/02/skos/core#>

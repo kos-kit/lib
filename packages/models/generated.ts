@@ -117,26 +117,41 @@ export namespace LabelStub {
 
   export function sparqlConstructQuery(
     parameters?: {
+      ignoreRdfType?: boolean;
       prefixes?: { [prefix: string]: string };
-      subject: rdfjs.Variable;
+      subject?: sparqljs.Triple["subject"];
+      variablePrefix?: string;
     } & Omit<
       sparqljs.ConstructQuery,
       "prefixes" | "queryType" | "template" | "type" | "where"
     >,
   ): sparqljs.ConstructQuery {
-    const subject = parameters?.subject ?? dataFactory.variable("labelStub");
+    const { ignoreRdfType, subject, variablePrefix, ...queryParameters } =
+      parameters ?? {};
+
     return {
-      ...parameters,
+      ...queryParameters,
       prefixes: parameters?.prefixes ?? {},
       queryType: "CONSTRUCT",
-      template: LabelStub.sparqlConstructTemplateTriples({ subject }).concat(),
+      template: LabelStub.sparqlConstructTemplateTriples({
+        ignoreRdfType,
+        subject,
+      }).concat(),
       type: "query",
-      where: LabelStub.sparqlWherePatterns({ subject }).concat(),
+      where: LabelStub.sparqlWherePatterns({
+        ignoreRdfType,
+        subject,
+        variablePrefix,
+      }).concat(),
     };
   }
 
   export function sparqlConstructQueryString(
-    parameters?: { subject: rdfjs.Variable } & Omit<
+    parameters?: {
+      ignoreRdfType?: boolean;
+      subject?: sparqljs.Triple["subject"];
+      variablePrefix?: string;
+    } & Omit<
       sparqljs.ConstructQuery,
       "prefixes" | "queryType" | "template" | "type" | "where"
     > &
@@ -147,18 +162,17 @@ export namespace LabelStub {
     );
   }
 
-  export function sparqlConstructTemplateTriples({
-    ignoreRdfType,
-    subject,
-    variablePrefix: variablePrefixParameter,
-  }: {
+  export function sparqlConstructTemplateTriples(parameters?: {
     ignoreRdfType?: boolean;
-    subject: rdfjs.Variable;
+    subject?: sparqljs.Triple["subject"];
     variablePrefix?: string;
   }): readonly sparqljs.Triple[] {
-    const variablePrefix = variablePrefixParameter ?? subject.value;
+    const subject = parameters?.subject ?? dataFactory.variable!("labelStub");
+    const variablePrefix =
+      parameters?.variablePrefix ??
+      (subject.termType === "Variable" ? subject.value : "labelStub");
     return [
-      ...(ignoreRdfType
+      ...(parameters?.ignoreRdfType
         ? []
         : [
             {
@@ -166,11 +180,11 @@ export namespace LabelStub {
               predicate: dataFactory.namedNode(
                 "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
               ),
-              object: dataFactory.variable(`${variablePrefix}RdfType`),
+              object: dataFactory.variable!(`${variablePrefix}RdfType`),
             },
           ]),
       {
-        object: dataFactory.variable(`${variablePrefix}LiteralForm`),
+        object: dataFactory.variable!(`${variablePrefix}LiteralForm`),
         predicate: dataFactory.namedNode(
           "http://www.w3.org/2008/05/skos-xl#literalForm",
         ),
@@ -179,18 +193,17 @@ export namespace LabelStub {
     ];
   }
 
-  export function sparqlWherePatterns({
-    ignoreRdfType,
-    subject,
-    variablePrefix: variablePrefixParameter,
-  }: {
+  export function sparqlWherePatterns(parameters: {
     ignoreRdfType?: boolean;
-    subject: rdfjs.Variable;
+    subject?: sparqljs.Triple["subject"];
     variablePrefix?: string;
   }): readonly sparqljs.Pattern[] {
-    const variablePrefix = variablePrefixParameter ?? subject.value;
+    const subject = parameters?.subject ?? dataFactory.variable!("labelStub");
+    const variablePrefix =
+      parameters?.variablePrefix ??
+      (subject.termType === "Variable" ? subject.value : "labelStub");
     return [
-      ...(ignoreRdfType
+      ...(parameters?.ignoreRdfType
         ? []
         : [
             {
@@ -209,7 +222,7 @@ export namespace LabelStub {
                   predicate: dataFactory.namedNode(
                     "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
                   ),
-                  object: dataFactory.variable(`${variablePrefix}RdfType`),
+                  object: dataFactory.variable!(`${variablePrefix}RdfType`),
                 },
               ],
               type: "bgp" as const,
@@ -218,7 +231,7 @@ export namespace LabelStub {
       {
         triples: [
           {
-            object: dataFactory.variable(`${variablePrefix}LiteralForm`),
+            object: dataFactory.variable!(`${variablePrefix}LiteralForm`),
             predicate: dataFactory.namedNode(
               "http://www.w3.org/2008/05/skos-xl#literalForm",
             ),
@@ -359,29 +372,41 @@ export namespace KosResourceStub {
 
   export function sparqlConstructQuery(
     parameters?: {
+      ignoreRdfType?: boolean;
       prefixes?: { [prefix: string]: string };
-      subject: rdfjs.Variable;
+      subject?: sparqljs.Triple["subject"];
+      variablePrefix?: string;
     } & Omit<
       sparqljs.ConstructQuery,
       "prefixes" | "queryType" | "template" | "type" | "where"
     >,
   ): sparqljs.ConstructQuery {
-    const subject =
-      parameters?.subject ?? dataFactory.variable("kosResourceStub");
+    const { ignoreRdfType, subject, variablePrefix, ...queryParameters } =
+      parameters ?? {};
+
     return {
-      ...parameters,
+      ...queryParameters,
       prefixes: parameters?.prefixes ?? {},
       queryType: "CONSTRUCT",
       template: KosResourceStub.sparqlConstructTemplateTriples({
+        ignoreRdfType,
         subject,
       }).concat(),
       type: "query",
-      where: KosResourceStub.sparqlWherePatterns({ subject }).concat(),
+      where: KosResourceStub.sparqlWherePatterns({
+        ignoreRdfType,
+        subject,
+        variablePrefix,
+      }).concat(),
     };
   }
 
   export function sparqlConstructQueryString(
-    parameters?: { subject: rdfjs.Variable } & Omit<
+    parameters?: {
+      ignoreRdfType?: boolean;
+      subject?: sparqljs.Triple["subject"];
+      variablePrefix?: string;
+    } & Omit<
       sparqljs.ConstructQuery,
       "prefixes" | "queryType" | "template" | "type" | "where"
     > &
@@ -392,53 +417,55 @@ export namespace KosResourceStub {
     );
   }
 
-  export function sparqlConstructTemplateTriples({
-    subject,
-    variablePrefix: variablePrefixParameter,
-  }: {
+  export function sparqlConstructTemplateTriples(parameters?: {
     ignoreRdfType?: boolean;
-    subject: rdfjs.Variable;
+    subject?: sparqljs.Triple["subject"];
     variablePrefix?: string;
   }): readonly sparqljs.Triple[] {
-    const variablePrefix = variablePrefixParameter ?? subject.value;
+    const subject =
+      parameters?.subject ?? dataFactory.variable!("kosResourceStub");
+    const variablePrefix =
+      parameters?.variablePrefix ??
+      (subject.termType === "Variable" ? subject.value : "kosResourceStub");
     return [
       {
-        object: dataFactory.variable(`${variablePrefix}PrefLabel`),
+        object: dataFactory.variable!(`${variablePrefix}PrefLabel`),
         predicate: dataFactory.namedNode(
           "http://www.w3.org/2004/02/skos/core#prefLabel",
         ),
         subject,
       },
       {
-        object: dataFactory.variable(`${variablePrefix}PrefLabelXl`),
+        object: dataFactory.variable!(`${variablePrefix}PrefLabelXl`),
         predicate: dataFactory.namedNode(
           "http://www.w3.org/2008/05/skos-xl#prefLabel",
         ),
         subject,
       },
       ...LabelStub.sparqlConstructTemplateTriples({
-        subject: dataFactory.variable(`${variablePrefix}PrefLabelXl`),
+        subject: dataFactory.variable!(`${variablePrefix}PrefLabelXl`),
         variablePrefix: `${variablePrefix}PrefLabelXl`,
       }),
     ];
   }
 
-  export function sparqlWherePatterns({
-    subject,
-    variablePrefix: variablePrefixParameter,
-  }: {
+  export function sparqlWherePatterns(parameters: {
     ignoreRdfType?: boolean;
-    subject: rdfjs.Variable;
+    subject?: sparqljs.Triple["subject"];
     variablePrefix?: string;
   }): readonly sparqljs.Pattern[] {
-    const variablePrefix = variablePrefixParameter ?? subject.value;
+    const subject =
+      parameters?.subject ?? dataFactory.variable!("kosResourceStub");
+    const variablePrefix =
+      parameters?.variablePrefix ??
+      (subject.termType === "Variable" ? subject.value : "kosResourceStub");
     return [
       {
         patterns: [
           {
             triples: [
               {
-                object: dataFactory.variable(`${variablePrefix}PrefLabel`),
+                object: dataFactory.variable!(`${variablePrefix}PrefLabel`),
                 predicate: dataFactory.namedNode(
                   "http://www.w3.org/2004/02/skos/core#prefLabel",
                 ),
@@ -455,7 +482,7 @@ export namespace KosResourceStub {
           {
             triples: [
               {
-                object: dataFactory.variable(`${variablePrefix}PrefLabelXl`),
+                object: dataFactory.variable!(`${variablePrefix}PrefLabelXl`),
                 predicate: dataFactory.namedNode(
                   "http://www.w3.org/2008/05/skos-xl#prefLabel",
                 ),
@@ -467,7 +494,7 @@ export namespace KosResourceStub {
           {
             patterns: [
               ...LabelStub.sparqlWherePatterns({
-                subject: dataFactory.variable(`${variablePrefix}PrefLabelXl`),
+                subject: dataFactory.variable!(`${variablePrefix}PrefLabelXl`),
                 variablePrefix: `${variablePrefix}PrefLabelXl`,
               }),
             ],
@@ -1256,28 +1283,41 @@ export namespace KosResource {
 
   export function sparqlConstructQuery(
     parameters?: {
+      ignoreRdfType?: boolean;
       prefixes?: { [prefix: string]: string };
-      subject: rdfjs.Variable;
+      subject?: sparqljs.Triple["subject"];
+      variablePrefix?: string;
     } & Omit<
       sparqljs.ConstructQuery,
       "prefixes" | "queryType" | "template" | "type" | "where"
     >,
   ): sparqljs.ConstructQuery {
-    const subject = parameters?.subject ?? dataFactory.variable("kosResource");
+    const { ignoreRdfType, subject, variablePrefix, ...queryParameters } =
+      parameters ?? {};
+
     return {
-      ...parameters,
+      ...queryParameters,
       prefixes: parameters?.prefixes ?? {},
       queryType: "CONSTRUCT",
       template: KosResource.sparqlConstructTemplateTriples({
+        ignoreRdfType,
         subject,
       }).concat(),
       type: "query",
-      where: KosResource.sparqlWherePatterns({ subject }).concat(),
+      where: KosResource.sparqlWherePatterns({
+        ignoreRdfType,
+        subject,
+        variablePrefix,
+      }).concat(),
     };
   }
 
   export function sparqlConstructQueryString(
-    parameters?: { subject: rdfjs.Variable } & Omit<
+    parameters?: {
+      ignoreRdfType?: boolean;
+      subject?: sparqljs.Triple["subject"];
+      variablePrefix?: string;
+    } & Omit<
       sparqljs.ConstructQuery,
       "prefixes" | "queryType" | "template" | "type" | "where"
     > &
@@ -1288,126 +1328,126 @@ export namespace KosResource {
     );
   }
 
-  export function sparqlConstructTemplateTriples({
-    subject,
-    variablePrefix: variablePrefixParameter,
-  }: {
+  export function sparqlConstructTemplateTriples(parameters?: {
     ignoreRdfType?: boolean;
-    subject: rdfjs.Variable;
+    subject?: sparqljs.Triple["subject"];
     variablePrefix?: string;
   }): readonly sparqljs.Triple[] {
-    const variablePrefix = variablePrefixParameter ?? subject.value;
+    const subject = parameters?.subject ?? dataFactory.variable!("kosResource");
+    const variablePrefix =
+      parameters?.variablePrefix ??
+      (subject.termType === "Variable" ? subject.value : "kosResource");
     return [
       {
-        object: dataFactory.variable(`${variablePrefix}AltLabel`),
+        object: dataFactory.variable!(`${variablePrefix}AltLabel`),
         predicate: dataFactory.namedNode(
           "http://www.w3.org/2004/02/skos/core#altLabel",
         ),
         subject,
       },
       {
-        object: dataFactory.variable(`${variablePrefix}AltLabelXl`),
+        object: dataFactory.variable!(`${variablePrefix}AltLabelXl`),
         predicate: dataFactory.namedNode(
           "http://www.w3.org/2008/05/skos-xl#altLabel",
         ),
         subject,
       },
       ...Label.sparqlConstructTemplateTriples({
-        subject: dataFactory.variable(`${variablePrefix}AltLabelXl`),
+        subject: dataFactory.variable!(`${variablePrefix}AltLabelXl`),
         variablePrefix: `${variablePrefix}AltLabelXl`,
       }),
       {
-        object: dataFactory.variable(`${variablePrefix}ChangeNote`),
+        object: dataFactory.variable!(`${variablePrefix}ChangeNote`),
         predicate: dataFactory.namedNode(
           "http://www.w3.org/2004/02/skos/core#changeNote",
         ),
         subject,
       },
       {
-        object: dataFactory.variable(`${variablePrefix}Definition`),
+        object: dataFactory.variable!(`${variablePrefix}Definition`),
         predicate: dataFactory.namedNode(
           "http://www.w3.org/2004/02/skos/core#definition",
         ),
         subject,
       },
       {
-        object: dataFactory.variable(`${variablePrefix}EditorialNote`),
+        object: dataFactory.variable!(`${variablePrefix}EditorialNote`),
         predicate: dataFactory.namedNode(
           "http://www.w3.org/2004/02/skos/core#editorialNote",
         ),
         subject,
       },
       {
-        object: dataFactory.variable(`${variablePrefix}Example`),
+        object: dataFactory.variable!(`${variablePrefix}Example`),
         predicate: dataFactory.namedNode(
           "http://www.w3.org/2004/02/skos/core#example",
         ),
         subject,
       },
       {
-        object: dataFactory.variable(`${variablePrefix}HiddenLabel`),
+        object: dataFactory.variable!(`${variablePrefix}HiddenLabel`),
         predicate: dataFactory.namedNode(
           "http://www.w3.org/2004/02/skos/core#hiddenLabel",
         ),
         subject,
       },
       {
-        object: dataFactory.variable(`${variablePrefix}HiddenLabelXl`),
+        object: dataFactory.variable!(`${variablePrefix}HiddenLabelXl`),
         predicate: dataFactory.namedNode(
           "http://www.w3.org/2008/05/skos-xl#hiddenLabel",
         ),
         subject,
       },
       ...Label.sparqlConstructTemplateTriples({
-        subject: dataFactory.variable(`${variablePrefix}HiddenLabelXl`),
+        subject: dataFactory.variable!(`${variablePrefix}HiddenLabelXl`),
         variablePrefix: `${variablePrefix}HiddenLabelXl`,
       }),
       {
-        object: dataFactory.variable(`${variablePrefix}HistoryNote`),
+        object: dataFactory.variable!(`${variablePrefix}HistoryNote`),
         predicate: dataFactory.namedNode(
           "http://www.w3.org/2004/02/skos/core#historyNote",
         ),
         subject,
       },
       {
-        object: dataFactory.variable(`${variablePrefix}Modified`),
+        object: dataFactory.variable!(`${variablePrefix}Modified`),
         predicate: dataFactory.namedNode("http://purl.org/dc/terms/modified"),
         subject,
       },
       {
-        object: dataFactory.variable(`${variablePrefix}Notation`),
+        object: dataFactory.variable!(`${variablePrefix}Notation`),
         predicate: dataFactory.namedNode(
           "http://www.w3.org/2004/02/skos/core#notation",
         ),
         subject,
       },
       {
-        object: dataFactory.variable(`${variablePrefix}Note`),
+        object: dataFactory.variable!(`${variablePrefix}Note`),
         predicate: dataFactory.namedNode(
           "http://www.w3.org/2004/02/skos/core#notation",
         ),
         subject,
       },
       {
-        object: dataFactory.variable(`${variablePrefix}PrefLabel`),
+        object: dataFactory.variable!(`${variablePrefix}PrefLabel`),
         predicate: dataFactory.namedNode(
           "http://www.w3.org/2004/02/skos/core#prefLabel",
         ),
         subject,
       },
       {
-        object: dataFactory.variable(`${variablePrefix}PrefLabelXl`),
+        object: dataFactory.variable!(`${variablePrefix}PrefLabelXl`),
         predicate: dataFactory.namedNode(
           "http://www.w3.org/2008/05/skos-xl#prefLabel",
         ),
         subject,
       },
       ...Label.sparqlConstructTemplateTriples({
-        subject: dataFactory.variable(`${variablePrefix}PrefLabelXl`),
+        subject: dataFactory.variable!(`${variablePrefix}PrefLabelXl`),
         variablePrefix: `${variablePrefix}PrefLabelXl`,
       }),
       {
-        object: dataFactory.variable(`${variablePrefix}ScopeNote`),
+        object: dataFactory.variable!(`${variablePrefix}ScopeNote`),
         predicate: dataFactory.namedNode(
           "http://www.w3.org/2004/02/skos/core#scopeNote",
         ),
@@ -1416,22 +1456,22 @@ export namespace KosResource {
     ];
   }
 
-  export function sparqlWherePatterns({
-    subject,
-    variablePrefix: variablePrefixParameter,
-  }: {
+  export function sparqlWherePatterns(parameters: {
     ignoreRdfType?: boolean;
-    subject: rdfjs.Variable;
+    subject?: sparqljs.Triple["subject"];
     variablePrefix?: string;
   }): readonly sparqljs.Pattern[] {
-    const variablePrefix = variablePrefixParameter ?? subject.value;
+    const subject = parameters?.subject ?? dataFactory.variable!("kosResource");
+    const variablePrefix =
+      parameters?.variablePrefix ??
+      (subject.termType === "Variable" ? subject.value : "kosResource");
     return [
       {
         patterns: [
           {
             triples: [
               {
-                object: dataFactory.variable(`${variablePrefix}AltLabel`),
+                object: dataFactory.variable!(`${variablePrefix}AltLabel`),
                 predicate: dataFactory.namedNode(
                   "http://www.w3.org/2004/02/skos/core#altLabel",
                 ),
@@ -1448,7 +1488,7 @@ export namespace KosResource {
           {
             triples: [
               {
-                object: dataFactory.variable(`${variablePrefix}AltLabelXl`),
+                object: dataFactory.variable!(`${variablePrefix}AltLabelXl`),
                 predicate: dataFactory.namedNode(
                   "http://www.w3.org/2008/05/skos-xl#altLabel",
                 ),
@@ -1460,7 +1500,7 @@ export namespace KosResource {
           {
             patterns: [
               ...Label.sparqlWherePatterns({
-                subject: dataFactory.variable(`${variablePrefix}AltLabelXl`),
+                subject: dataFactory.variable!(`${variablePrefix}AltLabelXl`),
                 variablePrefix: `${variablePrefix}AltLabelXl`,
               }),
             ],
@@ -1474,7 +1514,7 @@ export namespace KosResource {
           {
             triples: [
               {
-                object: dataFactory.variable(`${variablePrefix}ChangeNote`),
+                object: dataFactory.variable!(`${variablePrefix}ChangeNote`),
                 predicate: dataFactory.namedNode(
                   "http://www.w3.org/2004/02/skos/core#changeNote",
                 ),
@@ -1491,7 +1531,7 @@ export namespace KosResource {
           {
             triples: [
               {
-                object: dataFactory.variable(`${variablePrefix}Definition`),
+                object: dataFactory.variable!(`${variablePrefix}Definition`),
                 predicate: dataFactory.namedNode(
                   "http://www.w3.org/2004/02/skos/core#definition",
                 ),
@@ -1508,7 +1548,7 @@ export namespace KosResource {
           {
             triples: [
               {
-                object: dataFactory.variable(`${variablePrefix}EditorialNote`),
+                object: dataFactory.variable!(`${variablePrefix}EditorialNote`),
                 predicate: dataFactory.namedNode(
                   "http://www.w3.org/2004/02/skos/core#editorialNote",
                 ),
@@ -1525,7 +1565,7 @@ export namespace KosResource {
           {
             triples: [
               {
-                object: dataFactory.variable(`${variablePrefix}Example`),
+                object: dataFactory.variable!(`${variablePrefix}Example`),
                 predicate: dataFactory.namedNode(
                   "http://www.w3.org/2004/02/skos/core#example",
                 ),
@@ -1542,7 +1582,7 @@ export namespace KosResource {
           {
             triples: [
               {
-                object: dataFactory.variable(`${variablePrefix}HiddenLabel`),
+                object: dataFactory.variable!(`${variablePrefix}HiddenLabel`),
                 predicate: dataFactory.namedNode(
                   "http://www.w3.org/2004/02/skos/core#hiddenLabel",
                 ),
@@ -1559,7 +1599,7 @@ export namespace KosResource {
           {
             triples: [
               {
-                object: dataFactory.variable(`${variablePrefix}HiddenLabelXl`),
+                object: dataFactory.variable!(`${variablePrefix}HiddenLabelXl`),
                 predicate: dataFactory.namedNode(
                   "http://www.w3.org/2008/05/skos-xl#hiddenLabel",
                 ),
@@ -1571,7 +1611,9 @@ export namespace KosResource {
           {
             patterns: [
               ...Label.sparqlWherePatterns({
-                subject: dataFactory.variable(`${variablePrefix}HiddenLabelXl`),
+                subject: dataFactory.variable!(
+                  `${variablePrefix}HiddenLabelXl`,
+                ),
                 variablePrefix: `${variablePrefix}HiddenLabelXl`,
               }),
             ],
@@ -1585,7 +1627,7 @@ export namespace KosResource {
           {
             triples: [
               {
-                object: dataFactory.variable(`${variablePrefix}HistoryNote`),
+                object: dataFactory.variable!(`${variablePrefix}HistoryNote`),
                 predicate: dataFactory.namedNode(
                   "http://www.w3.org/2004/02/skos/core#historyNote",
                 ),
@@ -1602,7 +1644,7 @@ export namespace KosResource {
           {
             triples: [
               {
-                object: dataFactory.variable(`${variablePrefix}Modified`),
+                object: dataFactory.variable!(`${variablePrefix}Modified`),
                 predicate: dataFactory.namedNode(
                   "http://purl.org/dc/terms/modified",
                 ),
@@ -1619,7 +1661,7 @@ export namespace KosResource {
           {
             triples: [
               {
-                object: dataFactory.variable(`${variablePrefix}Notation`),
+                object: dataFactory.variable!(`${variablePrefix}Notation`),
                 predicate: dataFactory.namedNode(
                   "http://www.w3.org/2004/02/skos/core#notation",
                 ),
@@ -1636,7 +1678,7 @@ export namespace KosResource {
           {
             triples: [
               {
-                object: dataFactory.variable(`${variablePrefix}Note`),
+                object: dataFactory.variable!(`${variablePrefix}Note`),
                 predicate: dataFactory.namedNode(
                   "http://www.w3.org/2004/02/skos/core#notation",
                 ),
@@ -1653,7 +1695,7 @@ export namespace KosResource {
           {
             triples: [
               {
-                object: dataFactory.variable(`${variablePrefix}PrefLabel`),
+                object: dataFactory.variable!(`${variablePrefix}PrefLabel`),
                 predicate: dataFactory.namedNode(
                   "http://www.w3.org/2004/02/skos/core#prefLabel",
                 ),
@@ -1670,7 +1712,7 @@ export namespace KosResource {
           {
             triples: [
               {
-                object: dataFactory.variable(`${variablePrefix}PrefLabelXl`),
+                object: dataFactory.variable!(`${variablePrefix}PrefLabelXl`),
                 predicate: dataFactory.namedNode(
                   "http://www.w3.org/2008/05/skos-xl#prefLabel",
                 ),
@@ -1682,7 +1724,7 @@ export namespace KosResource {
           {
             patterns: [
               ...Label.sparqlWherePatterns({
-                subject: dataFactory.variable(`${variablePrefix}PrefLabelXl`),
+                subject: dataFactory.variable!(`${variablePrefix}PrefLabelXl`),
                 variablePrefix: `${variablePrefix}PrefLabelXl`,
               }),
             ],
@@ -1696,7 +1738,7 @@ export namespace KosResource {
           {
             triples: [
               {
-                object: dataFactory.variable(`${variablePrefix}ScopeNote`),
+                object: dataFactory.variable!(`${variablePrefix}ScopeNote`),
                 predicate: dataFactory.namedNode(
                   "http://www.w3.org/2004/02/skos/core#scopeNote",
                 ),
@@ -2043,29 +2085,41 @@ export namespace ConceptScheme {
 
   export function sparqlConstructQuery(
     parameters?: {
+      ignoreRdfType?: boolean;
       prefixes?: { [prefix: string]: string };
-      subject: rdfjs.Variable;
+      subject?: sparqljs.Triple["subject"];
+      variablePrefix?: string;
     } & Omit<
       sparqljs.ConstructQuery,
       "prefixes" | "queryType" | "template" | "type" | "where"
     >,
   ): sparqljs.ConstructQuery {
-    const subject =
-      parameters?.subject ?? dataFactory.variable("conceptScheme");
+    const { ignoreRdfType, subject, variablePrefix, ...queryParameters } =
+      parameters ?? {};
+
     return {
-      ...parameters,
+      ...queryParameters,
       prefixes: parameters?.prefixes ?? {},
       queryType: "CONSTRUCT",
       template: ConceptScheme.sparqlConstructTemplateTriples({
+        ignoreRdfType,
         subject,
       }).concat(),
       type: "query",
-      where: ConceptScheme.sparqlWherePatterns({ subject }).concat(),
+      where: ConceptScheme.sparqlWherePatterns({
+        ignoreRdfType,
+        subject,
+        variablePrefix,
+      }).concat(),
     };
   }
 
   export function sparqlConstructQueryString(
-    parameters?: { subject: rdfjs.Variable } & Omit<
+    parameters?: {
+      ignoreRdfType?: boolean;
+      subject?: sparqljs.Triple["subject"];
+      variablePrefix?: string;
+    } & Omit<
       sparqljs.ConstructQuery,
       "prefixes" | "queryType" | "template" | "type" | "where"
     > &
@@ -2076,23 +2130,23 @@ export namespace ConceptScheme {
     );
   }
 
-  export function sparqlConstructTemplateTriples({
-    ignoreRdfType,
-    subject,
-    variablePrefix: variablePrefixParameter,
-  }: {
+  export function sparqlConstructTemplateTriples(parameters?: {
     ignoreRdfType?: boolean;
-    subject: rdfjs.Variable;
+    subject?: sparqljs.Triple["subject"];
     variablePrefix?: string;
   }): readonly sparqljs.Triple[] {
-    const variablePrefix = variablePrefixParameter ?? subject.value;
+    const subject =
+      parameters?.subject ?? dataFactory.variable!("conceptScheme");
+    const variablePrefix =
+      parameters?.variablePrefix ??
+      (subject.termType === "Variable" ? subject.value : "conceptScheme");
     return [
       ...KosResource.sparqlConstructTemplateTriples({
         ignoreRdfType: true,
         subject,
         variablePrefix,
       }),
-      ...(ignoreRdfType
+      ...(parameters?.ignoreRdfType
         ? []
         : [
             {
@@ -2100,32 +2154,32 @@ export namespace ConceptScheme {
               predicate: dataFactory.namedNode(
                 "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
               ),
-              object: dataFactory.variable(`${variablePrefix}RdfType`),
+              object: dataFactory.variable!(`${variablePrefix}RdfType`),
             },
           ]),
       {
-        object: dataFactory.variable(`${variablePrefix}HasTopConcept`),
+        object: dataFactory.variable!(`${variablePrefix}HasTopConcept`),
         predicate: dataFactory.namedNode(
           "http://www.w3.org/2004/02/skos/core#hasTopConcept",
         ),
         subject,
       },
       ...ConceptStub.sparqlConstructTemplateTriples({
-        subject: dataFactory.variable(`${variablePrefix}HasTopConcept`),
+        subject: dataFactory.variable!(`${variablePrefix}HasTopConcept`),
         variablePrefix: `${variablePrefix}HasTopConcept`,
       }),
       {
-        object: dataFactory.variable(`${variablePrefix}License`),
+        object: dataFactory.variable!(`${variablePrefix}License`),
         predicate: dataFactory.namedNode("http://purl.org/dc/terms/license"),
         subject,
       },
       {
-        object: dataFactory.variable(`${variablePrefix}Rights`),
+        object: dataFactory.variable!(`${variablePrefix}Rights`),
         predicate: dataFactory.namedNode("http://purl.org/dc/terms/rights"),
         subject,
       },
       {
-        object: dataFactory.variable(`${variablePrefix}RightsHolder`),
+        object: dataFactory.variable!(`${variablePrefix}RightsHolder`),
         predicate: dataFactory.namedNode(
           "http://purl.org/dc/terms/rightsHolder",
         ),
@@ -2134,23 +2188,23 @@ export namespace ConceptScheme {
     ];
   }
 
-  export function sparqlWherePatterns({
-    ignoreRdfType,
-    subject,
-    variablePrefix: variablePrefixParameter,
-  }: {
+  export function sparqlWherePatterns(parameters: {
     ignoreRdfType?: boolean;
-    subject: rdfjs.Variable;
+    subject?: sparqljs.Triple["subject"];
     variablePrefix?: string;
   }): readonly sparqljs.Pattern[] {
-    const variablePrefix = variablePrefixParameter ?? subject.value;
+    const subject =
+      parameters?.subject ?? dataFactory.variable!("conceptScheme");
+    const variablePrefix =
+      parameters?.variablePrefix ??
+      (subject.termType === "Variable" ? subject.value : "conceptScheme");
     return [
       ...KosResource.sparqlWherePatterns({
         ignoreRdfType: true,
         subject,
         variablePrefix,
       }),
-      ...(ignoreRdfType
+      ...(parameters?.ignoreRdfType
         ? []
         : [
             {
@@ -2169,7 +2223,7 @@ export namespace ConceptScheme {
                   predicate: dataFactory.namedNode(
                     "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
                   ),
-                  object: dataFactory.variable(`${variablePrefix}RdfType`),
+                  object: dataFactory.variable!(`${variablePrefix}RdfType`),
                 },
               ],
               type: "bgp" as const,
@@ -2180,7 +2234,7 @@ export namespace ConceptScheme {
           {
             triples: [
               {
-                object: dataFactory.variable(`${variablePrefix}HasTopConcept`),
+                object: dataFactory.variable!(`${variablePrefix}HasTopConcept`),
                 predicate: dataFactory.namedNode(
                   "http://www.w3.org/2004/02/skos/core#hasTopConcept",
                 ),
@@ -2192,7 +2246,9 @@ export namespace ConceptScheme {
           {
             patterns: [
               ...ConceptStub.sparqlWherePatterns({
-                subject: dataFactory.variable(`${variablePrefix}HasTopConcept`),
+                subject: dataFactory.variable!(
+                  `${variablePrefix}HasTopConcept`,
+                ),
                 variablePrefix: `${variablePrefix}HasTopConcept`,
               }),
             ],
@@ -2206,7 +2262,7 @@ export namespace ConceptScheme {
           {
             triples: [
               {
-                object: dataFactory.variable(`${variablePrefix}License`),
+                object: dataFactory.variable!(`${variablePrefix}License`),
                 predicate: dataFactory.namedNode(
                   "http://purl.org/dc/terms/license",
                 ),
@@ -2223,7 +2279,7 @@ export namespace ConceptScheme {
           {
             triples: [
               {
-                object: dataFactory.variable(`${variablePrefix}Rights`),
+                object: dataFactory.variable!(`${variablePrefix}Rights`),
                 predicate: dataFactory.namedNode(
                   "http://purl.org/dc/terms/rights",
                 ),
@@ -2240,7 +2296,7 @@ export namespace ConceptScheme {
           {
             triples: [
               {
-                object: dataFactory.variable(`${variablePrefix}RightsHolder`),
+                object: dataFactory.variable!(`${variablePrefix}RightsHolder`),
                 predicate: dataFactory.namedNode(
                   "http://purl.org/dc/terms/rightsHolder",
                 ),
@@ -2334,29 +2390,41 @@ export namespace ConceptSchemeStub {
 
   export function sparqlConstructQuery(
     parameters?: {
+      ignoreRdfType?: boolean;
       prefixes?: { [prefix: string]: string };
-      subject: rdfjs.Variable;
+      subject?: sparqljs.Triple["subject"];
+      variablePrefix?: string;
     } & Omit<
       sparqljs.ConstructQuery,
       "prefixes" | "queryType" | "template" | "type" | "where"
     >,
   ): sparqljs.ConstructQuery {
-    const subject =
-      parameters?.subject ?? dataFactory.variable("conceptSchemeStub");
+    const { ignoreRdfType, subject, variablePrefix, ...queryParameters } =
+      parameters ?? {};
+
     return {
-      ...parameters,
+      ...queryParameters,
       prefixes: parameters?.prefixes ?? {},
       queryType: "CONSTRUCT",
       template: ConceptSchemeStub.sparqlConstructTemplateTriples({
+        ignoreRdfType,
         subject,
       }).concat(),
       type: "query",
-      where: ConceptSchemeStub.sparqlWherePatterns({ subject }).concat(),
+      where: ConceptSchemeStub.sparqlWherePatterns({
+        ignoreRdfType,
+        subject,
+        variablePrefix,
+      }).concat(),
     };
   }
 
   export function sparqlConstructQueryString(
-    parameters?: { subject: rdfjs.Variable } & Omit<
+    parameters?: {
+      ignoreRdfType?: boolean;
+      subject?: sparqljs.Triple["subject"];
+      variablePrefix?: string;
+    } & Omit<
       sparqljs.ConstructQuery,
       "prefixes" | "queryType" | "template" | "type" | "where"
     > &
@@ -2367,23 +2435,23 @@ export namespace ConceptSchemeStub {
     );
   }
 
-  export function sparqlConstructTemplateTriples({
-    ignoreRdfType,
-    subject,
-    variablePrefix: variablePrefixParameter,
-  }: {
+  export function sparqlConstructTemplateTriples(parameters?: {
     ignoreRdfType?: boolean;
-    subject: rdfjs.Variable;
+    subject?: sparqljs.Triple["subject"];
     variablePrefix?: string;
   }): readonly sparqljs.Triple[] {
-    const variablePrefix = variablePrefixParameter ?? subject.value;
+    const subject =
+      parameters?.subject ?? dataFactory.variable!("conceptSchemeStub");
+    const variablePrefix =
+      parameters?.variablePrefix ??
+      (subject.termType === "Variable" ? subject.value : "conceptSchemeStub");
     return [
       ...KosResourceStub.sparqlConstructTemplateTriples({
         ignoreRdfType: true,
         subject,
         variablePrefix,
       }),
-      ...(ignoreRdfType
+      ...(parameters?.ignoreRdfType
         ? []
         : [
             {
@@ -2391,29 +2459,29 @@ export namespace ConceptSchemeStub {
               predicate: dataFactory.namedNode(
                 "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
               ),
-              object: dataFactory.variable(`${variablePrefix}RdfType`),
+              object: dataFactory.variable!(`${variablePrefix}RdfType`),
             },
           ]),
     ];
   }
 
-  export function sparqlWherePatterns({
-    ignoreRdfType,
-    subject,
-    variablePrefix: variablePrefixParameter,
-  }: {
+  export function sparqlWherePatterns(parameters: {
     ignoreRdfType?: boolean;
-    subject: rdfjs.Variable;
+    subject?: sparqljs.Triple["subject"];
     variablePrefix?: string;
   }): readonly sparqljs.Pattern[] {
-    const variablePrefix = variablePrefixParameter ?? subject.value;
+    const subject =
+      parameters?.subject ?? dataFactory.variable!("conceptSchemeStub");
+    const variablePrefix =
+      parameters?.variablePrefix ??
+      (subject.termType === "Variable" ? subject.value : "conceptSchemeStub");
     return [
       ...KosResourceStub.sparqlWherePatterns({
         ignoreRdfType: true,
         subject,
         variablePrefix,
       }),
-      ...(ignoreRdfType
+      ...(parameters?.ignoreRdfType
         ? []
         : [
             {
@@ -2432,7 +2500,7 @@ export namespace ConceptSchemeStub {
                   predicate: dataFactory.namedNode(
                     "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
                   ),
-                  object: dataFactory.variable(`${variablePrefix}RdfType`),
+                  object: dataFactory.variable!(`${variablePrefix}RdfType`),
                 },
               ],
               type: "bgp" as const,
@@ -2518,28 +2586,41 @@ export namespace ConceptStub {
 
   export function sparqlConstructQuery(
     parameters?: {
+      ignoreRdfType?: boolean;
       prefixes?: { [prefix: string]: string };
-      subject: rdfjs.Variable;
+      subject?: sparqljs.Triple["subject"];
+      variablePrefix?: string;
     } & Omit<
       sparqljs.ConstructQuery,
       "prefixes" | "queryType" | "template" | "type" | "where"
     >,
   ): sparqljs.ConstructQuery {
-    const subject = parameters?.subject ?? dataFactory.variable("conceptStub");
+    const { ignoreRdfType, subject, variablePrefix, ...queryParameters } =
+      parameters ?? {};
+
     return {
-      ...parameters,
+      ...queryParameters,
       prefixes: parameters?.prefixes ?? {},
       queryType: "CONSTRUCT",
       template: ConceptStub.sparqlConstructTemplateTriples({
+        ignoreRdfType,
         subject,
       }).concat(),
       type: "query",
-      where: ConceptStub.sparqlWherePatterns({ subject }).concat(),
+      where: ConceptStub.sparqlWherePatterns({
+        ignoreRdfType,
+        subject,
+        variablePrefix,
+      }).concat(),
     };
   }
 
   export function sparqlConstructQueryString(
-    parameters?: { subject: rdfjs.Variable } & Omit<
+    parameters?: {
+      ignoreRdfType?: boolean;
+      subject?: sparqljs.Triple["subject"];
+      variablePrefix?: string;
+    } & Omit<
       sparqljs.ConstructQuery,
       "prefixes" | "queryType" | "template" | "type" | "where"
     > &
@@ -2550,23 +2631,22 @@ export namespace ConceptStub {
     );
   }
 
-  export function sparqlConstructTemplateTriples({
-    ignoreRdfType,
-    subject,
-    variablePrefix: variablePrefixParameter,
-  }: {
+  export function sparqlConstructTemplateTriples(parameters?: {
     ignoreRdfType?: boolean;
-    subject: rdfjs.Variable;
+    subject?: sparqljs.Triple["subject"];
     variablePrefix?: string;
   }): readonly sparqljs.Triple[] {
-    const variablePrefix = variablePrefixParameter ?? subject.value;
+    const subject = parameters?.subject ?? dataFactory.variable!("conceptStub");
+    const variablePrefix =
+      parameters?.variablePrefix ??
+      (subject.termType === "Variable" ? subject.value : "conceptStub");
     return [
       ...KosResourceStub.sparqlConstructTemplateTriples({
         ignoreRdfType: true,
         subject,
         variablePrefix,
       }),
-      ...(ignoreRdfType
+      ...(parameters?.ignoreRdfType
         ? []
         : [
             {
@@ -2574,29 +2654,28 @@ export namespace ConceptStub {
               predicate: dataFactory.namedNode(
                 "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
               ),
-              object: dataFactory.variable(`${variablePrefix}RdfType`),
+              object: dataFactory.variable!(`${variablePrefix}RdfType`),
             },
           ]),
     ];
   }
 
-  export function sparqlWherePatterns({
-    ignoreRdfType,
-    subject,
-    variablePrefix: variablePrefixParameter,
-  }: {
+  export function sparqlWherePatterns(parameters: {
     ignoreRdfType?: boolean;
-    subject: rdfjs.Variable;
+    subject?: sparqljs.Triple["subject"];
     variablePrefix?: string;
   }): readonly sparqljs.Pattern[] {
-    const variablePrefix = variablePrefixParameter ?? subject.value;
+    const subject = parameters?.subject ?? dataFactory.variable!("conceptStub");
+    const variablePrefix =
+      parameters?.variablePrefix ??
+      (subject.termType === "Variable" ? subject.value : "conceptStub");
     return [
       ...KosResourceStub.sparqlWherePatterns({
         ignoreRdfType: true,
         subject,
         variablePrefix,
       }),
-      ...(ignoreRdfType
+      ...(parameters?.ignoreRdfType
         ? []
         : [
             {
@@ -2615,7 +2694,7 @@ export namespace ConceptStub {
                   predicate: dataFactory.namedNode(
                     "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
                   ),
-                  object: dataFactory.variable(`${variablePrefix}RdfType`),
+                  object: dataFactory.variable!(`${variablePrefix}RdfType`),
                 },
               ],
               type: "bgp" as const,
@@ -3359,26 +3438,41 @@ export namespace Concept {
 
   export function sparqlConstructQuery(
     parameters?: {
+      ignoreRdfType?: boolean;
       prefixes?: { [prefix: string]: string };
-      subject: rdfjs.Variable;
+      subject?: sparqljs.Triple["subject"];
+      variablePrefix?: string;
     } & Omit<
       sparqljs.ConstructQuery,
       "prefixes" | "queryType" | "template" | "type" | "where"
     >,
   ): sparqljs.ConstructQuery {
-    const subject = parameters?.subject ?? dataFactory.variable("concept");
+    const { ignoreRdfType, subject, variablePrefix, ...queryParameters } =
+      parameters ?? {};
+
     return {
-      ...parameters,
+      ...queryParameters,
       prefixes: parameters?.prefixes ?? {},
       queryType: "CONSTRUCT",
-      template: Concept.sparqlConstructTemplateTriples({ subject }).concat(),
+      template: Concept.sparqlConstructTemplateTriples({
+        ignoreRdfType,
+        subject,
+      }).concat(),
       type: "query",
-      where: Concept.sparqlWherePatterns({ subject }).concat(),
+      where: Concept.sparqlWherePatterns({
+        ignoreRdfType,
+        subject,
+        variablePrefix,
+      }).concat(),
     };
   }
 
   export function sparqlConstructQueryString(
-    parameters?: { subject: rdfjs.Variable } & Omit<
+    parameters?: {
+      ignoreRdfType?: boolean;
+      subject?: sparqljs.Triple["subject"];
+      variablePrefix?: string;
+    } & Omit<
       sparqljs.ConstructQuery,
       "prefixes" | "queryType" | "template" | "type" | "where"
     > &
@@ -3389,23 +3483,22 @@ export namespace Concept {
     );
   }
 
-  export function sparqlConstructTemplateTriples({
-    ignoreRdfType,
-    subject,
-    variablePrefix: variablePrefixParameter,
-  }: {
+  export function sparqlConstructTemplateTriples(parameters?: {
     ignoreRdfType?: boolean;
-    subject: rdfjs.Variable;
+    subject?: sparqljs.Triple["subject"];
     variablePrefix?: string;
   }): readonly sparqljs.Triple[] {
-    const variablePrefix = variablePrefixParameter ?? subject.value;
+    const subject = parameters?.subject ?? dataFactory.variable!("concept");
+    const variablePrefix =
+      parameters?.variablePrefix ??
+      (subject.termType === "Variable" ? subject.value : "concept");
     return [
       ...KosResource.sparqlConstructTemplateTriples({
         ignoreRdfType: true,
         subject,
         variablePrefix,
       }),
-      ...(ignoreRdfType
+      ...(parameters?.ignoreRdfType
         ? []
         : [
             {
@@ -3413,183 +3506,182 @@ export namespace Concept {
               predicate: dataFactory.namedNode(
                 "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
               ),
-              object: dataFactory.variable(`${variablePrefix}RdfType`),
+              object: dataFactory.variable!(`${variablePrefix}RdfType`),
             },
           ]),
       {
-        object: dataFactory.variable(`${variablePrefix}Broader`),
+        object: dataFactory.variable!(`${variablePrefix}Broader`),
         predicate: dataFactory.namedNode(
           "http://www.w3.org/2004/02/skos/core#broader",
         ),
         subject,
       },
       ...ConceptStub.sparqlConstructTemplateTriples({
-        subject: dataFactory.variable(`${variablePrefix}Broader`),
+        subject: dataFactory.variable!(`${variablePrefix}Broader`),
         variablePrefix: `${variablePrefix}Broader`,
       }),
       {
-        object: dataFactory.variable(`${variablePrefix}BroaderTransitive`),
+        object: dataFactory.variable!(`${variablePrefix}BroaderTransitive`),
         predicate: dataFactory.namedNode(
           "http://www.w3.org/2004/02/skos/core#broaderTransitive",
         ),
         subject,
       },
       ...ConceptStub.sparqlConstructTemplateTriples({
-        subject: dataFactory.variable(`${variablePrefix}BroaderTransitive`),
+        subject: dataFactory.variable!(`${variablePrefix}BroaderTransitive`),
         variablePrefix: `${variablePrefix}BroaderTransitive`,
       }),
       {
-        object: dataFactory.variable(`${variablePrefix}BroadMatch`),
+        object: dataFactory.variable!(`${variablePrefix}BroadMatch`),
         predicate: dataFactory.namedNode(
           "http://www.w3.org/2004/02/skos/core#broadMatch",
         ),
         subject,
       },
       ...ConceptStub.sparqlConstructTemplateTriples({
-        subject: dataFactory.variable(`${variablePrefix}BroadMatch`),
+        subject: dataFactory.variable!(`${variablePrefix}BroadMatch`),
         variablePrefix: `${variablePrefix}BroadMatch`,
       }),
       {
-        object: dataFactory.variable(`${variablePrefix}CloseMatch`),
+        object: dataFactory.variable!(`${variablePrefix}CloseMatch`),
         predicate: dataFactory.namedNode(
           "http://www.w3.org/2004/02/skos/core#closeMatch",
         ),
         subject,
       },
       ...ConceptStub.sparqlConstructTemplateTriples({
-        subject: dataFactory.variable(`${variablePrefix}CloseMatch`),
+        subject: dataFactory.variable!(`${variablePrefix}CloseMatch`),
         variablePrefix: `${variablePrefix}CloseMatch`,
       }),
       {
-        object: dataFactory.variable(`${variablePrefix}ExactMatch`),
+        object: dataFactory.variable!(`${variablePrefix}ExactMatch`),
         predicate: dataFactory.namedNode(
           "http://www.w3.org/2004/02/skos/core#exactMatch",
         ),
         subject,
       },
       ...ConceptStub.sparqlConstructTemplateTriples({
-        subject: dataFactory.variable(`${variablePrefix}ExactMatch`),
+        subject: dataFactory.variable!(`${variablePrefix}ExactMatch`),
         variablePrefix: `${variablePrefix}ExactMatch`,
       }),
       {
-        object: dataFactory.variable(`${variablePrefix}InScheme`),
+        object: dataFactory.variable!(`${variablePrefix}InScheme`),
         predicate: dataFactory.namedNode(
           "http://www.w3.org/2004/02/skos/core#inScheme",
         ),
         subject,
       },
       ...ConceptSchemeStub.sparqlConstructTemplateTriples({
-        subject: dataFactory.variable(`${variablePrefix}InScheme`),
+        subject: dataFactory.variable!(`${variablePrefix}InScheme`),
         variablePrefix: `${variablePrefix}InScheme`,
       }),
       {
-        object: dataFactory.variable(`${variablePrefix}MappingRelation`),
+        object: dataFactory.variable!(`${variablePrefix}MappingRelation`),
         predicate: dataFactory.namedNode(
           "http://www.w3.org/2004/02/skos/core#mappingRelation",
         ),
         subject,
       },
       ...ConceptStub.sparqlConstructTemplateTriples({
-        subject: dataFactory.variable(`${variablePrefix}MappingRelation`),
+        subject: dataFactory.variable!(`${variablePrefix}MappingRelation`),
         variablePrefix: `${variablePrefix}MappingRelation`,
       }),
       {
-        object: dataFactory.variable(`${variablePrefix}Narrower`),
+        object: dataFactory.variable!(`${variablePrefix}Narrower`),
         predicate: dataFactory.namedNode(
           "http://www.w3.org/2004/02/skos/core#narrower",
         ),
         subject,
       },
       ...ConceptStub.sparqlConstructTemplateTriples({
-        subject: dataFactory.variable(`${variablePrefix}Narrower`),
+        subject: dataFactory.variable!(`${variablePrefix}Narrower`),
         variablePrefix: `${variablePrefix}Narrower`,
       }),
       {
-        object: dataFactory.variable(`${variablePrefix}NarrowerTransitive`),
+        object: dataFactory.variable!(`${variablePrefix}NarrowerTransitive`),
         predicate: dataFactory.namedNode(
           "http://www.w3.org/2004/02/skos/core#narrowerTransitive",
         ),
         subject,
       },
       ...ConceptStub.sparqlConstructTemplateTriples({
-        subject: dataFactory.variable(`${variablePrefix}NarrowerTransitive`),
+        subject: dataFactory.variable!(`${variablePrefix}NarrowerTransitive`),
         variablePrefix: `${variablePrefix}NarrowerTransitive`,
       }),
       {
-        object: dataFactory.variable(`${variablePrefix}NarrowMatch`),
+        object: dataFactory.variable!(`${variablePrefix}NarrowMatch`),
         predicate: dataFactory.namedNode(
           "http://www.w3.org/2004/02/skos/core#narrowMatch",
         ),
         subject,
       },
       ...ConceptStub.sparqlConstructTemplateTriples({
-        subject: dataFactory.variable(`${variablePrefix}NarrowMatch`),
+        subject: dataFactory.variable!(`${variablePrefix}NarrowMatch`),
         variablePrefix: `${variablePrefix}NarrowMatch`,
       }),
       {
-        object: dataFactory.variable(`${variablePrefix}Related`),
+        object: dataFactory.variable!(`${variablePrefix}Related`),
         predicate: dataFactory.namedNode(
           "http://www.w3.org/2004/02/skos/core#related",
         ),
         subject,
       },
       ...ConceptStub.sparqlConstructTemplateTriples({
-        subject: dataFactory.variable(`${variablePrefix}Related`),
+        subject: dataFactory.variable!(`${variablePrefix}Related`),
         variablePrefix: `${variablePrefix}Related`,
       }),
       {
-        object: dataFactory.variable(`${variablePrefix}RelatedMatch`),
+        object: dataFactory.variable!(`${variablePrefix}RelatedMatch`),
         predicate: dataFactory.namedNode(
           "http://www.w3.org/2004/02/skos/core#relatedMatch",
         ),
         subject,
       },
       ...ConceptStub.sparqlConstructTemplateTriples({
-        subject: dataFactory.variable(`${variablePrefix}RelatedMatch`),
+        subject: dataFactory.variable!(`${variablePrefix}RelatedMatch`),
         variablePrefix: `${variablePrefix}RelatedMatch`,
       }),
       {
-        object: dataFactory.variable(`${variablePrefix}SemanticRelation`),
+        object: dataFactory.variable!(`${variablePrefix}SemanticRelation`),
         predicate: dataFactory.namedNode(
           "http://www.w3.org/2004/02/skos/core#semanticRelation",
         ),
         subject,
       },
       ...ConceptStub.sparqlConstructTemplateTriples({
-        subject: dataFactory.variable(`${variablePrefix}SemanticRelation`),
+        subject: dataFactory.variable!(`${variablePrefix}SemanticRelation`),
         variablePrefix: `${variablePrefix}SemanticRelation`,
       }),
       {
-        object: dataFactory.variable(`${variablePrefix}TopConceptOf`),
+        object: dataFactory.variable!(`${variablePrefix}TopConceptOf`),
         predicate: dataFactory.namedNode(
           "http://www.w3.org/2004/02/skos/core#topConceptOf",
         ),
         subject,
       },
       ...ConceptSchemeStub.sparqlConstructTemplateTriples({
-        subject: dataFactory.variable(`${variablePrefix}TopConceptOf`),
+        subject: dataFactory.variable!(`${variablePrefix}TopConceptOf`),
         variablePrefix: `${variablePrefix}TopConceptOf`,
       }),
     ];
   }
 
-  export function sparqlWherePatterns({
-    ignoreRdfType,
-    subject,
-    variablePrefix: variablePrefixParameter,
-  }: {
+  export function sparqlWherePatterns(parameters: {
     ignoreRdfType?: boolean;
-    subject: rdfjs.Variable;
+    subject?: sparqljs.Triple["subject"];
     variablePrefix?: string;
   }): readonly sparqljs.Pattern[] {
-    const variablePrefix = variablePrefixParameter ?? subject.value;
+    const subject = parameters?.subject ?? dataFactory.variable!("concept");
+    const variablePrefix =
+      parameters?.variablePrefix ??
+      (subject.termType === "Variable" ? subject.value : "concept");
     return [
       ...KosResource.sparqlWherePatterns({
         ignoreRdfType: true,
         subject,
         variablePrefix,
       }),
-      ...(ignoreRdfType
+      ...(parameters?.ignoreRdfType
         ? []
         : [
             {
@@ -3608,7 +3700,7 @@ export namespace Concept {
                   predicate: dataFactory.namedNode(
                     "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
                   ),
-                  object: dataFactory.variable(`${variablePrefix}RdfType`),
+                  object: dataFactory.variable!(`${variablePrefix}RdfType`),
                 },
               ],
               type: "bgp" as const,
@@ -3619,7 +3711,7 @@ export namespace Concept {
           {
             triples: [
               {
-                object: dataFactory.variable(`${variablePrefix}Broader`),
+                object: dataFactory.variable!(`${variablePrefix}Broader`),
                 predicate: dataFactory.namedNode(
                   "http://www.w3.org/2004/02/skos/core#broader",
                 ),
@@ -3631,7 +3723,7 @@ export namespace Concept {
           {
             patterns: [
               ...ConceptStub.sparqlWherePatterns({
-                subject: dataFactory.variable(`${variablePrefix}Broader`),
+                subject: dataFactory.variable!(`${variablePrefix}Broader`),
                 variablePrefix: `${variablePrefix}Broader`,
               }),
             ],
@@ -3645,7 +3737,7 @@ export namespace Concept {
           {
             triples: [
               {
-                object: dataFactory.variable(
+                object: dataFactory.variable!(
                   `${variablePrefix}BroaderTransitive`,
                 ),
                 predicate: dataFactory.namedNode(
@@ -3659,7 +3751,7 @@ export namespace Concept {
           {
             patterns: [
               ...ConceptStub.sparqlWherePatterns({
-                subject: dataFactory.variable(
+                subject: dataFactory.variable!(
                   `${variablePrefix}BroaderTransitive`,
                 ),
                 variablePrefix: `${variablePrefix}BroaderTransitive`,
@@ -3675,7 +3767,7 @@ export namespace Concept {
           {
             triples: [
               {
-                object: dataFactory.variable(`${variablePrefix}BroadMatch`),
+                object: dataFactory.variable!(`${variablePrefix}BroadMatch`),
                 predicate: dataFactory.namedNode(
                   "http://www.w3.org/2004/02/skos/core#broadMatch",
                 ),
@@ -3687,7 +3779,7 @@ export namespace Concept {
           {
             patterns: [
               ...ConceptStub.sparqlWherePatterns({
-                subject: dataFactory.variable(`${variablePrefix}BroadMatch`),
+                subject: dataFactory.variable!(`${variablePrefix}BroadMatch`),
                 variablePrefix: `${variablePrefix}BroadMatch`,
               }),
             ],
@@ -3701,7 +3793,7 @@ export namespace Concept {
           {
             triples: [
               {
-                object: dataFactory.variable(`${variablePrefix}CloseMatch`),
+                object: dataFactory.variable!(`${variablePrefix}CloseMatch`),
                 predicate: dataFactory.namedNode(
                   "http://www.w3.org/2004/02/skos/core#closeMatch",
                 ),
@@ -3713,7 +3805,7 @@ export namespace Concept {
           {
             patterns: [
               ...ConceptStub.sparqlWherePatterns({
-                subject: dataFactory.variable(`${variablePrefix}CloseMatch`),
+                subject: dataFactory.variable!(`${variablePrefix}CloseMatch`),
                 variablePrefix: `${variablePrefix}CloseMatch`,
               }),
             ],
@@ -3727,7 +3819,7 @@ export namespace Concept {
           {
             triples: [
               {
-                object: dataFactory.variable(`${variablePrefix}ExactMatch`),
+                object: dataFactory.variable!(`${variablePrefix}ExactMatch`),
                 predicate: dataFactory.namedNode(
                   "http://www.w3.org/2004/02/skos/core#exactMatch",
                 ),
@@ -3739,7 +3831,7 @@ export namespace Concept {
           {
             patterns: [
               ...ConceptStub.sparqlWherePatterns({
-                subject: dataFactory.variable(`${variablePrefix}ExactMatch`),
+                subject: dataFactory.variable!(`${variablePrefix}ExactMatch`),
                 variablePrefix: `${variablePrefix}ExactMatch`,
               }),
             ],
@@ -3753,7 +3845,7 @@ export namespace Concept {
           {
             triples: [
               {
-                object: dataFactory.variable(`${variablePrefix}InScheme`),
+                object: dataFactory.variable!(`${variablePrefix}InScheme`),
                 predicate: dataFactory.namedNode(
                   "http://www.w3.org/2004/02/skos/core#inScheme",
                 ),
@@ -3765,7 +3857,7 @@ export namespace Concept {
           {
             patterns: [
               ...ConceptSchemeStub.sparqlWherePatterns({
-                subject: dataFactory.variable(`${variablePrefix}InScheme`),
+                subject: dataFactory.variable!(`${variablePrefix}InScheme`),
                 variablePrefix: `${variablePrefix}InScheme`,
               }),
             ],
@@ -3779,7 +3871,7 @@ export namespace Concept {
           {
             triples: [
               {
-                object: dataFactory.variable(
+                object: dataFactory.variable!(
                   `${variablePrefix}MappingRelation`,
                 ),
                 predicate: dataFactory.namedNode(
@@ -3793,7 +3885,7 @@ export namespace Concept {
           {
             patterns: [
               ...ConceptStub.sparqlWherePatterns({
-                subject: dataFactory.variable(
+                subject: dataFactory.variable!(
                   `${variablePrefix}MappingRelation`,
                 ),
                 variablePrefix: `${variablePrefix}MappingRelation`,
@@ -3809,7 +3901,7 @@ export namespace Concept {
           {
             triples: [
               {
-                object: dataFactory.variable(`${variablePrefix}Narrower`),
+                object: dataFactory.variable!(`${variablePrefix}Narrower`),
                 predicate: dataFactory.namedNode(
                   "http://www.w3.org/2004/02/skos/core#narrower",
                 ),
@@ -3821,7 +3913,7 @@ export namespace Concept {
           {
             patterns: [
               ...ConceptStub.sparqlWherePatterns({
-                subject: dataFactory.variable(`${variablePrefix}Narrower`),
+                subject: dataFactory.variable!(`${variablePrefix}Narrower`),
                 variablePrefix: `${variablePrefix}Narrower`,
               }),
             ],
@@ -3835,7 +3927,7 @@ export namespace Concept {
           {
             triples: [
               {
-                object: dataFactory.variable(
+                object: dataFactory.variable!(
                   `${variablePrefix}NarrowerTransitive`,
                 ),
                 predicate: dataFactory.namedNode(
@@ -3849,7 +3941,7 @@ export namespace Concept {
           {
             patterns: [
               ...ConceptStub.sparqlWherePatterns({
-                subject: dataFactory.variable(
+                subject: dataFactory.variable!(
                   `${variablePrefix}NarrowerTransitive`,
                 ),
                 variablePrefix: `${variablePrefix}NarrowerTransitive`,
@@ -3865,7 +3957,7 @@ export namespace Concept {
           {
             triples: [
               {
-                object: dataFactory.variable(`${variablePrefix}NarrowMatch`),
+                object: dataFactory.variable!(`${variablePrefix}NarrowMatch`),
                 predicate: dataFactory.namedNode(
                   "http://www.w3.org/2004/02/skos/core#narrowMatch",
                 ),
@@ -3877,7 +3969,7 @@ export namespace Concept {
           {
             patterns: [
               ...ConceptStub.sparqlWherePatterns({
-                subject: dataFactory.variable(`${variablePrefix}NarrowMatch`),
+                subject: dataFactory.variable!(`${variablePrefix}NarrowMatch`),
                 variablePrefix: `${variablePrefix}NarrowMatch`,
               }),
             ],
@@ -3891,7 +3983,7 @@ export namespace Concept {
           {
             triples: [
               {
-                object: dataFactory.variable(`${variablePrefix}Related`),
+                object: dataFactory.variable!(`${variablePrefix}Related`),
                 predicate: dataFactory.namedNode(
                   "http://www.w3.org/2004/02/skos/core#related",
                 ),
@@ -3903,7 +3995,7 @@ export namespace Concept {
           {
             patterns: [
               ...ConceptStub.sparqlWherePatterns({
-                subject: dataFactory.variable(`${variablePrefix}Related`),
+                subject: dataFactory.variable!(`${variablePrefix}Related`),
                 variablePrefix: `${variablePrefix}Related`,
               }),
             ],
@@ -3917,7 +4009,7 @@ export namespace Concept {
           {
             triples: [
               {
-                object: dataFactory.variable(`${variablePrefix}RelatedMatch`),
+                object: dataFactory.variable!(`${variablePrefix}RelatedMatch`),
                 predicate: dataFactory.namedNode(
                   "http://www.w3.org/2004/02/skos/core#relatedMatch",
                 ),
@@ -3929,7 +4021,7 @@ export namespace Concept {
           {
             patterns: [
               ...ConceptStub.sparqlWherePatterns({
-                subject: dataFactory.variable(`${variablePrefix}RelatedMatch`),
+                subject: dataFactory.variable!(`${variablePrefix}RelatedMatch`),
                 variablePrefix: `${variablePrefix}RelatedMatch`,
               }),
             ],
@@ -3943,7 +4035,7 @@ export namespace Concept {
           {
             triples: [
               {
-                object: dataFactory.variable(
+                object: dataFactory.variable!(
                   `${variablePrefix}SemanticRelation`,
                 ),
                 predicate: dataFactory.namedNode(
@@ -3957,7 +4049,7 @@ export namespace Concept {
           {
             patterns: [
               ...ConceptStub.sparqlWherePatterns({
-                subject: dataFactory.variable(
+                subject: dataFactory.variable!(
                   `${variablePrefix}SemanticRelation`,
                 ),
                 variablePrefix: `${variablePrefix}SemanticRelation`,
@@ -3973,7 +4065,7 @@ export namespace Concept {
           {
             triples: [
               {
-                object: dataFactory.variable(`${variablePrefix}TopConceptOf`),
+                object: dataFactory.variable!(`${variablePrefix}TopConceptOf`),
                 predicate: dataFactory.namedNode(
                   "http://www.w3.org/2004/02/skos/core#topConceptOf",
                 ),
@@ -3985,7 +4077,7 @@ export namespace Concept {
           {
             patterns: [
               ...ConceptSchemeStub.sparqlWherePatterns({
-                subject: dataFactory.variable(`${variablePrefix}TopConceptOf`),
+                subject: dataFactory.variable!(`${variablePrefix}TopConceptOf`),
                 variablePrefix: `${variablePrefix}TopConceptOf`,
               }),
             ],
@@ -4109,26 +4201,41 @@ export namespace Label {
 
   export function sparqlConstructQuery(
     parameters?: {
+      ignoreRdfType?: boolean;
       prefixes?: { [prefix: string]: string };
-      subject: rdfjs.Variable;
+      subject?: sparqljs.Triple["subject"];
+      variablePrefix?: string;
     } & Omit<
       sparqljs.ConstructQuery,
       "prefixes" | "queryType" | "template" | "type" | "where"
     >,
   ): sparqljs.ConstructQuery {
-    const subject = parameters?.subject ?? dataFactory.variable("label");
+    const { ignoreRdfType, subject, variablePrefix, ...queryParameters } =
+      parameters ?? {};
+
     return {
-      ...parameters,
+      ...queryParameters,
       prefixes: parameters?.prefixes ?? {},
       queryType: "CONSTRUCT",
-      template: Label.sparqlConstructTemplateTriples({ subject }).concat(),
+      template: Label.sparqlConstructTemplateTriples({
+        ignoreRdfType,
+        subject,
+      }).concat(),
       type: "query",
-      where: Label.sparqlWherePatterns({ subject }).concat(),
+      where: Label.sparqlWherePatterns({
+        ignoreRdfType,
+        subject,
+        variablePrefix,
+      }).concat(),
     };
   }
 
   export function sparqlConstructQueryString(
-    parameters?: { subject: rdfjs.Variable } & Omit<
+    parameters?: {
+      ignoreRdfType?: boolean;
+      subject?: sparqljs.Triple["subject"];
+      variablePrefix?: string;
+    } & Omit<
       sparqljs.ConstructQuery,
       "prefixes" | "queryType" | "template" | "type" | "where"
     > &
@@ -4139,18 +4246,17 @@ export namespace Label {
     );
   }
 
-  export function sparqlConstructTemplateTriples({
-    ignoreRdfType,
-    subject,
-    variablePrefix: variablePrefixParameter,
-  }: {
+  export function sparqlConstructTemplateTriples(parameters?: {
     ignoreRdfType?: boolean;
-    subject: rdfjs.Variable;
+    subject?: sparqljs.Triple["subject"];
     variablePrefix?: string;
   }): readonly sparqljs.Triple[] {
-    const variablePrefix = variablePrefixParameter ?? subject.value;
+    const subject = parameters?.subject ?? dataFactory.variable!("label");
+    const variablePrefix =
+      parameters?.variablePrefix ??
+      (subject.termType === "Variable" ? subject.value : "label");
     return [
-      ...(ignoreRdfType
+      ...(parameters?.ignoreRdfType
         ? []
         : [
             {
@@ -4158,11 +4264,11 @@ export namespace Label {
               predicate: dataFactory.namedNode(
                 "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
               ),
-              object: dataFactory.variable(`${variablePrefix}RdfType`),
+              object: dataFactory.variable!(`${variablePrefix}RdfType`),
             },
           ]),
       {
-        object: dataFactory.variable(`${variablePrefix}LiteralForm`),
+        object: dataFactory.variable!(`${variablePrefix}LiteralForm`),
         predicate: dataFactory.namedNode(
           "http://www.w3.org/2008/05/skos-xl#literalForm",
         ),
@@ -4171,18 +4277,17 @@ export namespace Label {
     ];
   }
 
-  export function sparqlWherePatterns({
-    ignoreRdfType,
-    subject,
-    variablePrefix: variablePrefixParameter,
-  }: {
+  export function sparqlWherePatterns(parameters: {
     ignoreRdfType?: boolean;
-    subject: rdfjs.Variable;
+    subject?: sparqljs.Triple["subject"];
     variablePrefix?: string;
   }): readonly sparqljs.Pattern[] {
-    const variablePrefix = variablePrefixParameter ?? subject.value;
+    const subject = parameters?.subject ?? dataFactory.variable!("label");
+    const variablePrefix =
+      parameters?.variablePrefix ??
+      (subject.termType === "Variable" ? subject.value : "label");
     return [
-      ...(ignoreRdfType
+      ...(parameters?.ignoreRdfType
         ? []
         : [
             {
@@ -4201,7 +4306,7 @@ export namespace Label {
                   predicate: dataFactory.namedNode(
                     "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
                   ),
-                  object: dataFactory.variable(`${variablePrefix}RdfType`),
+                  object: dataFactory.variable!(`${variablePrefix}RdfType`),
                 },
               ],
               type: "bgp" as const,
@@ -4210,7 +4315,7 @@ export namespace Label {
       {
         triples: [
           {
-            object: dataFactory.variable(`${variablePrefix}LiteralForm`),
+            object: dataFactory.variable!(`${variablePrefix}LiteralForm`),
             predicate: dataFactory.namedNode(
               "http://www.w3.org/2008/05/skos-xl#literalForm",
             ),

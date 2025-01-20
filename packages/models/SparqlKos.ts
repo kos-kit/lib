@@ -1,6 +1,6 @@
 import { SparqlQueryClient } from "@kos-kit/sparql-client";
 import { DataFactory, DatasetCoreFactory, Variable } from "@rdfjs/types";
-import { skos } from "@tpluscode/rdf-ns-builders";
+import { dcterms, rdf, rdfs, skos, skosxl } from "@tpluscode/rdf-ns-builders";
 import { Either } from "purify-ts";
 import { Resource } from "rdfjs-resource";
 import sparqljs from "sparqljs";
@@ -21,6 +21,14 @@ import {
 } from "./index.js";
 import { sparqlRdfTypePattern } from "./sparqlRdfTypePattern.js";
 
+const prefixes = {
+  dct: dcterms[""].value,
+  rdf: rdf[""].value,
+  rdfs: rdfs[""].value,
+  skos: skos[""].value,
+  "skos-xl": skosxl[""].value,
+};
+
 export class SparqlKos<
   ConceptT extends Concept = Concept,
   ConceptSchemeT extends ConceptScheme = ConceptScheme,
@@ -39,6 +47,7 @@ export class SparqlKos<
     ConceptSchemeStubT,
     ConceptStubT
   >;
+  private readonly modelVariable: Variable;
   private readonly sparqlGenerator: sparqljs.SparqlGenerator;
   private readonly sparqlQueryClient: SparqlQueryClient;
 
@@ -66,6 +75,7 @@ export class SparqlKos<
     this.datasetCoreFactory = datasetCoreFactory;
     this.languageIn = languageIn;
     this.modelFactories = modelFactories;
+    this.modelVariable = dataFactory.variable!("model");
     this.sparqlGenerator = new sparqljs.Generator();
     this.sparqlQueryClient = sparqlQueryClient;
   }
@@ -75,7 +85,6 @@ export class SparqlKos<
       await this.modelsByIdentifiers({
         identifiers: [identifier],
         modelFactory: this.modelFactories.concept,
-        subject: this.conceptVariable,
       })
     )[0];
   }
@@ -96,7 +105,7 @@ export class SparqlKos<
           limit: limit ?? undefined,
           offset,
           order: [{ expression: this.conceptVariable }],
-          prefixes: {},
+          prefixes,
           queryType: "SELECT",
           type: "query",
           variables: [this.conceptVariable],
@@ -114,7 +123,6 @@ export class SparqlKos<
       await this.modelsByIdentifiers({
         identifiers: [identifier],
         modelFactory: this.modelFactories.conceptScheme,
-        subject: this.conceptSchemeVariable,
       })
     )[0];
   }
@@ -135,7 +143,7 @@ export class SparqlKos<
           limit: limit ?? undefined,
           offset,
           order: [{ expression: this.conceptSchemeVariable }],
-          prefixes: {},
+          prefixes,
           queryType: "SELECT",
           type: "query",
           variables: [this.conceptSchemeVariable],
@@ -153,7 +161,6 @@ export class SparqlKos<
       await this.modelsByIdentifiers({
         identifiers: [identifier],
         modelFactory: this.modelFactories.conceptSchemeStub,
-        subject: this.conceptSchemeVariable,
       })
     )[0];
   }
@@ -167,7 +174,6 @@ export class SparqlKos<
     const modelEithers = await this.modelsByIdentifiers({
       identifiers: identifiers,
       modelFactory: this.modelFactories.conceptSchemeStub,
-      subject: this.conceptSchemeVariable,
     });
     if (modelEithers.length !== identifiers.length) {
       throw new Error("should never happen");
@@ -188,7 +194,7 @@ export class SparqlKos<
       await this.sparqlQueryClient.queryBindings(
         this.sparqlGenerator.stringify({
           distinct: true,
-          prefixes: {},
+          prefixes,
           queryType: "SELECT",
           type: "query",
           variables: [
@@ -216,7 +222,6 @@ export class SparqlKos<
       await this.modelsByIdentifiers({
         identifiers: [identifier],
         modelFactory: this.modelFactories.conceptStub,
-        subject: this.conceptVariable,
       })
     )[0];
   }
@@ -230,7 +235,6 @@ export class SparqlKos<
     const modelEithers = await this.modelsByIdentifiers({
       identifiers: identifiers,
       modelFactory: this.modelFactories.conceptStub,
-      subject: this.conceptVariable,
     });
     if (modelEithers.length !== identifiers.length) {
       throw new Error("should never happen");
@@ -249,7 +253,7 @@ export class SparqlKos<
       await this.sparqlQueryClient.queryBindings(
         this.sparqlGenerator.stringify({
           distinct: true,
-          prefixes: {},
+          prefixes,
           queryType: "SELECT",
           type: "query",
           variables: [
@@ -452,23 +456,26 @@ export class SparqlKos<
   private async modelsByIdentifiers<ModelT>({
     identifiers,
     modelFactory,
-    subject,
   }: {
     identifiers: readonly Identifier[];
     modelFactory: ModelFactory<ModelT>;
-    subject: Variable;
   }): Promise<readonly Either<Resource.ValueError, ModelT>[]> {
     if (identifiers.length === 0) {
       return [];
     }
 
     const constructQueryString = modelFactory.sparqlConstructQueryString({
-      subject,
-      values: identifiers.map((identifier) => {
-        const valuePatternRow: sparqljs.ValuePatternRow = {};
-        valuePatternRow[`?${subject.value}`] = identifier;
-        return valuePatternRow;
-      }),
+      prefixes,
+      subject: identifiers.length === 1 ? identifiers[0] : this.modelVariable,
+      values:
+        identifiers.length > 1
+          ?
+            identifiers.map((identifier) => {
+              const valuePatternRow: sparqljs.ValuePatternRow = {};
+              valuePatternRow[`?${this.modelVariable.value}`] = identifier;
+              return valuePatternRow;
+            })
+          : undefined,
     });
 
     const quads = await this.sparqlQueryClient.queryQuads(constructQueryString);
@@ -478,6 +485,7 @@ export class SparqlKos<
 
     return identifiers.map((identifier) =>
       modelFactory.fromRdf({
+        ignoreRdfType: true,
         languageIn: this.languageIn,
         resource: new Resource({
           dataset: this.datasetCoreFactory.dataset(quads.concat()),
