@@ -35,20 +35,17 @@
     "watch:models": "npm run watch -w @kos-kit/models",
     "watch:next-utils": "npm run watch -w @kos-kit/next-utils",
     "watch:search": "npm run watch -w @kos-kit/search",
-    "watch:sparql-builder": "npm run watch -w @kos-kit/sparql-builder",
     "watch:sparql-client": "npm run watch -w @kos-kit/sparql-client",
     "watch:noEmit": "run-p watch:noEmit:*",
     "watch:noEmit:models": "npm run watch:noEmit -w @kos-kit/models",
     "watch:noEmit:next-utils": "npm run watch:noEmit -w @kos-kit/next-utils",
     "watch:noEmit:search": "npm run watch:noEmit -w @kos-kit/search",
-    "watch:noEmit:sparql-builder": "npm run watch:noEmit -w @kos-kit/sparql-builder",
     "watch:noEmit:sparql-client": "npm run watch:noEmit -w @kos-kit/sparql-client"
   },
   "workspaces": [
     "packages/models",
     "packages/next-utils",
     "packages/search",
-    "packages/sparql-builder",
     "packages/sparql-client"
   ]
 }

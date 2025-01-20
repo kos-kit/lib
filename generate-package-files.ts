@@ -4,12 +4,7 @@ import { stringify as stringifyYaml } from "yaml";
 
 const VERSION = "2.0.109";
 
-type PackageName =
-  | "models"
-  | "next-utils"
-  | "search"
-  | "sparql-builder"
-  | "sparql-client";
+type PackageName = "models" | "next-utils" | "search" | "sparql-client";
 
 interface Package {
   devDependencies?: Record<string, string>;
@@ -49,7 +44,7 @@ const packages: readonly Package[] = [
       "purify-ts-helpers": externalDependencyVersions["purify-ts-helpers"],
       sparqljs: "3.7.3",
     },
-    internalDependencies: ["sparql-builder", "sparql-client"],
+    internalDependencies: ["sparql-client"],
     name: "models",
   },
   {
@@ -80,18 +75,6 @@ const packages: readonly Package[] = [
     },
     internalDependencies: ["models"],
     name: "search",
-  },
-  {
-    devDependencies: {
-      "@kos-kit/sparql-client": VERSION,
-      oxigraph: externalDependencyVersions["oxigraph"],
-    },
-    externalDependencies: {
-      "@rdfjs/types": externalDependencyVersions["@rdfjs/types"],
-      "@tpluscode/rdf-ns-builders":
-        externalDependencyVersions["@tpluscode/rdf-ns-builders"],
-    },
-    name: "sparql-builder",
   },
   {
     devDependencies: {
