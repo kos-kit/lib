@@ -25,7 +25,7 @@ const externalDependencyVersions = {
   "@tpluscode/rdf-ns-builders": "^4.3.0",
   "@types/n3": "^1.21.1",
   "@types/rdfjs__term-set": "^2.0.9",
-  oxigraph: "^0.4.0",
+  oxigraph: "0.4.7",
   n3: "^1.21.3",
   pino: "^9.1.0",
   "purify-ts": "~2.1.0",
