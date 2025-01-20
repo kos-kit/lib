@@ -17,9 +17,6 @@ export interface ModelFactory<T> {
       prefixes?: { [prefix: string]: string };
       subject?: sparqljs.Triple["subject"];
       variablePrefix?: string;
-    } & Omit<
-      sparqljs.ConstructQuery,
-      "prefixes" | "queryType" | "template" | "type" | "where"
-    >,
+    } & Omit<sparqljs.ConstructQuery, "prefixes" | "queryType" | "type">,
   ) => string;
 }

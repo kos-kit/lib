@@ -466,22 +466,23 @@ export class SparqlKos<
 
     const constructQueryString = modelFactory.sparqlConstructQueryString({
       prefixes,
-      subject: identifiers.length === 1 ? identifiers[0] : this.modelVariable,
-      values:
-        identifiers.length > 1
-          ?
-            identifiers.map((identifier) => {
-              const valuePatternRow: sparqljs.ValuePatternRow = {};
-              valuePatternRow[`?${this.modelVariable.value}`] = identifier;
-              return valuePatternRow;
-            })
-          : undefined,
+      subject: this.modelVariable,
+      where: [
+        {
+          values: identifiers.map((identifier) => {
+            const valuePatternRow: sparqljs.ValuePatternRow = {};
+            valuePatternRow[`?${this.modelVariable.value}`] = identifier;
+            return valuePatternRow;
+          }),
+          type: "values",
+        },
+      ],
     });
 
     const quads = await this.sparqlQueryClient.queryQuads(constructQueryString);
 
-    // const quadsString = quads.map((quad) => quad.toString()).join("\n");
-    // console.log(quadsString);
+    const quadsString = quads.map((quad) => quad.toString()).join("\n");
+    console.log(quadsString);
 
     return identifiers.map((identifier) =>
       modelFactory.fromRdf({

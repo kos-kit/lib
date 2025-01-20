@@ -25,30 +25,6 @@ kos-kit:KosResource
         sh:path skos:scopeNote ;
         sh:xone dash:StringOrLangString
     ], [
-        sh:name "historyNote" ;
-        sh:path skos:historyNote ;
-        sh:xone dash:StringOrLangString
-    ], [
-        sh:name "altLabel" ;
-        sh:path skos:altLabel ;
-        sh:xone dash:StringOrLangString
-    ], [
-        sh:datatype rdf:langString ;
-        sh:name "notation" ;
-        sh:path skos:notation
-    ], [
-        sh:name "note" ;
-        sh:path skos:notation ;
-        sh:xone dash:StringOrLangString
-    ], [
-        sh:name "prefLabel" ;
-        sh:path skos:prefLabel ;
-        sh:xone dash:StringOrLangString
-    ], [
-        sh:name "prefLabelXl" ;
-        sh:node skos-xl:Label ;
-        sh:path skos-xl:prefLabel
-    ], [
         sh:name "altLabelXl" ;
         sh:node skos-xl:Label ;
         sh:path skos-xl:altLabel
@@ -81,6 +57,30 @@ kos-kit:KosResource
         sh:name "hiddenLabelXl" ;
         sh:node skos-xl:Label ;
         sh:path skos-xl:hiddenLabel
+    ], [
+        sh:name "historyNote" ;
+        sh:path skos:historyNote ;
+        sh:xone dash:StringOrLangString
+    ], [
+        sh:name "altLabel" ;
+        sh:path skos:altLabel ;
+        sh:xone dash:StringOrLangString
+    ], [
+        sh:datatype rdf:langString ;
+        sh:name "notation" ;
+        sh:path skos:notation
+    ], [
+        sh:name "note" ;
+        sh:path skos:notation ;
+        sh:xone dash:StringOrLangString
+    ], [
+        sh:name "prefLabel" ;
+        sh:path skos:prefLabel ;
+        sh:xone dash:StringOrLangString
+    ], [
+        sh:name "prefLabelXl" ;
+        sh:node skos-xl:Label ;
+        sh:path skos-xl:prefLabel
     ] .
 
 <http://www.w3.org/2004/02/skos/core#>

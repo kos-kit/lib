@@ -212,6 +212,11 @@ export namespace LabelStub {
                     "http://www.w3.org/2008/05/skos-xl#Label",
                   ),
                 },
+              ],
+              type: "bgp" as const,
+            },
+            {
+              triples: [
                 {
                   subject,
                   predicate: dataFactory.namedNode(
@@ -436,6 +441,7 @@ export namespace KosResourceStub {
         subject,
       },
       ...LabelStub.sparqlConstructTemplateTriples({
+        ignoreRdfType: true,
         subject: dataFactory.variable!(`${variablePrefix}PrefLabelXl`),
         variablePrefix: `${variablePrefix}PrefLabelXl`,
       }),
@@ -484,15 +490,11 @@ export namespace KosResourceStub {
             ],
             type: "bgp",
           },
-          {
-            patterns: [
-              ...LabelStub.sparqlWherePatterns({
-                subject: dataFactory.variable!(`${variablePrefix}PrefLabelXl`),
-                variablePrefix: `${variablePrefix}PrefLabelXl`,
-              }),
-            ],
-            type: "optional",
-          },
+          ...LabelStub.sparqlWherePatterns({
+            ignoreRdfType: true,
+            subject: dataFactory.variable!(`${variablePrefix}PrefLabelXl`),
+            variablePrefix: `${variablePrefix}PrefLabelXl`,
+          }),
         ],
         type: "optional",
       },
@@ -1341,6 +1343,7 @@ export namespace KosResource {
         subject,
       },
       ...Label.sparqlConstructTemplateTriples({
+        ignoreRdfType: true,
         subject: dataFactory.variable!(`${variablePrefix}AltLabelXl`),
         variablePrefix: `${variablePrefix}AltLabelXl`,
       }),
@@ -1387,6 +1390,7 @@ export namespace KosResource {
         subject,
       },
       ...Label.sparqlConstructTemplateTriples({
+        ignoreRdfType: true,
         subject: dataFactory.variable!(`${variablePrefix}HiddenLabelXl`),
         variablePrefix: `${variablePrefix}HiddenLabelXl`,
       }),
@@ -1431,6 +1435,7 @@ export namespace KosResource {
         subject,
       },
       ...Label.sparqlConstructTemplateTriples({
+        ignoreRdfType: true,
         subject: dataFactory.variable!(`${variablePrefix}PrefLabelXl`),
         variablePrefix: `${variablePrefix}PrefLabelXl`,
       }),
@@ -1485,15 +1490,11 @@ export namespace KosResource {
             ],
             type: "bgp",
           },
-          {
-            patterns: [
-              ...Label.sparqlWherePatterns({
-                subject: dataFactory.variable!(`${variablePrefix}AltLabelXl`),
-                variablePrefix: `${variablePrefix}AltLabelXl`,
-              }),
-            ],
-            type: "optional",
-          },
+          ...Label.sparqlWherePatterns({
+            ignoreRdfType: true,
+            subject: dataFactory.variable!(`${variablePrefix}AltLabelXl`),
+            variablePrefix: `${variablePrefix}AltLabelXl`,
+          }),
         ],
         type: "optional",
       },
@@ -1596,17 +1597,11 @@ export namespace KosResource {
             ],
             type: "bgp",
           },
-          {
-            patterns: [
-              ...Label.sparqlWherePatterns({
-                subject: dataFactory.variable!(
-                  `${variablePrefix}HiddenLabelXl`,
-                ),
-                variablePrefix: `${variablePrefix}HiddenLabelXl`,
-              }),
-            ],
-            type: "optional",
-          },
+          ...Label.sparqlWherePatterns({
+            ignoreRdfType: true,
+            subject: dataFactory.variable!(`${variablePrefix}HiddenLabelXl`),
+            variablePrefix: `${variablePrefix}HiddenLabelXl`,
+          }),
         ],
         type: "optional",
       },
@@ -1709,15 +1704,11 @@ export namespace KosResource {
             ],
             type: "bgp",
           },
-          {
-            patterns: [
-              ...Label.sparqlWherePatterns({
-                subject: dataFactory.variable!(`${variablePrefix}PrefLabelXl`),
-                variablePrefix: `${variablePrefix}PrefLabelXl`,
-              }),
-            ],
-            type: "optional",
-          },
+          ...Label.sparqlWherePatterns({
+            ignoreRdfType: true,
+            subject: dataFactory.variable!(`${variablePrefix}PrefLabelXl`),
+            variablePrefix: `${variablePrefix}PrefLabelXl`,
+          }),
         ],
         type: "optional",
       },
@@ -2151,6 +2142,7 @@ export namespace ConceptScheme {
         subject,
       },
       ...ConceptStub.sparqlConstructTemplateTriples({
+        ignoreRdfType: true,
         subject: dataFactory.variable!(`${variablePrefix}HasTopConcept`),
         variablePrefix: `${variablePrefix}HasTopConcept`,
       }),
@@ -2204,6 +2196,11 @@ export namespace ConceptScheme {
                     "http://www.w3.org/2004/02/skos/core#ConceptScheme",
                   ),
                 },
+              ],
+              type: "bgp" as const,
+            },
+            {
+              triples: [
                 {
                   subject,
                   predicate: dataFactory.namedNode(
@@ -2229,17 +2226,11 @@ export namespace ConceptScheme {
             ],
             type: "bgp",
           },
-          {
-            patterns: [
-              ...ConceptStub.sparqlWherePatterns({
-                subject: dataFactory.variable!(
-                  `${variablePrefix}HasTopConcept`,
-                ),
-                variablePrefix: `${variablePrefix}HasTopConcept`,
-              }),
-            ],
-            type: "optional",
-          },
+          ...ConceptStub.sparqlWherePatterns({
+            ignoreRdfType: true,
+            subject: dataFactory.variable!(`${variablePrefix}HasTopConcept`),
+            variablePrefix: `${variablePrefix}HasTopConcept`,
+          }),
         ],
         type: "optional",
       },
@@ -2479,6 +2470,11 @@ export namespace ConceptSchemeStub {
                     "http://www.w3.org/2004/02/skos/core#ConceptScheme",
                   ),
                 },
+              ],
+              type: "bgp" as const,
+            },
+            {
+              triples: [
                 {
                   subject,
                   predicate: dataFactory.namedNode(
@@ -2668,6 +2664,11 @@ export namespace ConceptStub {
                     "http://www.w3.org/2004/02/skos/core#Concept",
                   ),
                 },
+              ],
+              type: "bgp" as const,
+            },
+            {
+              triples: [
                 {
                   subject,
                   predicate: dataFactory.namedNode(
@@ -3487,6 +3488,7 @@ export namespace Concept {
         subject,
       },
       ...ConceptStub.sparqlConstructTemplateTriples({
+        ignoreRdfType: true,
         subject: dataFactory.variable!(`${variablePrefix}Broader`),
         variablePrefix: `${variablePrefix}Broader`,
       }),
@@ -3498,6 +3500,7 @@ export namespace Concept {
         subject,
       },
       ...ConceptStub.sparqlConstructTemplateTriples({
+        ignoreRdfType: true,
         subject: dataFactory.variable!(`${variablePrefix}BroaderTransitive`),
         variablePrefix: `${variablePrefix}BroaderTransitive`,
       }),
@@ -3509,6 +3512,7 @@ export namespace Concept {
         subject,
       },
       ...ConceptStub.sparqlConstructTemplateTriples({
+        ignoreRdfType: true,
         subject: dataFactory.variable!(`${variablePrefix}BroadMatch`),
         variablePrefix: `${variablePrefix}BroadMatch`,
       }),
@@ -3520,6 +3524,7 @@ export namespace Concept {
         subject,
       },
       ...ConceptStub.sparqlConstructTemplateTriples({
+        ignoreRdfType: true,
         subject: dataFactory.variable!(`${variablePrefix}CloseMatch`),
         variablePrefix: `${variablePrefix}CloseMatch`,
       }),
@@ -3531,6 +3536,7 @@ export namespace Concept {
         subject,
       },
       ...ConceptStub.sparqlConstructTemplateTriples({
+        ignoreRdfType: true,
         subject: dataFactory.variable!(`${variablePrefix}ExactMatch`),
         variablePrefix: `${variablePrefix}ExactMatch`,
       }),
@@ -3542,6 +3548,7 @@ export namespace Concept {
         subject,
       },
       ...ConceptSchemeStub.sparqlConstructTemplateTriples({
+        ignoreRdfType: true,
         subject: dataFactory.variable!(`${variablePrefix}InScheme`),
         variablePrefix: `${variablePrefix}InScheme`,
       }),
@@ -3553,6 +3560,7 @@ export namespace Concept {
         subject,
       },
       ...ConceptStub.sparqlConstructTemplateTriples({
+        ignoreRdfType: true,
         subject: dataFactory.variable!(`${variablePrefix}MappingRelation`),
         variablePrefix: `${variablePrefix}MappingRelation`,
       }),
@@ -3564,6 +3572,7 @@ export namespace Concept {
         subject,
       },
       ...ConceptStub.sparqlConstructTemplateTriples({
+        ignoreRdfType: true,
         subject: dataFactory.variable!(`${variablePrefix}Narrower`),
         variablePrefix: `${variablePrefix}Narrower`,
       }),
@@ -3575,6 +3584,7 @@ export namespace Concept {
         subject,
       },
       ...ConceptStub.sparqlConstructTemplateTriples({
+        ignoreRdfType: true,
         subject: dataFactory.variable!(`${variablePrefix}NarrowerTransitive`),
         variablePrefix: `${variablePrefix}NarrowerTransitive`,
       }),
@@ -3586,6 +3596,7 @@ export namespace Concept {
         subject,
       },
       ...ConceptStub.sparqlConstructTemplateTriples({
+        ignoreRdfType: true,
         subject: dataFactory.variable!(`${variablePrefix}NarrowMatch`),
         variablePrefix: `${variablePrefix}NarrowMatch`,
       }),
@@ -3597,6 +3608,7 @@ export namespace Concept {
         subject,
       },
       ...ConceptStub.sparqlConstructTemplateTriples({
+        ignoreRdfType: true,
         subject: dataFactory.variable!(`${variablePrefix}Related`),
         variablePrefix: `${variablePrefix}Related`,
       }),
@@ -3608,6 +3620,7 @@ export namespace Concept {
         subject,
       },
       ...ConceptStub.sparqlConstructTemplateTriples({
+        ignoreRdfType: true,
         subject: dataFactory.variable!(`${variablePrefix}RelatedMatch`),
         variablePrefix: `${variablePrefix}RelatedMatch`,
       }),
@@ -3619,6 +3632,7 @@ export namespace Concept {
         subject,
       },
       ...ConceptStub.sparqlConstructTemplateTriples({
+        ignoreRdfType: true,
         subject: dataFactory.variable!(`${variablePrefix}SemanticRelation`),
         variablePrefix: `${variablePrefix}SemanticRelation`,
       }),
@@ -3630,6 +3644,7 @@ export namespace Concept {
         subject,
       },
       ...ConceptSchemeStub.sparqlConstructTemplateTriples({
+        ignoreRdfType: true,
         subject: dataFactory.variable!(`${variablePrefix}TopConceptOf`),
         variablePrefix: `${variablePrefix}TopConceptOf`,
       }),
@@ -3665,6 +3680,11 @@ export namespace Concept {
                     "http://www.w3.org/2004/02/skos/core#Concept",
                   ),
                 },
+              ],
+              type: "bgp" as const,
+            },
+            {
+              triples: [
                 {
                   subject,
                   predicate: dataFactory.namedNode(
@@ -3690,15 +3710,11 @@ export namespace Concept {
             ],
             type: "bgp",
           },
-          {
-            patterns: [
-              ...ConceptStub.sparqlWherePatterns({
-                subject: dataFactory.variable!(`${variablePrefix}Broader`),
-                variablePrefix: `${variablePrefix}Broader`,
-              }),
-            ],
-            type: "optional",
-          },
+          ...ConceptStub.sparqlWherePatterns({
+            ignoreRdfType: true,
+            subject: dataFactory.variable!(`${variablePrefix}Broader`),
+            variablePrefix: `${variablePrefix}Broader`,
+          }),
         ],
         type: "optional",
       },
@@ -3718,17 +3734,13 @@ export namespace Concept {
             ],
             type: "bgp",
           },
-          {
-            patterns: [
-              ...ConceptStub.sparqlWherePatterns({
-                subject: dataFactory.variable!(
-                  `${variablePrefix}BroaderTransitive`,
-                ),
-                variablePrefix: `${variablePrefix}BroaderTransitive`,
-              }),
-            ],
-            type: "optional",
-          },
+          ...ConceptStub.sparqlWherePatterns({
+            ignoreRdfType: true,
+            subject: dataFactory.variable!(
+              `${variablePrefix}BroaderTransitive`,
+            ),
+            variablePrefix: `${variablePrefix}BroaderTransitive`,
+          }),
         ],
         type: "optional",
       },
@@ -3746,15 +3758,11 @@ export namespace Concept {
             ],
             type: "bgp",
           },
-          {
-            patterns: [
-              ...ConceptStub.sparqlWherePatterns({
-                subject: dataFactory.variable!(`${variablePrefix}BroadMatch`),
-                variablePrefix: `${variablePrefix}BroadMatch`,
-              }),
-            ],
-            type: "optional",
-          },
+          ...ConceptStub.sparqlWherePatterns({
+            ignoreRdfType: true,
+            subject: dataFactory.variable!(`${variablePrefix}BroadMatch`),
+            variablePrefix: `${variablePrefix}BroadMatch`,
+          }),
         ],
         type: "optional",
       },
@@ -3772,15 +3780,11 @@ export namespace Concept {
             ],
             type: "bgp",
           },
-          {
-            patterns: [
-              ...ConceptStub.sparqlWherePatterns({
-                subject: dataFactory.variable!(`${variablePrefix}CloseMatch`),
-                variablePrefix: `${variablePrefix}CloseMatch`,
-              }),
-            ],
-            type: "optional",
-          },
+          ...ConceptStub.sparqlWherePatterns({
+            ignoreRdfType: true,
+            subject: dataFactory.variable!(`${variablePrefix}CloseMatch`),
+            variablePrefix: `${variablePrefix}CloseMatch`,
+          }),
         ],
         type: "optional",
       },
@@ -3798,15 +3802,11 @@ export namespace Concept {
             ],
             type: "bgp",
           },
-          {
-            patterns: [
-              ...ConceptStub.sparqlWherePatterns({
-                subject: dataFactory.variable!(`${variablePrefix}ExactMatch`),
-                variablePrefix: `${variablePrefix}ExactMatch`,
-              }),
-            ],
-            type: "optional",
-          },
+          ...ConceptStub.sparqlWherePatterns({
+            ignoreRdfType: true,
+            subject: dataFactory.variable!(`${variablePrefix}ExactMatch`),
+            variablePrefix: `${variablePrefix}ExactMatch`,
+          }),
         ],
         type: "optional",
       },
@@ -3824,15 +3824,11 @@ export namespace Concept {
             ],
             type: "bgp",
           },
-          {
-            patterns: [
-              ...ConceptSchemeStub.sparqlWherePatterns({
-                subject: dataFactory.variable!(`${variablePrefix}InScheme`),
-                variablePrefix: `${variablePrefix}InScheme`,
-              }),
-            ],
-            type: "optional",
-          },
+          ...ConceptSchemeStub.sparqlWherePatterns({
+            ignoreRdfType: true,
+            subject: dataFactory.variable!(`${variablePrefix}InScheme`),
+            variablePrefix: `${variablePrefix}InScheme`,
+          }),
         ],
         type: "optional",
       },
@@ -3852,17 +3848,11 @@ export namespace Concept {
             ],
             type: "bgp",
           },
-          {
-            patterns: [
-              ...ConceptStub.sparqlWherePatterns({
-                subject: dataFactory.variable!(
-                  `${variablePrefix}MappingRelation`,
-                ),
-                variablePrefix: `${variablePrefix}MappingRelation`,
-              }),
-            ],
-            type: "optional",
-          },
+          ...ConceptStub.sparqlWherePatterns({
+            ignoreRdfType: true,
+            subject: dataFactory.variable!(`${variablePrefix}MappingRelation`),
+            variablePrefix: `${variablePrefix}MappingRelation`,
+          }),
         ],
         type: "optional",
       },
@@ -3880,15 +3870,11 @@ export namespace Concept {
             ],
             type: "bgp",
           },
-          {
-            patterns: [
-              ...ConceptStub.sparqlWherePatterns({
-                subject: dataFactory.variable!(`${variablePrefix}Narrower`),
-                variablePrefix: `${variablePrefix}Narrower`,
-              }),
-            ],
-            type: "optional",
-          },
+          ...ConceptStub.sparqlWherePatterns({
+            ignoreRdfType: true,
+            subject: dataFactory.variable!(`${variablePrefix}Narrower`),
+            variablePrefix: `${variablePrefix}Narrower`,
+          }),
         ],
         type: "optional",
       },
@@ -3908,17 +3894,13 @@ export namespace Concept {
             ],
             type: "bgp",
           },
-          {
-            patterns: [
-              ...ConceptStub.sparqlWherePatterns({
-                subject: dataFactory.variable!(
-                  `${variablePrefix}NarrowerTransitive`,
-                ),
-                variablePrefix: `${variablePrefix}NarrowerTransitive`,
-              }),
-            ],
-            type: "optional",
-          },
+          ...ConceptStub.sparqlWherePatterns({
+            ignoreRdfType: true,
+            subject: dataFactory.variable!(
+              `${variablePrefix}NarrowerTransitive`,
+            ),
+            variablePrefix: `${variablePrefix}NarrowerTransitive`,
+          }),
         ],
         type: "optional",
       },
@@ -3936,15 +3918,11 @@ export namespace Concept {
             ],
             type: "bgp",
           },
-          {
-            patterns: [
-              ...ConceptStub.sparqlWherePatterns({
-                subject: dataFactory.variable!(`${variablePrefix}NarrowMatch`),
-                variablePrefix: `${variablePrefix}NarrowMatch`,
-              }),
-            ],
-            type: "optional",
-          },
+          ...ConceptStub.sparqlWherePatterns({
+            ignoreRdfType: true,
+            subject: dataFactory.variable!(`${variablePrefix}NarrowMatch`),
+            variablePrefix: `${variablePrefix}NarrowMatch`,
+          }),
         ],
         type: "optional",
       },
@@ -3962,15 +3940,11 @@ export namespace Concept {
             ],
             type: "bgp",
           },
-          {
-            patterns: [
-              ...ConceptStub.sparqlWherePatterns({
-                subject: dataFactory.variable!(`${variablePrefix}Related`),
-                variablePrefix: `${variablePrefix}Related`,
-              }),
-            ],
-            type: "optional",
-          },
+          ...ConceptStub.sparqlWherePatterns({
+            ignoreRdfType: true,
+            subject: dataFactory.variable!(`${variablePrefix}Related`),
+            variablePrefix: `${variablePrefix}Related`,
+          }),
         ],
         type: "optional",
       },
@@ -3988,15 +3962,11 @@ export namespace Concept {
             ],
             type: "bgp",
           },
-          {
-            patterns: [
-              ...ConceptStub.sparqlWherePatterns({
-                subject: dataFactory.variable!(`${variablePrefix}RelatedMatch`),
-                variablePrefix: `${variablePrefix}RelatedMatch`,
-              }),
-            ],
-            type: "optional",
-          },
+          ...ConceptStub.sparqlWherePatterns({
+            ignoreRdfType: true,
+            subject: dataFactory.variable!(`${variablePrefix}RelatedMatch`),
+            variablePrefix: `${variablePrefix}RelatedMatch`,
+          }),
         ],
         type: "optional",
       },
@@ -4016,17 +3986,11 @@ export namespace Concept {
             ],
             type: "bgp",
           },
-          {
-            patterns: [
-              ...ConceptStub.sparqlWherePatterns({
-                subject: dataFactory.variable!(
-                  `${variablePrefix}SemanticRelation`,
-                ),
-                variablePrefix: `${variablePrefix}SemanticRelation`,
-              }),
-            ],
-            type: "optional",
-          },
+          ...ConceptStub.sparqlWherePatterns({
+            ignoreRdfType: true,
+            subject: dataFactory.variable!(`${variablePrefix}SemanticRelation`),
+            variablePrefix: `${variablePrefix}SemanticRelation`,
+          }),
         ],
         type: "optional",
       },
@@ -4044,15 +4008,11 @@ export namespace Concept {
             ],
             type: "bgp",
           },
-          {
-            patterns: [
-              ...ConceptSchemeStub.sparqlWherePatterns({
-                subject: dataFactory.variable!(`${variablePrefix}TopConceptOf`),
-                variablePrefix: `${variablePrefix}TopConceptOf`,
-              }),
-            ],
-            type: "optional",
-          },
+          ...ConceptSchemeStub.sparqlWherePatterns({
+            ignoreRdfType: true,
+            subject: dataFactory.variable!(`${variablePrefix}TopConceptOf`),
+            variablePrefix: `${variablePrefix}TopConceptOf`,
+          }),
         ],
         type: "optional",
       },
@@ -4262,6 +4222,11 @@ export namespace Label {
                     "http://www.w3.org/2008/05/skos-xl#Label",
                   ),
                 },
+              ],
+              type: "bgp" as const,
+            },
+            {
+              triples: [
                 {
                   subject,
                   predicate: dataFactory.namedNode(
