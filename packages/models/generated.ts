@@ -121,10 +121,7 @@ export namespace LabelStub {
       prefixes?: { [prefix: string]: string };
       subject?: sparqljs.Triple["subject"];
       variablePrefix?: string;
-    } & Omit<
-      sparqljs.ConstructQuery,
-      "prefixes" | "queryType" | "template" | "type" | "where"
-    >,
+    } & Omit<sparqljs.ConstructQuery, "prefixes" | "queryType" | "type">,
   ): sparqljs.ConstructQuery {
     const { ignoreRdfType, subject, variablePrefix, ...queryParameters } =
       parameters ?? {};
@@ -133,16 +130,17 @@ export namespace LabelStub {
       ...queryParameters,
       prefixes: parameters?.prefixes ?? {},
       queryType: "CONSTRUCT",
-      template: LabelStub.sparqlConstructTemplateTriples({
-        ignoreRdfType,
-        subject,
-      }).concat(),
+      template: (queryParameters.template ?? []).concat(
+        LabelStub.sparqlConstructTemplateTriples({ ignoreRdfType, subject }),
+      ),
       type: "query",
-      where: LabelStub.sparqlWherePatterns({
-        ignoreRdfType,
-        subject,
-        variablePrefix,
-      }).concat(),
+      where: (queryParameters.where ?? []).concat(
+        LabelStub.sparqlWherePatterns({
+          ignoreRdfType,
+          subject,
+          variablePrefix,
+        }),
+      ),
     };
   }
 
@@ -151,10 +149,7 @@ export namespace LabelStub {
       ignoreRdfType?: boolean;
       subject?: sparqljs.Triple["subject"];
       variablePrefix?: string;
-    } & Omit<
-      sparqljs.ConstructQuery,
-      "prefixes" | "queryType" | "template" | "type" | "where"
-    > &
+    } & Omit<sparqljs.ConstructQuery, "prefixes" | "queryType" | "type"> &
       sparqljs.GeneratorOptions,
   ): string {
     return new sparqljs.Generator(parameters).stringify(
@@ -376,10 +371,7 @@ export namespace KosResourceStub {
       prefixes?: { [prefix: string]: string };
       subject?: sparqljs.Triple["subject"];
       variablePrefix?: string;
-    } & Omit<
-      sparqljs.ConstructQuery,
-      "prefixes" | "queryType" | "template" | "type" | "where"
-    >,
+    } & Omit<sparqljs.ConstructQuery, "prefixes" | "queryType" | "type">,
   ): sparqljs.ConstructQuery {
     const { ignoreRdfType, subject, variablePrefix, ...queryParameters } =
       parameters ?? {};
@@ -388,16 +380,20 @@ export namespace KosResourceStub {
       ...queryParameters,
       prefixes: parameters?.prefixes ?? {},
       queryType: "CONSTRUCT",
-      template: KosResourceStub.sparqlConstructTemplateTriples({
-        ignoreRdfType,
-        subject,
-      }).concat(),
+      template: (queryParameters.template ?? []).concat(
+        KosResourceStub.sparqlConstructTemplateTriples({
+          ignoreRdfType,
+          subject,
+        }),
+      ),
       type: "query",
-      where: KosResourceStub.sparqlWherePatterns({
-        ignoreRdfType,
-        subject,
-        variablePrefix,
-      }).concat(),
+      where: (queryParameters.where ?? []).concat(
+        KosResourceStub.sparqlWherePatterns({
+          ignoreRdfType,
+          subject,
+          variablePrefix,
+        }),
+      ),
     };
   }
 
@@ -406,10 +402,7 @@ export namespace KosResourceStub {
       ignoreRdfType?: boolean;
       subject?: sparqljs.Triple["subject"];
       variablePrefix?: string;
-    } & Omit<
-      sparqljs.ConstructQuery,
-      "prefixes" | "queryType" | "template" | "type" | "where"
-    > &
+    } & Omit<sparqljs.ConstructQuery, "prefixes" | "queryType" | "type"> &
       sparqljs.GeneratorOptions,
   ): string {
     return new sparqljs.Generator(parameters).stringify(
@@ -1287,10 +1280,7 @@ export namespace KosResource {
       prefixes?: { [prefix: string]: string };
       subject?: sparqljs.Triple["subject"];
       variablePrefix?: string;
-    } & Omit<
-      sparqljs.ConstructQuery,
-      "prefixes" | "queryType" | "template" | "type" | "where"
-    >,
+    } & Omit<sparqljs.ConstructQuery, "prefixes" | "queryType" | "type">,
   ): sparqljs.ConstructQuery {
     const { ignoreRdfType, subject, variablePrefix, ...queryParameters } =
       parameters ?? {};
@@ -1299,16 +1289,17 @@ export namespace KosResource {
       ...queryParameters,
       prefixes: parameters?.prefixes ?? {},
       queryType: "CONSTRUCT",
-      template: KosResource.sparqlConstructTemplateTriples({
-        ignoreRdfType,
-        subject,
-      }).concat(),
+      template: (queryParameters.template ?? []).concat(
+        KosResource.sparqlConstructTemplateTriples({ ignoreRdfType, subject }),
+      ),
       type: "query",
-      where: KosResource.sparqlWherePatterns({
-        ignoreRdfType,
-        subject,
-        variablePrefix,
-      }).concat(),
+      where: (queryParameters.where ?? []).concat(
+        KosResource.sparqlWherePatterns({
+          ignoreRdfType,
+          subject,
+          variablePrefix,
+        }),
+      ),
     };
   }
 
@@ -1317,10 +1308,7 @@ export namespace KosResource {
       ignoreRdfType?: boolean;
       subject?: sparqljs.Triple["subject"];
       variablePrefix?: string;
-    } & Omit<
-      sparqljs.ConstructQuery,
-      "prefixes" | "queryType" | "template" | "type" | "where"
-    > &
+    } & Omit<sparqljs.ConstructQuery, "prefixes" | "queryType" | "type"> &
       sparqljs.GeneratorOptions,
   ): string {
     return new sparqljs.Generator(parameters).stringify(
@@ -2089,10 +2077,7 @@ export namespace ConceptScheme {
       prefixes?: { [prefix: string]: string };
       subject?: sparqljs.Triple["subject"];
       variablePrefix?: string;
-    } & Omit<
-      sparqljs.ConstructQuery,
-      "prefixes" | "queryType" | "template" | "type" | "where"
-    >,
+    } & Omit<sparqljs.ConstructQuery, "prefixes" | "queryType" | "type">,
   ): sparqljs.ConstructQuery {
     const { ignoreRdfType, subject, variablePrefix, ...queryParameters } =
       parameters ?? {};
@@ -2101,16 +2086,20 @@ export namespace ConceptScheme {
       ...queryParameters,
       prefixes: parameters?.prefixes ?? {},
       queryType: "CONSTRUCT",
-      template: ConceptScheme.sparqlConstructTemplateTriples({
-        ignoreRdfType,
-        subject,
-      }).concat(),
+      template: (queryParameters.template ?? []).concat(
+        ConceptScheme.sparqlConstructTemplateTriples({
+          ignoreRdfType,
+          subject,
+        }),
+      ),
       type: "query",
-      where: ConceptScheme.sparqlWherePatterns({
-        ignoreRdfType,
-        subject,
-        variablePrefix,
-      }).concat(),
+      where: (queryParameters.where ?? []).concat(
+        ConceptScheme.sparqlWherePatterns({
+          ignoreRdfType,
+          subject,
+          variablePrefix,
+        }),
+      ),
     };
   }
 
@@ -2119,10 +2108,7 @@ export namespace ConceptScheme {
       ignoreRdfType?: boolean;
       subject?: sparqljs.Triple["subject"];
       variablePrefix?: string;
-    } & Omit<
-      sparqljs.ConstructQuery,
-      "prefixes" | "queryType" | "template" | "type" | "where"
-    > &
+    } & Omit<sparqljs.ConstructQuery, "prefixes" | "queryType" | "type"> &
       sparqljs.GeneratorOptions,
   ): string {
     return new sparqljs.Generator(parameters).stringify(
@@ -2394,10 +2380,7 @@ export namespace ConceptSchemeStub {
       prefixes?: { [prefix: string]: string };
       subject?: sparqljs.Triple["subject"];
       variablePrefix?: string;
-    } & Omit<
-      sparqljs.ConstructQuery,
-      "prefixes" | "queryType" | "template" | "type" | "where"
-    >,
+    } & Omit<sparqljs.ConstructQuery, "prefixes" | "queryType" | "type">,
   ): sparqljs.ConstructQuery {
     const { ignoreRdfType, subject, variablePrefix, ...queryParameters } =
       parameters ?? {};
@@ -2406,16 +2389,20 @@ export namespace ConceptSchemeStub {
       ...queryParameters,
       prefixes: parameters?.prefixes ?? {},
       queryType: "CONSTRUCT",
-      template: ConceptSchemeStub.sparqlConstructTemplateTriples({
-        ignoreRdfType,
-        subject,
-      }).concat(),
+      template: (queryParameters.template ?? []).concat(
+        ConceptSchemeStub.sparqlConstructTemplateTriples({
+          ignoreRdfType,
+          subject,
+        }),
+      ),
       type: "query",
-      where: ConceptSchemeStub.sparqlWherePatterns({
-        ignoreRdfType,
-        subject,
-        variablePrefix,
-      }).concat(),
+      where: (queryParameters.where ?? []).concat(
+        ConceptSchemeStub.sparqlWherePatterns({
+          ignoreRdfType,
+          subject,
+          variablePrefix,
+        }),
+      ),
     };
   }
 
@@ -2424,10 +2411,7 @@ export namespace ConceptSchemeStub {
       ignoreRdfType?: boolean;
       subject?: sparqljs.Triple["subject"];
       variablePrefix?: string;
-    } & Omit<
-      sparqljs.ConstructQuery,
-      "prefixes" | "queryType" | "template" | "type" | "where"
-    > &
+    } & Omit<sparqljs.ConstructQuery, "prefixes" | "queryType" | "type"> &
       sparqljs.GeneratorOptions,
   ): string {
     return new sparqljs.Generator(parameters).stringify(
@@ -2590,10 +2574,7 @@ export namespace ConceptStub {
       prefixes?: { [prefix: string]: string };
       subject?: sparqljs.Triple["subject"];
       variablePrefix?: string;
-    } & Omit<
-      sparqljs.ConstructQuery,
-      "prefixes" | "queryType" | "template" | "type" | "where"
-    >,
+    } & Omit<sparqljs.ConstructQuery, "prefixes" | "queryType" | "type">,
   ): sparqljs.ConstructQuery {
     const { ignoreRdfType, subject, variablePrefix, ...queryParameters } =
       parameters ?? {};
@@ -2602,16 +2583,17 @@ export namespace ConceptStub {
       ...queryParameters,
       prefixes: parameters?.prefixes ?? {},
       queryType: "CONSTRUCT",
-      template: ConceptStub.sparqlConstructTemplateTriples({
-        ignoreRdfType,
-        subject,
-      }).concat(),
+      template: (queryParameters.template ?? []).concat(
+        ConceptStub.sparqlConstructTemplateTriples({ ignoreRdfType, subject }),
+      ),
       type: "query",
-      where: ConceptStub.sparqlWherePatterns({
-        ignoreRdfType,
-        subject,
-        variablePrefix,
-      }).concat(),
+      where: (queryParameters.where ?? []).concat(
+        ConceptStub.sparqlWherePatterns({
+          ignoreRdfType,
+          subject,
+          variablePrefix,
+        }),
+      ),
     };
   }
 
@@ -2620,10 +2602,7 @@ export namespace ConceptStub {
       ignoreRdfType?: boolean;
       subject?: sparqljs.Triple["subject"];
       variablePrefix?: string;
-    } & Omit<
-      sparqljs.ConstructQuery,
-      "prefixes" | "queryType" | "template" | "type" | "where"
-    > &
+    } & Omit<sparqljs.ConstructQuery, "prefixes" | "queryType" | "type"> &
       sparqljs.GeneratorOptions,
   ): string {
     return new sparqljs.Generator(parameters).stringify(
@@ -3442,10 +3421,7 @@ export namespace Concept {
       prefixes?: { [prefix: string]: string };
       subject?: sparqljs.Triple["subject"];
       variablePrefix?: string;
-    } & Omit<
-      sparqljs.ConstructQuery,
-      "prefixes" | "queryType" | "template" | "type" | "where"
-    >,
+    } & Omit<sparqljs.ConstructQuery, "prefixes" | "queryType" | "type">,
   ): sparqljs.ConstructQuery {
     const { ignoreRdfType, subject, variablePrefix, ...queryParameters } =
       parameters ?? {};
@@ -3454,16 +3430,13 @@ export namespace Concept {
       ...queryParameters,
       prefixes: parameters?.prefixes ?? {},
       queryType: "CONSTRUCT",
-      template: Concept.sparqlConstructTemplateTriples({
-        ignoreRdfType,
-        subject,
-      }).concat(),
+      template: (queryParameters.template ?? []).concat(
+        Concept.sparqlConstructTemplateTriples({ ignoreRdfType, subject }),
+      ),
       type: "query",
-      where: Concept.sparqlWherePatterns({
-        ignoreRdfType,
-        subject,
-        variablePrefix,
-      }).concat(),
+      where: (queryParameters.where ?? []).concat(
+        Concept.sparqlWherePatterns({ ignoreRdfType, subject, variablePrefix }),
+      ),
     };
   }
 
@@ -3472,10 +3445,7 @@ export namespace Concept {
       ignoreRdfType?: boolean;
       subject?: sparqljs.Triple["subject"];
       variablePrefix?: string;
-    } & Omit<
-      sparqljs.ConstructQuery,
-      "prefixes" | "queryType" | "template" | "type" | "where"
-    > &
+    } & Omit<sparqljs.ConstructQuery, "prefixes" | "queryType" | "type"> &
       sparqljs.GeneratorOptions,
   ): string {
     return new sparqljs.Generator(parameters).stringify(
@@ -4205,10 +4175,7 @@ export namespace Label {
       prefixes?: { [prefix: string]: string };
       subject?: sparqljs.Triple["subject"];
       variablePrefix?: string;
-    } & Omit<
-      sparqljs.ConstructQuery,
-      "prefixes" | "queryType" | "template" | "type" | "where"
-    >,
+    } & Omit<sparqljs.ConstructQuery, "prefixes" | "queryType" | "type">,
   ): sparqljs.ConstructQuery {
     const { ignoreRdfType, subject, variablePrefix, ...queryParameters } =
       parameters ?? {};
@@ -4217,16 +4184,13 @@ export namespace Label {
       ...queryParameters,
       prefixes: parameters?.prefixes ?? {},
       queryType: "CONSTRUCT",
-      template: Label.sparqlConstructTemplateTriples({
-        ignoreRdfType,
-        subject,
-      }).concat(),
+      template: (queryParameters.template ?? []).concat(
+        Label.sparqlConstructTemplateTriples({ ignoreRdfType, subject }),
+      ),
       type: "query",
-      where: Label.sparqlWherePatterns({
-        ignoreRdfType,
-        subject,
-        variablePrefix,
-      }).concat(),
+      where: (queryParameters.where ?? []).concat(
+        Label.sparqlWherePatterns({ ignoreRdfType, subject, variablePrefix }),
+      ),
     };
   }
 
@@ -4235,10 +4199,7 @@ export namespace Label {
       ignoreRdfType?: boolean;
       subject?: sparqljs.Triple["subject"];
       variablePrefix?: string;
-    } & Omit<
-      sparqljs.ConstructQuery,
-      "prefixes" | "queryType" | "template" | "type" | "where"
-    > &
+    } & Omit<sparqljs.ConstructQuery, "prefixes" | "queryType" | "type"> &
       sparqljs.GeneratorOptions,
   ): string {
     return new sparqljs.Generator(parameters).stringify(
