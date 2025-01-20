@@ -1,6 +1,6 @@
 import { Identifier, SemanticRelationProperty } from "./index.js";
 
-export type ConceptsQuery =
+export type ConceptQuery =
   | {
       // All concepts
       readonly type: "All";

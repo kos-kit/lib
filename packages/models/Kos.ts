@@ -1,11 +1,11 @@
 import { Either } from "purify-ts";
 import {
   Concept,
+  ConceptQuery,
   ConceptScheme,
+  ConceptSchemeQuery,
   ConceptSchemeStub,
-  ConceptSchemesQuery,
   ConceptStub,
-  ConceptsQuery,
   Identifier,
 } from "./index.js";
 
@@ -20,7 +20,7 @@ export interface Kos<
   conceptIdentifiers(kwds: {
     limit: number | null;
     offset: number;
-    query: ConceptsQuery;
+    query: ConceptQuery;
   }): Promise<readonly Identifier[]>;
 
   conceptScheme(identifier: Identifier): Promise<Either<Error, ConceptSchemeT>>;
@@ -28,7 +28,7 @@ export interface Kos<
   conceptSchemeIdentifiers(kwds: {
     limit: number | null;
     offset: number;
-    query: ConceptSchemesQuery;
+    query: ConceptSchemeQuery;
   }): Promise<readonly Identifier[]>;
 
   conceptSchemeStub(
@@ -38,18 +38,18 @@ export interface Kos<
   conceptSchemeStubs(kwds: {
     limit: number | null;
     offset: number;
-    query: ConceptSchemesQuery;
+    query: ConceptSchemeQuery;
   }): Promise<readonly ConceptSchemeStubT[]>;
 
-  conceptSchemesCount(query: ConceptSchemesQuery): Promise<number>;
+  conceptSchemesCount(query: ConceptSchemeQuery): Promise<number>;
 
   conceptStub(identifier: Identifier): Promise<Either<Error, ConceptStubT>>;
 
   conceptStubs(kwds: {
     limit: number | null;
     offset: number;
-    query: ConceptsQuery;
+    query: ConceptQuery;
   }): Promise<readonly ConceptStubT[]>;
 
-  conceptsCount(query: ConceptsQuery): Promise<number>;
+  conceptsCount(query: ConceptQuery): Promise<number>;
 }

@@ -8,11 +8,11 @@ import { ModelFactories } from "./ModelFactories.js";
 import { ModelFactory } from "./ModelFactory.js";
 import {
   Concept,
+  ConceptQuery,
   ConceptScheme,
+  ConceptSchemeQuery,
   ConceptSchemeStub,
-  ConceptSchemesQuery,
   ConceptStub,
-  ConceptsQuery,
   Identifier,
   Kos,
   LanguageTag,
@@ -96,7 +96,7 @@ export class SparqlKos<
   }: {
     limit: number | null;
     offset: number;
-    query: ConceptsQuery;
+    query: ConceptQuery;
   }): Promise<readonly Identifier[]> {
     return mapBindingsToIdentifiers(
       await this.sparqlQueryClient.queryBindings(
@@ -109,7 +109,7 @@ export class SparqlKos<
           queryType: "SELECT",
           type: "query",
           variables: [this.conceptVariable],
-          where: this.conceptsQueryToWhereGraphPatterns(query).concat(),
+          where: this.conceptQueryToWhereGraphPatterns(query).concat(),
         }),
       ),
       this.conceptVariable.value,
@@ -134,7 +134,7 @@ export class SparqlKos<
   }: {
     limit: number | null;
     offset: number;
-    query: ConceptSchemesQuery;
+    query: ConceptSchemeQuery;
   }): Promise<readonly Identifier[]> {
     return mapBindingsToIdentifiers(
       await this.sparqlQueryClient.queryBindings(
@@ -147,7 +147,7 @@ export class SparqlKos<
           queryType: "SELECT",
           type: "query",
           variables: [this.conceptSchemeVariable],
-          where: this.conceptSchemesQueryToWhereGraphPatterns(query).concat(),
+          where: this.conceptSchemeQueryToWhereGraphPatterns(query).concat(),
         }),
       ),
       this.conceptSchemeVariable.value,
@@ -168,7 +168,7 @@ export class SparqlKos<
   async conceptSchemeStubs(parameters: {
     limit: number | null;
     offset: number;
-    query: ConceptSchemesQuery;
+    query: ConceptSchemeQuery;
   }): Promise<readonly ConceptSchemeStubT[]> {
     const identifiers = await this.conceptSchemeIdentifiers(parameters);
     const modelEithers = await this.modelsByIdentifiers({
@@ -189,7 +189,7 @@ export class SparqlKos<
     );
   }
 
-  async conceptSchemesCount(query: ConceptSchemesQuery): Promise<number> {
+  async conceptSchemesCount(query: ConceptSchemeQuery): Promise<number> {
     return mapBindingsToCount(
       await this.sparqlQueryClient.queryBindings(
         this.sparqlGenerator.stringify({
@@ -208,7 +208,7 @@ export class SparqlKos<
               variable: this.countVariable,
             },
           ],
-          where: this.conceptSchemesQueryToWhereGraphPatterns(query).concat(),
+          where: this.conceptSchemeQueryToWhereGraphPatterns(query).concat(),
         }),
       ),
       this.countVariable.value,
@@ -229,7 +229,7 @@ export class SparqlKos<
   async conceptStubs(parameters: {
     limit: number | null;
     offset: number;
-    query: ConceptsQuery;
+    query: ConceptQuery;
   }): Promise<readonly ConceptStubT[]> {
     const identifiers = await this.conceptIdentifiers(parameters);
     const modelEithers = await this.modelsByIdentifiers({
@@ -248,7 +248,7 @@ export class SparqlKos<
     );
   }
 
-  async conceptsCount(query: ConceptsQuery): Promise<number> {
+  async conceptsCount(query: ConceptQuery): Promise<number> {
     return mapBindingsToCount(
       await this.sparqlQueryClient.queryBindings(
         this.sparqlGenerator.stringify({
@@ -267,75 +267,15 @@ export class SparqlKos<
               variable: this.countVariable,
             },
           ],
-          where: this.conceptsQueryToWhereGraphPatterns(query).concat(),
+          where: this.conceptQueryToWhereGraphPatterns(query).concat(),
         }),
       ),
       this.countVariable.value,
     );
   }
 
-  private conceptSchemesQueryToWhereGraphPatterns(
-    query: ConceptSchemesQuery,
-  ): readonly sparqljs.Pattern[] {
-    if (query.type === "All") {
-      // rdf:type/rdfs:subClassOf* skos:ConceptScheme
-      return [
-        sparqlRdfTypePattern({
-          rdfType: skos.ConceptScheme,
-          subject: this.conceptSchemeVariable,
-        }),
-      ];
-    }
-
-    // Query type HasConcept or HasTopConcept
-    const unionPatterns: sparqljs.Pattern[] = [
-      {
-        // skos:topConceptOf's range is skos:ConceptScheme, so we don't have to check the rdf:type
-        triples: [
-          {
-            subject: query.conceptIdentifier,
-            predicate: skos.topConceptOf,
-            object: this.conceptSchemeVariable,
-          },
-        ],
-        type: "bgp",
-      },
-      {
-        // skos:hasTopConcept's domain is skos:ConceptScheme, so we don't have to check the rdf:type
-        triples: [
-          {
-            subject: this.conceptSchemeVariable,
-            predicate: skos.hasTopConcept,
-            object: query.conceptIdentifier,
-          },
-        ],
-        type: "bgp",
-      },
-    ];
-
-    if (query.type === "HasConcept") {
-      unionPatterns.push({
-        triples: [
-          {
-            subject: query.conceptIdentifier,
-            predicate: skos.inScheme,
-            object: this.conceptSchemeVariable,
-          },
-        ],
-        type: "bgp",
-      });
-    }
-
-    return [
-      {
-        patterns: unionPatterns,
-        type: "union",
-      },
-    ];
-  }
-
-  private conceptsQueryToWhereGraphPatterns(
-    query: ConceptsQuery,
+  private conceptQueryToWhereGraphPatterns(
+    query: ConceptQuery,
   ): readonly sparqljs.Pattern[] {
     if (query.type === "All") {
       // rdf:type/rdfs:subClassOf* skos:ConceptScheme
@@ -451,6 +391,66 @@ export class SparqlKos<
     }
 
     throw new RangeError("should never reach this code");
+  }
+
+  private conceptSchemeQueryToWhereGraphPatterns(
+    query: ConceptSchemeQuery,
+  ): readonly sparqljs.Pattern[] {
+    if (query.type === "All") {
+      // rdf:type/rdfs:subClassOf* skos:ConceptScheme
+      return [
+        sparqlRdfTypePattern({
+          rdfType: skos.ConceptScheme,
+          subject: this.conceptSchemeVariable,
+        }),
+      ];
+    }
+
+    // Query type HasConcept or HasTopConcept
+    const unionPatterns: sparqljs.Pattern[] = [
+      {
+        // skos:topConceptOf's range is skos:ConceptScheme, so we don't have to check the rdf:type
+        triples: [
+          {
+            subject: query.conceptIdentifier,
+            predicate: skos.topConceptOf,
+            object: this.conceptSchemeVariable,
+          },
+        ],
+        type: "bgp",
+      },
+      {
+        // skos:hasTopConcept's domain is skos:ConceptScheme, so we don't have to check the rdf:type
+        triples: [
+          {
+            subject: this.conceptSchemeVariable,
+            predicate: skos.hasTopConcept,
+            object: query.conceptIdentifier,
+          },
+        ],
+        type: "bgp",
+      },
+    ];
+
+    if (query.type === "HasConcept") {
+      unionPatterns.push({
+        triples: [
+          {
+            subject: query.conceptIdentifier,
+            predicate: skos.inScheme,
+            object: this.conceptSchemeVariable,
+          },
+        ],
+        type: "bgp",
+      });
+    }
+
+    return [
+      {
+        patterns: unionPatterns,
+        type: "union",
+      },
+    ];
   }
 
   private async modelsByIdentifiers<ModelT>({

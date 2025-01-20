@@ -6,11 +6,11 @@ import { Resource, ResourceSet } from "rdfjs-resource";
 import { ModelFactories } from "./ModelFactories.js";
 import {
   Concept,
+  ConceptQuery,
   ConceptScheme,
+  ConceptSchemeQuery,
   ConceptSchemeStub,
-  ConceptSchemesQuery,
   ConceptStub,
-  ConceptsQuery,
   Identifier,
   Kos,
   LanguageTag,
@@ -130,7 +130,7 @@ export class RdfjsDatasetKos<
   async conceptIdentifiers(parameters: {
     limit: number | null;
     offset: number;
-    query: ConceptsQuery;
+    query: ConceptQuery;
   }): Promise<readonly Identifier[]> {
     return this.conceptIdentifiersSync(parameters);
   }
@@ -142,7 +142,7 @@ export class RdfjsDatasetKos<
   }: {
     limit: number | null;
     offset: number;
-    query: ConceptsQuery;
+    query: ConceptQuery;
   }): readonly Identifier[] {
     return sortIdentifiers([...this.queryConcepts(query)]).slice(
       offset,
@@ -159,7 +159,7 @@ export class RdfjsDatasetKos<
   async conceptSchemeIdentifiers(parameters: {
     limit: number | null;
     offset: number;
-    query: ConceptSchemesQuery;
+    query: ConceptSchemeQuery;
   }): Promise<readonly Identifier[]> {
     return this.conceptSchemeIdentifiersSync(parameters);
   }
@@ -171,7 +171,7 @@ export class RdfjsDatasetKos<
   }: {
     limit: number | null;
     offset: number;
-    query: ConceptSchemesQuery;
+    query: ConceptSchemeQuery;
   }): readonly Identifier[] {
     return sortIdentifiers([...this.queryConceptSchemes(query)]).slice(
       offset,
@@ -197,7 +197,7 @@ export class RdfjsDatasetKos<
   async conceptSchemeStubs(parameters: {
     limit: number | null;
     offset: number;
-    query: ConceptSchemesQuery;
+    query: ConceptSchemeQuery;
   }): Promise<readonly ConceptSchemeStubT[]> {
     return this.conceptSchemeStubsSync(parameters);
   }
@@ -209,7 +209,7 @@ export class RdfjsDatasetKos<
   }: {
     limit: number | null;
     offset: number;
-    query: ConceptSchemesQuery;
+    query: ConceptSchemeQuery;
   }): readonly ConceptSchemeStubT[] {
     const conceptSchemeStubs: ConceptSchemeStubT[] = [];
     let conceptSchemeI = 0;
@@ -238,11 +238,11 @@ export class RdfjsDatasetKos<
     });
   }
 
-  async conceptSchemesCount(query: ConceptSchemesQuery): Promise<number> {
+  async conceptSchemesCount(query: ConceptSchemeQuery): Promise<number> {
     return this.conceptSchemesCountSync(query);
   }
 
-  conceptSchemesCountSync(query: ConceptSchemesQuery): number {
+  conceptSchemesCountSync(query: ConceptSchemeQuery): number {
     let count = 0;
     for (const _ of this.queryConceptSchemes(query)) {
       count++;
@@ -266,7 +266,7 @@ export class RdfjsDatasetKos<
   async conceptStubs(parameters: {
     limit: number | null;
     offset: number;
-    query: ConceptsQuery;
+    query: ConceptQuery;
   }): Promise<readonly ConceptStubT[]> {
     return this.conceptStubsSync(parameters);
   }
@@ -278,7 +278,7 @@ export class RdfjsDatasetKos<
   }: {
     limit: number | null;
     offset: number;
-    query: ConceptsQuery;
+    query: ConceptQuery;
   }): readonly ConceptStubT[] {
     const conceptStubs: ConceptStubT[] = [];
     let conceptI = 0;
@@ -307,11 +307,11 @@ export class RdfjsDatasetKos<
     });
   }
 
-  async conceptsCount(query: ConceptsQuery): Promise<number> {
+  async conceptsCount(query: ConceptQuery): Promise<number> {
     return this.conceptsCountSync(query);
   }
 
-  conceptsCountSync(query: ConceptsQuery): number {
+  conceptsCountSync(query: ConceptQuery): number {
     let count = 0;
     for (const _ of this.queryConcepts(query)) {
       count++;
@@ -320,7 +320,7 @@ export class RdfjsDatasetKos<
   }
 
   private *queryConceptSchemes(
-    query: ConceptSchemesQuery,
+    query: ConceptSchemeQuery,
   ): Generator<Identifier> {
     if (query.type === "All") {
       for (const resource of this.resourceSet.namedInstancesOf(
@@ -385,7 +385,7 @@ export class RdfjsDatasetKos<
     }
   }
 
-  private *queryConcepts(query: ConceptsQuery): Generator<Identifier> {
+  private *queryConcepts(query: ConceptQuery): Generator<Identifier> {
     if (query.type === "All") {
       for (const resource of this.resourceSet.namedInstancesOf(skos.Concept)) {
         yield resource.identifier;
