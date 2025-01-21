@@ -20,68 +20,98 @@ kos-kit:KosResource
     shaclmate:name "KosResource" ;
     a owl:Class, sh:NodeShape ;
     sh:nodeKind sh:IRI ;
-    sh:property [
-        sh:name "scopeNote" ;
-        sh:path skos:scopeNote ;
-        sh:xone dash:StringOrLangString
-    ], [
-        sh:name "altLabelXl" ;
-        sh:node skos-xl:Label ;
-        sh:path skos-xl:altLabel
-    ], [
-        sh:name "changeNote" ;
-        sh:path skos:changeNote ;
-        sh:xone dash:StringOrLangString
-    ], [
-        sh:name "definition" ;
-        sh:path skos:definition ;
-        sh:xone dash:StringOrLangString
-    ], [
-        sh:name "editorialNote" ;
-        sh:path skos:editorialNote ;
-        sh:xone dash:StringOrLangString
-    ], [
-        sh:name "example" ;
-        sh:path skos:example ;
-        sh:xone dash:StringOrLangString
-    ], [
-        sh:name "hiddenLabel" ;
-        sh:path skos:hiddenLabel ;
-        sh:xone dash:StringOrLangString
-    ], [
-        sh:datatype xsd:dateTime ;
-        sh:maxCount 1 ;
-        sh:name "modified" ;
-        sh:path dcterms:modified
-    ], [
-        sh:name "hiddenLabelXl" ;
-        sh:node skos-xl:Label ;
-        sh:path skos-xl:hiddenLabel
-    ], [
-        sh:name "historyNote" ;
-        sh:path skos:historyNote ;
-        sh:xone dash:StringOrLangString
-    ], [
-        sh:name "altLabel" ;
-        sh:path skos:altLabel ;
-        sh:xone dash:StringOrLangString
-    ], [
-        sh:datatype rdf:langString ;
-        sh:name "notation" ;
-        sh:path skos:notation
-    ], [
-        sh:name "note" ;
-        sh:path skos:notation ;
-        sh:xone dash:StringOrLangString
-    ], [
-        sh:name "prefLabel" ;
-        sh:path skos:prefLabel ;
-        sh:xone dash:StringOrLangString
-    ], [
-        sh:name "prefLabelXl" ;
-        sh:node skos-xl:Label ;
-        sh:path skos-xl:prefLabel
-    ] .
+    sh:property kos-kit:KosResource-altLabel, kos-kit:KosResource-altLabelXl, kos-kit:KosResource-changeNote, kos-kit:KosResource-definition, kos-kit:KosResource-editorialNote, kos-kit:KosResource-example, kos-kit:KosResource-hiddenLabel, kos-kit:KosResource-hiddenLabelXl, kos-kit:KosResource-historyNote, kos-kit:KosResource-modified, kos-kit:KosResource-notation, kos-kit:KosResource-note, kos-kit:KosResource-prefLabel, kos-kit:KosResource-prefLabelXl, kos-kit:KosResource-scopeNote .
+
+kos-kit:KosResource-altLabel
+    a sh:PropertyShape ;
+    sh:name "altLabel" ;
+    sh:path skos:altLabel ;
+    sh:xone dash:StringOrLangString .
+
+kos-kit:KosResource-altLabelXl
+    a sh:PropertyShape ;
+    sh:name "altLabelXl" ;
+    sh:node skos-xl:Label ;
+    sh:path skos-xl:altLabel .
+
+kos-kit:KosResource-changeNote
+    a sh:PropertyShape ;
+    sh:name "changeNote" ;
+    sh:path skos:changeNote ;
+    sh:xone dash:StringOrLangString .
+
+kos-kit:KosResource-definition
+    a sh:PropertyShape ;
+    sh:name "definition" ;
+    sh:path skos:definition ;
+    sh:xone dash:StringOrLangString .
+
+kos-kit:KosResource-editorialNote
+    a sh:PropertyShape ;
+    sh:name "editorialNote" ;
+    sh:path skos:editorialNote ;
+    sh:xone dash:StringOrLangString .
+
+kos-kit:KosResource-example
+    a sh:PropertyShape ;
+    sh:name "example" ;
+    sh:path skos:example ;
+    sh:xone dash:StringOrLangString .
+
+kos-kit:KosResource-hiddenLabel
+    a sh:PropertyShape ;
+    sh:name "hiddenLabel" ;
+    sh:path skos:hiddenLabel ;
+    sh:xone dash:StringOrLangString .
+
+kos-kit:KosResource-hiddenLabelXl
+    a sh:PropertyShape ;
+    sh:name "hiddenLabelXl" ;
+    sh:node skos-xl:Label ;
+    sh:path skos-xl:hiddenLabel .
+
+kos-kit:KosResource-historyNote
+    a sh:PropertyShape ;
+    sh:name "historyNote" ;
+    sh:path skos:historyNote ;
+    sh:xone dash:StringOrLangString .
+
+kos-kit:KosResource-modified
+    a sh:PropertyShape ;
+    sh:datatype xsd:dateTime ;
+    sh:maxCount 1 ;
+    sh:name "modified" ;
+    sh:path dcterms:modified .
+
+kos-kit:KosResource-notation
+    a sh:PropertyShape ;
+    sh:datatype rdf:langString ;
+    sh:name "notation" ;
+    sh:path skos:notation .
+
+kos-kit:KosResource-note
+    a sh:PropertyShape ;
+    sh:name "note" ;
+    sh:path skos:note ;
+    sh:xone dash:StringOrLangString .
+
+kos-kit:KosResource-prefLabel
+    a sh:PropertyShape ;
+    sh:name "prefLabel" ;
+    sh:path skos:prefLabel ;
+    sh:xone dash:StringOrLangString .
+
+kos-kit:KosResource-prefLabelXl
+    a sh:PropertyShape ;
+    sh:name "prefLabelXl" ;
+    sh:node skos-xl:Label ;
+    sh:path skos-xl:prefLabel .
+
+kos-kit:KosResource-scopeNote
+    a sh:PropertyShape ;
+    sh:name "scopeNote" ;
+    sh:path skos:scopeNote ;
+    sh:xone dash:StringOrLangString .
 
 <http://www.w3.org/2004/02/skos/core#>
     shaclmate:tsFeatureInclude shaclmate:_TsFeature_Create, shaclmate:_TsFeature_FromRdf, shaclmate:_TsFeature_Sparql ;
@@ -96,6 +126,26 @@ skos:Concept
         sh:name "broader" ;
         sh:node kos-kit:ConceptStub ;
         sh:path skos:broader
+    ], [
+        sh:name "narrowMatch" ;
+        sh:node kos-kit:ConceptStub ;
+        sh:path skos:narrowMatch
+    ], [
+        sh:name "related" ;
+        sh:node kos-kit:ConceptStub ;
+        sh:path skos:related
+    ], [
+        sh:name "relatedMatch" ;
+        sh:node kos-kit:ConceptStub ;
+        sh:path skos:relatedMatch
+    ], [
+        sh:name "semanticRelation" ;
+        sh:node kos-kit:ConceptStub ;
+        sh:path skos:semanticRelation
+    ], [
+        sh:name "topConceptOf" ;
+        sh:node kos-kit:ConceptSchemeStub ;
+        sh:path skos:topConceptOf
     ], [
         sh:name "broaderTransitive" ;
         sh:node kos-kit:ConceptStub ;
@@ -128,26 +178,6 @@ skos:Concept
         sh:name "narrowerTransitive" ;
         sh:node kos-kit:ConceptStub ;
         sh:path skos:narrowerTransitive
-    ], [
-        sh:name "narrowMatch" ;
-        sh:node kos-kit:ConceptStub ;
-        sh:path skos:narrowMatch
-    ], [
-        sh:name "related" ;
-        sh:node kos-kit:ConceptStub ;
-        sh:path skos:related
-    ], [
-        sh:name "relatedMatch" ;
-        sh:node kos-kit:ConceptStub ;
-        sh:path skos:relatedMatch
-    ], [
-        sh:name "semanticRelation" ;
-        sh:node kos-kit:ConceptStub ;
-        sh:path skos:semanticRelation
-    ], [
-        sh:name "topConceptOf" ;
-        sh:node kos-kit:ConceptSchemeStub ;
-        sh:path skos:topConceptOf
     ] .
 
 skos:ConceptScheme
