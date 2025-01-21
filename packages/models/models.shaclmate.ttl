@@ -212,32 +212,40 @@ skos:ConceptScheme
     shaclmate:name "ConceptScheme" ;
     a owl:Class, sh:NodeShape ;
     rdfs:subClassOf kos-kit:KosResource ;
-    sh:property [
-        sh:name "hasTopConcept" ;
-        sh:node kos-kit:ConceptStub ;
-        sh:path skos:hasTopConcept
-    ], [
-        sh:maxCount 1 ;
-        sh:name "license" ;
-        sh:path dcterms:license ;
-        sh:xone ([
-                sh:nodeKind sh:IRI
-            ]
-            [
-                sh:nodeKind sh:Literal
-            ]
-        )
-    ], [
-        sh:maxCount 1 ;
-        sh:name "rights" ;
-        sh:nodeKind sh:Literal ;
-        sh:path dcterms:rights
-    ], [
-        sh:maxCount 1 ;
-        sh:name "rightsHolder" ;
-        sh:nodeKind sh:Literal ;
-        sh:path dcterms:rightsHolder
-    ] .
+    sh:property skos:ConceptScheme-hasTopConcept, skos:ConceptScheme-license, skos:ConceptScheme-rights, skos:ConceptScheme-rightsHolder .
+
+skos:ConceptScheme-hasTopConcept
+    a sh:PropertyShape ;
+    sh:name "hasTopConcept" ;
+    sh:node kos-kit:ConceptStub ;
+    sh:path skos:hasTopConcept .
+
+skos:ConceptScheme-license
+    a sh:PropertyShape ;
+    sh:maxCount 1 ;
+    sh:name "license" ;
+    sh:path dcterms:license ;
+    sh:xone ([
+            sh:nodeKind sh:IRI
+        ]
+        [
+            sh:nodeKind sh:Literal
+        ]
+    ) .
+
+skos:ConceptScheme-rights
+    a sh:PropertyShape ;
+    sh:maxCount 1 ;
+    sh:name "rights" ;
+    sh:nodeKind sh:Literal ;
+    sh:path dcterms:rights .
+
+skos:ConceptScheme-rightsHolder
+    a sh:PropertyShape ;
+    sh:maxCount 1 ;
+    sh:name "rightsHolder" ;
+    sh:nodeKind sh:Literal ;
+    sh:path dcterms:rightsHolder .
 
 <http://www.w3.org/2008/05/skos-xl#>
     shaclmate:tsFeatureInclude shaclmate:_TsFeature_Create, shaclmate:_TsFeature_FromRdf, shaclmate:_TsFeature_Sparql ;
