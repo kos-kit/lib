@@ -242,6 +242,34 @@ export namespace LabelStub {
       },
     ];
   }
+
+  export function toJson(_labelStub: LabelStub): {
+    readonly "@id": string;
+    readonly literalForm: purify.NonEmptyList<{
+      readonly "@language": string | undefined;
+      readonly "@type": string | undefined;
+      readonly "@value": string;
+    }>;
+    readonly type: "LabelStub";
+  } {
+    return JSON.parse(
+      JSON.stringify({
+        "@id":
+          _labelStub.identifier.termType === "BlankNode"
+            ? `_:${_labelStub.identifier.value}`
+            : _labelStub.identifier.value,
+        literalForm: _labelStub.literalForm.map((_item) => ({
+          "@language": _item.language.length > 0 ? _item.language : undefined,
+          "@type":
+            _item.datatype.value !== "http://www.w3.org/2001/XMLSchema#string"
+              ? _item.datatype.value
+              : undefined,
+          "@value": _item.value,
+        })),
+        type: _labelStub.type,
+      } satisfies ReturnType<typeof LabelStub.toJson>),
+    );
+  }
 }
 export interface KosResourceStub {
   readonly identifier: rdfjs.NamedNode;
@@ -499,6 +527,35 @@ export namespace KosResourceStub {
         type: "optional",
       },
     ];
+  }
+
+  export function toJson(_kosResourceStub: KosResourceStub): {
+    readonly "@id": string;
+    readonly prefLabel: readonly {
+      readonly "@language": string | undefined;
+      readonly "@type": string | undefined;
+      readonly "@value": string;
+    }[];
+    readonly prefLabelXl: readonly ReturnType<typeof LabelStub.toJson>[];
+    readonly type: "ConceptSchemeStub" | "ConceptStub";
+  } {
+    return JSON.parse(
+      JSON.stringify({
+        "@id": _kosResourceStub.identifier.value,
+        prefLabel: _kosResourceStub.prefLabel.map((_item) => ({
+          "@language": _item.language.length > 0 ? _item.language : undefined,
+          "@type":
+            _item.datatype.value !== "http://www.w3.org/2001/XMLSchema#string"
+              ? _item.datatype.value
+              : undefined,
+          "@value": _item.value,
+        })),
+        prefLabelXl: _kosResourceStub.prefLabelXl.map((_item) =>
+          LabelStub.toJson(_item),
+        ),
+        type: _kosResourceStub.type,
+      } satisfies ReturnType<typeof KosResourceStub.toJson>),
+    );
   }
 }
 export interface KosResource {
@@ -1731,6 +1788,175 @@ export namespace KosResource {
       },
     ];
   }
+
+  export function toJson(_kosResource: KosResource): {
+    readonly altLabel: readonly {
+      readonly "@language": string | undefined;
+      readonly "@type": string | undefined;
+      readonly "@value": string;
+    }[];
+    readonly altLabelXl: readonly ReturnType<typeof Label.toJson>[];
+    readonly changeNote: readonly {
+      readonly "@language": string | undefined;
+      readonly "@type": string | undefined;
+      readonly "@value": string;
+    }[];
+    readonly definition: readonly {
+      readonly "@language": string | undefined;
+      readonly "@type": string | undefined;
+      readonly "@value": string;
+    }[];
+    readonly editorialNote: readonly {
+      readonly "@language": string | undefined;
+      readonly "@type": string | undefined;
+      readonly "@value": string;
+    }[];
+    readonly example: readonly {
+      readonly "@language": string | undefined;
+      readonly "@type": string | undefined;
+      readonly "@value": string;
+    }[];
+    readonly hiddenLabel: readonly {
+      readonly "@language": string | undefined;
+      readonly "@type": string | undefined;
+      readonly "@value": string;
+    }[];
+    readonly hiddenLabelXl: readonly ReturnType<typeof Label.toJson>[];
+    readonly historyNote: readonly {
+      readonly "@language": string | undefined;
+      readonly "@type": string | undefined;
+      readonly "@value": string;
+    }[];
+    readonly "@id": string;
+    readonly modified: string | undefined;
+    readonly notation: readonly {
+      readonly "@language": string | undefined;
+      readonly "@type": string | undefined;
+      readonly "@value": string;
+    }[];
+    readonly note: readonly {
+      readonly "@language": string | undefined;
+      readonly "@type": string | undefined;
+      readonly "@value": string;
+    }[];
+    readonly prefLabel: readonly {
+      readonly "@language": string | undefined;
+      readonly "@type": string | undefined;
+      readonly "@value": string;
+    }[];
+    readonly prefLabelXl: readonly ReturnType<typeof Label.toJson>[];
+    readonly scopeNote: readonly {
+      readonly "@language": string | undefined;
+      readonly "@type": string | undefined;
+      readonly "@value": string;
+    }[];
+    readonly type: "Concept" | "ConceptScheme";
+  } {
+    return JSON.parse(
+      JSON.stringify({
+        altLabel: _kosResource.altLabel.map((_item) => ({
+          "@language": _item.language.length > 0 ? _item.language : undefined,
+          "@type":
+            _item.datatype.value !== "http://www.w3.org/2001/XMLSchema#string"
+              ? _item.datatype.value
+              : undefined,
+          "@value": _item.value,
+        })),
+        altLabelXl: _kosResource.altLabelXl.map((_item) => Label.toJson(_item)),
+        changeNote: _kosResource.changeNote.map((_item) => ({
+          "@language": _item.language.length > 0 ? _item.language : undefined,
+          "@type":
+            _item.datatype.value !== "http://www.w3.org/2001/XMLSchema#string"
+              ? _item.datatype.value
+              : undefined,
+          "@value": _item.value,
+        })),
+        definition: _kosResource.definition.map((_item) => ({
+          "@language": _item.language.length > 0 ? _item.language : undefined,
+          "@type":
+            _item.datatype.value !== "http://www.w3.org/2001/XMLSchema#string"
+              ? _item.datatype.value
+              : undefined,
+          "@value": _item.value,
+        })),
+        editorialNote: _kosResource.editorialNote.map((_item) => ({
+          "@language": _item.language.length > 0 ? _item.language : undefined,
+          "@type":
+            _item.datatype.value !== "http://www.w3.org/2001/XMLSchema#string"
+              ? _item.datatype.value
+              : undefined,
+          "@value": _item.value,
+        })),
+        example: _kosResource.example.map((_item) => ({
+          "@language": _item.language.length > 0 ? _item.language : undefined,
+          "@type":
+            _item.datatype.value !== "http://www.w3.org/2001/XMLSchema#string"
+              ? _item.datatype.value
+              : undefined,
+          "@value": _item.value,
+        })),
+        hiddenLabel: _kosResource.hiddenLabel.map((_item) => ({
+          "@language": _item.language.length > 0 ? _item.language : undefined,
+          "@type":
+            _item.datatype.value !== "http://www.w3.org/2001/XMLSchema#string"
+              ? _item.datatype.value
+              : undefined,
+          "@value": _item.value,
+        })),
+        hiddenLabelXl: _kosResource.hiddenLabelXl.map((_item) =>
+          Label.toJson(_item),
+        ),
+        historyNote: _kosResource.historyNote.map((_item) => ({
+          "@language": _item.language.length > 0 ? _item.language : undefined,
+          "@type":
+            _item.datatype.value !== "http://www.w3.org/2001/XMLSchema#string"
+              ? _item.datatype.value
+              : undefined,
+          "@value": _item.value,
+        })),
+        "@id": _kosResource.identifier.value,
+        modified: _kosResource.modified
+          .map((_item) => _item.toISOString())
+          .extract(),
+        notation: _kosResource.notation.map((_item) => ({
+          "@language": _item.language.length > 0 ? _item.language : undefined,
+          "@type":
+            _item.datatype.value !== "http://www.w3.org/2001/XMLSchema#string"
+              ? _item.datatype.value
+              : undefined,
+          "@value": _item.value,
+        })),
+        note: _kosResource.note.map((_item) => ({
+          "@language": _item.language.length > 0 ? _item.language : undefined,
+          "@type":
+            _item.datatype.value !== "http://www.w3.org/2001/XMLSchema#string"
+              ? _item.datatype.value
+              : undefined,
+          "@value": _item.value,
+        })),
+        prefLabel: _kosResource.prefLabel.map((_item) => ({
+          "@language": _item.language.length > 0 ? _item.language : undefined,
+          "@type":
+            _item.datatype.value !== "http://www.w3.org/2001/XMLSchema#string"
+              ? _item.datatype.value
+              : undefined,
+          "@value": _item.value,
+        })),
+        prefLabelXl: _kosResource.prefLabelXl.map((_item) =>
+          Label.toJson(_item),
+        ),
+        scopeNote: _kosResource.scopeNote.map((_item) => ({
+          "@language": _item.language.length > 0 ? _item.language : undefined,
+          "@type":
+            _item.datatype.value !== "http://www.w3.org/2001/XMLSchema#string"
+              ? _item.datatype.value
+              : undefined,
+          "@value": _item.value,
+        })),
+        type: _kosResource.type,
+      } satisfies ReturnType<typeof KosResource.toJson>),
+    );
+  }
 }
 export interface ConceptScheme extends KosResource {
   readonly hasTopConcept: readonly ConceptStub[];
@@ -2287,6 +2513,83 @@ export namespace ConceptScheme {
       },
     ];
   }
+
+  export function toJson(
+    _conceptScheme: ConceptScheme,
+  ): {
+    readonly hasTopConcept: readonly ReturnType<typeof ConceptStub.toJson>[];
+    readonly license:
+      | (
+          | { readonly "@id": string; readonly termType: "NamedNode" }
+          | {
+              readonly "@language": string | undefined;
+              readonly "@type": string | undefined;
+              readonly "@value": string;
+              readonly termType: "Literal";
+            }
+        )
+      | undefined;
+    readonly rights:
+      | {
+          readonly "@language": string | undefined;
+          readonly "@type": string | undefined;
+          readonly "@value": string;
+        }
+      | undefined;
+    readonly rightsHolder:
+      | {
+          readonly "@language": string | undefined;
+          readonly "@type": string | undefined;
+          readonly "@value": string;
+        }
+      | undefined;
+  } & ReturnType<typeof KosResource.toJson> {
+    return JSON.parse(
+      JSON.stringify({
+        ...KosResource.toJson(_conceptScheme),
+        hasTopConcept: _conceptScheme.hasTopConcept.map((_item) =>
+          ConceptStub.toJson(_item),
+        ),
+        license: _conceptScheme.license
+          .map((_item) =>
+            _item.termType === "Literal"
+              ? {
+                  "@language":
+                    _item.language.length > 0 ? _item.language : undefined,
+                  "@type":
+                    _item.datatype.value !==
+                    "http://www.w3.org/2001/XMLSchema#string"
+                      ? _item.datatype.value
+                      : undefined,
+                  "@value": _item.value,
+                  termType: "Literal" as const,
+                }
+              : { "@id": _item.value, termType: "NamedNode" as const },
+          )
+          .extract(),
+        rights: _conceptScheme.rights
+          .map((_item) => ({
+            "@language": _item.language.length > 0 ? _item.language : undefined,
+            "@type":
+              _item.datatype.value !== "http://www.w3.org/2001/XMLSchema#string"
+                ? _item.datatype.value
+                : undefined,
+            "@value": _item.value,
+          }))
+          .extract(),
+        rightsHolder: _conceptScheme.rightsHolder
+          .map((_item) => ({
+            "@language": _item.language.length > 0 ? _item.language : undefined,
+            "@type":
+              _item.datatype.value !== "http://www.w3.org/2001/XMLSchema#string"
+                ? _item.datatype.value
+                : undefined,
+            "@value": _item.value,
+          }))
+          .extract(),
+      } satisfies ReturnType<typeof ConceptScheme.toJson>),
+    );
+  }
 }
 export interface ConceptSchemeStub extends KosResourceStub {
   readonly identifier: rdfjs.NamedNode;
@@ -2488,6 +2791,16 @@ export namespace ConceptSchemeStub {
           ]),
     ];
   }
+
+  export function toJson(
+    _conceptSchemeStub: ConceptSchemeStub,
+  ): ReturnType<typeof KosResourceStub.toJson> {
+    return JSON.parse(
+      JSON.stringify({
+        ...KosResourceStub.toJson(_conceptSchemeStub),
+      } satisfies ReturnType<typeof ConceptSchemeStub.toJson>),
+    );
+  }
 }
 export interface ConceptStub extends KosResourceStub {
   readonly identifier: rdfjs.NamedNode;
@@ -2681,6 +2994,16 @@ export namespace ConceptStub {
             },
           ]),
     ];
+  }
+
+  export function toJson(
+    _conceptStub: ConceptStub,
+  ): ReturnType<typeof KosResourceStub.toJson> {
+    return JSON.parse(
+      JSON.stringify({
+        ...KosResourceStub.toJson(_conceptStub),
+      } satisfies ReturnType<typeof ConceptStub.toJson>),
+    );
   }
 }
 export interface Concept extends KosResource {
@@ -4018,6 +4341,73 @@ export namespace Concept {
       },
     ];
   }
+
+  export function toJson(
+    _concept: Concept,
+  ): {
+    readonly broader: readonly ReturnType<typeof ConceptStub.toJson>[];
+    readonly broaderTransitive: readonly ReturnType<
+      typeof ConceptStub.toJson
+    >[];
+    readonly broadMatch: readonly ReturnType<typeof ConceptStub.toJson>[];
+    readonly closeMatch: readonly ReturnType<typeof ConceptStub.toJson>[];
+    readonly exactMatch: readonly ReturnType<typeof ConceptStub.toJson>[];
+    readonly inScheme: readonly ReturnType<typeof ConceptSchemeStub.toJson>[];
+    readonly mappingRelation: readonly ReturnType<typeof ConceptStub.toJson>[];
+    readonly narrower: readonly ReturnType<typeof ConceptStub.toJson>[];
+    readonly narrowerTransitive: readonly ReturnType<
+      typeof ConceptStub.toJson
+    >[];
+    readonly narrowMatch: readonly ReturnType<typeof ConceptStub.toJson>[];
+    readonly related: readonly ReturnType<typeof ConceptStub.toJson>[];
+    readonly relatedMatch: readonly ReturnType<typeof ConceptStub.toJson>[];
+    readonly semanticRelation: readonly ReturnType<typeof ConceptStub.toJson>[];
+    readonly topConceptOf: readonly ReturnType<
+      typeof ConceptSchemeStub.toJson
+    >[];
+  } & ReturnType<typeof KosResource.toJson> {
+    return JSON.parse(
+      JSON.stringify({
+        ...KosResource.toJson(_concept),
+        broader: _concept.broader.map((_item) => ConceptStub.toJson(_item)),
+        broaderTransitive: _concept.broaderTransitive.map((_item) =>
+          ConceptStub.toJson(_item),
+        ),
+        broadMatch: _concept.broadMatch.map((_item) =>
+          ConceptStub.toJson(_item),
+        ),
+        closeMatch: _concept.closeMatch.map((_item) =>
+          ConceptStub.toJson(_item),
+        ),
+        exactMatch: _concept.exactMatch.map((_item) =>
+          ConceptStub.toJson(_item),
+        ),
+        inScheme: _concept.inScheme.map((_item) =>
+          ConceptSchemeStub.toJson(_item),
+        ),
+        mappingRelation: _concept.mappingRelation.map((_item) =>
+          ConceptStub.toJson(_item),
+        ),
+        narrower: _concept.narrower.map((_item) => ConceptStub.toJson(_item)),
+        narrowerTransitive: _concept.narrowerTransitive.map((_item) =>
+          ConceptStub.toJson(_item),
+        ),
+        narrowMatch: _concept.narrowMatch.map((_item) =>
+          ConceptStub.toJson(_item),
+        ),
+        related: _concept.related.map((_item) => ConceptStub.toJson(_item)),
+        relatedMatch: _concept.relatedMatch.map((_item) =>
+          ConceptStub.toJson(_item),
+        ),
+        semanticRelation: _concept.semanticRelation.map((_item) =>
+          ConceptStub.toJson(_item),
+        ),
+        topConceptOf: _concept.topConceptOf.map((_item) =>
+          ConceptSchemeStub.toJson(_item),
+        ),
+      } satisfies ReturnType<typeof Concept.toJson>),
+    );
+  }
 }
 export interface Label {
   readonly identifier: rdfjs.BlankNode | rdfjs.NamedNode;
@@ -4251,5 +4641,33 @@ export namespace Label {
         type: "bgp",
       },
     ];
+  }
+
+  export function toJson(_label: Label): {
+    readonly "@id": string;
+    readonly literalForm: purify.NonEmptyList<{
+      readonly "@language": string | undefined;
+      readonly "@type": string | undefined;
+      readonly "@value": string;
+    }>;
+    readonly type: "Label";
+  } {
+    return JSON.parse(
+      JSON.stringify({
+        "@id":
+          _label.identifier.termType === "BlankNode"
+            ? `_:${_label.identifier.value}`
+            : _label.identifier.value,
+        literalForm: _label.literalForm.map((_item) => ({
+          "@language": _item.language.length > 0 ? _item.language : undefined,
+          "@type":
+            _item.datatype.value !== "http://www.w3.org/2001/XMLSchema#string"
+              ? _item.datatype.value
+              : undefined,
+          "@value": _item.value,
+        })),
+        type: _label.type,
+      } satisfies ReturnType<typeof Label.toJson>),
+    );
   }
 }
