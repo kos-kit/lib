@@ -122,63 +122,91 @@ skos:Concept
     shaclmate:name "Concept" ;
     a owl:Class, sh:NodeShape ;
     rdfs:subClassOf kos-kit:KosResource ;
-    sh:property [
-        sh:name "broader" ;
-        sh:node kos-kit:ConceptStub ;
-        sh:path skos:broader
-    ], [
-        sh:name "narrowMatch" ;
-        sh:node kos-kit:ConceptStub ;
-        sh:path skos:narrowMatch
-    ], [
-        sh:name "related" ;
-        sh:node kos-kit:ConceptStub ;
-        sh:path skos:related
-    ], [
-        sh:name "relatedMatch" ;
-        sh:node kos-kit:ConceptStub ;
-        sh:path skos:relatedMatch
-    ], [
-        sh:name "semanticRelation" ;
-        sh:node kos-kit:ConceptStub ;
-        sh:path skos:semanticRelation
-    ], [
-        sh:name "topConceptOf" ;
-        sh:node kos-kit:ConceptSchemeStub ;
-        sh:path skos:topConceptOf
-    ], [
-        sh:name "broaderTransitive" ;
-        sh:node kos-kit:ConceptStub ;
-        sh:path skos:broaderTransitive
-    ], [
-        sh:name "broadMatch" ;
-        sh:node kos-kit:ConceptStub ;
-        sh:path skos:broadMatch
-    ], [
-        sh:name "closeMatch" ;
-        sh:node kos-kit:ConceptStub ;
-        sh:path skos:closeMatch
-    ], [
-        sh:name "exactMatch" ;
-        sh:node kos-kit:ConceptStub ;
-        sh:path skos:exactMatch
-    ], [
-        sh:name "inScheme" ;
-        sh:node kos-kit:ConceptSchemeStub ;
-        sh:path skos:inScheme
-    ], [
-        sh:name "mappingRelation" ;
-        sh:node kos-kit:ConceptStub ;
-        sh:path skos:mappingRelation
-    ], [
-        sh:name "narrower" ;
-        sh:node kos-kit:ConceptStub ;
-        sh:path skos:narrower
-    ], [
-        sh:name "narrowerTransitive" ;
-        sh:node kos-kit:ConceptStub ;
-        sh:path skos:narrowerTransitive
-    ] .
+    sh:property skos:Concept-broadMatch, skos:Concept-broader, skos:Concept-broaderTransitive, skos:Concept-closeMatch, skos:Concept-exactMatch, skos:Concept-inScheme, skos:Concept-mappingRelation, skos:Concept-narrowMatch, skos:Concept-narrower, skos:Concept-narrowerTransitive, skos:Concept-related, skos:Concept-relatedMatch, skos:Concept-semanticRelation, skos:Concept-topConceptOf .
+
+skos:Concept-broadMatch
+    a sh:PropertyShape ;
+    sh:name "broadMatch" ;
+    sh:node kos-kit:ConceptStub ;
+    sh:path skos:broadMatch .
+
+skos:Concept-broader
+    a sh:PropertyShape ;
+    sh:name "broader" ;
+    sh:node kos-kit:ConceptStub ;
+    sh:path skos:broader .
+
+skos:Concept-broaderTransitive
+    a sh:PropertyShape ;
+    sh:name "broaderTransitive" ;
+    sh:node kos-kit:ConceptStub ;
+    sh:path skos:broaderTransitive .
+
+skos:Concept-closeMatch
+    a sh:PropertyShape ;
+    sh:name "closeMatch" ;
+    sh:node kos-kit:ConceptStub ;
+    sh:path skos:closeMatch .
+
+skos:Concept-exactMatch
+    a sh:PropertyShape ;
+    sh:name "exactMatch" ;
+    sh:node kos-kit:ConceptStub ;
+    sh:path skos:exactMatch .
+
+skos:Concept-inScheme
+    a sh:PropertyShape ;
+    sh:name "inScheme" ;
+    sh:node kos-kit:ConceptSchemeStub ;
+    sh:path skos:inScheme .
+
+skos:Concept-mappingRelation
+    a sh:PropertyShape ;
+    sh:name "mappingRelation" ;
+    sh:node kos-kit:ConceptStub ;
+    sh:path skos:mappingRelation .
+
+skos:Concept-narrowMatch
+    a sh:PropertyShape ;
+    sh:name "narrowMatch" ;
+    sh:node kos-kit:ConceptStub ;
+    sh:path skos:narrowMatch .
+
+skos:Concept-narrower
+    a sh:PropertyShape ;
+    sh:name "narrower" ;
+    sh:node kos-kit:ConceptStub ;
+    sh:path skos:narrower .
+
+skos:Concept-narrowerTransitive
+    a sh:PropertyShape ;
+    sh:name "narrowerTransitive" ;
+    sh:node kos-kit:ConceptStub ;
+    sh:path skos:narrowerTransitive .
+
+skos:Concept-related
+    a sh:PropertyShape ;
+    sh:name "related" ;
+    sh:node kos-kit:ConceptStub ;
+    sh:path skos:related .
+
+skos:Concept-relatedMatch
+    a sh:PropertyShape ;
+    sh:name "relatedMatch" ;
+    sh:node kos-kit:ConceptStub ;
+    sh:path skos:relatedMatch .
+
+skos:Concept-semanticRelation
+    a sh:PropertyShape ;
+    sh:name "semanticRelation" ;
+    sh:node kos-kit:ConceptStub ;
+    sh:path skos:semanticRelation .
+
+skos:Concept-topConceptOf
+    a sh:PropertyShape ;
+    sh:name "topConceptOf" ;
+    sh:node kos-kit:ConceptSchemeStub ;
+    sh:path skos:topConceptOf .
 
 skos:ConceptScheme
     shaclmate:name "ConceptScheme" ;
