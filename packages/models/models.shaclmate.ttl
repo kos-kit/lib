@@ -256,10 +256,12 @@ skos-xl:Label
     shaclmate:name "Label" ;
     a owl:Class, sh:NodeShape ;
     sh:nodeKind sh:BlankNodeOrIRI ;
-    sh:property [
-        sh:minCount 1 ;
-        sh:name "literalForm" ;
-        sh:path skos-xl:literalForm ;
-        sh:xone dash:StringOrLangString
-    ] .
+    sh:property skos-xl:Label-literalForm .
+
+skos-xl:Label-literalForm
+    a sh:PropertyShape ;
+    sh:minCount 1 ;
+    sh:name "literalForm" ;
+    sh:path skos-xl:literalForm ;
+    sh:xone dash:StringOrLangString .
 
