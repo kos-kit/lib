@@ -1119,7 +1119,7 @@ export namespace KosResource {
     > = purify.Either.of([
       ..._resource
         .values(
-          dataFactory.namedNode("http://www.w3.org/2004/02/skos/core#notation"),
+          dataFactory.namedNode("http://www.w3.org/2004/02/skos/core#note"),
           { unique: true },
         )
         .flatMap((_item) =>
@@ -1416,7 +1416,7 @@ export namespace KosResource {
       {
         object: dataFactory.variable!(`${variablePrefix}Note`),
         predicate: dataFactory.namedNode(
-          "http://www.w3.org/2004/02/skos/core#notation",
+          "http://www.w3.org/2004/02/skos/core#note",
         ),
         subject,
       },
@@ -1663,7 +1663,7 @@ export namespace KosResource {
               {
                 object: dataFactory.variable!(`${variablePrefix}Note`),
                 predicate: dataFactory.namedNode(
-                  "http://www.w3.org/2004/02/skos/core#notation",
+                  "http://www.w3.org/2004/02/skos/core#note",
                 ),
                 subject,
               },
