@@ -11,7 +11,7 @@
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
 <http://kos-kit.github.io/stubs#>
-    shaclmate:tsFeatureInclude shaclmate:_TsFeature_Create, shaclmate:_TsFeature_FromRdf, shaclmate:_TsFeature_Sparql, shaclmate:_TsFeature_ToJson ;
+    shaclmate:tsFeatureInclude shaclmate:_TsFeature_Create, shaclmate:_TsFeature_Equals, shaclmate:_TsFeature_FromRdf, shaclmate:_TsFeature_Sparql, shaclmate:_TsFeature_ToJson ;
     shaclmate:tsObjectDeclarationType shaclmate:_TsObjectDeclarationType_Interface ;
     a owl:Ontology .
 
