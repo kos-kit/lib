@@ -1,5 +1,5 @@
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-@prefix kos-kit: <http://kos-kit.github.io/ns#> .
+@prefix kos-kit-stubs: <http://kos-kit.github.io/stubs#> .
 @prefix dash: <http://datashapes.org/dash#> .
 @prefix dcterms: <http://purl.org/dc/terms/> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
@@ -10,50 +10,50 @@
 @prefix skos-xl: <http://www.w3.org/2008/05/skos-xl#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-<http://kos-kit.github.io/ns#>
+<http://kos-kit.github.io/stubs#>
     shaclmate:tsFeatureInclude shaclmate:_TsFeature_Create, shaclmate:_TsFeature_FromRdf, shaclmate:_TsFeature_Sparql, shaclmate:_TsFeature_ToJson ;
     shaclmate:tsObjectDeclarationType shaclmate:_TsObjectDeclarationType_Interface ;
     a owl:Ontology .
 
-kos-kit:ConceptSchemeStub
+kos-kit-stubs:ConceptSchemeStub
     shaclmate:fromRdfType skos:ConceptScheme ;
     shaclmate:name "ConceptSchemeStub" ;
     a owl:Class, sh:NodeShape ;
-    rdfs:subClassOf kos-kit:KosResourceStub .
+    rdfs:subClassOf kos-kit-stubs:KosResourceStub .
 
-kos-kit:ConceptStub
+kos-kit-stubs:ConceptStub
     shaclmate:fromRdfType skos:Concept ;
     shaclmate:name "ConceptStub" ;
     a owl:Class, sh:NodeShape ;
-    rdfs:subClassOf kos-kit:KosResourceStub .
+    rdfs:subClassOf kos-kit-stubs:KosResourceStub .
 
-kos-kit:KosResourceStub
+kos-kit-stubs:KosResourceStub
     shaclmate:abstract true ;
     shaclmate:name "KosResourceStub" ;
     a owl:Class, sh:NodeShape ;
     sh:nodeKind sh:IRI ;
-    sh:property kos-kit:KosResourceStub-prefLabel, kos-kit:KosResourceStub-prefLabelXl .
+    sh:property kos-kit-stubs:KosResourceStub-prefLabel, kos-kit-stubs:KosResourceStub-prefLabelXl .
 
-kos-kit:KosResourceStub-prefLabel
+kos-kit-stubs:KosResourceStub-prefLabel
     a sh:PropertyShape ;
     sh:name "prefLabel" ;
     sh:path skos:prefLabel ;
     sh:xone dash:StringOrLangString .
 
-kos-kit:KosResourceStub-prefLabelXl
+kos-kit-stubs:KosResourceStub-prefLabelXl
     a sh:PropertyShape ;
     sh:name "prefLabelXl" ;
-    sh:node kos-kit:LabelStub ;
+    sh:node kos-kit-stubs:LabelStub ;
     sh:path skos-xl:prefLabel .
 
-kos-kit:LabelStub
+kos-kit-stubs:LabelStub
     shaclmate:fromRdfType skos-xl:Label ;
     shaclmate:name "LabelStub" ;
     a owl:Class, sh:NodeShape ;
     sh:nodeKind sh:BlankNodeOrIRI ;
-    sh:property kos-kit:LabelStub-literalForm .
+    sh:property kos-kit-stubs:LabelStub-literalForm .
 
-kos-kit:LabelStub-literalForm
+kos-kit-stubs:LabelStub-literalForm
     a sh:PropertyShape ;
     sh:minCount 1 ;
     sh:name "literalForm" ;
