@@ -33,16 +33,13 @@ const packages: readonly Package[] = [
     externalDependencies: {
       "@rdfjs/term-set": externalDependencyVersions["@rdfjs/term-set"],
       "@rdfjs/types": externalDependencyVersions["@rdfjs/types"],
+      "@shaclmate/runtime": "2.0.14",
       "@tpluscode/rdf-ns-builders":
         externalDependencyVersions["@tpluscode/rdf-ns-builders"],
       "@types/rdfjs__term-set":
         externalDependencyVersions["@types/rdfjs__term-set"],
-      "@types/sparqljs": "3.1.12",
-      "js-sha256": "^0.11.0",
       pino: externalDependencyVersions["pino"],
       "purify-ts": externalDependencyVersions["purify-ts"],
-      "purify-ts-helpers": externalDependencyVersions["purify-ts-helpers"],
-      sparqljs: "3.7.3",
     },
     internalDependencies: ["sparql-client"],
     name: "models",
