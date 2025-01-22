@@ -5,6 +5,8 @@ import * as purifyHelpers from "purify-ts-helpers";
 import * as rdfLiteral from "rdf-literal";
 import * as rdfjsResource from "rdfjs-resource";
 import * as sparqljs from "sparqljs";
+import { z as zod } from "zod";
+import { zodToJsonSchema } from "zod-to-json-schema";
 export interface LabelStub {
   readonly identifier: rdfjs.BlankNode | rdfjs.NamedNode;
   readonly literalForm: purify.NonEmptyList<rdfjs.Literal>;
@@ -20,6 +22,93 @@ export namespace LabelStub {
     const literalForm = parameters.literalForm;
     const type = "LabelStub" as const;
     return { identifier, literalForm, type };
+  }
+
+  export function equals(
+    left: LabelStub,
+    right: LabelStub,
+  ): purifyHelpers.Equatable.EqualsResult {
+    return purifyHelpers.Equatable.booleanEquals(
+      left.identifier,
+      right.identifier,
+    )
+      .mapLeft((propertyValuesUnequal) => ({
+        left: left,
+        right: right,
+        propertyName: "identifier",
+        propertyValuesUnequal,
+        type: "Property" as const,
+      }))
+      .chain(() =>
+        ((left, right) =>
+          purifyHelpers.Arrays.equals(
+            left,
+            right,
+            purifyHelpers.Equatable.booleanEquals,
+          ))(left.literalForm, right.literalForm).mapLeft(
+          (propertyValuesUnequal) => ({
+            left: left,
+            right: right,
+            propertyName: "literalForm",
+            propertyValuesUnequal,
+            type: "Property" as const,
+          }),
+        ),
+      )
+      .chain(() =>
+        purifyHelpers.Equatable.strictEquals(left.type, right.type).mapLeft(
+          (propertyValuesUnequal) => ({
+            left: left,
+            right: right,
+            propertyName: "type",
+            propertyValuesUnequal,
+            type: "Property" as const,
+          }),
+        ),
+      );
+  }
+
+  export function propertiesFromJson(
+    _json: unknown,
+  ): purify.Either<
+    zod.ZodError,
+    {
+      identifier: rdfjs.BlankNode | rdfjs.NamedNode;
+      literalForm: purify.NonEmptyList<rdfjs.Literal>;
+      type: "LabelStub";
+    }
+  > {
+    const _jsonSafeParseResult = jsonZodSchema().safeParse(_json);
+    if (!_jsonSafeParseResult.success) {
+      return purify.Left(_jsonSafeParseResult.error);
+    }
+
+    const _jsonObject = _jsonSafeParseResult.data;
+    const identifier = _jsonObject["@id"].startsWith("_:")
+      ? dataFactory.blankNode(_jsonObject["@id"].substring(2))
+      : dataFactory.namedNode(_jsonObject["@id"]);
+    const literalForm = purify.NonEmptyList.fromArray(
+      _jsonObject["literalForm"],
+    )
+      .unsafeCoerce()
+      .map((_item) =>
+        dataFactory.literal(
+          _item["@value"],
+          typeof _item["@language"] !== "undefined"
+            ? _item["@language"]
+            : typeof _item["@type"] !== "undefined"
+              ? dataFactory.namedNode(_item["@type"])
+              : undefined,
+        ),
+      );
+    const type = "LabelStub" as const;
+    return purify.Either.of({ identifier, literalForm, type });
+  }
+
+  export function fromJson(
+    json: unknown,
+  ): purify.Either<zod.ZodError, LabelStub> {
+    return LabelStub.propertiesFromJson(json);
   }
 
   export function propertiesFromRdf({
@@ -115,16 +204,76 @@ export namespace LabelStub {
     return LabelStub.propertiesFromRdf(parameters);
   }
 
+  export function jsonSchema() {
+    return zodToJsonSchema(jsonZodSchema());
+  }
+
+  export function jsonUiSchema(parameters?: { scopePrefix?: string }) {
+    const scopePrefix = parameters?.scopePrefix ?? "#";
+    return {
+      elements: [
+        {
+          label: "Identifier",
+          scope: `${scopePrefix}/properties/@id`,
+          type: "Control",
+        },
+        { scope: `${scopePrefix}/properties/literalForm`, type: "Control" },
+        {
+          rule: {
+            condition: {
+              schema: { const: "LabelStub" },
+              scope: `${scopePrefix}/properties/type`,
+            },
+            effect: "HIDE",
+          },
+          scope: `${scopePrefix}/properties/type`,
+          type: "Control",
+        },
+      ],
+      label: "LabelStub",
+      type: "Group",
+    };
+  }
+
+  export function jsonZodSchema() {
+    return zod.object({
+      "@id": zod.string().min(1),
+      literalForm: zod
+        .object({
+          "@language": zod.string().optional(),
+          "@type": zod.string().optional(),
+          "@value": zod.string(),
+        })
+        .array()
+        .nonempty()
+        .min(1),
+      type: zod.literal("LabelStub"),
+    });
+  }
+
+  export function hash<
+    HasherT extends {
+      update: (message: string | number[] | ArrayBuffer | Uint8Array) => void;
+    },
+  >(_labelStub: LabelStub, _hasher: HasherT): HasherT {
+    for (const _item0 of _labelStub.literalForm) {
+      _hasher.update(_item0.datatype.value);
+      _hasher.update(_item0.language);
+      _hasher.update(_item0.termType);
+      _hasher.update(_item0.value);
+    }
+
+    return _hasher;
+  }
+
   export function sparqlConstructQuery(
     parameters?: {
       ignoreRdfType?: boolean;
       prefixes?: { [prefix: string]: string };
       subject?: sparqljs.Triple["subject"];
-      variablePrefix?: string;
     } & Omit<sparqljs.ConstructQuery, "prefixes" | "queryType" | "type">,
   ): sparqljs.ConstructQuery {
-    const { ignoreRdfType, subject, variablePrefix, ...queryParameters } =
-      parameters ?? {};
+    const { ignoreRdfType, subject, ...queryParameters } = parameters ?? {};
 
     return {
       ...queryParameters,
@@ -135,11 +284,7 @@ export namespace LabelStub {
       ),
       type: "query",
       where: (queryParameters.where ?? []).concat(
-        LabelStub.sparqlWherePatterns({
-          ignoreRdfType,
-          subject,
-          variablePrefix,
-        }),
+        LabelStub.sparqlWherePatterns({ ignoreRdfType, subject }),
       ),
     };
   }
@@ -270,6 +415,40 @@ export namespace LabelStub {
       } satisfies ReturnType<typeof LabelStub.toJson>),
     );
   }
+
+  export function toRdf(
+    _labelStub: LabelStub,
+    {
+      ignoreRdfType,
+      mutateGraph,
+      resourceSet,
+    }: {
+      ignoreRdfType?: boolean;
+      mutateGraph: rdfjsResource.MutableResource.MutateGraph;
+      resourceSet: rdfjsResource.MutableResourceSet;
+    },
+  ): rdfjsResource.MutableResource {
+    const _resource = resourceSet.mutableResource({
+      identifier: _labelStub.identifier,
+      mutateGraph,
+    });
+    if (!ignoreRdfType) {
+      _resource.add(
+        _resource.dataFactory.namedNode(
+          "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        ),
+        _resource.dataFactory.namedNode(
+          "http://www.w3.org/2008/05/skos-xl#Label",
+        ),
+      );
+    }
+
+    _resource.add(
+      dataFactory.namedNode("http://www.w3.org/2008/05/skos-xl#literalForm"),
+      _labelStub.literalForm.map((_item) => _item),
+    );
+    return _resource;
+  }
 }
 export interface KosResourceStub {
   readonly identifier: rdfjs.NamedNode;
@@ -304,6 +483,97 @@ export namespace KosResourceStub {
     }
 
     return { identifier, prefLabel, prefLabelXl };
+  }
+
+  export function equals(
+    left: KosResourceStub,
+    right: KosResourceStub,
+  ): purifyHelpers.Equatable.EqualsResult {
+    return purifyHelpers.Equatable.booleanEquals(
+      left.identifier,
+      right.identifier,
+    )
+      .mapLeft((propertyValuesUnequal) => ({
+        left: left,
+        right: right,
+        propertyName: "identifier",
+        propertyValuesUnequal,
+        type: "Property" as const,
+      }))
+      .chain(() =>
+        ((left, right) =>
+          purifyHelpers.Arrays.equals(
+            left,
+            right,
+            purifyHelpers.Equatable.booleanEquals,
+          ))(left.prefLabel, right.prefLabel).mapLeft(
+          (propertyValuesUnequal) => ({
+            left: left,
+            right: right,
+            propertyName: "prefLabel",
+            propertyValuesUnequal,
+            type: "Property" as const,
+          }),
+        ),
+      )
+      .chain(() =>
+        ((left, right) =>
+          purifyHelpers.Arrays.equals(left, right, LabelStub.equals))(
+          left.prefLabelXl,
+          right.prefLabelXl,
+        ).mapLeft((propertyValuesUnequal) => ({
+          left: left,
+          right: right,
+          propertyName: "prefLabelXl",
+          propertyValuesUnequal,
+          type: "Property" as const,
+        })),
+      )
+      .chain(() =>
+        purifyHelpers.Equatable.strictEquals(left.type, right.type).mapLeft(
+          (propertyValuesUnequal) => ({
+            left: left,
+            right: right,
+            propertyName: "type",
+            propertyValuesUnequal,
+            type: "Property" as const,
+          }),
+        ),
+      );
+  }
+
+  export function propertiesFromJson(
+    _json: unknown,
+  ): purify.Either<
+    zod.ZodError,
+    {
+      identifier: rdfjs.NamedNode;
+      prefLabel: readonly rdfjs.Literal[];
+      prefLabelXl: readonly LabelStub[];
+    }
+  > {
+    const _jsonSafeParseResult =
+      kosResourceStubJsonZodSchema().safeParse(_json);
+    if (!_jsonSafeParseResult.success) {
+      return purify.Left(_jsonSafeParseResult.error);
+    }
+
+    const _jsonObject = _jsonSafeParseResult.data;
+    const identifier = dataFactory.namedNode(_jsonObject["@id"]);
+    const prefLabel = _jsonObject["prefLabel"].map((_item) =>
+      dataFactory.literal(
+        _item["@value"],
+        typeof _item["@language"] !== "undefined"
+          ? _item["@language"]
+          : typeof _item["@type"] !== "undefined"
+            ? dataFactory.namedNode(_item["@type"])
+            : undefined,
+      ),
+    );
+    const prefLabelXl = _jsonObject["prefLabelXl"].map((_item) =>
+      LabelStub.fromJson(_item).unsafeCoerce(),
+    );
+    return purify.Either.of({ identifier, prefLabel, prefLabelXl });
   }
 
   export function propertiesFromRdf({
@@ -398,16 +668,84 @@ export namespace KosResourceStub {
     return purify.Either.of({ identifier, prefLabel, prefLabelXl });
   }
 
+  export function jsonSchema() {
+    return zodToJsonSchema(kosResourceStubJsonZodSchema());
+  }
+
+  export function kosResourceStubJsonUiSchema(parameters?: {
+    scopePrefix?: string;
+  }) {
+    const scopePrefix = parameters?.scopePrefix ?? "#";
+    return {
+      elements: [
+        {
+          label: "Identifier",
+          scope: `${scopePrefix}/properties/@id`,
+          type: "Control",
+        },
+        { scope: `${scopePrefix}/properties/prefLabel`, type: "Control" },
+        LabelStub.jsonUiSchema({
+          scopePrefix: `${scopePrefix}/properties/prefLabelXl`,
+        }),
+        {
+          rule: {
+            condition: {
+              schema: { const: "KosResourceStub" },
+              scope: `${scopePrefix}/properties/type`,
+            },
+            effect: "HIDE",
+          },
+          scope: `${scopePrefix}/properties/type`,
+          type: "Control",
+        },
+      ],
+      label: "KosResourceStub",
+      type: "Group",
+    };
+  }
+
+  export function kosResourceStubJsonZodSchema() {
+    return zod.object({
+      "@id": zod.string().min(1),
+      prefLabel: zod
+        .object({
+          "@language": zod.string().optional(),
+          "@type": zod.string().optional(),
+          "@value": zod.string(),
+        })
+        .array(),
+      prefLabelXl: LabelStub.jsonZodSchema().array(),
+      type: zod.enum(["ConceptSchemeStub", "ConceptStub"]),
+    });
+  }
+
+  export function hashKosResourceStub<
+    HasherT extends {
+      update: (message: string | number[] | ArrayBuffer | Uint8Array) => void;
+    },
+  >(_kosResourceStub: KosResourceStub, _hasher: HasherT): HasherT {
+    for (const _item0 of _kosResourceStub.prefLabel) {
+      _hasher.update(_item0.datatype.value);
+      _hasher.update(_item0.language);
+      _hasher.update(_item0.termType);
+      _hasher.update(_item0.value);
+    }
+
+    for (const _item0 of _kosResourceStub.prefLabelXl) {
+      LabelStub.hash(_item0, _hasher);
+    }
+
+    return _hasher;
+  }
+
   export function sparqlConstructQuery(
     parameters?: {
       ignoreRdfType?: boolean;
       prefixes?: { [prefix: string]: string };
       subject?: sparqljs.Triple["subject"];
-      variablePrefix?: string;
     } & Omit<sparqljs.ConstructQuery, "prefixes" | "queryType" | "type">,
   ): sparqljs.ConstructQuery {
-    const { ignoreRdfType, subject, variablePrefix, ...queryParameters } =
-      parameters ?? {};
+    const { ignoreRdfType, subject, ...queryParameters } = parameters ?? {};
 
     return {
       ...queryParameters,
@@ -421,11 +759,7 @@ export namespace KosResourceStub {
       ),
       type: "query",
       where: (queryParameters.where ?? []).concat(
-        KosResourceStub.sparqlWherePatterns({
-          ignoreRdfType,
-          subject,
-          variablePrefix,
-        }),
+        KosResourceStub.sparqlWherePatterns({ ignoreRdfType, subject }),
       ),
     };
   }
@@ -556,6 +890,37 @@ export namespace KosResourceStub {
         type: _kosResourceStub.type,
       } satisfies ReturnType<typeof KosResourceStub.toJson>),
     );
+  }
+
+  export function toRdf(
+    _kosResourceStub: KosResourceStub,
+    {
+      mutateGraph,
+      resourceSet,
+    }: {
+      ignoreRdfType?: boolean;
+      mutateGraph: rdfjsResource.MutableResource.MutateGraph;
+      resourceSet: rdfjsResource.MutableResourceSet;
+    },
+  ): rdfjsResource.MutableResource<rdfjs.NamedNode> {
+    const _resource = resourceSet.mutableNamedResource({
+      identifier: _kosResourceStub.identifier,
+      mutateGraph,
+    });
+    _resource.add(
+      dataFactory.namedNode("http://www.w3.org/2004/02/skos/core#prefLabel"),
+      _kosResourceStub.prefLabel.map((_item) => _item),
+    );
+    _resource.add(
+      dataFactory.namedNode("http://www.w3.org/2008/05/skos-xl#prefLabel"),
+      _kosResourceStub.prefLabelXl.map((_item) =>
+        LabelStub.toRdf(_item, {
+          mutateGraph: mutateGraph,
+          resourceSet: resourceSet,
+        }),
+      ),
+    );
+    return _resource;
   }
 }
 export interface KosResource {
@@ -1338,11 +1703,9 @@ export namespace KosResource {
       ignoreRdfType?: boolean;
       prefixes?: { [prefix: string]: string };
       subject?: sparqljs.Triple["subject"];
-      variablePrefix?: string;
     } & Omit<sparqljs.ConstructQuery, "prefixes" | "queryType" | "type">,
   ): sparqljs.ConstructQuery {
-    const { ignoreRdfType, subject, variablePrefix, ...queryParameters } =
-      parameters ?? {};
+    const { ignoreRdfType, subject, ...queryParameters } = parameters ?? {};
 
     return {
       ...queryParameters,
@@ -1353,11 +1716,7 @@ export namespace KosResource {
       ),
       type: "query",
       where: (queryParameters.where ?? []).concat(
-        KosResource.sparqlWherePatterns({
-          ignoreRdfType,
-          subject,
-          variablePrefix,
-        }),
+        KosResource.sparqlWherePatterns({ ignoreRdfType, subject }),
       ),
     };
   }
@@ -2124,11 +2483,9 @@ export namespace ConceptScheme {
       ignoreRdfType?: boolean;
       prefixes?: { [prefix: string]: string };
       subject?: sparqljs.Triple["subject"];
-      variablePrefix?: string;
     } & Omit<sparqljs.ConstructQuery, "prefixes" | "queryType" | "type">,
   ): sparqljs.ConstructQuery {
-    const { ignoreRdfType, subject, variablePrefix, ...queryParameters } =
-      parameters ?? {};
+    const { ignoreRdfType, subject, ...queryParameters } = parameters ?? {};
 
     return {
       ...queryParameters,
@@ -2142,11 +2499,7 @@ export namespace ConceptScheme {
       ),
       type: "query",
       where: (queryParameters.where ?? []).concat(
-        ConceptScheme.sparqlWherePatterns({
-          ignoreRdfType,
-          subject,
-          variablePrefix,
-        }),
+        ConceptScheme.sparqlWherePatterns({ ignoreRdfType, subject }),
       ),
     };
   }
@@ -2361,6 +2714,48 @@ export namespace ConceptSchemeStub {
     return { ...KosResourceStub.create(parameters), identifier, type };
   }
 
+  export function equals(
+    left: ConceptSchemeStub,
+    right: ConceptSchemeStub,
+  ): purifyHelpers.Equatable.EqualsResult {
+    return KosResourceStub.equals(left, right);
+  }
+
+  export function propertiesFromJson(
+    _json: unknown,
+  ): purify.Either<
+    zod.ZodError,
+    {
+      identifier: rdfjs.NamedNode;
+      type: "ConceptSchemeStub";
+    } & purifyHelpers.Eithers.UnwrapR<
+      ReturnType<typeof KosResourceStub.propertiesFromJson>
+    >
+  > {
+    const _jsonSafeParseResult =
+      conceptSchemeStubJsonZodSchema().safeParse(_json);
+    if (!_jsonSafeParseResult.success) {
+      return purify.Left(_jsonSafeParseResult.error);
+    }
+
+    const _jsonObject = _jsonSafeParseResult.data;
+    const _super0Either = KosResourceStub.propertiesFromJson(_jsonObject);
+    if (_super0Either.isLeft()) {
+      return _super0Either;
+    }
+
+    const _super0 = _super0Either.unsafeCoerce();
+    const identifier = dataFactory.namedNode(_jsonObject["@id"]);
+    const type = "ConceptSchemeStub" as const;
+    return purify.Either.of({ ..._super0, identifier, type });
+  }
+
+  export function fromJson(
+    json: unknown,
+  ): purify.Either<zod.ZodError, ConceptSchemeStub> {
+    return ConceptSchemeStub.propertiesFromJson(json);
+  }
+
   export function propertiesFromRdf({
     ignoreRdfType: _ignoreRdfType,
     languageIn: _languageIn,
@@ -2422,16 +2817,47 @@ export namespace ConceptSchemeStub {
     return ConceptSchemeStub.propertiesFromRdf(parameters);
   }
 
+  export function jsonSchema() {
+    return zodToJsonSchema(conceptSchemeStubJsonZodSchema());
+  }
+
+  export function conceptSchemeStubJsonUiSchema(parameters?: {
+    scopePrefix?: string;
+  }) {
+    const scopePrefix = parameters?.scopePrefix ?? "#";
+    return {
+      elements: [KosResourceStub.kosResourceStubJsonUiSchema({ scopePrefix })],
+      label: "ConceptSchemeStub",
+      type: "Group",
+    };
+  }
+
+  export function conceptSchemeStubJsonZodSchema() {
+    return KosResourceStub.kosResourceStubJsonZodSchema().merge(
+      zod.object({
+        "@id": zod.string().min(1),
+        type: zod.literal("ConceptSchemeStub"),
+      }),
+    );
+  }
+
+  export function hashConceptSchemeStub<
+    HasherT extends {
+      update: (message: string | number[] | ArrayBuffer | Uint8Array) => void;
+    },
+  >(_conceptSchemeStub: ConceptSchemeStub, _hasher: HasherT): HasherT {
+    KosResourceStub.hashKosResourceStub(_conceptSchemeStub, _hasher);
+    return _hasher;
+  }
+
   export function sparqlConstructQuery(
     parameters?: {
       ignoreRdfType?: boolean;
       prefixes?: { [prefix: string]: string };
       subject?: sparqljs.Triple["subject"];
-      variablePrefix?: string;
     } & Omit<sparqljs.ConstructQuery, "prefixes" | "queryType" | "type">,
   ): sparqljs.ConstructQuery {
-    const { ignoreRdfType, subject, variablePrefix, ...queryParameters } =
-      parameters ?? {};
+    const { ignoreRdfType, subject, ...queryParameters } = parameters ?? {};
 
     return {
       ...queryParameters,
@@ -2445,11 +2871,7 @@ export namespace ConceptSchemeStub {
       ),
       type: "query",
       where: (queryParameters.where ?? []).concat(
-        ConceptSchemeStub.sparqlWherePatterns({
-          ignoreRdfType,
-          subject,
-          variablePrefix,
-        }),
+        ConceptSchemeStub.sparqlWherePatterns({ ignoreRdfType, subject }),
       ),
     };
   }
@@ -2555,6 +2977,37 @@ export namespace ConceptSchemeStub {
       } satisfies ReturnType<typeof ConceptSchemeStub.toJson>),
     );
   }
+
+  export function toRdf(
+    _conceptSchemeStub: ConceptSchemeStub,
+    {
+      ignoreRdfType,
+      mutateGraph,
+      resourceSet,
+    }: {
+      ignoreRdfType?: boolean;
+      mutateGraph: rdfjsResource.MutableResource.MutateGraph;
+      resourceSet: rdfjsResource.MutableResourceSet;
+    },
+  ): rdfjsResource.MutableResource<rdfjs.NamedNode> {
+    const _resource = KosResourceStub.toRdf(_conceptSchemeStub, {
+      ignoreRdfType: true,
+      mutateGraph,
+      resourceSet,
+    });
+    if (!ignoreRdfType) {
+      _resource.add(
+        _resource.dataFactory.namedNode(
+          "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        ),
+        _resource.dataFactory.namedNode(
+          "http://www.w3.org/2004/02/skos/core#ConceptScheme",
+        ),
+      );
+    }
+
+    return _resource;
+  }
 }
 export interface ConceptStub extends KosResourceStub {
   readonly identifier: rdfjs.NamedNode;
@@ -2570,6 +3023,47 @@ export namespace ConceptStub {
     const identifier = parameters.identifier;
     const type = "ConceptStub" as const;
     return { ...KosResourceStub.create(parameters), identifier, type };
+  }
+
+  export function equals(
+    left: ConceptStub,
+    right: ConceptStub,
+  ): purifyHelpers.Equatable.EqualsResult {
+    return KosResourceStub.equals(left, right);
+  }
+
+  export function propertiesFromJson(
+    _json: unknown,
+  ): purify.Either<
+    zod.ZodError,
+    {
+      identifier: rdfjs.NamedNode;
+      type: "ConceptStub";
+    } & purifyHelpers.Eithers.UnwrapR<
+      ReturnType<typeof KosResourceStub.propertiesFromJson>
+    >
+  > {
+    const _jsonSafeParseResult = conceptStubJsonZodSchema().safeParse(_json);
+    if (!_jsonSafeParseResult.success) {
+      return purify.Left(_jsonSafeParseResult.error);
+    }
+
+    const _jsonObject = _jsonSafeParseResult.data;
+    const _super0Either = KosResourceStub.propertiesFromJson(_jsonObject);
+    if (_super0Either.isLeft()) {
+      return _super0Either;
+    }
+
+    const _super0 = _super0Either.unsafeCoerce();
+    const identifier = dataFactory.namedNode(_jsonObject["@id"]);
+    const type = "ConceptStub" as const;
+    return purify.Either.of({ ..._super0, identifier, type });
+  }
+
+  export function fromJson(
+    json: unknown,
+  ): purify.Either<zod.ZodError, ConceptStub> {
+    return ConceptStub.propertiesFromJson(json);
   }
 
   export function propertiesFromRdf({
@@ -2631,16 +3125,47 @@ export namespace ConceptStub {
     return ConceptStub.propertiesFromRdf(parameters);
   }
 
+  export function jsonSchema() {
+    return zodToJsonSchema(conceptStubJsonZodSchema());
+  }
+
+  export function conceptStubJsonUiSchema(parameters?: {
+    scopePrefix?: string;
+  }) {
+    const scopePrefix = parameters?.scopePrefix ?? "#";
+    return {
+      elements: [KosResourceStub.kosResourceStubJsonUiSchema({ scopePrefix })],
+      label: "ConceptStub",
+      type: "Group",
+    };
+  }
+
+  export function conceptStubJsonZodSchema() {
+    return KosResourceStub.kosResourceStubJsonZodSchema().merge(
+      zod.object({
+        "@id": zod.string().min(1),
+        type: zod.literal("ConceptStub"),
+      }),
+    );
+  }
+
+  export function hashConceptStub<
+    HasherT extends {
+      update: (message: string | number[] | ArrayBuffer | Uint8Array) => void;
+    },
+  >(_conceptStub: ConceptStub, _hasher: HasherT): HasherT {
+    KosResourceStub.hashKosResourceStub(_conceptStub, _hasher);
+    return _hasher;
+  }
+
   export function sparqlConstructQuery(
     parameters?: {
       ignoreRdfType?: boolean;
       prefixes?: { [prefix: string]: string };
       subject?: sparqljs.Triple["subject"];
-      variablePrefix?: string;
     } & Omit<sparqljs.ConstructQuery, "prefixes" | "queryType" | "type">,
   ): sparqljs.ConstructQuery {
-    const { ignoreRdfType, subject, variablePrefix, ...queryParameters } =
-      parameters ?? {};
+    const { ignoreRdfType, subject, ...queryParameters } = parameters ?? {};
 
     return {
       ...queryParameters,
@@ -2651,11 +3176,7 @@ export namespace ConceptStub {
       ),
       type: "query",
       where: (queryParameters.where ?? []).concat(
-        ConceptStub.sparqlWherePatterns({
-          ignoreRdfType,
-          subject,
-          variablePrefix,
-        }),
+        ConceptStub.sparqlWherePatterns({ ignoreRdfType, subject }),
       ),
     };
   }
@@ -2758,6 +3279,37 @@ export namespace ConceptStub {
         ...KosResourceStub.toJson(_conceptStub),
       } satisfies ReturnType<typeof ConceptStub.toJson>),
     );
+  }
+
+  export function toRdf(
+    _conceptStub: ConceptStub,
+    {
+      ignoreRdfType,
+      mutateGraph,
+      resourceSet,
+    }: {
+      ignoreRdfType?: boolean;
+      mutateGraph: rdfjsResource.MutableResource.MutateGraph;
+      resourceSet: rdfjsResource.MutableResourceSet;
+    },
+  ): rdfjsResource.MutableResource<rdfjs.NamedNode> {
+    const _resource = KosResourceStub.toRdf(_conceptStub, {
+      ignoreRdfType: true,
+      mutateGraph,
+      resourceSet,
+    });
+    if (!ignoreRdfType) {
+      _resource.add(
+        _resource.dataFactory.namedNode(
+          "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        ),
+        _resource.dataFactory.namedNode(
+          "http://www.w3.org/2004/02/skos/core#Concept",
+        ),
+      );
+    }
+
+    return _resource;
   }
 }
 export interface Concept extends KosResource {
@@ -3498,11 +4050,9 @@ export namespace Concept {
       ignoreRdfType?: boolean;
       prefixes?: { [prefix: string]: string };
       subject?: sparqljs.Triple["subject"];
-      variablePrefix?: string;
     } & Omit<sparqljs.ConstructQuery, "prefixes" | "queryType" | "type">,
   ): sparqljs.ConstructQuery {
-    const { ignoreRdfType, subject, variablePrefix, ...queryParameters } =
-      parameters ?? {};
+    const { ignoreRdfType, subject, ...queryParameters } = parameters ?? {};
 
     return {
       ...queryParameters,
@@ -3513,7 +4063,7 @@ export namespace Concept {
       ),
       type: "query",
       where: (queryParameters.where ?? []).concat(
-        Concept.sparqlWherePatterns({ ignoreRdfType, subject, variablePrefix }),
+        Concept.sparqlWherePatterns({ ignoreRdfType, subject }),
       ),
     };
   }
@@ -4211,11 +4761,9 @@ export namespace Label {
       ignoreRdfType?: boolean;
       prefixes?: { [prefix: string]: string };
       subject?: sparqljs.Triple["subject"];
-      variablePrefix?: string;
     } & Omit<sparqljs.ConstructQuery, "prefixes" | "queryType" | "type">,
   ): sparqljs.ConstructQuery {
-    const { ignoreRdfType, subject, variablePrefix, ...queryParameters } =
-      parameters ?? {};
+    const { ignoreRdfType, subject, ...queryParameters } = parameters ?? {};
 
     return {
       ...queryParameters,
@@ -4226,7 +4774,7 @@ export namespace Label {
       ),
       type: "query",
       where: (queryParameters.where ?? []).concat(
-        Label.sparqlWherePatterns({ ignoreRdfType, subject, variablePrefix }),
+        Label.sparqlWherePatterns({ ignoreRdfType, subject }),
       ),
     };
   }
