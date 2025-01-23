@@ -27,7 +27,7 @@
     "format:write": "biome format --write",
     "format:write:unsafe": "biome format --write --unsafe",
     "rebuild": "run-s clean build",
-    "link-dependencies": "npm link purify-ts-helpers rdfjs-resource",
+    "link-dependencies": "npm link rdfjs-resource",
     "lint": "biome lint",
     "lint:write": "biome lint --write",
     "lint:write:unsafe": "biome lint --write --unsafe",

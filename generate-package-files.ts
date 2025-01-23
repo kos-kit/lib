@@ -32,7 +32,7 @@ const packages: readonly Package[] = [
     externalDependencies: {
       "@rdfjs/term-set": externalDependencyVersions["@rdfjs/term-set"],
       "@rdfjs/types": externalDependencyVersions["@rdfjs/types"],
-      "@shaclmate/runtime": "2.0.14",
+      "@shaclmate/runtime": "2.0.15",
       "@tpluscode/rdf-ns-builders":
         externalDependencyVersions["@tpluscode/rdf-ns-builders"],
       "@types/rdfjs__term-set":
@@ -144,7 +144,7 @@ for (const package_ of packages) {
           "format:write": "biome format --write",
           "format:write:unsafe": "biome format --write --unsafe",
           rebuild: "run-s clean build",
-          "link-dependencies": "npm link purify-ts-helpers rdfjs-resource",
+          "link-dependencies": "npm link rdfjs-resource",
           lint: "biome lint",
           "lint:write": "biome lint --write",
           "lint:write:unsafe": "biome lint --write --unsafe",
