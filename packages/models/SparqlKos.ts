@@ -1,8 +1,7 @@
 import { SparqlQueryClient } from "@kos-kit/sparql-client";
 import { DataFactory, DatasetCoreFactory, Quad, Variable } from "@rdfjs/types";
 import { dcterms, rdf, rdfs, skos, skosxl } from "@tpluscode/rdf-ns-builders";
-import { Either, Left } from "purify-ts";
-import { Eithers } from "purify-ts-helpers";
+import { Either, EitherAsync, Left } from "purify-ts";
 import { Resource } from "rdfjs-resource";
 import sparqljs from "sparqljs";
 import { ModelFactories } from "./ModelFactories.js";
@@ -99,9 +98,9 @@ export class SparqlKos<
     offset: number;
     query: ConceptQuery;
   }): Promise<Either<Error, readonly Identifier[]>> {
-    return (
-      await Eithers.encaseAsync(() =>
-        this.sparqlQueryClient.queryBindings(
+    return await EitherAsync(async () =>
+      mapBindingsToIdentifiers(
+        await this.sparqlQueryClient.queryBindings(
           this.sparqlGenerator.stringify({
             distinct: true,
             limit: limit ?? undefined,
@@ -114,9 +113,8 @@ export class SparqlKos<
             where: this.conceptQueryToWhereGraphPatterns(query).concat(),
           }),
         ),
-      )
-    ).map((bindings) =>
-      mapBindingsToIdentifiers(bindings, this.conceptVariable.value),
+        this.conceptVariable.value,
+      ),
     );
   }
 
@@ -140,9 +138,9 @@ export class SparqlKos<
     offset: number;
     query: ConceptSchemeQuery;
   }): Promise<Either<Error, readonly Identifier[]>> {
-    return (
-      await Eithers.encaseAsync(() =>
-        this.sparqlQueryClient.queryBindings(
+    return await EitherAsync(async () =>
+      mapBindingsToIdentifiers(
+        await this.sparqlQueryClient.queryBindings(
           this.sparqlGenerator.stringify({
             distinct: true,
             limit: limit ?? undefined,
@@ -155,9 +153,8 @@ export class SparqlKos<
             where: this.conceptSchemeQueryToWhereGraphPatterns(query).concat(),
           }),
         ),
-      )
-    ).map((bindings) =>
-      mapBindingsToIdentifiers(bindings, this.conceptSchemeVariable.value),
+        this.conceptSchemeVariable.value,
+      ),
     );
   }
 
@@ -206,31 +203,33 @@ export class SparqlKos<
   async conceptSchemesCount(
     query: ConceptSchemeQuery,
   ): Promise<Either<Error, number>> {
-    return (
-      await Eithers.encaseAsync(() =>
-        this.sparqlQueryClient.queryBindings(
-          this.sparqlGenerator.stringify({
-            distinct: true,
-            prefixes,
-            queryType: "SELECT",
-            type: "query",
-            variables: [
-              {
-                expression: {
-                  aggregation: "COUNT",
-                  distinct: true,
-                  expression: this.conceptSchemeVariable,
-                  type: "aggregate",
+    return await EitherAsync(async ({ liftEither }) =>
+      liftEither(
+        mapBindingsToCount(
+          await this.sparqlQueryClient.queryBindings(
+            this.sparqlGenerator.stringify({
+              distinct: true,
+              prefixes,
+              queryType: "SELECT",
+              type: "query",
+              variables: [
+                {
+                  expression: {
+                    aggregation: "COUNT",
+                    distinct: true,
+                    expression: this.conceptSchemeVariable,
+                    type: "aggregate",
+                  },
+                  variable: this.countVariable,
                 },
-                variable: this.countVariable,
-              },
-            ],
-            where: this.conceptSchemeQueryToWhereGraphPatterns(query).concat(),
-          }),
+              ],
+              where:
+                this.conceptSchemeQueryToWhereGraphPatterns(query).concat(),
+            }),
+          ),
+          this.countVariable.value,
         ),
-      )
-    ).chain((bindings) =>
-      mapBindingsToCount(bindings, this.countVariable.value),
+      ),
     );
   }
 
@@ -277,31 +276,32 @@ export class SparqlKos<
   }
 
   async conceptsCount(query: ConceptQuery): Promise<Either<Error, number>> {
-    return (
-      await Eithers.encaseAsync(() =>
-        this.sparqlQueryClient.queryBindings(
-          this.sparqlGenerator.stringify({
-            distinct: true,
-            prefixes,
-            queryType: "SELECT",
-            type: "query",
-            variables: [
-              {
-                expression: {
-                  aggregation: "COUNT",
-                  distinct: true,
-                  expression: this.conceptVariable,
-                  type: "aggregate",
+    return await EitherAsync(async ({ liftEither }) =>
+      liftEither(
+        mapBindingsToCount(
+          await this.sparqlQueryClient.queryBindings(
+            this.sparqlGenerator.stringify({
+              distinct: true,
+              prefixes,
+              queryType: "SELECT",
+              type: "query",
+              variables: [
+                {
+                  expression: {
+                    aggregation: "COUNT",
+                    distinct: true,
+                    expression: this.conceptVariable,
+                    type: "aggregate",
+                  },
+                  variable: this.countVariable,
                 },
-                variable: this.countVariable,
-              },
-            ],
-            where: this.conceptQueryToWhereGraphPatterns(query).concat(),
-          }),
+              ],
+              where: this.conceptQueryToWhereGraphPatterns(query).concat(),
+            }),
+          ),
+          this.countVariable.value,
         ),
-      )
-    ).chain((bindings) =>
-      mapBindingsToCount(bindings, this.countVariable.value),
+      ),
     );
   }
 
