@@ -1,12 +1,170 @@
 import type * as rdfjs from "@rdfjs/types";
 import { DataFactory as dataFactory } from "n3";
 import * as purify from "purify-ts";
-import * as purifyHelpers from "purify-ts-helpers";
 import * as rdfLiteral from "rdf-literal";
 import * as rdfjsResource from "rdfjs-resource";
 import * as sparqljs from "sparqljs";
 import { z as zod } from "zod";
 import { zodToJsonSchema } from "zod-to-json-schema";
+export type EqualsResult = purify.Either<EqualsResult.Unequal, true>;
+
+export namespace EqualsResult {
+  export const Equal: EqualsResult = purify.Either.of<Unequal, true>(true);
+
+  export function fromBooleanEqualsResult(
+    left: any,
+    right: any,
+    equalsResult: boolean | EqualsResult,
+  ): EqualsResult {
+    if (typeof equalsResult !== "boolean") {
+      return equalsResult;
+    }
+
+    if (equalsResult) {
+      return Equal;
+    }
+    return purify.Left({
+      left,
+      right,
+      type: "BooleanEquals",
+    });
+  }
+
+  export type Unequal =
+    | {
+        readonly left: {
+          readonly array: readonly any[];
+          readonly element: any;
+          readonly elementIndex: number;
+        };
+        readonly right: {
+          readonly array: readonly any[];
+          readonly unequals: readonly Unequal[];
+        };
+        readonly type: "ArrayElement";
+      }
+    | {
+        readonly left: readonly any[];
+        readonly right: readonly any[];
+        readonly type: "ArrayLength";
+      }
+    | {
+        readonly left: any;
+        readonly right: any;
+        readonly type: "BooleanEquals";
+      }
+    | {
+        readonly left: any;
+        readonly right: any;
+        readonly type: "LeftError";
+      }
+    | {
+        readonly right: any;
+        readonly type: "LeftNull";
+      }
+    | {
+        readonly left: bigint | boolean | number | string;
+        readonly right: bigint | boolean | number | string;
+        readonly type: "Primitive";
+      }
+    | {
+        readonly left: object;
+        readonly right: object;
+        readonly propertyName: string;
+        readonly propertyValuesUnequal: Unequal;
+        readonly type: "Property";
+      }
+    | {
+        readonly left: any;
+        readonly right: any;
+        readonly type: "RightError";
+      }
+    | {
+        readonly left: any;
+        readonly type: "RightNull";
+      };
+}
+/**
+ * Compare two objects with equals(other: T): boolean methods and return an EqualsResult.
+ */
+export function booleanEquals<T extends { equals: (other: T) => boolean }>(
+  left: T,
+  right: T,
+): EqualsResult {
+  return EqualsResult.fromBooleanEqualsResult(left, right, left.equals(right));
+}
+export function arrayEquals<T>(
+  leftArray: readonly T[],
+  rightArray: readonly T[],
+  elementEquals: (left: T, right: T) => boolean | EqualsResult,
+): EqualsResult {
+  if (leftArray.length !== rightArray.length) {
+    return purify.Left({
+      left: leftArray,
+      right: rightArray,
+      type: "ArrayLength",
+    });
+  }
+
+  for (
+    let leftElementIndex = 0;
+    leftElementIndex < leftArray.length;
+    leftElementIndex++
+  ) {
+    const leftElement = leftArray[leftElementIndex];
+
+    const rightUnequals: EqualsResult.Unequal[] = [];
+    for (
+      let rightElementIndex = 0;
+      rightElementIndex < rightArray.length;
+      rightElementIndex++
+    ) {
+      const rightElement = rightArray[rightElementIndex];
+
+      const leftElementEqualsRightElement =
+        EqualsResult.fromBooleanEqualsResult(
+          leftElement,
+          rightElement,
+          elementEquals(leftElement, rightElement),
+        );
+      if (leftElementEqualsRightElement.isRight()) {
+        break; // left element === right element, break out of the right iteration
+      }
+      rightUnequals.push(
+        leftElementEqualsRightElement.extract() as EqualsResult.Unequal,
+      );
+    }
+
+    if (rightUnequals.length === rightArray.length) {
+      // All right elements were unequal to the left element
+      return purify.Left({
+        left: {
+          array: leftArray,
+          element: leftElement,
+          elementIndex: leftElementIndex,
+        },
+        right: {
+          array: rightArray,
+          unequals: rightUnequals,
+        },
+        type: "ArrayElement",
+      });
+    }
+    // Else there was a right element equal to the left element, continue to the next left element
+  }
+
+  return EqualsResult.Equal;
+}
+/**
+ * Compare two values for strict equality (===), returning an EqualsResult rather than a boolean.
+ */
+export function strictEquals<T extends bigint | boolean | number | string>(
+  left: T,
+  right: T,
+): EqualsResult {
+  return EqualsResult.fromBooleanEqualsResult(left, right, left === right);
+}
+type UnwrapR<T> = T extends purify.Either<any, infer R> ? R : never;
 export interface LabelStub {
   readonly identifier: rdfjs.BlankNode | rdfjs.NamedNode;
   readonly literalForm: purify.NonEmptyList<rdfjs.Literal>;
@@ -24,14 +182,8 @@ export namespace LabelStub {
     return { identifier, literalForm, type };
   }
 
-  export function equals(
-    left: LabelStub,
-    right: LabelStub,
-  ): purifyHelpers.Equatable.EqualsResult {
-    return purifyHelpers.Equatable.booleanEquals(
-      left.identifier,
-      right.identifier,
-    )
+  export function equals(left: LabelStub, right: LabelStub): EqualsResult {
+    return booleanEquals(left.identifier, right.identifier)
       .mapLeft((propertyValuesUnequal) => ({
         left: left,
         right: right,
@@ -40,23 +192,19 @@ export namespace LabelStub {
         type: "Property" as const,
       }))
       .chain(() =>
-        ((left, right) =>
-          purifyHelpers.Arrays.equals(
-            left,
-            right,
-            purifyHelpers.Equatable.booleanEquals,
-          ))(left.literalForm, right.literalForm).mapLeft(
-          (propertyValuesUnequal) => ({
-            left: left,
-            right: right,
-            propertyName: "literalForm",
-            propertyValuesUnequal,
-            type: "Property" as const,
-          }),
-        ),
+        ((left, right) => arrayEquals(left, right, booleanEquals))(
+          left.literalForm,
+          right.literalForm,
+        ).mapLeft((propertyValuesUnequal) => ({
+          left: left,
+          right: right,
+          propertyName: "literalForm",
+          propertyValuesUnequal,
+          type: "Property" as const,
+        })),
       )
       .chain(() =>
-        purifyHelpers.Equatable.strictEquals(left.type, right.type).mapLeft(
+        strictEquals(left.type, right.type).mapLeft(
           (propertyValuesUnequal) => ({
             left: left,
             right: right,
@@ -68,7 +216,9 @@ export namespace LabelStub {
       );
   }
 
-  export function propertiesFromJson(_json: unknown): purify.Either<
+  export function propertiesFromJson(
+    _json: unknown,
+  ): purify.Either<
     zod.ZodError,
     {
       identifier: rdfjs.BlankNode | rdfjs.NamedNode;
@@ -486,11 +636,8 @@ export namespace KosResourceStub {
   export function equals(
     left: KosResourceStub,
     right: KosResourceStub,
-  ): purifyHelpers.Equatable.EqualsResult {
-    return purifyHelpers.Equatable.booleanEquals(
-      left.identifier,
-      right.identifier,
-    )
+  ): EqualsResult {
+    return booleanEquals(left.identifier, right.identifier)
       .mapLeft((propertyValuesUnequal) => ({
         left: left,
         right: right,
@@ -499,24 +646,19 @@ export namespace KosResourceStub {
         type: "Property" as const,
       }))
       .chain(() =>
-        ((left, right) =>
-          purifyHelpers.Arrays.equals(
-            left,
-            right,
-            purifyHelpers.Equatable.booleanEquals,
-          ))(left.prefLabel, right.prefLabel).mapLeft(
-          (propertyValuesUnequal) => ({
-            left: left,
-            right: right,
-            propertyName: "prefLabel",
-            propertyValuesUnequal,
-            type: "Property" as const,
-          }),
-        ),
+        ((left, right) => arrayEquals(left, right, booleanEquals))(
+          left.prefLabel,
+          right.prefLabel,
+        ).mapLeft((propertyValuesUnequal) => ({
+          left: left,
+          right: right,
+          propertyName: "prefLabel",
+          propertyValuesUnequal,
+          type: "Property" as const,
+        })),
       )
       .chain(() =>
-        ((left, right) =>
-          purifyHelpers.Arrays.equals(left, right, LabelStub.equals))(
+        ((left, right) => arrayEquals(left, right, LabelStub.equals))(
           left.prefLabelXl,
           right.prefLabelXl,
         ).mapLeft((propertyValuesUnequal) => ({
@@ -528,7 +670,7 @@ export namespace KosResourceStub {
         })),
       )
       .chain(() =>
-        purifyHelpers.Equatable.strictEquals(left.type, right.type).mapLeft(
+        strictEquals(left.type, right.type).mapLeft(
           (propertyValuesUnequal) => ({
             left: left,
             right: right,
@@ -540,7 +682,9 @@ export namespace KosResourceStub {
       );
   }
 
-  export function propertiesFromJson(_json: unknown): purify.Either<
+  export function propertiesFromJson(
+    _json: unknown,
+  ): purify.Either<
     zod.ZodError,
     {
       identifier: rdfjs.NamedNode;
@@ -2291,9 +2435,7 @@ export namespace ConceptScheme {
       rights: purify.Maybe<rdfjs.Literal>;
       rightsHolder: purify.Maybe<rdfjs.Literal>;
       type: "ConceptScheme";
-    } & purifyHelpers.Eithers.UnwrapR<
-      ReturnType<typeof KosResource.propertiesFromRdf>
-    >
+    } & UnwrapR<ReturnType<typeof KosResource.propertiesFromRdf>>
   > {
     const _super0Either = KosResource.propertiesFromRdf({
       ..._context,
@@ -2713,16 +2855,15 @@ export namespace ConceptSchemeStub {
   export function equals(
     left: ConceptSchemeStub,
     right: ConceptSchemeStub,
-  ): purifyHelpers.Equatable.EqualsResult {
+  ): EqualsResult {
     return KosResourceStub.equals(left, right);
   }
 
-  export function propertiesFromJson(_json: unknown): purify.Either<
+  export function propertiesFromJson(
+    _json: unknown,
+  ): purify.Either<
     zod.ZodError,
-    {
-      identifier: rdfjs.NamedNode;
-      type: "ConceptSchemeStub";
-    } & purifyHelpers.Eithers.UnwrapR<
+    { identifier: rdfjs.NamedNode; type: "ConceptSchemeStub" } & UnwrapR<
       ReturnType<typeof KosResourceStub.propertiesFromJson>
     >
   > {
@@ -2763,10 +2904,7 @@ export namespace ConceptSchemeStub {
     resource: rdfjsResource.Resource<rdfjs.NamedNode>;
   }): purify.Either<
     rdfjsResource.Resource.ValueError,
-    {
-      identifier: rdfjs.NamedNode;
-      type: "ConceptSchemeStub";
-    } & purifyHelpers.Eithers.UnwrapR<
+    { identifier: rdfjs.NamedNode; type: "ConceptSchemeStub" } & UnwrapR<
       ReturnType<typeof KosResourceStub.propertiesFromRdf>
     >
   > {
@@ -3019,19 +3157,15 @@ export namespace ConceptStub {
     return { ...KosResourceStub.create(parameters), identifier, type };
   }
 
-  export function equals(
-    left: ConceptStub,
-    right: ConceptStub,
-  ): purifyHelpers.Equatable.EqualsResult {
+  export function equals(left: ConceptStub, right: ConceptStub): EqualsResult {
     return KosResourceStub.equals(left, right);
   }
 
-  export function propertiesFromJson(_json: unknown): purify.Either<
+  export function propertiesFromJson(
+    _json: unknown,
+  ): purify.Either<
     zod.ZodError,
-    {
-      identifier: rdfjs.NamedNode;
-      type: "ConceptStub";
-    } & purifyHelpers.Eithers.UnwrapR<
+    { identifier: rdfjs.NamedNode; type: "ConceptStub" } & UnwrapR<
       ReturnType<typeof KosResourceStub.propertiesFromJson>
     >
   > {
@@ -3071,10 +3205,7 @@ export namespace ConceptStub {
     resource: rdfjsResource.Resource<rdfjs.NamedNode>;
   }): purify.Either<
     rdfjsResource.Resource.ValueError,
-    {
-      identifier: rdfjs.NamedNode;
-      type: "ConceptStub";
-    } & purifyHelpers.Eithers.UnwrapR<
+    { identifier: rdfjs.NamedNode; type: "ConceptStub" } & UnwrapR<
       ReturnType<typeof KosResourceStub.propertiesFromRdf>
     >
   > {
@@ -3522,9 +3653,7 @@ export namespace Concept {
       semanticRelation: readonly ConceptStub[];
       topConceptOf: readonly ConceptSchemeStub[];
       type: "Concept";
-    } & purifyHelpers.Eithers.UnwrapR<
-      ReturnType<typeof KosResource.propertiesFromRdf>
-    >
+    } & UnwrapR<ReturnType<typeof KosResource.propertiesFromRdf>>
   > {
     const _super0Either = KosResource.propertiesFromRdf({
       ..._context,
