@@ -11,11 +11,13 @@ export const behavesLikeUnescoThesaurusKos = (
   const kos = kosFactory("en");
 
   it("UNESCO thesaurus KOS: concept", async () => {
-    for (const expectedConceptIdentifier of await kos.conceptIdentifiers({
-      limit: 1,
-      offset: 0,
-      query: { type: "All" },
-    })) {
+    for (const expectedConceptIdentifier of (
+      await kos.conceptIdentifiers({
+        limit: 1,
+        offset: 0,
+        query: { type: "All" },
+      })
+    ).unsafeCoerce()) {
       const actualConcept = (
         await kos.concept(expectedConceptIdentifier)
       ).unsafeCoerce();
@@ -28,22 +30,22 @@ export const behavesLikeUnescoThesaurusKos = (
   });
 
   it("UNESCO thesaurus KOS: conceptIdentifiers: All", async () => {
-    const firstConceptIdentifiers = [
-      ...(await kos.conceptIdentifiers({
+    const firstConceptIdentifiers = (
+      await kos.conceptIdentifiers({
         limit: 10,
         offset: 0,
         query: { type: "All" },
-      })),
-    ];
+      })
+    ).unsafeCoerce();
     expect(firstConceptIdentifiers).toHaveLength(10);
 
-    const nextConceptIdentifiers = [
-      ...(await kos.conceptIdentifiers({
+    const nextConceptIdentifiers = (
+      await kos.conceptIdentifiers({
         limit: 10,
         offset: 10,
         query: { type: "All" },
-      })),
-    ];
+      })
+    ).unsafeCoerce();
     expect(nextConceptIdentifiers).toHaveLength(10);
     for (const nextConceptIdentifier of nextConceptIdentifiers) {
       expect(
@@ -58,8 +60,8 @@ export const behavesLikeUnescoThesaurusKos = (
   it("UNESCO thesaurus KOS: conceptIdentifiers: SubjectsOfSemanticRelation", async ({
     expect,
   }) => {
-    const subjectConceptIdentifiers = [
-      ...(await kos.conceptIdentifiers({
+    const subjectConceptIdentifiers = (
+      await kos.conceptIdentifiers({
         limit: null,
         offset: 0,
         query: {
@@ -69,8 +71,8 @@ export const behavesLikeUnescoThesaurusKos = (
           semanticRelationProperty: SemanticRelationProperty.NARROWER,
           type: "SubjectsOfSemanticRelation",
         },
-      })),
-    ];
+      })
+    ).unsafeCoerce();
     expect(subjectConceptIdentifiers).toHaveLength(1);
     expect(
       subjectConceptIdentifiers.find((subjectConceptIdentifier) =>
@@ -84,13 +86,13 @@ export const behavesLikeUnescoThesaurusKos = (
   });
 
   it("UNESCO thesaurus KOS: conceptScheme", async () => {
-    for (const expectedConceptSchemeIdentifier of await kos.conceptSchemeIdentifiers(
-      {
+    for (const expectedConceptSchemeIdentifier of (
+      await kos.conceptSchemeIdentifiers({
         limit: null,
         offset: 0,
         query: { type: "All" },
-      },
-    )) {
+      })
+    ).unsafeCoerce()) {
       const actualConceptScheme = (
         await kos.conceptScheme(expectedConceptSchemeIdentifier)
       ).unsafeCoerce();
@@ -101,20 +103,24 @@ export const behavesLikeUnescoThesaurusKos = (
   });
 
   it("UNESCO thesaurus KOS: conceptSchemeIdentifiers", async () => {
-    const conceptSchemeIdentifiers = await kos.conceptSchemeIdentifiers({
-      limit: null,
-      offset: 0,
-      query: { type: "All" },
-    });
+    const conceptSchemeIdentifiers = (
+      await kos.conceptSchemeIdentifiers({
+        limit: null,
+        offset: 0,
+        query: { type: "All" },
+      })
+    ).unsafeCoerce();
     expect(conceptSchemeIdentifiers).not.toHaveLength(0);
   });
 
   it("UNESCO thesaurus KOS: conceptSchemeStub", async () => {
-    const expectedConceptSchemeStubs = await kos.conceptSchemeStubs({
-      limit: 1,
-      offset: 0,
-      query: { type: "All" },
-    });
+    const expectedConceptSchemeStubs = (
+      await kos.conceptSchemeStubs({
+        limit: 1,
+        offset: 0,
+        query: { type: "All" },
+      })
+    ).unsafeCoerce();
     expect(expectedConceptSchemeStubs).toHaveLength(1);
     const expectedConceptSchemeStub = expectedConceptSchemeStubs[0];
     expect(expectedConceptSchemeStub.prefLabel).toHaveLength(1);
@@ -141,11 +147,13 @@ export const behavesLikeUnescoThesaurusKos = (
   });
 
   it("UNESCO thesaurus KOS: conceptSchemeStubs", async () => {
-    const conceptSchemeStubs = await kos.conceptSchemeStubs({
-      limit: null,
-      offset: 0,
-      query: { type: "All" },
-    });
+    const conceptSchemeStubs = (
+      await kos.conceptSchemeStubs({
+        limit: null,
+        offset: 0,
+        query: { type: "All" },
+      })
+    ).unsafeCoerce();
     expect(conceptSchemeStubs).toHaveLength(1);
     const conceptSchemeStub = conceptSchemeStubs[0];
     expect(conceptSchemeStub.prefLabel).toHaveLength(1);
@@ -155,15 +163,19 @@ export const behavesLikeUnescoThesaurusKos = (
   });
 
   it("UNESCO thesaurus KOS: conceptSchemesCount", async () => {
-    expect(await kos.conceptSchemesCount({ type: "All" })).toStrictEqual(1);
+    expect(
+      (await kos.conceptSchemesCount({ type: "All" })).unsafeCoerce(),
+    ).toStrictEqual(1);
   });
 
   it("UNESCO thesaurus KOS: conceptStub", async () => {
-    const expectedConceptStubs = await kos.conceptStubs({
-      limit: 1,
-      offset: 0,
-      query: { type: "All" },
-    });
+    const expectedConceptStubs = (
+      await kos.conceptStubs({
+        limit: 1,
+        offset: 0,
+        query: { type: "All" },
+      })
+    ).unsafeCoerce();
     expect(expectedConceptStubs).toHaveLength(1);
     const expectedConceptStub = expectedConceptStubs[0];
     expect(expectedConceptStub.prefLabel).toHaveLength(1);
@@ -186,11 +198,13 @@ export const behavesLikeUnescoThesaurusKos = (
   });
 
   it("UNESCO thesaurus KOS: conceptStubs", async () => {
-    const conceptStubs = await kos.conceptStubs({
-      limit: 10,
-      offset: 0,
-      query: { type: "All" },
-    });
+    const conceptStubs = (
+      await kos.conceptStubs({
+        limit: 10,
+        offset: 0,
+        query: { type: "All" },
+      })
+    ).unsafeCoerce();
     expect(conceptStubs).toHaveLength(10);
     const conceptStub = conceptStubs[0];
     expect(conceptStub.prefLabel).toHaveLength(1);
@@ -200,7 +214,9 @@ export const behavesLikeUnescoThesaurusKos = (
   });
 
   it("UNESCO thesaurus KOS: conceptsCount", async () => {
-    expect(await kos.conceptsCount({ type: "All" })).not.toStrictEqual(0);
+    expect(
+      (await kos.conceptsCount({ type: "All" })).unsafeCoerce(),
+    ).toStrictEqual(4482);
   });
 
   behavesLikeUnescoThesaurusConceptScheme(kosFactory);

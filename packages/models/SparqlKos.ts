@@ -1,7 +1,8 @@
 import { SparqlQueryClient } from "@kos-kit/sparql-client";
-import { DataFactory, DatasetCoreFactory, Variable } from "@rdfjs/types";
+import { DataFactory, DatasetCoreFactory, Quad, Variable } from "@rdfjs/types";
 import { dcterms, rdf, rdfs, skos, skosxl } from "@tpluscode/rdf-ns-builders";
-import { Either } from "purify-ts";
+import { Either, Left } from "purify-ts";
+import { Eithers } from "purify-ts-helpers";
 import { Resource } from "rdfjs-resource";
 import sparqljs from "sparqljs";
 import { ModelFactories } from "./ModelFactories.js";
@@ -97,22 +98,25 @@ export class SparqlKos<
     limit: number | null;
     offset: number;
     query: ConceptQuery;
-  }): Promise<readonly Identifier[]> {
-    return mapBindingsToIdentifiers(
-      await this.sparqlQueryClient.queryBindings(
-        this.sparqlGenerator.stringify({
-          distinct: true,
-          limit: limit ?? undefined,
-          offset,
-          order: [{ expression: this.conceptVariable }],
-          prefixes,
-          queryType: "SELECT",
-          type: "query",
-          variables: [this.conceptVariable],
-          where: this.conceptQueryToWhereGraphPatterns(query).concat(),
-        }),
-      ),
-      this.conceptVariable.value,
+  }): Promise<Either<Error, readonly Identifier[]>> {
+    return (
+      await Eithers.encaseAsync(() =>
+        this.sparqlQueryClient.queryBindings(
+          this.sparqlGenerator.stringify({
+            distinct: true,
+            limit: limit ?? undefined,
+            offset,
+            order: [{ expression: this.conceptVariable }],
+            prefixes,
+            queryType: "SELECT",
+            type: "query",
+            variables: [this.conceptVariable],
+            where: this.conceptQueryToWhereGraphPatterns(query).concat(),
+          }),
+        ),
+      )
+    ).map((bindings) =>
+      mapBindingsToIdentifiers(bindings, this.conceptVariable.value),
     );
   }
 
@@ -135,22 +139,25 @@ export class SparqlKos<
     limit: number | null;
     offset: number;
     query: ConceptSchemeQuery;
-  }): Promise<readonly Identifier[]> {
-    return mapBindingsToIdentifiers(
-      await this.sparqlQueryClient.queryBindings(
-        this.sparqlGenerator.stringify({
-          distinct: true,
-          limit: limit ?? undefined,
-          offset,
-          order: [{ expression: this.conceptSchemeVariable }],
-          prefixes,
-          queryType: "SELECT",
-          type: "query",
-          variables: [this.conceptSchemeVariable],
-          where: this.conceptSchemeQueryToWhereGraphPatterns(query).concat(),
-        }),
-      ),
-      this.conceptSchemeVariable.value,
+  }): Promise<Either<Error, readonly Identifier[]>> {
+    return (
+      await Eithers.encaseAsync(() =>
+        this.sparqlQueryClient.queryBindings(
+          this.sparqlGenerator.stringify({
+            distinct: true,
+            limit: limit ?? undefined,
+            offset,
+            order: [{ expression: this.conceptSchemeVariable }],
+            prefixes,
+            queryType: "SELECT",
+            type: "query",
+            variables: [this.conceptSchemeVariable],
+            where: this.conceptSchemeQueryToWhereGraphPatterns(query).concat(),
+          }),
+        ),
+      )
+    ).map((bindings) =>
+      mapBindingsToIdentifiers(bindings, this.conceptSchemeVariable.value),
     );
   }
 
@@ -169,8 +176,12 @@ export class SparqlKos<
     limit: number | null;
     offset: number;
     query: ConceptSchemeQuery;
-  }): Promise<readonly ConceptSchemeStubT[]> {
-    const identifiers = await this.conceptSchemeIdentifiers(parameters);
+  }): Promise<Either<Error, readonly ConceptSchemeStubT[]>> {
+    const identifiersEither = await this.conceptSchemeIdentifiers(parameters);
+    if (identifiersEither.isLeft()) {
+      return identifiersEither;
+    }
+    const identifiers = identifiersEither.unsafeCoerce();
     const modelEithers = await this.modelsByIdentifiers({
       identifiers: identifiers,
       modelFactory: this.modelFactories.conceptSchemeStub,
@@ -178,40 +189,48 @@ export class SparqlKos<
     if (modelEithers.length !== identifiers.length) {
       throw new Error("should never happen");
     }
-    return modelEithers.map((modelEither, index) =>
-      modelEither
-        .mapLeft(() =>
-          this.modelFactories.conceptSchemeStub.fromIdentifier(
-            identifiers[index],
-          ),
-        )
-        .extract(),
+    return Either.of(
+      modelEithers.map(
+        (modelEither, index) =>
+          modelEither
+            .mapLeft(() =>
+              this.modelFactories.conceptSchemeStub.fromIdentifier(
+                identifiers[index],
+              ),
+            )
+            .extract()!,
+      ),
     );
   }
 
-  async conceptSchemesCount(query: ConceptSchemeQuery): Promise<number> {
-    return mapBindingsToCount(
-      await this.sparqlQueryClient.queryBindings(
-        this.sparqlGenerator.stringify({
-          distinct: true,
-          prefixes,
-          queryType: "SELECT",
-          type: "query",
-          variables: [
-            {
-              expression: {
-                aggregation: "COUNT",
-                distinct: true,
-                expression: this.conceptSchemeVariable,
-                type: "aggregate",
+  async conceptSchemesCount(
+    query: ConceptSchemeQuery,
+  ): Promise<Either<Error, number>> {
+    return (
+      await Eithers.encaseAsync(() =>
+        this.sparqlQueryClient.queryBindings(
+          this.sparqlGenerator.stringify({
+            distinct: true,
+            prefixes,
+            queryType: "SELECT",
+            type: "query",
+            variables: [
+              {
+                expression: {
+                  aggregation: "COUNT",
+                  distinct: true,
+                  expression: this.conceptSchemeVariable,
+                  type: "aggregate",
+                },
+                variable: this.countVariable,
               },
-              variable: this.countVariable,
-            },
-          ],
-          where: this.conceptSchemeQueryToWhereGraphPatterns(query).concat(),
-        }),
-      ),
-      this.countVariable.value,
+            ],
+            where: this.conceptSchemeQueryToWhereGraphPatterns(query).concat(),
+          }),
+        ),
+      )
+    ).chain((bindings) =>
+      mapBindingsToCount(bindings, this.countVariable.value),
     );
   }
 
@@ -230,8 +249,12 @@ export class SparqlKos<
     limit: number | null;
     offset: number;
     query: ConceptQuery;
-  }): Promise<readonly ConceptStubT[]> {
-    const identifiers = await this.conceptIdentifiers(parameters);
+  }): Promise<Either<Error, readonly ConceptStubT[]>> {
+    const identifiersEither = await this.conceptIdentifiers(parameters);
+    if (identifiersEither.isLeft()) {
+      return identifiersEither;
+    }
+    const identifiers = identifiersEither.unsafeCoerce();
     const modelEithers = await this.modelsByIdentifiers({
       identifiers: identifiers,
       modelFactory: this.modelFactories.conceptStub,
@@ -239,38 +262,46 @@ export class SparqlKos<
     if (modelEithers.length !== identifiers.length) {
       throw new Error("should never happen");
     }
-    return modelEithers.map((modelEither, index) =>
-      modelEither
-        .mapLeft(() =>
-          this.modelFactories.conceptStub.fromIdentifier(identifiers[index]),
-        )
-        .extract(),
+    return Either.of(
+      modelEithers.map(
+        (modelEither, index) =>
+          modelEither
+            .mapLeft(() =>
+              this.modelFactories.conceptStub.fromIdentifier(
+                identifiers[index],
+              ),
+            )
+            .extract()!,
+      ),
     );
   }
 
-  async conceptsCount(query: ConceptQuery): Promise<number> {
-    return mapBindingsToCount(
-      await this.sparqlQueryClient.queryBindings(
-        this.sparqlGenerator.stringify({
-          distinct: true,
-          prefixes,
-          queryType: "SELECT",
-          type: "query",
-          variables: [
-            {
-              expression: {
-                aggregation: "COUNT",
-                distinct: true,
-                expression: this.conceptVariable,
-                type: "aggregate",
+  async conceptsCount(query: ConceptQuery): Promise<Either<Error, number>> {
+    return (
+      await Eithers.encaseAsync(() =>
+        this.sparqlQueryClient.queryBindings(
+          this.sparqlGenerator.stringify({
+            distinct: true,
+            prefixes,
+            queryType: "SELECT",
+            type: "query",
+            variables: [
+              {
+                expression: {
+                  aggregation: "COUNT",
+                  distinct: true,
+                  expression: this.conceptVariable,
+                  type: "aggregate",
+                },
+                variable: this.countVariable,
               },
-              variable: this.countVariable,
-            },
-          ],
-          where: this.conceptQueryToWhereGraphPatterns(query).concat(),
-        }),
-      ),
-      this.countVariable.value,
+            ],
+            where: this.conceptQueryToWhereGraphPatterns(query).concat(),
+          }),
+        ),
+      )
+    ).chain((bindings) =>
+      mapBindingsToCount(bindings, this.countVariable.value),
     );
   }
 
@@ -459,7 +490,7 @@ export class SparqlKos<
   }: {
     identifiers: readonly Identifier[];
     modelFactory: ModelFactory<ModelT>;
-  }): Promise<readonly Either<Resource.ValueError, ModelT>[]> {
+  }): Promise<readonly Either<Error, ModelT>[]> {
     if (identifiers.length === 0) {
       return [];
     }
@@ -479,7 +510,13 @@ export class SparqlKos<
       ],
     });
 
-    const quads = await this.sparqlQueryClient.queryQuads(constructQueryString);
+    let quads: readonly Quad[];
+    try {
+      quads = await this.sparqlQueryClient.queryQuads(constructQueryString);
+    } catch (e) {
+      const left = Left<Error, ModelT>(e as Error);
+      return identifiers.map(() => left);
+    }
 
     // const quadsString = quads.map((quad) => quad.toString()).join("\n");
     // console.log(quadsString);

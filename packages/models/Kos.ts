@@ -21,7 +21,7 @@ export interface Kos<
     limit: number | null;
     offset: number;
     query: ConceptQuery;
-  }): Promise<readonly Identifier[]>;
+  }): Promise<Either<Error, readonly Identifier[]>>;
 
   conceptScheme(identifier: Identifier): Promise<Either<Error, ConceptSchemeT>>;
 
@@ -29,7 +29,7 @@ export interface Kos<
     limit: number | null;
     offset: number;
     query: ConceptSchemeQuery;
-  }): Promise<readonly Identifier[]>;
+  }): Promise<Either<Error, readonly Identifier[]>>;
 
   conceptSchemeStub(
     identifier: Identifier,
@@ -39,9 +39,11 @@ export interface Kos<
     limit: number | null;
     offset: number;
     query: ConceptSchemeQuery;
-  }): Promise<readonly ConceptSchemeStubT[]>;
+  }): Promise<Either<Error, readonly ConceptSchemeStubT[]>>;
 
-  conceptSchemesCount(query: ConceptSchemeQuery): Promise<number>;
+  conceptSchemesCount(
+    query: ConceptSchemeQuery,
+  ): Promise<Either<Error, number>>;
 
   conceptStub(identifier: Identifier): Promise<Either<Error, ConceptStubT>>;
 
@@ -49,7 +51,7 @@ export interface Kos<
     limit: number | null;
     offset: number;
     query: ConceptQuery;
-  }): Promise<readonly ConceptStubT[]>;
+  }): Promise<Either<Error, readonly ConceptStubT[]>>;
 
-  conceptsCount(query: ConceptQuery): Promise<number>;
+  conceptsCount(query: ConceptQuery): Promise<Either<Error, number>>;
 }
