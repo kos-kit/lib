@@ -2,7 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { stringify as stringifyYaml } from "yaml";
 
-const VERSION = "2.0.111";
+const VERSION = "2.0.112";
 
 type PackageName = "models" | "next-utils" | "search" | "sparql-client";
 
@@ -24,7 +24,6 @@ const externalDependencyVersions = {
   n3: "^1.21.3",
   pino: "^9.1.0",
   "purify-ts": "~2.1.0",
-  "purify-ts-helpers": "1.0.8",
   "rdfjs-resource": "1.0.14",
 };
 
@@ -33,16 +32,13 @@ const packages: readonly Package[] = [
     externalDependencies: {
       "@rdfjs/term-set": externalDependencyVersions["@rdfjs/term-set"],
       "@rdfjs/types": externalDependencyVersions["@rdfjs/types"],
+      "@shaclmate/runtime": "2.0.15",
       "@tpluscode/rdf-ns-builders":
         externalDependencyVersions["@tpluscode/rdf-ns-builders"],
       "@types/rdfjs__term-set":
         externalDependencyVersions["@types/rdfjs__term-set"],
-      "@types/sparqljs": "3.1.12",
-      "js-sha256": "^0.11.0",
       pino: externalDependencyVersions["pino"],
       "purify-ts": externalDependencyVersions["purify-ts"],
-      "purify-ts-helpers": externalDependencyVersions["purify-ts-helpers"],
-      sparqljs: "3.7.3",
     },
     internalDependencies: ["sparql-client"],
     name: "models",
@@ -148,7 +144,7 @@ for (const package_ of packages) {
           "format:write": "biome format --write",
           "format:write:unsafe": "biome format --write --unsafe",
           rebuild: "run-s clean build",
-          "link-dependencies": "npm link purify-ts-helpers rdfjs-resource",
+          "link-dependencies": "npm link rdfjs-resource",
           lint: "biome lint",
           "lint:write": "biome lint --write",
           "lint:write:unsafe": "biome lint --write --unsafe",

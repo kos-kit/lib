@@ -67,22 +67,26 @@ export class LunrSearchEngine implements SearchEngine {
 
     if (conceptsLimit != null) {
       // Don't index all concepts in the set, in testing
-      for (const conceptStub of await kos.conceptStubs({
-        limit: conceptsLimit,
-        offset: 0,
-        query: { type: "All" },
-      })) {
+      for (const conceptStub of (
+        await kos.conceptStubs({
+          limit: conceptsLimit,
+          offset: 0,
+          query: { type: "All" },
+        })
+      ).orDefault([])) {
         (await kos.concept(conceptStub.identifier)).ifRight((concept) =>
           indexDocuments.push(toIndexDocument(concept, "Concept")),
         );
       }
     } else {
       // Index all concepts in the set
-      for (const conceptStub of await kos.conceptStubs({
-        limit: null,
-        offset: 0,
-        query: { type: "All" },
-      })) {
+      for (const conceptStub of (
+        await kos.conceptStubs({
+          limit: null,
+          offset: 0,
+          query: { type: "All" },
+        })
+      ).orDefault([])) {
         (await kos.concept(conceptStub.identifier)).ifRight((concept) =>
           indexDocuments.push(toIndexDocument(concept, "Concept")),
         );
@@ -90,11 +94,13 @@ export class LunrSearchEngine implements SearchEngine {
     }
 
     // Index concept schemes
-    for (const conceptSchemeStub of await kos.conceptSchemeStubs({
-      limit: null,
-      offset: 0,
-      query: { type: "All" },
-    })) {
+    for (const conceptSchemeStub of (
+      await kos.conceptSchemeStubs({
+        limit: null,
+        offset: 0,
+        query: { type: "All" },
+      })
+    ).orDefault([])) {
       (await kos.conceptScheme(conceptSchemeStub.identifier)).ifRight(
         (conceptScheme) =>
           indexDocuments.push(toIndexDocument(conceptScheme, "ConceptScheme")),

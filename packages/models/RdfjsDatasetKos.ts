@@ -131,8 +131,8 @@ export class RdfjsDatasetKos<
     limit: number | null;
     offset: number;
     query: ConceptQuery;
-  }): Promise<readonly Identifier[]> {
-    return this.conceptIdentifiersSync(parameters);
+  }): Promise<Either<Error, readonly Identifier[]>> {
+    return Either.of(this.conceptIdentifiersSync(parameters));
   }
 
   conceptIdentifiersSync({
@@ -160,8 +160,8 @@ export class RdfjsDatasetKos<
     limit: number | null;
     offset: number;
     query: ConceptSchemeQuery;
-  }): Promise<readonly Identifier[]> {
-    return this.conceptSchemeIdentifiersSync(parameters);
+  }): Promise<Either<Error, readonly Identifier[]>> {
+    return Either.of(this.conceptSchemeIdentifiersSync(parameters));
   }
 
   conceptSchemeIdentifiersSync({
@@ -198,8 +198,8 @@ export class RdfjsDatasetKos<
     limit: number | null;
     offset: number;
     query: ConceptSchemeQuery;
-  }): Promise<readonly ConceptSchemeStubT[]> {
-    return this.conceptSchemeStubsSync(parameters);
+  }): Promise<Either<Error, readonly ConceptSchemeStubT[]>> {
+    return Either.of(this.conceptSchemeStubsSync(parameters));
   }
 
   conceptSchemeStubsSync({
@@ -238,8 +238,10 @@ export class RdfjsDatasetKos<
     });
   }
 
-  async conceptSchemesCount(query: ConceptSchemeQuery): Promise<number> {
-    return this.conceptSchemesCountSync(query);
+  async conceptSchemesCount(
+    query: ConceptSchemeQuery,
+  ): Promise<Either<Error, number>> {
+    return Either.of(this.conceptSchemesCountSync(query));
   }
 
   conceptSchemesCountSync(query: ConceptSchemeQuery): number {
@@ -267,8 +269,8 @@ export class RdfjsDatasetKos<
     limit: number | null;
     offset: number;
     query: ConceptQuery;
-  }): Promise<readonly ConceptStubT[]> {
-    return this.conceptStubsSync(parameters);
+  }): Promise<Either<Error, readonly ConceptStubT[]>> {
+    return Either.of(this.conceptStubsSync(parameters));
   }
 
   conceptStubsSync({
@@ -307,8 +309,8 @@ export class RdfjsDatasetKos<
     });
   }
 
-  async conceptsCount(query: ConceptQuery): Promise<number> {
-    return this.conceptsCountSync(query);
+  async conceptsCount(query: ConceptQuery): Promise<Either<Error, number>> {
+    return Either.of(this.conceptsCountSync(query));
   }
 
   conceptsCountSync(query: ConceptQuery): number {

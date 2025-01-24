@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "@kos-kit/models": "2.0.111",
+    "@kos-kit/models": "2.0.112",
     "@rdfjs/types": "^1.1.0",
     "@types/lunr": "^2.3.7",
     "lunr": "^2.3.9",
@@ -25,7 +25,7 @@
     "format:write": "biome format --write",
     "format:write:unsafe": "biome format --write --unsafe",
     "rebuild": "run-s clean build",
-    "link-dependencies": "npm link purify-ts-helpers rdfjs-resource",
+    "link-dependencies": "npm link rdfjs-resource",
     "lint": "biome lint",
     "lint:write": "biome lint --write",
     "lint:write:unsafe": "biome lint --write --unsafe",
@@ -42,5 +42,5 @@
   },
   "type": "module",
   "types": "index.d.ts",
-  "version": "2.0.111"
+  "version": "2.0.112"
 }
