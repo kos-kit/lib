@@ -92,7 +92,7 @@ export class RdfjsDatasetKos<
 > implements Kos<ConceptT, ConceptSchemeT, ConceptSchemeStubT, ConceptStubT>
 {
   readonly resourceSet: ResourceSet;
-  private readonly languageIn: readonly LanguageTag[];
+  protected readonly languageIn: readonly LanguageTag[];
   private readonly modelFactories: ModelFactories<
     ConceptT,
     ConceptSchemeT,
