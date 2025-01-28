@@ -40,7 +40,7 @@ export class SparqlKos<
   private readonly conceptVariable: Variable;
   private readonly countVariable: Variable;
   private readonly datasetCoreFactory: DatasetCoreFactory;
-  private readonly languageIn: readonly LanguageTag[];
+  protected readonly languageIn: readonly LanguageTag[];
   private readonly modelFactories: ModelFactories<
     ConceptT,
     ConceptSchemeT,
@@ -48,7 +48,7 @@ export class SparqlKos<
     ConceptStubT
   >;
   private readonly modelVariable: Variable;
-  private readonly sparqlGenerator: sparqljs.SparqlGenerator;
+  protected readonly sparqlGenerator: sparqljs.SparqlGenerator;
   protected readonly sparqlQueryClient: SparqlQueryClient;
 
   constructor({
@@ -81,12 +81,10 @@ export class SparqlKos<
   }
 
   async concept(identifier: Identifier): Promise<Either<Error, ConceptT>> {
-    return (
-      await this.modelsByIdentifiers({
-        identifiers: [identifier],
-        modelFactory: this.modelFactories.concept,
-      })
-    )[0];
+    return this.modelByIdentifier({
+      identifier,
+      modelFactory: this.modelFactories.concept,
+    });
   }
 
   async conceptIdentifiers({
@@ -110,7 +108,7 @@ export class SparqlKos<
             queryType: "SELECT",
             type: "query",
             variables: [this.conceptVariable],
-            where: this.conceptQueryToWhereGraphPatterns(query).concat(),
+            where: this.conceptQueryToWherePatterns(query).concat(),
           }),
         ),
         this.conceptVariable.value,
@@ -121,12 +119,10 @@ export class SparqlKos<
   async conceptScheme(
     identifier: Identifier,
   ): Promise<Either<Error, ConceptSchemeT>> {
-    return (
-      await this.modelsByIdentifiers({
-        identifiers: [identifier],
-        modelFactory: this.modelFactories.conceptScheme,
-      })
-    )[0];
+    return this.modelByIdentifier({
+      identifier,
+      modelFactory: this.modelFactories.conceptScheme,
+    });
   }
 
   async conceptSchemeIdentifiers({
@@ -150,7 +146,7 @@ export class SparqlKos<
             queryType: "SELECT",
             type: "query",
             variables: [this.conceptSchemeVariable],
-            where: this.conceptSchemeQueryToWhereGraphPatterns(query).concat(),
+            where: this.conceptSchemeQueryToWherePatterns(query).concat(),
           }),
         ),
         this.conceptSchemeVariable.value,
@@ -161,12 +157,10 @@ export class SparqlKos<
   async conceptSchemeStub(
     identifier: Identifier,
   ): Promise<Either<Error, ConceptSchemeStubT>> {
-    return (
-      await this.modelsByIdentifiers({
-        identifiers: [identifier],
-        modelFactory: this.modelFactories.conceptSchemeStub,
-      })
-    )[0];
+    return this.modelByIdentifier({
+      identifier,
+      modelFactory: this.modelFactories.conceptSchemeStub,
+    });
   }
 
   async conceptSchemeStubs(parameters: {
@@ -223,8 +217,7 @@ export class SparqlKos<
                   variable: this.countVariable,
                 },
               ],
-              where:
-                this.conceptSchemeQueryToWhereGraphPatterns(query).concat(),
+              where: this.conceptSchemeQueryToWherePatterns(query).concat(),
             }),
           ),
           this.countVariable.value,
@@ -236,12 +229,10 @@ export class SparqlKos<
   async conceptStub(
     identifier: Identifier,
   ): Promise<Either<Error, ConceptStubT>> {
-    return (
-      await this.modelsByIdentifiers({
-        identifiers: [identifier],
-        modelFactory: this.modelFactories.conceptStub,
-      })
-    )[0];
+    return this.modelByIdentifier({
+      identifier,
+      modelFactory: this.modelFactories.conceptStub,
+    });
   }
 
   async conceptStubs(parameters: {
@@ -296,7 +287,7 @@ export class SparqlKos<
                   variable: this.countVariable,
                 },
               ],
-              where: this.conceptQueryToWhereGraphPatterns(query).concat(),
+              where: this.conceptQueryToWherePatterns(query).concat(),
             }),
           ),
           this.countVariable.value,
@@ -305,7 +296,7 @@ export class SparqlKos<
     );
   }
 
-  private conceptQueryToWhereGraphPatterns(
+  private conceptQueryToWherePatterns(
     query: ConceptQuery,
   ): readonly sparqljs.Pattern[] {
     if (query.type === "All") {
@@ -351,13 +342,6 @@ export class SparqlKos<
               rdfType: skos.ConceptScheme,
             }),
           );
-          // `{ ?concept <${
-          //   skos.inScheme.value
-          // }> ${conceptSchemeIdentifierString} . ${new RdfTypeGraphPatterns(
-          //   GraphPattern.variable("concept"),
-          //   skos.Concept,
-          // ).toWhereString()} }`,
-          // "UNION",
         }
       }
 
@@ -424,7 +408,7 @@ export class SparqlKos<
     throw new RangeError("should never reach this code");
   }
 
-  private conceptSchemeQueryToWhereGraphPatterns(
+  private conceptSchemeQueryToWherePatterns(
     query: ConceptSchemeQuery,
   ): readonly sparqljs.Pattern[] {
     if (query.type === "All") {
@@ -484,7 +468,22 @@ export class SparqlKos<
     ];
   }
 
-  private async modelsByIdentifiers<ModelT>({
+  protected async modelByIdentifier<ModelT>({
+    identifier,
+    modelFactory,
+  }: {
+    identifier: Identifier;
+    modelFactory: ModelFactory<ModelT>;
+  }): Promise<Either<Error, ModelT>> {
+    return (
+      await this.modelsByIdentifiers({
+        identifiers: [identifier],
+        modelFactory,
+      })
+    )[0];
+  }
+
+  protected async modelsByIdentifiers<ModelT>({
     identifiers,
     modelFactory,
   }: {
