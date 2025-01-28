@@ -49,7 +49,7 @@ export class SparqlKos<
   >;
   private readonly modelVariable: Variable;
   private readonly sparqlGenerator: sparqljs.SparqlGenerator;
-  private readonly sparqlQueryClient: SparqlQueryClient;
+  protected readonly sparqlQueryClient: SparqlQueryClient;
 
   constructor({
     dataFactory,
@@ -98,7 +98,7 @@ export class SparqlKos<
     offset: number;
     query: ConceptQuery;
   }): Promise<Either<Error, readonly Identifier[]>> {
-    return await EitherAsync(async () =>
+    return EitherAsync(async () =>
       mapBindingsToIdentifiers(
         await this.sparqlQueryClient.queryBindings(
           this.sparqlGenerator.stringify({
@@ -138,7 +138,7 @@ export class SparqlKos<
     offset: number;
     query: ConceptSchemeQuery;
   }): Promise<Either<Error, readonly Identifier[]>> {
-    return await EitherAsync(async () =>
+    return EitherAsync(async () =>
       mapBindingsToIdentifiers(
         await this.sparqlQueryClient.queryBindings(
           this.sparqlGenerator.stringify({
@@ -203,7 +203,7 @@ export class SparqlKos<
   async conceptSchemesCount(
     query: ConceptSchemeQuery,
   ): Promise<Either<Error, number>> {
-    return await EitherAsync(async ({ liftEither }) =>
+    return EitherAsync(async ({ liftEither }) =>
       liftEither(
         mapBindingsToCount(
           await this.sparqlQueryClient.queryBindings(
@@ -276,7 +276,7 @@ export class SparqlKos<
   }
 
   async conceptsCount(query: ConceptQuery): Promise<Either<Error, number>> {
-    return await EitherAsync(async ({ liftEither }) =>
+    return EitherAsync(async ({ liftEither }) =>
       liftEither(
         mapBindingsToCount(
           await this.sparqlQueryClient.queryBindings(
