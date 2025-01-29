@@ -395,6 +395,17 @@ export class RdfjsDatasetKos<
       return;
     }
 
+    if (query.type === "Identifiers") {
+      for (const identifier of query.conceptIdentifiers) {
+        if (
+          this.resourceSet.namedResource(identifier).isInstanceOf(skos.Concept)
+        ) {
+          yield identifier;
+        }
+      }
+      return;
+    }
+
     if (query.type === "InScheme" && query.conceptIdentifier) {
       if (
         isConceptInScheme({
