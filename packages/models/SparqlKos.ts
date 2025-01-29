@@ -309,15 +309,43 @@ export class SparqlKos<
       ];
     }
 
+    if (query.type === "Identifiers") {
+      return [
+        {
+          values: query.conceptIdentifiers.map((identifier) => {
+            const valuePatternRow: sparqljs.ValuePatternRow = {};
+            valuePatternRow[`?${this.conceptVariable.value}`] = identifier;
+            return valuePatternRow;
+          }),
+          type: "values",
+        },
+        sparqlRdfTypePattern({
+          rdfType: skos.Concept,
+          subject: this.conceptVariable,
+        }),
+      ];
+    }
+
     if (query.type === "InScheme" || query.type === "TopConceptOf") {
+      const patterns: sparqljs.Pattern[] = [];
+
       const unionPatterns: sparqljs.Pattern[] = [];
 
       if (query.type === "InScheme") {
         if (query.conceptIdentifier) {
+          patterns.push({
+            values: [query.conceptIdentifier].map((identifier) => {
+              const valuePatternRow: sparqljs.ValuePatternRow = {};
+              valuePatternRow[`?${this.conceptVariable.value}`] = identifier;
+              return valuePatternRow;
+            }),
+            type: "values",
+          });
+
           unionPatterns.push({
             triples: [
               {
-                subject: query.conceptIdentifier,
+                subject: this.conceptVariable,
                 predicate: skos.inScheme,
                 object: query.conceptSchemeIdentifier,
               },
@@ -326,22 +354,25 @@ export class SparqlKos<
           });
         } else {
           // skos:inScheme has an open domain, so we have to check the concept's rdf:type
-          unionPatterns.push(
-            {
-              triples: [
-                {
-                  subject: this.conceptVariable,
-                  predicate: skos.inScheme,
-                  object: query.conceptSchemeIdentifier,
-                },
-              ],
-              type: "bgp",
-            },
-            sparqlRdfTypePattern({
-              subject: this.conceptVariable,
-              rdfType: skos.ConceptScheme,
-            }),
-          );
+          unionPatterns.push({
+            patterns: [
+              {
+                triples: [
+                  {
+                    subject: this.conceptVariable,
+                    predicate: skos.inScheme,
+                    object: query.conceptSchemeIdentifier,
+                  },
+                ],
+                type: "bgp",
+              },
+              sparqlRdfTypePattern({
+                subject: this.conceptVariable,
+                rdfType: skos.Concept,
+              }),
+            ],
+            type: "group",
+          });
         }
       }
 
@@ -370,7 +401,8 @@ export class SparqlKos<
         },
       );
 
-      return [{ patterns: unionPatterns, type: "union" }];
+      patterns.push({ patterns: unionPatterns, type: "union" });
+      return patterns;
     }
 
     if (query.type === "ObjectsOfSemanticRelation") {
