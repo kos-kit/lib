@@ -5,6 +5,25 @@ import { behavesLikeUnescoThesaurusConcept10 } from "./behavesLikeUnescoThesauru
 import { behavesLikeUnescoThesaurusConcept10018 } from "./behavesLikeUnescoThesaurusConcept10018.js";
 import { behavesLikeUnescoThesaurusConceptScheme } from "./behavesLikeUnescoThesaurusConceptScheme.js";
 
+const conceptSchemeIri = DataFactory.namedNode(
+  "http://vocabularies.unesco.org/thesaurus",
+);
+const concept10Iri = DataFactory.namedNode(
+  "http://vocabularies.unesco.org/thesaurus/concept10",
+);
+const concept197Iri = DataFactory.namedNode(
+  "http://vocabularies.unesco.org/thesaurus/concept197",
+);
+const concept4938Iri = DataFactory.namedNode(
+  "http://vocabularies.unesco.org/thesaurus/concept4938",
+);
+const concept7597Iri = DataFactory.namedNode(
+  "http://vocabularies.unesco.org/thesaurus/concept7597",
+);
+const concept10018Iri = DataFactory.namedNode(
+  "http://vocabularies.unesco.org/thesaurus/concept10018",
+);
+
 export const behavesLikeUnescoThesaurusKos = (
   kosFactory: (languageIn: LanguageTag) => Kos,
 ) => {
@@ -57,6 +76,49 @@ export const behavesLikeUnescoThesaurusKos = (
     }
   });
 
+  it("UNESCO thesaurus KOS: conceptIdentifiers: InScheme", async () => {
+    const conceptIdentifiers = (
+      await kos.conceptIdentifiers({
+        limit: 10,
+        offset: 0,
+        query: {
+          conceptIdentifier: concept10Iri,
+          conceptSchemeIdentifier: conceptSchemeIri,
+          type: "InScheme",
+        },
+      })
+    ).unsafeCoerce();
+    expect(conceptIdentifiers).toHaveLength(1);
+    expect(conceptIdentifiers[0].equals(concept10Iri)).toStrictEqual(true);
+  });
+
+  it("UNESCO thesaurus KOS: conceptIdentifiers: ObjectsOfSemanticRelation", async ({
+    expect,
+  }) => {
+    const objectConceptIdentifiers = (
+      await kos.conceptIdentifiers({
+        limit: null,
+        offset: 0,
+        query: {
+          subjectConceptIdentifier: concept10Iri,
+          semanticRelationProperty: SemanticRelationProperty.NARROWER,
+          type: "ObjectsOfSemanticRelation",
+        },
+      })
+    ).unsafeCoerce();
+    expect(objectConceptIdentifiers).toHaveLength(2);
+    expect(
+      objectConceptIdentifiers.find((conceptIdentifier) =>
+        conceptIdentifier.equals(concept4938Iri),
+      ),
+    ).toBeDefined();
+    expect(
+      objectConceptIdentifiers.find((subjectConceptIdentifier) =>
+        subjectConceptIdentifier.equals(concept7597Iri),
+      ),
+    ).toBeDefined();
+  });
+
   it("UNESCO thesaurus KOS: conceptIdentifiers: SubjectsOfSemanticRelation", async ({
     expect,
   }) => {
@@ -65,24 +127,16 @@ export const behavesLikeUnescoThesaurusKos = (
         limit: null,
         offset: 0,
         query: {
-          objectConceptIdentifier: DataFactory.namedNode(
-            "http://vocabularies.unesco.org/thesaurus/concept10018",
-          ),
+          objectConceptIdentifier: concept10018Iri,
           semanticRelationProperty: SemanticRelationProperty.NARROWER,
           type: "SubjectsOfSemanticRelation",
         },
       })
     ).unsafeCoerce();
     expect(subjectConceptIdentifiers).toHaveLength(1);
-    expect(
-      subjectConceptIdentifiers.find((subjectConceptIdentifier) =>
-        subjectConceptIdentifier.equals(
-          DataFactory.namedNode(
-            "http://vocabularies.unesco.org/thesaurus/concept197",
-          ),
-        ),
-      ),
-    ).toBeDefined;
+    expect(subjectConceptIdentifiers[0].equals(concept197Iri)).toStrictEqual(
+      true,
+    );
   });
 
   it("UNESCO thesaurus KOS: conceptScheme", async () => {
@@ -102,7 +156,7 @@ export const behavesLikeUnescoThesaurusKos = (
     }
   });
 
-  it("UNESCO thesaurus KOS: conceptSchemeIdentifiers", async () => {
+  it("UNESCO thesaurus KOS: conceptSchemeIdentifiers: All", async () => {
     const conceptSchemeIdentifiers = (
       await kos.conceptSchemeIdentifiers({
         limit: null,
@@ -111,6 +165,72 @@ export const behavesLikeUnescoThesaurusKos = (
       })
     ).unsafeCoerce();
     expect(conceptSchemeIdentifiers).not.toHaveLength(0);
+  });
+
+  it("UNESCO thesaurus KOS: conceptSchemeIdentifiers: HasConcept 10", async () => {
+    const conceptSchemeIdentifiers = (
+      await kos.conceptSchemeIdentifiers({
+        limit: null,
+        offset: 0,
+        query: {
+          conceptIdentifier: concept10Iri,
+          type: "HasConcept",
+        },
+      })
+    ).unsafeCoerce();
+    expect(conceptSchemeIdentifiers).toHaveLength(1);
+    expect(conceptSchemeIdentifiers[0].equals(conceptSchemeIri)).toStrictEqual(
+      true,
+    );
+  });
+
+  it("UNESCO thesaurus KOS: conceptSchemeIdentifiers: HasConcept 10018", async () => {
+    const conceptSchemeIdentifiers = (
+      await kos.conceptSchemeIdentifiers({
+        limit: null,
+        offset: 0,
+        query: {
+          conceptIdentifier: concept10018Iri,
+          type: "HasConcept",
+        },
+      })
+    ).unsafeCoerce();
+    expect(conceptSchemeIdentifiers).toHaveLength(1);
+    expect(conceptSchemeIdentifiers[0].equals(conceptSchemeIri)).toStrictEqual(
+      true,
+    );
+  });
+
+  it("UNESCO thesaurus KOS: conceptSchemeIdentifiers: HasTopConcept 10", async () => {
+    const conceptSchemeIdentifiers = (
+      await kos.conceptSchemeIdentifiers({
+        limit: null,
+        offset: 0,
+        query: {
+          conceptIdentifier: concept10Iri,
+          type: "HasTopConcept",
+        },
+      })
+    ).unsafeCoerce();
+    expect(conceptSchemeIdentifiers).toHaveLength(1);
+    expect(conceptSchemeIdentifiers[0].equals(conceptSchemeIri)).toStrictEqual(
+      true,
+    );
+  });
+
+  it("UNESCO thesaurus KOS: conceptSchemeIdentifiers: HasTopConcept 10018", async () => {
+    expect(
+      (
+        await kos.conceptSchemeIdentifiers({
+          limit: null,
+          offset: 0,
+          query: {
+            conceptIdentifier: concept10018Iri,
+            type: "HasTopConcept",
+          },
+        })
+      ).unsafeCoerce(),
+    ).toHaveLength(0);
   });
 
   it("UNESCO thesaurus KOS: conceptSchemeStub", async () => {
@@ -162,86 +282,7 @@ export const behavesLikeUnescoThesaurusKos = (
     expect(prefLabel.value).toStrictEqual("UNESCO Thesaurus");
   });
 
-  it("UNESCO thesaurus KOS: conceptSchemeStubs: HasConcept 10", async () => {
-    const conceptSchemeStubs = (
-      await kos.conceptSchemeStubs({
-        limit: null,
-        offset: 0,
-        query: {
-          conceptIdentifier: DataFactory.namedNode(
-            "http://vocabularies.unesco.org/thesaurus/concept10",
-          ),
-          type: "HasConcept",
-        },
-      })
-    ).unsafeCoerce();
-    expect(conceptSchemeStubs).toHaveLength(1);
-    const conceptSchemeStub = conceptSchemeStubs[0];
-    expect(conceptSchemeStub.prefLabel).toHaveLength(1);
-    const prefLabel = conceptSchemeStub.prefLabel[0];
-    expect(prefLabel.language).toStrictEqual("en");
-    expect(prefLabel.value).toStrictEqual("UNESCO Thesaurus");
-  });
-
-  it("UNESCO thesaurus KOS: conceptSchemeStubs: HasConcept 10018", async () => {
-    const conceptSchemeStubs = (
-      await kos.conceptSchemeStubs({
-        limit: null,
-        offset: 0,
-        query: {
-          conceptIdentifier: DataFactory.namedNode(
-            "http://vocabularies.unesco.org/thesaurus/concept10018",
-          ),
-          type: "HasConcept",
-        },
-      })
-    ).unsafeCoerce();
-    expect(conceptSchemeStubs).toHaveLength(1);
-    const conceptSchemeStub = conceptSchemeStubs[0];
-    expect(conceptSchemeStub.prefLabel).toHaveLength(1);
-    const prefLabel = conceptSchemeStub.prefLabel[0];
-    expect(prefLabel.language).toStrictEqual("en");
-    expect(prefLabel.value).toStrictEqual("UNESCO Thesaurus");
-  });
-
-  it("UNESCO thesaurus KOS: conceptSchemeStubs: HasTopConcept 10", async () => {
-    const conceptSchemeStubs = (
-      await kos.conceptSchemeStubs({
-        limit: null,
-        offset: 0,
-        query: {
-          conceptIdentifier: DataFactory.namedNode(
-            "http://vocabularies.unesco.org/thesaurus/concept10",
-          ),
-          type: "HasTopConcept",
-        },
-      })
-    ).unsafeCoerce();
-    expect(conceptSchemeStubs).toHaveLength(1);
-    const conceptSchemeStub = conceptSchemeStubs[0];
-    expect(conceptSchemeStub.prefLabel).toHaveLength(1);
-    const prefLabel = conceptSchemeStub.prefLabel[0];
-    expect(prefLabel.language).toStrictEqual("en");
-    expect(prefLabel.value).toStrictEqual("UNESCO Thesaurus");
-  });
-
-  it("UNESCO thesaurus KOS: conceptSchemeStubs: HasTopConcept 10018", async () => {
-    const conceptSchemeStubs = (
-      await kos.conceptSchemeStubs({
-        limit: null,
-        offset: 0,
-        query: {
-          conceptIdentifier: DataFactory.namedNode(
-            "http://vocabularies.unesco.org/thesaurus/concept10018",
-          ),
-          type: "HasTopConcept",
-        },
-      })
-    ).unsafeCoerce();
-    expect(conceptSchemeStubs).toHaveLength(0);
-  });
-
-  it("UNESCO thesaurus KOS: conceptSchemesCount", async () => {
+  it("UNESCO thesaurus KOS: conceptSchemesCount: All", async () => {
     expect(
       (await kos.conceptSchemesCount({ type: "All" })).unsafeCoerce(),
     ).toStrictEqual(1);
@@ -292,10 +333,51 @@ export const behavesLikeUnescoThesaurusKos = (
     expect(prefLabel.value).toStrictEqual("Right to education");
   });
 
-  it("UNESCO thesaurus KOS: conceptsCount", async () => {
+  it("UNESCO thesaurus KOS: conceptStubs: Identifiers", async () => {
+    const conceptStubs = (
+      await kos.conceptStubs({
+        limit: 10,
+        offset: 0,
+        query: {
+          conceptIdentifiers: [concept10Iri],
+          type: "Identifiers",
+        },
+      })
+    ).unsafeCoerce();
+    expect(conceptStubs).toHaveLength(1);
+    const conceptStub = conceptStubs[0];
+    expect(conceptStub.prefLabel).toHaveLength(1);
+    const prefLabel = conceptStub.prefLabel[0];
+    expect(prefLabel.language).toStrictEqual("en");
+    expect(prefLabel.value).toStrictEqual("Right to education");
+  });
+
+  it("UNESCO thesaurus KOS: conceptsCount: All", async () => {
     expect(
       (await kos.conceptsCount({ type: "All" })).unsafeCoerce(),
     ).toStrictEqual(4482);
+  });
+
+  it("UNESCO thesaurus KOS: conceptsCount: InScheme", async () => {
+    expect(
+      (
+        await kos.conceptsCount({
+          conceptSchemeIdentifier: conceptSchemeIri,
+          type: "InScheme",
+        })
+      ).unsafeCoerce(),
+    ).toStrictEqual(4482);
+  });
+
+  it("UNESCO thesaurus KOS: conceptsCount: TopConceptOf", async () => {
+    expect(
+      (
+        await kos.conceptsCount({
+          conceptSchemeIdentifier: conceptSchemeIri,
+          type: "TopConceptOf",
+        })
+      ).unsafeCoerce(),
+    ).toStrictEqual(585);
   });
 
   behavesLikeUnescoThesaurusConceptScheme(kosFactory);
