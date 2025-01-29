@@ -92,7 +92,7 @@ export const behavesLikeUnescoThesaurusKos = (
     expect(conceptIdentifiers[0].equals(concept10Iri)).toStrictEqual(true);
   });
 
-  it("UNESCO thesaurus KOS: conceptIdentifiers: ObjectsOfSemanticRelation", async ({
+  it("UNESCO thesaurus KOS: conceptIdentifiers: ObjectsOfSemanticRelations", async ({
     expect,
   }) => {
     const objectConceptIdentifiers = (
@@ -101,11 +101,40 @@ export const behavesLikeUnescoThesaurusKos = (
         offset: 0,
         query: {
           subjectConceptIdentifier: concept10Iri,
-          semanticRelationProperty: SemanticRelationProperty.NARROWER,
-          type: "ObjectsOfSemanticRelation",
+          semanticRelationProperties: [SemanticRelationProperty.NARROWER],
+          type: "ObjectsOfSemanticRelations",
         },
       })
     ).unsafeCoerce();
+    expect(objectConceptIdentifiers).toHaveLength(2);
+    expect(
+      objectConceptIdentifiers.find((conceptIdentifier) =>
+        conceptIdentifier.equals(concept4938Iri),
+      ),
+    ).toBeDefined();
+    expect(
+      objectConceptIdentifiers.find((subjectConceptIdentifier) =>
+        subjectConceptIdentifier.equals(concept7597Iri),
+      ),
+    ).toBeDefined();
+  });
+
+  it("UNESCO thesaurus KOS: conceptIdentifiers: ObjectsOfSemanticRelations (with inverse)", async ({
+    expect,
+  }) => {
+    const objectConceptIdentifiers = (
+      await kos.conceptIdentifiers({
+        limit: null,
+        offset: 0,
+        query: {
+          inverseSemanticRelationProperties: true,
+          subjectConceptIdentifier: concept10Iri,
+          semanticRelationProperties: [SemanticRelationProperty.NARROWER],
+          type: "ObjectsOfSemanticRelations",
+        },
+      })
+    ).unsafeCoerce();
+    // The narrower concepts are also skos:broader to concept10, but the method should deduplicate
     expect(objectConceptIdentifiers).toHaveLength(2);
     expect(
       objectConceptIdentifiers.find((conceptIdentifier) =>
@@ -128,8 +157,8 @@ export const behavesLikeUnescoThesaurusKos = (
         offset: 0,
         query: {
           objectConceptIdentifier: concept10018Iri,
-          semanticRelationProperty: SemanticRelationProperty.NARROWER,
-          type: "SubjectsOfSemanticRelation",
+          semanticRelationProperties: [SemanticRelationProperty.NARROWER],
+          type: "SubjectsOfSemanticRelations",
         },
       })
     ).unsafeCoerce();

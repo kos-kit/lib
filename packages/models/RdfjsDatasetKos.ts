@@ -14,6 +14,8 @@ import {
   Identifier,
   Kos,
   LanguageTag,
+  SemanticRelationProperty,
+  semanticRelationProperties,
 } from "./index.js";
 
 function isConceptInScheme({
@@ -387,6 +389,38 @@ export class RdfjsDatasetKos<
     }
   }
 
+  private *querySemanticallyRelatedConcepts({
+    objectConceptIdentifier,
+    subjectConceptIdentifier,
+    semanticRelationProperties,
+    yieldedConceptIdentifiers,
+  }: {
+    objectConceptIdentifier?: Identifier;
+    semanticRelationProperties: readonly SemanticRelationProperty[];
+    subjectConceptIdentifier?: Identifier;
+    yieldedConceptIdentifiers: TermSet<Identifier>;
+  }): Generator<Identifier> {
+    for (const semanticRelationProperty of semanticRelationProperties) {
+      for (const quad of this.dataset.match(
+        subjectConceptIdentifier,
+        semanticRelationProperty.identifier,
+        objectConceptIdentifier,
+      )) {
+        // The semantic relation properties have a range of skos:Concept
+        const semanticallyRelatedConceptIdentifier = subjectConceptIdentifier
+          ? quad.object
+          : quad.subject;
+        if (
+          semanticallyRelatedConceptIdentifier.termType === "NamedNode" &&
+          !yieldedConceptIdentifiers.has(semanticallyRelatedConceptIdentifier)
+        ) {
+          yield semanticallyRelatedConceptIdentifier;
+          yieldedConceptIdentifiers.add(semanticallyRelatedConceptIdentifier);
+        }
+      }
+    }
+  }
+
   private *queryConcepts(query: ConceptQuery): Generator<Identifier> {
     if (query.type === "All") {
       for (const resource of this.resourceSet.namedInstancesOf(skos.Concept)) {
@@ -420,9 +454,9 @@ export class RdfjsDatasetKos<
       return;
     }
 
-    if (query.type === "InScheme" || query.type === "TopConceptOf") {
-      const yieldedConceptIdentifiers = new TermSet<Identifier>();
+    const yieldedConceptIdentifiers = new TermSet<Identifier>();
 
+    if (query.type === "InScheme" || query.type === "TopConceptOf") {
       for (const quad of this.dataset.match(
         query.conceptSchemeIdentifier,
         skos.hasTopConcept,
@@ -460,10 +494,10 @@ export class RdfjsDatasetKos<
           skos.inScheme,
           query.conceptSchemeIdentifier,
         )) {
-          if (quad.subject.termType !== "NamedNode") {
-            continue;
-          }
-          if (yieldedConceptIdentifiers.has(quad.subject)) {
+          if (
+            quad.subject.termType !== "NamedNode" ||
+            yieldedConceptIdentifiers.has(quad.subject)
+          ) {
             continue;
           }
           // resource skos:inScheme conceptScheme does not entail resource is a skos:Concept, since
@@ -480,34 +514,49 @@ export class RdfjsDatasetKos<
           yieldedConceptIdentifiers.add(quad.subject);
         }
       }
+
       return;
     }
 
-    if (query.type === "ObjectsOfSemanticRelation") {
-      for (const quad of this.dataset.match(
-        query.subjectConceptIdentifier,
-        query.semanticRelationProperty.identifier,
-        null,
-      )) {
-        // The semantic relation properties have a range of skos:Concept
-        if (quad.object.termType === "NamedNode") {
-          yield quad.object;
-        }
+    if (query.type === "ObjectsOfSemanticRelations") {
+      yield* this.querySemanticallyRelatedConcepts({
+        semanticRelationProperties: query.semanticRelationProperties,
+        subjectConceptIdentifier: query.subjectConceptIdentifier,
+        yieldedConceptIdentifiers,
+      });
+
+      if (query.inverseSemanticRelationProperties) {
+        yield* this.querySemanticallyRelatedConcepts({
+          objectConceptIdentifier: query.subjectConceptIdentifier,
+          semanticRelationProperties: query.semanticRelationProperties.flatMap(
+            (semanticRelationProperty) =>
+              semanticRelationProperty.inverse.toList(),
+          ),
+          yieldedConceptIdentifiers,
+        });
       }
+
       return;
     }
 
-    if (query.type === "SubjectsOfSemanticRelation") {
-      for (const quad of this.dataset.match(
-        null,
-        query.semanticRelationProperty.identifier,
-        query.objectConceptIdentifier,
-      )) {
-        // The semantic relation properties have a domain of skos:Concept
-        if (quad.subject.termType === "NamedNode") {
-          yield quad.subject;
-        }
+    if (query.type === "SubjectsOfSemanticRelations") {
+      yield* this.querySemanticallyRelatedConcepts({
+        objectConceptIdentifier: query.objectConceptIdentifier,
+        semanticRelationProperties: query.semanticRelationProperties,
+        yieldedConceptIdentifiers,
+      });
+
+      if (query.inverseSemanticRelationProperties) {
+        yield* this.querySemanticallyRelatedConcepts({
+          semanticRelationProperties: query.semanticRelationProperties.flatMap(
+            (semanticRelationProperty) =>
+              semanticRelationProperty.inverse.toList(),
+          ),
+          subjectConceptIdentifier: query.objectConceptIdentifier,
+          yieldedConceptIdentifiers,
+        });
       }
+
       return;
     }
 
