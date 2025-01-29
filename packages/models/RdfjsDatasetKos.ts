@@ -15,7 +15,6 @@ import {
   Kos,
   LanguageTag,
   SemanticRelationProperty,
-  semanticRelationProperties,
 } from "./index.js";
 
 function isConceptInScheme({

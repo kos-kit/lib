@@ -16,10 +16,8 @@ import {
   Identifier,
   Kos,
   LanguageTag,
-  SemanticRelationProperty,
   mapBindingsToCount,
   mapBindingsToIdentifiers,
-  semanticRelationProperties,
 } from "./index.js";
 import { sparqlRdfTypePattern } from "./sparqlRdfTypePattern.js";
 
