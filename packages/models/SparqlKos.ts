@@ -16,8 +16,10 @@ import {
   Identifier,
   Kos,
   LanguageTag,
+  SemanticRelationProperty,
   mapBindingsToCount,
   mapBindingsToIdentifiers,
+  semanticRelationProperties,
 } from "./index.js";
 import { sparqlRdfTypePattern } from "./sparqlRdfTypePattern.js";
 
@@ -405,36 +407,69 @@ export class SparqlKos<
       return patterns;
     }
 
-    if (query.type === "ObjectsOfSemanticRelation") {
-      return [
-        // The semantic relations have a range of skos:Concept, so no need to check the rdf:type
-        {
-          triples: [
-            {
-              subject: query.subjectConceptIdentifier,
-              predicate: query.semanticRelationProperty.identifier,
-              object: this.conceptVariable,
+    if (
+      query.type === "ObjectsOfSemanticRelations" ||
+      query.type === "SubjectsOfSemanticRelations"
+    ) {
+      // The semantic relations have a range of skos:Concept, so no need to check the rdf:type
+      const directPattern: sparqljs.Pattern = {
+        triples: [
+          {
+            subject:
+              query.type === "ObjectsOfSemanticRelations"
+                ? query.subjectConceptIdentifier
+                : this.conceptVariable,
+            predicate: {
+              items: query.semanticRelationProperties.map(
+                (semanticRelationProperty) =>
+                  semanticRelationProperty.identifier,
+              ),
+              pathType: "|",
+              type: "path",
             },
-          ],
-          type: "bgp",
-        },
-      ];
-    }
+            object:
+              query.type === "ObjectsOfSemanticRelations"
+                ? this.conceptVariable
+                : query.objectConceptIdentifier,
+          },
+        ],
+        type: "bgp",
+      };
+      if (query.inverseSemanticRelationProperties) {
+        const inverseSemanticRelationProperties =
+          query.semanticRelationProperties.flatMap((semanticRelationProperty) =>
+            semanticRelationProperty.inverse.toList(),
+          );
+        if (inverseSemanticRelationProperties.length > 0) {
+          const inversePattern: sparqljs.Pattern = {
+            triples: [
+              {
+                subject:
+                  query.type === "ObjectsOfSemanticRelations"
+                    ? this.conceptVariable
+                    : query.objectConceptIdentifier,
+                predicate: {
+                  items: inverseSemanticRelationProperties.map(
+                    (semanticRelationProperty) =>
+                      semanticRelationProperty.identifier,
+                  ),
+                  pathType: "|",
+                  type: "path",
+                },
+                object:
+                  query.type === "ObjectsOfSemanticRelations"
+                    ? query.subjectConceptIdentifier
+                    : this.conceptVariable,
+              },
+            ],
+            type: "bgp",
+          };
 
-    if (query.type === "SubjectsOfSemanticRelation") {
-      return [
-        // The semantic relations have a domain of skos:Concept, so no need to check the rdf:type
-        {
-          triples: [
-            {
-              subject: this.conceptVariable,
-              predicate: query.semanticRelationProperty.identifier,
-              object: query.objectConceptIdentifier,
-            },
-          ],
-          type: "bgp",
-        },
-      ];
+          return [{ patterns: [directPattern, inversePattern], type: "union" }];
+        }
+      }
+
+      return [directPattern];
     }
 
     throw new RangeError("should never reach this code");
