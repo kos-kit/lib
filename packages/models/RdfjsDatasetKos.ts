@@ -92,8 +92,8 @@ export class RdfjsDatasetKos<
   ConceptStubT extends ConceptStub = ConceptStub,
 > implements Kos<ConceptT, ConceptSchemeT, ConceptSchemeStubT, ConceptStubT>
 {
+  readonly languageIn: readonly LanguageTag[];
   readonly resourceSet: ResourceSet;
-  protected readonly languageIn: readonly LanguageTag[];
   private readonly modelFactories: ModelFactories<
     ConceptT,
     ConceptSchemeT,
