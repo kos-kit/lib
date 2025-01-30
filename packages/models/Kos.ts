@@ -23,6 +23,10 @@ export interface Kos<
     query: ConceptQuery;
   }): Promise<Either<Error, readonly Identifier[]>>;
 
+  concepts(
+    identifiers: readonly Identifier[],
+  ): Promise<readonly Either<Error, ConceptT>[]>;
+
   conceptScheme(identifier: Identifier): Promise<Either<Error, ConceptSchemeT>>;
 
   conceptSchemeIdentifiers(kwds: {

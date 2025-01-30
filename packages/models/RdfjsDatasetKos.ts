@@ -151,6 +151,18 @@ export class RdfjsDatasetKos<
     );
   }
 
+  async concepts(
+    identifiers: readonly Identifier[],
+  ): Promise<readonly Either<Error, ConceptT>[]> {
+    return this.conceptsSync(identifiers);
+  }
+
+  conceptsSync(
+    identifiers: readonly Identifier[],
+  ): readonly Either<Error, ConceptT>[] {
+    return identifiers.map((identifier) => this.conceptSync(identifier));
+  }
+
   async conceptScheme(
     identifier: Identifier,
   ): Promise<Either<Error, ConceptSchemeT>> {

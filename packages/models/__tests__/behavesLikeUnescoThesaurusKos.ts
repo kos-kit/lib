@@ -48,6 +48,28 @@ export const behavesLikeUnescoThesaurusKos = (
     assert.fail("no concepts");
   });
 
+  it("UNESCO thesaurus KOS: concepts", async () => {
+    const expectedConceptIdentifiers = (
+      await kos.conceptIdentifiers({
+        limit: 2,
+        offset: 0,
+        query: { type: "All" },
+      })
+    ).unsafeCoerce();
+    expect(expectedConceptIdentifiers).toHaveLength(2);
+    const actualConcepts = await kos.concepts(expectedConceptIdentifiers);
+    expect(actualConcepts).toHaveLength(2);
+    expectedConceptIdentifiers.forEach(
+      (expectedConceptIdentifier, conceptI) => {
+        expect(
+          actualConcepts[conceptI]
+            .unsafeCoerce()
+            .identifier.equals(expectedConceptIdentifier),
+        ).toStrictEqual(true);
+      },
+    );
+  });
+
   it("UNESCO thesaurus KOS: conceptIdentifiers: All", async () => {
     const firstConceptIdentifiers = (
       await kos.conceptIdentifiers({

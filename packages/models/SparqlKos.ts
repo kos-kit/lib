@@ -116,6 +116,15 @@ export class SparqlKos<
     );
   }
 
+  async concepts(
+    identifiers: readonly Identifier[],
+  ): Promise<readonly Either<Error, ConceptT>[]> {
+    return this.modelsByIdentifiers({
+      identifiers,
+      modelFactory: this.modelFactories.concept,
+    });
+  }
+
   async conceptScheme(
     identifier: Identifier,
   ): Promise<Either<Error, ConceptSchemeT>> {
