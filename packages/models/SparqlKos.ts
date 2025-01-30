@@ -49,7 +49,7 @@ export class SparqlKos<
   >;
   private readonly modelVariable: Variable;
   protected readonly sparqlGenerator: sparqljs.SparqlGenerator;
-  protected readonly sparqlQueryClient: SparqlQueryClient;
+  readonly sparqlQueryClient: SparqlQueryClient;
 
   constructor({
     dataFactory,
