@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "@kos-kit/sparql-client": "2.0.112",
+    "@kos-kit/sparql-client": "2.0.113",
     "@rdfjs/term-set": "^2.0.3",
     "@rdfjs/types": "^1.1.0",
     "@shaclmate/runtime": "2.0.15",
@@ -44,5 +44,5 @@
   },
   "type": "module",
   "types": "index.d.ts",
-  "version": "2.0.112"
+  "version": "2.0.113"
 }
