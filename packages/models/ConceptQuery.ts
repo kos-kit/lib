@@ -6,6 +6,11 @@ export type ConceptQuery =
       readonly type: "All";
     }
   | {
+      // Concepts with the given identifiers
+      readonly conceptIdentifiers: readonly Identifier[];
+      readonly type: "Identifiers";
+    }
+  | {
       // Concepts that are in the given concept scheme
       // If conceptIdentifier is supplied, only check if it's in the given concept scheme
       readonly conceptIdentifier?: Identifier;
@@ -16,17 +21,19 @@ export type ConceptQuery =
       // Object concepts that are semantic relations of the given subject concept
       // i.e. if semanticRelationProperty is skos:broader, then
       // (subjectConceptIdentifier, skos:broader, ?otherConcept)
-      readonly semanticRelationProperty: SemanticRelationProperty;
+      readonly inverseSemanticRelationProperties?: boolean;
+      readonly semanticRelationProperties: readonly SemanticRelationProperty[];
       readonly subjectConceptIdentifier: Identifier;
-      readonly type: "ObjectsOfSemanticRelation";
+      readonly type: "ObjectsOfSemanticRelations";
     }
   | {
       // Subject concepts that are semantic relations of the given object concept
       // i.e. if semanticRelationProperty is skos:broader, then
       // (?otherConcept, skos:broader, objectConceptIdentifier)
-      readonly semanticRelationProperty: SemanticRelationProperty;
+      readonly inverseSemanticRelationProperties?: boolean;
+      readonly semanticRelationProperties: readonly SemanticRelationProperty[];
       readonly objectConceptIdentifier: Identifier;
-      readonly type: "SubjectsOfSemanticRelation";
+      readonly type: "SubjectsOfSemanticRelations";
     }
   | {
       // Concepts that are the top concept of the given concept scheme

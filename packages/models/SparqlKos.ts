@@ -40,7 +40,7 @@ export class SparqlKos<
   private readonly conceptVariable: Variable;
   private readonly countVariable: Variable;
   private readonly datasetCoreFactory: DatasetCoreFactory;
-  private readonly languageIn: readonly LanguageTag[];
+  protected readonly languageIn: readonly LanguageTag[];
   private readonly modelFactories: ModelFactories<
     ConceptT,
     ConceptSchemeT,
@@ -48,8 +48,8 @@ export class SparqlKos<
     ConceptStubT
   >;
   private readonly modelVariable: Variable;
-  private readonly sparqlGenerator: sparqljs.SparqlGenerator;
-  private readonly sparqlQueryClient: SparqlQueryClient;
+  protected readonly sparqlGenerator: sparqljs.SparqlGenerator;
+  readonly sparqlQueryClient: SparqlQueryClient;
 
   constructor({
     dataFactory,
@@ -81,12 +81,10 @@ export class SparqlKos<
   }
 
   async concept(identifier: Identifier): Promise<Either<Error, ConceptT>> {
-    return (
-      await this.modelsByIdentifiers({
-        identifiers: [identifier],
-        modelFactory: this.modelFactories.concept,
-      })
-    )[0];
+    return this.modelByIdentifier({
+      identifier,
+      modelFactory: this.modelFactories.concept,
+    });
   }
 
   async conceptIdentifiers({
@@ -98,7 +96,7 @@ export class SparqlKos<
     offset: number;
     query: ConceptQuery;
   }): Promise<Either<Error, readonly Identifier[]>> {
-    return await EitherAsync(async () =>
+    return EitherAsync(async () =>
       mapBindingsToIdentifiers(
         await this.sparqlQueryClient.queryBindings(
           this.sparqlGenerator.stringify({
@@ -110,7 +108,7 @@ export class SparqlKos<
             queryType: "SELECT",
             type: "query",
             variables: [this.conceptVariable],
-            where: this.conceptQueryToWhereGraphPatterns(query).concat(),
+            where: this.conceptQueryToWherePatterns(query).concat(),
           }),
         ),
         this.conceptVariable.value,
@@ -118,15 +116,22 @@ export class SparqlKos<
     );
   }
 
+  async concepts(
+    identifiers: readonly Identifier[],
+  ): Promise<readonly Either<Error, ConceptT>[]> {
+    return this.modelsByIdentifiers({
+      identifiers,
+      modelFactory: this.modelFactories.concept,
+    });
+  }
+
   async conceptScheme(
     identifier: Identifier,
   ): Promise<Either<Error, ConceptSchemeT>> {
-    return (
-      await this.modelsByIdentifiers({
-        identifiers: [identifier],
-        modelFactory: this.modelFactories.conceptScheme,
-      })
-    )[0];
+    return this.modelByIdentifier({
+      identifier,
+      modelFactory: this.modelFactories.conceptScheme,
+    });
   }
 
   async conceptSchemeIdentifiers({
@@ -138,7 +143,7 @@ export class SparqlKos<
     offset: number;
     query: ConceptSchemeQuery;
   }): Promise<Either<Error, readonly Identifier[]>> {
-    return await EitherAsync(async () =>
+    return EitherAsync(async () =>
       mapBindingsToIdentifiers(
         await this.sparqlQueryClient.queryBindings(
           this.sparqlGenerator.stringify({
@@ -150,7 +155,7 @@ export class SparqlKos<
             queryType: "SELECT",
             type: "query",
             variables: [this.conceptSchemeVariable],
-            where: this.conceptSchemeQueryToWhereGraphPatterns(query).concat(),
+            where: this.conceptSchemeQueryToWherePatterns(query).concat(),
           }),
         ),
         this.conceptSchemeVariable.value,
@@ -161,12 +166,10 @@ export class SparqlKos<
   async conceptSchemeStub(
     identifier: Identifier,
   ): Promise<Either<Error, ConceptSchemeStubT>> {
-    return (
-      await this.modelsByIdentifiers({
-        identifiers: [identifier],
-        modelFactory: this.modelFactories.conceptSchemeStub,
-      })
-    )[0];
+    return this.modelByIdentifier({
+      identifier,
+      modelFactory: this.modelFactories.conceptSchemeStub,
+    });
   }
 
   async conceptSchemeStubs(parameters: {
@@ -203,7 +206,7 @@ export class SparqlKos<
   async conceptSchemesCount(
     query: ConceptSchemeQuery,
   ): Promise<Either<Error, number>> {
-    return await EitherAsync(async ({ liftEither }) =>
+    return EitherAsync(async ({ liftEither }) =>
       liftEither(
         mapBindingsToCount(
           await this.sparqlQueryClient.queryBindings(
@@ -223,8 +226,7 @@ export class SparqlKos<
                   variable: this.countVariable,
                 },
               ],
-              where:
-                this.conceptSchemeQueryToWhereGraphPatterns(query).concat(),
+              where: this.conceptSchemeQueryToWherePatterns(query).concat(),
             }),
           ),
           this.countVariable.value,
@@ -236,12 +238,10 @@ export class SparqlKos<
   async conceptStub(
     identifier: Identifier,
   ): Promise<Either<Error, ConceptStubT>> {
-    return (
-      await this.modelsByIdentifiers({
-        identifiers: [identifier],
-        modelFactory: this.modelFactories.conceptStub,
-      })
-    )[0];
+    return this.modelByIdentifier({
+      identifier,
+      modelFactory: this.modelFactories.conceptStub,
+    });
   }
 
   async conceptStubs(parameters: {
@@ -276,7 +276,7 @@ export class SparqlKos<
   }
 
   async conceptsCount(query: ConceptQuery): Promise<Either<Error, number>> {
-    return await EitherAsync(async ({ liftEither }) =>
+    return EitherAsync(async ({ liftEither }) =>
       liftEither(
         mapBindingsToCount(
           await this.sparqlQueryClient.queryBindings(
@@ -296,7 +296,7 @@ export class SparqlKos<
                   variable: this.countVariable,
                 },
               ],
-              where: this.conceptQueryToWhereGraphPatterns(query).concat(),
+              where: this.conceptQueryToWherePatterns(query).concat(),
             }),
           ),
           this.countVariable.value,
@@ -305,7 +305,7 @@ export class SparqlKos<
     );
   }
 
-  private conceptQueryToWhereGraphPatterns(
+  private conceptQueryToWherePatterns(
     query: ConceptQuery,
   ): readonly sparqljs.Pattern[] {
     if (query.type === "All") {
@@ -318,15 +318,43 @@ export class SparqlKos<
       ];
     }
 
+    if (query.type === "Identifiers") {
+      return [
+        {
+          values: query.conceptIdentifiers.map((identifier) => {
+            const valuePatternRow: sparqljs.ValuePatternRow = {};
+            valuePatternRow[`?${this.conceptVariable.value}`] = identifier;
+            return valuePatternRow;
+          }),
+          type: "values",
+        },
+        sparqlRdfTypePattern({
+          rdfType: skos.Concept,
+          subject: this.conceptVariable,
+        }),
+      ];
+    }
+
     if (query.type === "InScheme" || query.type === "TopConceptOf") {
+      const patterns: sparqljs.Pattern[] = [];
+
       const unionPatterns: sparqljs.Pattern[] = [];
 
       if (query.type === "InScheme") {
         if (query.conceptIdentifier) {
+          patterns.push({
+            values: [query.conceptIdentifier].map((identifier) => {
+              const valuePatternRow: sparqljs.ValuePatternRow = {};
+              valuePatternRow[`?${this.conceptVariable.value}`] = identifier;
+              return valuePatternRow;
+            }),
+            type: "values",
+          });
+
           unionPatterns.push({
             triples: [
               {
-                subject: query.conceptIdentifier,
+                subject: this.conceptVariable,
                 predicate: skos.inScheme,
                 object: query.conceptSchemeIdentifier,
               },
@@ -335,29 +363,25 @@ export class SparqlKos<
           });
         } else {
           // skos:inScheme has an open domain, so we have to check the concept's rdf:type
-          unionPatterns.push(
-            {
-              triples: [
-                {
-                  subject: this.conceptVariable,
-                  predicate: skos.inScheme,
-                  object: query.conceptSchemeIdentifier,
-                },
-              ],
-              type: "bgp",
-            },
-            sparqlRdfTypePattern({
-              subject: this.conceptVariable,
-              rdfType: skos.ConceptScheme,
-            }),
-          );
-          // `{ ?concept <${
-          //   skos.inScheme.value
-          // }> ${conceptSchemeIdentifierString} . ${new RdfTypeGraphPatterns(
-          //   GraphPattern.variable("concept"),
-          //   skos.Concept,
-          // ).toWhereString()} }`,
-          // "UNION",
+          unionPatterns.push({
+            patterns: [
+              {
+                triples: [
+                  {
+                    subject: this.conceptVariable,
+                    predicate: skos.inScheme,
+                    object: query.conceptSchemeIdentifier,
+                  },
+                ],
+                type: "bgp",
+              },
+              sparqlRdfTypePattern({
+                subject: this.conceptVariable,
+                rdfType: skos.Concept,
+              }),
+            ],
+            type: "group",
+          });
         }
       }
 
@@ -386,45 +410,79 @@ export class SparqlKos<
         },
       );
 
-      return [{ patterns: unionPatterns, type: "union" }];
+      patterns.push({ patterns: unionPatterns, type: "union" });
+      return patterns;
     }
 
-    if (query.type === "ObjectsOfSemanticRelation") {
-      return [
-        // The semantic relations have a range of skos:Concept, so no need to check the rdf:type
-        {
-          triples: [
-            {
-              subject: query.subjectConceptIdentifier,
-              predicate: query.semanticRelationProperty.identifier,
-              object: this.conceptVariable,
+    if (
+      query.type === "ObjectsOfSemanticRelations" ||
+      query.type === "SubjectsOfSemanticRelations"
+    ) {
+      // The semantic relations have a range of skos:Concept, so no need to check the rdf:type
+      const directPattern: sparqljs.Pattern = {
+        triples: [
+          {
+            subject:
+              query.type === "ObjectsOfSemanticRelations"
+                ? query.subjectConceptIdentifier
+                : this.conceptVariable,
+            predicate: {
+              items: query.semanticRelationProperties.map(
+                (semanticRelationProperty) =>
+                  semanticRelationProperty.identifier,
+              ),
+              pathType: "|",
+              type: "path",
             },
-          ],
-          type: "bgp",
-        },
-      ];
-    }
+            object:
+              query.type === "ObjectsOfSemanticRelations"
+                ? this.conceptVariable
+                : query.objectConceptIdentifier,
+          },
+        ],
+        type: "bgp",
+      };
+      if (query.inverseSemanticRelationProperties) {
+        const inverseSemanticRelationProperties =
+          query.semanticRelationProperties.flatMap((semanticRelationProperty) =>
+            semanticRelationProperty.inverse.toList(),
+          );
+        if (inverseSemanticRelationProperties.length > 0) {
+          const inversePattern: sparqljs.Pattern = {
+            triples: [
+              {
+                subject:
+                  query.type === "ObjectsOfSemanticRelations"
+                    ? this.conceptVariable
+                    : query.objectConceptIdentifier,
+                predicate: {
+                  items: inverseSemanticRelationProperties.map(
+                    (semanticRelationProperty) =>
+                      semanticRelationProperty.identifier,
+                  ),
+                  pathType: "|",
+                  type: "path",
+                },
+                object:
+                  query.type === "ObjectsOfSemanticRelations"
+                    ? query.subjectConceptIdentifier
+                    : this.conceptVariable,
+              },
+            ],
+            type: "bgp",
+          };
 
-    if (query.type === "SubjectsOfSemanticRelation") {
-      return [
-        // The semantic relations have a domain of skos:Concept, so no need to check the rdf:type
-        {
-          triples: [
-            {
-              subject: this.conceptVariable,
-              predicate: query.semanticRelationProperty.identifier,
-              object: query.objectConceptIdentifier,
-            },
-          ],
-          type: "bgp",
-        },
-      ];
+          return [{ patterns: [directPattern, inversePattern], type: "union" }];
+        }
+      }
+
+      return [directPattern];
     }
 
     throw new RangeError("should never reach this code");
   }
 
-  private conceptSchemeQueryToWhereGraphPatterns(
+  private conceptSchemeQueryToWherePatterns(
     query: ConceptSchemeQuery,
   ): readonly sparqljs.Pattern[] {
     if (query.type === "All") {
@@ -484,7 +542,22 @@ export class SparqlKos<
     ];
   }
 
-  private async modelsByIdentifiers<ModelT>({
+  protected async modelByIdentifier<ModelT>({
+    identifier,
+    modelFactory,
+  }: {
+    identifier: Identifier;
+    modelFactory: ModelFactory<ModelT>;
+  }): Promise<Either<Error, ModelT>> {
+    return (
+      await this.modelsByIdentifiers({
+        identifiers: [identifier],
+        modelFactory,
+      })
+    )[0];
+  }
+
+  protected async modelsByIdentifiers<ModelT>({
     identifiers,
     modelFactory,
   }: {
