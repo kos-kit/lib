@@ -1,14 +1,14 @@
 {
   "dependencies": {
-    "@kos-kit/sparql-client": "2.0.114",
+    "@kos-kit/sparql-client": "2.0.115",
     "@rdfjs/term-set": "^2.0.3",
     "@rdfjs/types": "^1.1.0",
-    "@shaclmate/runtime": "2.0.20",
+    "@shaclmate/runtime": "2.0.22",
     "@tpluscode/rdf-ns-builders": "^4.3.0",
     "@types/rdfjs__term-set": "^2.0.9",
     "pino": "^9.1.0",
     "purify-ts": "~2.1.0",
-    "rdfjs-resource": "1.0.17"
+    "rdfjs-resource": "1.0.19"
   },
   "files": [
     "*.d.ts",
@@ -45,5 +45,5 @@
   },
   "type": "module",
   "types": "index.d.ts",
-  "version": "2.0.114"
+  "version": "2.0.115"
 }

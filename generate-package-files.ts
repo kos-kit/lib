@@ -4,7 +4,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { stringify as stringifyYaml } from "yaml";
 
-const VERSION = "2.0.114";
+const VERSION = "2.0.115";
 
 type PackageName = "models" | "next-utils" | "search" | "sparql-client";
 
@@ -26,7 +26,7 @@ const externalDependencyVersions = {
   n3: "^1.21.3",
   pino: "^9.1.0",
   "purify-ts": "~2.1.0",
-  "rdfjs-resource": "1.0.17",
+  "rdfjs-resource": "1.0.19",
 };
 
 const packages: readonly Package[] = [
@@ -34,7 +34,7 @@ const packages: readonly Package[] = [
     externalDependencies: {
       "@rdfjs/term-set": externalDependencyVersions["@rdfjs/term-set"],
       "@rdfjs/types": externalDependencyVersions["@rdfjs/types"],
-      "@shaclmate/runtime": "2.0.20",
+      "@shaclmate/runtime": "2.0.22",
       "@tpluscode/rdf-ns-builders":
         externalDependencyVersions["@tpluscode/rdf-ns-builders"],
       "@types/rdfjs__term-set":
