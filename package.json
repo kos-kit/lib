@@ -23,6 +23,7 @@
     "check:write": "npm run check:write --workspaces",
     "check:write:unsafe": "npm run check:write --workspaces",
     "clean": "npm run clean --workspaces",
+    "generate-package-files": "tsx generate-package-files.ts",
     "link": "npm link --workspaces",
     "link-dependencies": "npm run link-dependencies --workspaces",
     "lint": "npm run lint --workspaces",

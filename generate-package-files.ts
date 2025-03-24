@@ -34,7 +34,7 @@ const packages: readonly Package[] = [
     externalDependencies: {
       "@rdfjs/term-set": externalDependencyVersions["@rdfjs/term-set"],
       "@rdfjs/types": externalDependencyVersions["@rdfjs/types"],
-      "@shaclmate/runtime": "2.0.15",
+      "@shaclmate/runtime": "2.0.20",
       "@tpluscode/rdf-ns-builders":
         externalDependencyVersions["@tpluscode/rdf-ns-builders"],
       "@types/rdfjs__term-set":
