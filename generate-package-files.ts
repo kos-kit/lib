@@ -41,6 +41,7 @@ const packages: readonly Package[] = [
         externalDependencyVersions["@types/rdfjs__term-set"],
       pino: externalDependencyVersions["pino"],
       "purify-ts": externalDependencyVersions["purify-ts"],
+      "rdfjs-resource": externalDependencyVersions["rdfjs-resource"],
     },
     internalDependencies: ["sparql-client"],
     name: "models",
