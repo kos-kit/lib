@@ -1,11 +1,11 @@
 {
   "dependencies": {
-    "@kos-kit/models": "2.0.113",
+    "@kos-kit/models": "2.0.114",
     "@rdfjs/types": "^1.1.0",
     "@types/lunr": "^2.3.7",
     "lunr": "^2.3.9",
     "purify-ts": "~2.1.0",
-    "rdfjs-resource": "1.0.14"
+    "rdfjs-resource": "1.0.17"
   },
   "files": [
     "*.d.ts",
@@ -42,5 +42,5 @@
   },
   "type": "module",
   "types": "index.d.ts",
-  "version": "2.0.113"
+  "version": "2.0.114"
 }
