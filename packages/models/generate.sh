@@ -12,6 +12,6 @@ format_rdf() {
 format_rdf $PWD/models.shaclmate.ttl
 format_rdf $PWD/stubs.shaclmate.ttl
 
-../../../../shaclmate/packages/cli/cli.sh generate $PWD/models.shaclmate.ttl $PWD/stubs.shaclmate.ttl  >$PWD/generated.ts
+../../../../shaclmate/packages/cli/dist/cli.js generate $PWD/models.shaclmate.ttl $PWD/stubs.shaclmate.ttl  >$PWD/generated.ts
 
 npm exec biome -- check --write --unsafe $PWD/generated.ts
