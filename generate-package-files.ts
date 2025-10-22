@@ -4,7 +4,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { stringify as stringifyYaml } from "yaml";
 
-const VERSION = "2.0.115";
+const VERSION = "2.0.116";
 
 type PackageName = "models" | "next-utils" | "search" | "sparql-client";
 
@@ -17,74 +17,68 @@ interface Package {
 }
 
 const externalDependencyVersions = {
-  "@rdfjs/term-set": "^2.0.3",
-  "@rdfjs/types": "^1.1.0",
-  "@tpluscode/rdf-ns-builders": "^4.3.0",
-  "@types/n3": "^1.21.1",
-  "@types/rdfjs__term-set": "^2.0.9",
-  oxigraph: "0.4.7",
-  n3: "^1.21.3",
-  pino: "^9.1.0",
-  "purify-ts": "~2.1.0",
-  "rdfjs-resource": "1.0.19",
+  "@rdfjs/term-set": { "@rdfjs/term-set": "^2.0.3" },
+  "@rdfjs/types": { "@rdfjs/types": "^1.1.0" },
+  "@tpluscode/rdf-ns-builders": { "@tpluscode/rdf-ns-builders": "^4.3.0" },
+  "@types/n3": { "@types/n3": "^1.26.0" },
+  "@types/rdfjs__term-set": { "@types/rdfjs__term-set": "^2.0.9" },
+  oxigraph: { oxigraph: "0.4.7" },
+  n3: { n3: "^1.26.0" },
+  "purify-ts": { "purify-ts": "~2.1.0" },
+  "rdfjs-resource": { "rdfjs-resource": "1.0.24" },
 };
 
 const packages: readonly Package[] = [
   {
     externalDependencies: {
-      "@rdfjs/term-set": externalDependencyVersions["@rdfjs/term-set"],
-      "@rdfjs/types": externalDependencyVersions["@rdfjs/types"],
-      "@shaclmate/runtime": "2.0.22",
-      "@tpluscode/rdf-ns-builders":
-        externalDependencyVersions["@tpluscode/rdf-ns-builders"],
-      "@types/rdfjs__term-set":
-        externalDependencyVersions["@types/rdfjs__term-set"],
-      pino: externalDependencyVersions["pino"],
-      "purify-ts": externalDependencyVersions["purify-ts"],
-      "rdfjs-resource": externalDependencyVersions["rdfjs-resource"],
+      ...externalDependencyVersions["@rdfjs/term-set"],
+      ...externalDependencyVersions["@rdfjs/types"],
+      "@shaclmate/runtime": "3.0.3",
+      ...externalDependencyVersions["@tpluscode/rdf-ns-builders"],
+      ...externalDependencyVersions["@types/rdfjs__term-set"],
+      ...externalDependencyVersions["purify-ts"],
+      ...externalDependencyVersions["rdfjs-resource"],
     },
     internalDependencies: ["sparql-client"],
     name: "models",
   },
   {
     externalDependencies: {
-      "@rdfjs/types": externalDependencyVersions["@rdfjs/types"],
-      "@types/n3": externalDependencyVersions["@types/n3"],
+      ...externalDependencyVersions["@rdfjs/types"],
+      ...externalDependencyVersions["@types/n3"],
       "@types/npmcli__promise-spawn": "6.0.3",
       "@types/unbzip2-stream": "^1.4.3",
       "base-x": "^3.0.9",
       envalid: "^8.0.0",
       "jsonld-streaming-parser": "^3.4.0",
       mime: "^4.0.4",
-      pino: externalDependencyVersions["pino"],
       "@npmcli/promise-spawn": "^8.0.0",
-      n3: externalDependencyVersions["n3"],
-      "purify-ts": externalDependencyVersions["purify-ts"],
+      ...externalDependencyVersions["n3"],
+      ...externalDependencyVersions["purify-ts"],
       "unbzip2-stream": "^1.4.3",
     },
     name: "next-utils",
   },
   {
     externalDependencies: {
-      "@rdfjs/types": externalDependencyVersions["@rdfjs/types"],
+      ...externalDependencyVersions["@rdfjs/types"],
       "@types/lunr": "^2.3.7",
       lunr: "^2.3.9",
-      "purify-ts": externalDependencyVersions["purify-ts"],
-      "rdfjs-resource": externalDependencyVersions["rdfjs-resource"],
+      ...externalDependencyVersions["purify-ts"],
+      ...externalDependencyVersions["rdfjs-resource"],
     },
     internalDependencies: ["models"],
     name: "search",
   },
   {
     devDependencies: {
-      oxigraph: externalDependencyVersions["oxigraph"],
+      ...externalDependencyVersions["oxigraph"],
       "vitest-fetch-mock": "^0.3.0",
     },
     externalDependencies: {
-      "@rdfjs/types": externalDependencyVersions["@rdfjs/types"],
-      pino: externalDependencyVersions["pino"],
-      "@types/n3": externalDependencyVersions["@types/n3"],
-      n3: externalDependencyVersions.n3,
+      ...externalDependencyVersions["@rdfjs/types"],
+      ...externalDependencyVersions["@types/n3"],
+      ...externalDependencyVersions.n3,
     },
     name: "sparql-client",
   },

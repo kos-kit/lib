@@ -13,9 +13,9 @@ export class LoggingSparqlQueryClient
   async queryBindings(
     query: string,
   ): Promise<readonly Record<string, BlankNode | Literal | NamedNode>[]> {
-    this.logger.trace(this.loggableQuery(query));
+    this.logger(this.loggableQuery(query));
     const result = await this.delegate.queryBindings(query);
-    this.logger.trace(
+    this.logger(
       "queryBindings results:\n%s",
       JSON.stringify(result, undefined, 2),
     );
@@ -23,26 +23,26 @@ export class LoggingSparqlQueryClient
   }
 
   async queryBoolean(query: string): Promise<boolean> {
-    this.logger.trace(this.loggableQuery(query));
+    this.logger(this.loggableQuery(query));
     const result = await this.delegate.queryBoolean(query);
-    this.logger.trace("queryBoolean result: %s", result);
+    this.logger("queryBoolean result: %s", result);
     return result;
   }
 
   async queryQuads(query: string): Promise<readonly Quad[]> {
-    this.logger.trace(this.loggableQuery(query));
+    this.logger(this.loggableQuery(query));
     const result = await this.delegate.queryQuads(query);
-    this.logger.trace("queryQuads result: %d quads", result.length);
-    if (this.logger.isLevelEnabled("trace")) {
-      const writer = new N3.Writer({ format: "application/N-Quads" });
-      for (const quad of result) {
-        this.logger.trace(
-          writer
-            .quadToString(quad.subject, quad.predicate, quad.object, quad.graph)
-            .trimEnd(),
-        );
-      }
+    this.logger("queryQuads result: %d quads", result.length);
+    // if (this.logger.isLevelEnabled("trace")) {
+    const writer = new N3.Writer({ format: "application/N-Quads" });
+    for (const quad of result) {
+      this.logger(
+        writer
+          .quadToString(quad.subject, quad.predicate, quad.object, quad.graph)
+          .trimEnd(),
+      );
     }
+    // }
     return result;
   }
 }

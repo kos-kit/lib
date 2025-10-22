@@ -36,7 +36,7 @@ describe("LunrSearchEngine", () => {
       conceptsLimit: 10,
       kos: new RdfjsDatasetKos({
         dataset: unescoThesaurusDataset,
-        languageIn: ["en", ""],
+        preferredLanguages: ["en", ""],
         modelFactories: ModelFactories.default_,
       }),
       languageTag: "en",

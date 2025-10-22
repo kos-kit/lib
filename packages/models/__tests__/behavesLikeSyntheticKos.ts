@@ -3,7 +3,7 @@ import { it } from "vitest";
 import { Kos, LanguageTag } from "../index.js";
 
 export const behavesLikeSyntheticKos = (
-  kosFactory: (languageIn: LanguageTag) => Kos,
+  kosFactory: (preferredLanguage: LanguageTag) => Kos,
 ) => {
   const kos = kosFactory("en");
   const conceptIdentifier = DataFactory.namedNode(
@@ -39,9 +39,9 @@ export const behavesLikeSyntheticKos = (
     expect(relatedConceptStub.prefLabel).toHaveLength(0);
     expect(relatedConceptStub.prefLabelXl).toHaveLength(0);
     expect(
-      relatedConceptStub.identifier.equals(
+      relatedConceptStub.$identifier.equals(
         DataFactory.namedNode("http://example.com/synthetic/danglingConcept"),
       ),
-    );
+    ).toStrictEqual(true);
   });
 };

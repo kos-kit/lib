@@ -35,10 +35,10 @@ describe("RdfjsDatasetKos", () => {
   );
 
   const kosFactoryFactory =
-    (dataset: DatasetCore) => (languageIn: LanguageTag) =>
+    (dataset: DatasetCore) => (preferredLanguage: LanguageTag) =>
       new RdfjsDatasetKos({
         dataset: dataset,
-        languageIn: [languageIn, ""],
+        preferredLanguages: [preferredLanguage, ""],
         modelFactories: ModelFactories.default_,
       });
 

@@ -12,7 +12,7 @@
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
 <http://kos-kit.github.io/models#>
-    shaclmate:tsFeatureInclude shaclmate:_TsFeature_Create, shaclmate:_TsFeature_FromRdf, shaclmate:_TsFeature_Sparql ;
+    shaclmate:tsFeatureInclude shaclmate:_TsFeature_Create, shaclmate:_TsFeature_Rdf, shaclmate:_TsFeature_Sparql ;
     shaclmate:tsObjectDeclarationType shaclmate:_TsObjectDeclarationType_Interface ;
     a owl:Ontology .
 
@@ -115,7 +115,7 @@ kos-kit-models:KosResource-scopeNote
     sh:xone dash:StringOrLangString .
 
 <http://www.w3.org/2004/02/skos/core#>
-    shaclmate:tsFeatureInclude shaclmate:_TsFeature_Create, shaclmate:_TsFeature_FromRdf, shaclmate:_TsFeature_Sparql ;
+    shaclmate:tsFeatureInclude shaclmate:_TsFeature_Create, shaclmate:_TsFeature_Rdf, shaclmate:_TsFeature_Sparql ;
     shaclmate:tsObjectDeclarationType shaclmate:_TsObjectDeclarationType_Interface ;
     a owl:Ontology .
 
@@ -249,7 +249,7 @@ skos:ConceptScheme-rightsHolder
     sh:path dcterms:rightsHolder .
 
 <http://www.w3.org/2008/05/skos-xl#>
-    shaclmate:tsFeatureInclude shaclmate:_TsFeature_Create, shaclmate:_TsFeature_FromRdf, shaclmate:_TsFeature_Sparql ;
+    shaclmate:tsFeatureInclude shaclmate:_TsFeature_Create, shaclmate:_TsFeature_Rdf, shaclmate:_TsFeature_Sparql ;
     shaclmate:tsObjectDeclarationType shaclmate:_TsObjectDeclarationType_Interface ;
     a owl:Ontology .
 

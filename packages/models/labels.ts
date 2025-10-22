@@ -13,9 +13,9 @@ function literalLabel(literal: Literal): Label {
   }
   literalHash.update(literal.value);
   return {
-    identifier: dataFactory.namedNode(`urn:literal:${literalHash.hex()}`),
+    $identifier: dataFactory.namedNode(`urn:literal:${literalHash.hex()}`),
     literalForm: NonEmptyList([literal]),
-    type: "Label",
+    $type: "Label",
   };
 }
 
@@ -30,7 +30,7 @@ class Labels {
     readonly altLabelXl?: readonly Label[];
     readonly hiddenLabel?: readonly rdfjs.Literal[];
     readonly hiddenLabelXl?: readonly Label[];
-    readonly identifier: Identifier;
+    readonly $identifier: Identifier;
     readonly prefLabel: readonly rdfjs.Literal[];
     readonly prefLabelXl: readonly (Label | LabelStub)[];
   }) {
@@ -61,14 +61,14 @@ class Labels {
       }
 
       for (const skosXlLabel of kosResource.prefLabelXl) {
-        switch (skosXlLabel.type) {
+        switch (skosXlLabel.$type) {
           case "Label":
             return Maybe.of(skosXlLabel);
           case "LabelStub":
             return Maybe.of({
-              identifier: skosXlLabel.identifier,
+              $identifier: skosXlLabel.$identifier,
               literalForm: skosXlLabel.literalForm,
-              type: "Label",
+              $type: "Label",
             });
         }
       }
@@ -85,7 +85,7 @@ class Labels {
       kosResource.hiddenLabelXl,
     );
     this.preferred = prefLabel();
-    this.subject = kosResource.identifier;
+    this.subject = kosResource.$identifier;
   }
 
   get display(): string {

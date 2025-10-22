@@ -47,7 +47,7 @@ export class LunrSearchEngine implements SearchEngine {
       }
 
       const identifierString = rdfjsResource.Resource.Identifier.toString(
-        kosResource.identifier,
+        kosResource.$identifier,
       );
 
       return {
@@ -74,7 +74,7 @@ export class LunrSearchEngine implements SearchEngine {
           query: { type: "All" },
         })
       ).orDefault([])) {
-        (await kos.concept(conceptStub.identifier)).ifRight((concept) =>
+        (await kos.concept(conceptStub.$identifier)).ifRight((concept) =>
           indexDocuments.push(toIndexDocument(concept, "Concept")),
         );
       }
@@ -87,7 +87,7 @@ export class LunrSearchEngine implements SearchEngine {
           query: { type: "All" },
         })
       ).orDefault([])) {
-        (await kos.concept(conceptStub.identifier)).ifRight((concept) =>
+        (await kos.concept(conceptStub.$identifier)).ifRight((concept) =>
           indexDocuments.push(toIndexDocument(concept, "Concept")),
         );
       }
@@ -101,7 +101,7 @@ export class LunrSearchEngine implements SearchEngine {
         query: { type: "All" },
       })
     ).orDefault([])) {
-      (await kos.conceptScheme(conceptSchemeStub.identifier)).ifRight(
+      (await kos.conceptScheme(conceptSchemeStub.$identifier)).ifRight(
         (conceptScheme) =>
           indexDocuments.push(toIndexDocument(conceptScheme, "ConceptScheme")),
       );

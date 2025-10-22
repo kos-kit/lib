@@ -5,13 +5,15 @@ import { Identifier } from "./Identifier.js";
 import { LanguageTag } from "./LanguageTag.js";
 
 export interface ModelFactory<T> {
-  readonly fromRdf: (parameters: {
-    ignoreRdfType?: boolean;
-    languageIn: readonly LanguageTag[];
-    resource: Resource<Identifier>;
-  }) => Either<Resource.ValueError, T>;
+  readonly $fromRdf: (
+    resource: Resource<Identifier>,
+    parameters: {
+      ignoreRdfType?: boolean;
+      preferredLanguages?: readonly LanguageTag[];
+    },
+  ) => Either<Error, T>;
 
-  readonly sparqlConstructQueryString: (
+  readonly $sparqlConstructQueryString: (
     parameters?: {
       ignoreRdfType?: boolean;
       prefixes?: { [prefix: string]: string };
