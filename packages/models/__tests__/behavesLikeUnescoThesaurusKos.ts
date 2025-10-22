@@ -25,7 +25,7 @@ const concept10018Iri = DataFactory.namedNode(
 );
 
 export const behavesLikeUnescoThesaurusKos = (
-  kosFactory: (languageIn: LanguageTag) => Kos,
+  kosFactory: (preferredLanguage: LanguageTag) => Kos,
 ) => {
   const kos = kosFactory("en");
 

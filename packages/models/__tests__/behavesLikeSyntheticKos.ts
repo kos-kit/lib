@@ -3,7 +3,7 @@ import { it } from "vitest";
 import { Kos, LanguageTag } from "../index.js";
 
 export const behavesLikeSyntheticKos = (
-  kosFactory: (languageIn: LanguageTag) => Kos,
+  kosFactory: (preferredLanguage: LanguageTag) => Kos,
 ) => {
   const kos = kosFactory("en");
   const conceptIdentifier = DataFactory.namedNode(

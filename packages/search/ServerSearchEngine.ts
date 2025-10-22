@@ -42,7 +42,7 @@ export class ServerSearchEngine implements SearchEngine {
     store.addQuads(parser.parse(await response.text()));
     const kos = new RdfjsDatasetKos({
       dataset: store,
-      languageIn: [params.languageTag, ""],
+      preferredLanguages: [params.languageTag, ""],
       modelFactories: ModelFactories.default_,
     });
 
@@ -60,7 +60,7 @@ export class ServerSearchEngine implements SearchEngine {
         continue;
       }
       page.push({
-        identifier: Resource.Identifier.toString(conceptStub.identifier),
+        identifier: Resource.Identifier.toString(conceptStub.$identifier),
         prefLabel: prefLabel.value,
         type: "Concept",
       });
@@ -78,7 +78,7 @@ export class ServerSearchEngine implements SearchEngine {
         continue;
       }
       page.push({
-        identifier: Resource.Identifier.toString(conceptSchemeStub.identifier),
+        identifier: Resource.Identifier.toString(conceptSchemeStub.$identifier),
         prefLabel: prefLabel.value,
         type: "ConceptScheme",
       });

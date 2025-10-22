@@ -3,10 +3,10 @@ import { expect, it } from "vitest";
 import { Kos, LanguageTag } from "../index.js";
 
 export function behavesLikeUnescoThesaurusConcept10018(
-  kosFactory: (languageIn: LanguageTag) => Kos,
+  kosFactory: (preferredLanguage: LanguageTag) => Kos,
 ) {
-  const testConcept = async (languageIn: LanguageTag) =>
-    kosFactory(languageIn)
+  const testConcept = async (preferredLanguage: LanguageTag) =>
+    kosFactory(preferredLanguage)
       .concept(
         DataFactory.namedNode(
           "http://vocabularies.unesco.org/thesaurus/concept10018",
