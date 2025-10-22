@@ -1,5 +1,3 @@
-import { Logger, pino } from "pino";
-
 /**
  * Abstract base class for HTTP-based SPARQL clients.
  */
@@ -8,20 +6,13 @@ export abstract class HttpSparqlBaseClient<
 > {
   protected defaultRequestOptions?: RequestOptionsT;
   protected readonly endpointUrl: string;
-  protected readonly logger: Logger;
 
   constructor({
     defaultRequestOptions,
     endpointUrl,
-    logger,
   }: HttpSparqlBaseClient.Parameters<RequestOptionsT>) {
     this.defaultRequestOptions = defaultRequestOptions;
     this.endpointUrl = endpointUrl;
-    this.logger =
-      logger ??
-      pino({
-        level: "silent",
-      });
   }
 
   protected async ensureOkResponse(response: Response): Promise<Response> {
@@ -87,16 +78,16 @@ export abstract class HttpSparqlBaseClient<
       mergedHeaders.delete("content-type");
     }
 
-    if (this.logger.isLevelEnabled("trace")) {
-      this.logger.trace("request URL: %s", url);
-      this.logger.trace("request method: %s", method);
-      for (const [name, value] of mergedHeaders.entries()) {
-        this.logger.trace("request header: %s: %s", name, value);
-      }
-      if (body && typeof body === "string") {
-        this.logger.trace("request body (length=%s):\n%s", body.length, body);
-      }
-    }
+    // if (this.logger.isLevelEnabled("trace")) {
+    //   this.logger.trace("request URL: %s", url);
+    //   this.logger.trace("request method: %s", method);
+    //   for (const [name, value] of mergedHeaders.entries()) {
+    //     this.logger.trace("request header: %s: %s", name, value);
+    //   }
+    //   if (body && typeof body === "string") {
+    //     this.logger.trace("request body (length=%s):\n%s", body.length, body);
+    //   }
+    // }
 
     return await fetch(url, {
       body,
@@ -117,7 +108,6 @@ export namespace HttpSparqlBaseClient {
   export interface Parameters<RequestOptionsT extends RequestOptions> {
     defaultRequestOptions?: RequestOptionsT;
     endpointUrl: string;
-    logger?: Logger;
   }
 
   export interface RequestOptions {

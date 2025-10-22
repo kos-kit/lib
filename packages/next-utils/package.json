@@ -8,7 +8,6 @@
     "envalid": "^8.0.0",
     "jsonld-streaming-parser": "^3.4.0",
     "mime": "^4.0.4",
-    "pino": "^9.1.0",
     "@npmcli/promise-spawn": "^8.0.0",
     "n3": "^1.26.0",
     "purify-ts": "~2.1.0",

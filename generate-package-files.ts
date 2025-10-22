@@ -24,7 +24,6 @@ const externalDependencyVersions = {
   "@types/rdfjs__term-set": { "@types/rdfjs__term-set": "^2.0.9" },
   oxigraph: { oxigraph: "0.4.7" },
   n3: { n3: "^1.26.0" },
-  pino: { pino: "^9.1.0" },
   "purify-ts": { "purify-ts": "~2.1.0" },
   "rdfjs-resource": { "rdfjs-resource": "1.0.24" },
 };
@@ -37,7 +36,6 @@ const packages: readonly Package[] = [
       "@shaclmate/runtime": "3.0.3",
       ...externalDependencyVersions["@tpluscode/rdf-ns-builders"],
       ...externalDependencyVersions["@types/rdfjs__term-set"],
-      ...externalDependencyVersions["pino"],
       ...externalDependencyVersions["purify-ts"],
       ...externalDependencyVersions["rdfjs-resource"],
     },
@@ -54,7 +52,6 @@ const packages: readonly Package[] = [
       envalid: "^8.0.0",
       "jsonld-streaming-parser": "^3.4.0",
       mime: "^4.0.4",
-      ...externalDependencyVersions["pino"],
       "@npmcli/promise-spawn": "^8.0.0",
       ...externalDependencyVersions["n3"],
       ...externalDependencyVersions["purify-ts"],
@@ -80,7 +77,6 @@ const packages: readonly Package[] = [
     },
     externalDependencies: {
       ...externalDependencyVersions["@rdfjs/types"],
-      ...externalDependencyVersions["pino"],
       ...externalDependencyVersions["@types/n3"],
       ...externalDependencyVersions.n3,
     },

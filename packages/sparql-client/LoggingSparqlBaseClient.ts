@@ -1,7 +1,10 @@
-import { Logger } from "pino";
 import { SparqlGraphStoreClient } from "./SparqlGraphStoreClient.js";
 import { SparqlQueryClient } from "./SparqlQueryClient.js";
 import { SparqlUpdateClient } from "./SparqlUpdateClient.js";
+
+type Logger = {
+  trace(...parameters: any[]): void;
+};
 
 export class LoggingSparqlBaseClient<
   DelegateT extends

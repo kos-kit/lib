@@ -2,10 +2,15 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import promiseSpawn from "@npmcli/promise-spawn";
 import { DataFactory, DatasetCore, DatasetCoreFactory } from "@rdfjs/types";
-import { Logger } from "pino";
 import { RdfFile } from "./RdfFile.js";
 import * as fsEither from "./fsEither.js";
 import { getRdfFileFormat } from "./getRdfFileFormat.js";
+
+type Logger = {
+  debug(...parameters: any[]): void;
+  info(...parameters: any[]): void;
+  warn(...parameters: any[]): void;
+};
 
 /**
  * Abstraction for iterating over a directory of files with RDF data in them.
