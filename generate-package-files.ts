@@ -4,7 +4,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { stringify as stringifyYaml } from "yaml";
 
-const VERSION = "2.0.115";
+const VERSION = "2.0.116";
 
 type PackageName = "models" | "next-utils" | "search" | "sparql-client";
 
