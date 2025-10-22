@@ -2,9 +2,10 @@ import { SparqlGraphStoreClient } from "./SparqlGraphStoreClient.js";
 import { SparqlQueryClient } from "./SparqlQueryClient.js";
 import { SparqlUpdateClient } from "./SparqlUpdateClient.js";
 
-type Logger = {
-  trace(...parameters: any[]): void;
-};
+type Logger = (
+  message: string,
+  ...parameters: (boolean | number | string)[]
+) => void;
 
 export class LoggingSparqlBaseClient<
   DelegateT extends
