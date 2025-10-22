@@ -41,7 +41,7 @@ export const behavesLikeUnescoThesaurusKos = (
         await kos.concept(expectedConceptIdentifier)
       ).unsafeCoerce();
       expect(
-        expectedConceptIdentifier.equals(actualConcept.identifier),
+        expectedConceptIdentifier.equals(actualConcept.$identifier),
       ).toStrictEqual(true);
       return;
     }
@@ -64,7 +64,7 @@ export const behavesLikeUnescoThesaurusKos = (
         expect(
           actualConcepts[conceptI]
             .unsafeCoerce()
-            .identifier.equals(expectedConceptIdentifier),
+            .$identifier.equals(expectedConceptIdentifier),
         ).toStrictEqual(true);
       },
     );
@@ -202,7 +202,7 @@ export const behavesLikeUnescoThesaurusKos = (
         await kos.conceptScheme(expectedConceptSchemeIdentifier)
       ).unsafeCoerce();
       expect(
-        expectedConceptSchemeIdentifier.equals(actualConceptScheme.identifier),
+        expectedConceptSchemeIdentifier.equals(actualConceptScheme.$identifier),
       ).toBeTruthy();
     }
   });
@@ -300,16 +300,16 @@ export const behavesLikeUnescoThesaurusKos = (
     expect(expectedPrefLabel.value).toStrictEqual("UNESCO Thesaurus");
 
     const actualConceptSchemeStub = (
-      await kos.conceptSchemeStub(expectedConceptSchemeStub.identifier)
+      await kos.conceptSchemeStub(expectedConceptSchemeStub.$identifier)
     ).unsafeCoerce();
     expect(
-      actualConceptSchemeStub.identifier.equals(
-        expectedConceptSchemeStub.identifier,
+      actualConceptSchemeStub.$identifier.equals(
+        expectedConceptSchemeStub.$identifier,
       ),
     ).toStrictEqual(true);
     expect(
-      actualConceptSchemeStub.identifier.equals(
-        expectedConceptSchemeStub.identifier,
+      actualConceptSchemeStub.$identifier.equals(
+        expectedConceptSchemeStub.$identifier,
       ),
     ).toStrictEqual(true);
     const actualPrefLabel = expectedConceptSchemeStub.prefLabel[0];
@@ -355,13 +355,13 @@ export const behavesLikeUnescoThesaurusKos = (
     expect(expectedPrefLabel.value).toStrictEqual("Right to education");
 
     const actualConceptStub = (
-      await kos.conceptStub(expectedConceptStub.identifier)
+      await kos.conceptStub(expectedConceptStub.$identifier)
     ).unsafeCoerce();
     expect(
-      actualConceptStub.identifier.equals(expectedConceptStub.identifier),
+      actualConceptStub.$identifier.equals(expectedConceptStub.$identifier),
     ).toStrictEqual(true);
     expect(
-      actualConceptStub.identifier.equals(expectedConceptStub.identifier),
+      actualConceptStub.$identifier.equals(expectedConceptStub.$identifier),
     ).toStrictEqual(true);
     const actualPrefLabel = expectedConceptStub.prefLabel[0];
     expect(actualPrefLabel.language).toStrictEqual("en");

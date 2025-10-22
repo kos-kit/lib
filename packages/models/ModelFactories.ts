@@ -16,32 +16,28 @@ export interface ModelFactories<
   readonly concept: ModelFactory<ConceptT>;
   readonly conceptScheme: ModelFactory<ConceptSchemeT>;
   readonly conceptSchemeStub: ModelFactory<ConceptSchemeStubT> & {
-    fromIdentifier: (identifier: Identifier) => ConceptSchemeStubT;
+    $fromIdentifier: (identifier: Identifier) => ConceptSchemeStubT;
   };
   readonly conceptStub: ModelFactory<ConceptStubT> & {
-    fromIdentifier: (identifier: Identifier) => ConceptStubT;
+    $fromIdentifier: (identifier: Identifier) => ConceptStubT;
   };
 }
 
 export namespace ModelFactories {
   export const default_: ModelFactories = {
-    concept: {
-      fromRdf: Concept.fromRdf,
-      sparqlConstructQueryString: Concept.sparqlConstructQueryString,
-    },
-    conceptScheme: {
-      fromRdf: ConceptScheme.fromRdf,
-      sparqlConstructQueryString: ConceptScheme.sparqlConstructQueryString,
-    },
+    concept: Concept,
+    conceptScheme: ConceptScheme,
     conceptSchemeStub: {
-      fromIdentifier: (identifier) => ConceptSchemeStub.create({ identifier }),
-      fromRdf: ConceptSchemeStub.fromRdf,
-      sparqlConstructQueryString: ConceptSchemeStub.sparqlConstructQueryString,
+      $fromIdentifier: ($identifier) =>
+        ConceptSchemeStub.$create({ $identifier }),
+      $fromRdf: ConceptSchemeStub.$fromRdf,
+      $sparqlConstructQueryString:
+        ConceptSchemeStub.$sparqlConstructQueryString,
     },
     conceptStub: {
-      fromIdentifier: (identifier) => ConceptStub.create({ identifier }),
-      fromRdf: ConceptStub.fromRdf,
-      sparqlConstructQueryString: ConceptStub.sparqlConstructQueryString,
+      $fromIdentifier: ($identifier) => ConceptStub.$create({ $identifier }),
+      $fromRdf: ConceptStub.$fromRdf,
+      $sparqlConstructQueryString: ConceptStub.$sparqlConstructQueryString,
     },
   };
 }

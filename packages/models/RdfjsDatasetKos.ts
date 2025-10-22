@@ -92,7 +92,7 @@ export class RdfjsDatasetKos<
   ConceptStubT extends ConceptStub = ConceptStub,
 > implements Kos<ConceptT, ConceptSchemeT, ConceptSchemeStubT, ConceptStubT>
 {
-  readonly languageIn: readonly LanguageTag[];
+  readonly preferredLanguages: readonly LanguageTag[];
   readonly resourceSet: ResourceSet;
   private readonly modelFactories: ModelFactories<
     ConceptT,
@@ -103,11 +103,11 @@ export class RdfjsDatasetKos<
 
   constructor({
     dataset,
-    languageIn,
+    preferredLanguages,
     modelFactories,
   }: {
     dataset: DatasetCore;
-    languageIn: readonly LanguageTag[];
+    preferredLanguages: readonly LanguageTag[];
     modelFactories: ModelFactories<
       ConceptT,
       ConceptSchemeT,
@@ -115,7 +115,7 @@ export class RdfjsDatasetKos<
       ConceptStubT
     >;
   }) {
-    this.languageIn = languageIn;
+    this.preferredLanguages = preferredLanguages;
     this.modelFactories = modelFactories;
     this.resourceSet = new ResourceSet({ dataset });
   }
@@ -201,10 +201,12 @@ export class RdfjsDatasetKos<
   conceptSchemeStubSync(
     identifier: Identifier,
   ): Either<Error, ConceptSchemeStubT> {
-    return this.modelFactories.conceptSchemeStub.fromRdf({
-      languageIn: this.languageIn,
-      resource: this.resourceSet.namedResource(identifier),
-    });
+    return this.modelFactories.conceptSchemeStub.$fromRdf(
+      this.resourceSet.namedResource(identifier),
+      {
+        preferredLanguages: this.preferredLanguages,
+      },
+    );
   }
 
   async conceptSchemeStubs(parameters: {
@@ -228,9 +230,8 @@ export class RdfjsDatasetKos<
     let conceptSchemeI = 0;
     for (const conceptSchemeIdentifier of this.queryConceptSchemes(query)) {
       this.modelFactories.conceptSchemeStub
-        .fromRdf({
-          languageIn: this.languageIn,
-          resource: this.resourceSet.namedResource(conceptSchemeIdentifier),
+        .$fromRdf(this.resourceSet.namedResource(conceptSchemeIdentifier), {
+          preferredLanguages: this.preferredLanguages,
         })
         .ifRight((conceptSchemeStub) => {
           if (conceptSchemeI++ >= offset) {
@@ -245,10 +246,12 @@ export class RdfjsDatasetKos<
   }
 
   conceptSchemeSync(identifier: Identifier): Either<Error, ConceptSchemeT> {
-    return this.modelFactories.conceptScheme.fromRdf({
-      languageIn: this.languageIn,
-      resource: this.resourceSet.namedResource(identifier),
-    });
+    return this.modelFactories.conceptScheme.$fromRdf(
+      this.resourceSet.namedResource(identifier),
+      {
+        preferredLanguages: this.preferredLanguages,
+      },
+    );
   }
 
   async conceptSchemesCount(
@@ -272,10 +275,12 @@ export class RdfjsDatasetKos<
   }
 
   conceptStubSync(identifier: Identifier): Either<Error, ConceptStubT> {
-    return this.modelFactories.conceptStub.fromRdf({
-      languageIn: this.languageIn,
-      resource: this.resourceSet.namedResource(identifier),
-    });
+    return this.modelFactories.conceptStub.$fromRdf(
+      this.resourceSet.namedResource(identifier),
+      {
+        preferredLanguages: this.preferredLanguages,
+      },
+    );
   }
 
   async conceptStubs(parameters: {
@@ -299,9 +304,8 @@ export class RdfjsDatasetKos<
     let conceptI = 0;
     for (const conceptIdentifier of this.queryConcepts(query)) {
       this.modelFactories.conceptStub
-        .fromRdf({
-          languageIn: this.languageIn,
-          resource: this.resourceSet.namedResource(conceptIdentifier),
+        .$fromRdf(this.resourceSet.namedResource(conceptIdentifier), {
+          preferredLanguages: this.preferredLanguages,
         })
         .ifRight((conceptStub) => {
           if (conceptI++ >= offset) {
@@ -316,10 +320,12 @@ export class RdfjsDatasetKos<
   }
 
   conceptSync(identifier: Identifier): Either<Error, ConceptT> {
-    return this.modelFactories.concept.fromRdf({
-      languageIn: this.languageIn,
-      resource: this.resourceSet.namedResource(identifier),
-    });
+    return this.modelFactories.concept.$fromRdf(
+      this.resourceSet.namedResource(identifier),
+      {
+        preferredLanguages: this.preferredLanguages,
+      },
+    );
   }
 
   async conceptsCount(query: ConceptQuery): Promise<Either<Error, number>> {

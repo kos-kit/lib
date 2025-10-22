@@ -33,14 +33,14 @@ describe("SparqlKos", async () => {
   // const syntheticStoreString = syntheticStore.dump({ format: "trig" });
 
   const kosFactoryFactory =
-    (store: oxigraph.Store) => (languageIn: LanguageTag) =>
+    (store: oxigraph.Store) => (preferredLanguage: LanguageTag) =>
       new SparqlKos({
         dataFactory: N3.DataFactory,
         datasetCoreFactory: {
           dataset: (quads) =>
             new OxigraphDatasetCore(new oxigraph.Store(quads)),
         },
-        languageIn: [languageIn, ""],
+        preferredLanguages: [preferredLanguage, ""],
         modelFactories: ModelFactories.default_,
         sparqlQueryClient: new OxigraphSparqlClient({
           dataFactory: oxigraph,
@@ -69,14 +69,14 @@ describe("SparqlKos", async () => {
   );
 
   behavesLikeUnescoThesaurusKos(
-    (languageIn: LanguageTag) =>
+    (preferredLanguage: LanguageTag) =>
       new SparqlKos({
         dataFactory: N3.DataFactory,
         datasetCoreFactory: {
           dataset: (quads) =>
             new OxigraphDatasetCore(new oxigraph.Store(quads)),
         },
-        languageIn: [languageIn, ""],
+        preferredLanguages: [preferredLanguage, ""],
         modelFactories: ModelFactories.default_,
         sparqlQueryClient: new OxigraphSparqlClient({
           dataFactory: oxigraph,

@@ -13,9 +13,9 @@ function literalLabel(literal: Literal): Label {
   }
   literalHash.update(literal.value);
   return {
-    identifier: dataFactory.namedNode(`urn:literal:${literalHash.hex()}`),
+    $identifier: dataFactory.namedNode(`urn:literal:${literalHash.hex()}`),
     literalForm: NonEmptyList([literal]),
-    type: "Label",
+    $type: "Label",
   };
 }
 
@@ -61,14 +61,14 @@ class Labels {
       }
 
       for (const skosXlLabel of kosResource.prefLabelXl) {
-        switch (skosXlLabel.type) {
+        switch (skosXlLabel.$type) {
           case "Label":
             return Maybe.of(skosXlLabel);
           case "LabelStub":
             return Maybe.of({
-              identifier: skosXlLabel.identifier,
+              $identifier: skosXlLabel.$identifier,
               literalForm: skosXlLabel.literalForm,
-              type: "Label",
+              $type: "Label",
             });
         }
       }

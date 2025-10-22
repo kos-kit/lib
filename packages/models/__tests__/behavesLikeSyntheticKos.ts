@@ -39,9 +39,9 @@ export const behavesLikeSyntheticKos = (
     expect(relatedConceptStub.prefLabel).toHaveLength(0);
     expect(relatedConceptStub.prefLabelXl).toHaveLength(0);
     expect(
-      relatedConceptStub.identifier.equals(
+      relatedConceptStub.$identifier.equals(
         DataFactory.namedNode("http://example.com/synthetic/danglingConcept"),
       ),
-    );
+    ).toStrictEqual(true);
   });
 };

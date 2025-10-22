@@ -19,10 +19,10 @@ export function behavesLikeUnescoThesaurusConcept10018(
     const inSchemes = concept.inScheme;
     expect(inSchemes).toHaveLength(1);
     expect(
-      inSchemes[0].identifier.equals(
+      inSchemes[0].$identifier.equals(
         DataFactory.namedNode("http://vocabularies.unesco.org/thesaurus"),
       ),
-    );
+    ).toStrictEqual(true);
   });
 
   it("UNESCO thesaurus concept 10018: should have a modified date", async () => {
@@ -83,7 +83,7 @@ export function behavesLikeUnescoThesaurusConcept10018(
         );
         expect(
           actualConcepts.find((actualConcept) =>
-            actualConcept.identifier.equals(expectedConceptIdentifier),
+            actualConcept.$identifier.equals(expectedConceptIdentifier),
           ),
         ).toBeDefined();
       }

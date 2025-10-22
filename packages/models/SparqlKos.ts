@@ -40,7 +40,7 @@ export class SparqlKos<
   private readonly conceptVariable: Variable;
   private readonly countVariable: Variable;
   private readonly datasetCoreFactory: DatasetCoreFactory;
-  protected readonly languageIn: readonly LanguageTag[];
+  protected readonly preferredLanguages: readonly LanguageTag[];
   private readonly modelFactories: ModelFactories<
     ConceptT,
     ConceptSchemeT,
@@ -54,13 +54,13 @@ export class SparqlKos<
   constructor({
     dataFactory,
     datasetCoreFactory,
-    languageIn,
+    preferredLanguages,
     modelFactories,
     sparqlQueryClient,
   }: {
     dataFactory: DataFactory;
     datasetCoreFactory: DatasetCoreFactory;
-    languageIn: readonly LanguageTag[];
+    preferredLanguages: readonly LanguageTag[];
     modelFactories: ModelFactories<
       ConceptT,
       ConceptSchemeT,
@@ -73,7 +73,7 @@ export class SparqlKos<
     this.conceptSchemeVariable = dataFactory.variable!("conceptScheme");
     this.countVariable = dataFactory.variable!("count");
     this.datasetCoreFactory = datasetCoreFactory;
-    this.languageIn = languageIn;
+    this.preferredLanguages = preferredLanguages;
     this.modelFactories = modelFactories;
     this.modelVariable = dataFactory.variable!("model");
     this.sparqlGenerator = new sparqljs.Generator();
@@ -194,7 +194,7 @@ export class SparqlKos<
         (modelEither, index) =>
           modelEither
             .mapLeft(() =>
-              this.modelFactories.conceptSchemeStub.fromIdentifier(
+              this.modelFactories.conceptSchemeStub.$fromIdentifier(
                 identifiers[index],
               ),
             )
@@ -266,7 +266,7 @@ export class SparqlKos<
         (modelEither, index) =>
           modelEither
             .mapLeft(() =>
-              this.modelFactories.conceptStub.fromIdentifier(
+              this.modelFactories.conceptStub.$fromIdentifier(
                 identifiers[index],
               ),
             )
@@ -568,7 +568,7 @@ export class SparqlKos<
       return [];
     }
 
-    const constructQueryString = modelFactory.sparqlConstructQueryString({
+    const constructQueryString = modelFactory.$sparqlConstructQueryString({
       prefixes,
       subject: this.modelVariable,
       where: [
@@ -595,14 +595,16 @@ export class SparqlKos<
     // console.log(quadsString);
 
     return identifiers.map((identifier) =>
-      modelFactory.fromRdf({
-        ignoreRdfType: true,
-        languageIn: this.languageIn,
-        resource: new Resource({
+      modelFactory.$fromRdf(
+        new Resource({
           dataset: this.datasetCoreFactory.dataset(quads.concat()),
           identifier,
         }),
-      }),
+        {
+          ignoreRdfType: true,
+          preferredLanguages: this.preferredLanguages,
+        },
+      ),
     );
   }
 }

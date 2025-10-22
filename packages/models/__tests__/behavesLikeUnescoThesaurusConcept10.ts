@@ -19,10 +19,10 @@ export function behavesLikeUnescoThesaurusConcept10(
     for (const inSchemes of [concept.topConceptOf, concept.inScheme]) {
       expect(inSchemes).toHaveLength(1);
       expect(
-        inSchemes[0].identifier.equals(
+        inSchemes[0].$identifier.equals(
           DataFactory.namedNode("http://vocabularies.unesco.org/thesaurus"),
         ),
-      );
+      ).toStrictEqual(true);
     }
   });
 
@@ -51,10 +51,10 @@ export function behavesLikeUnescoThesaurusConcept10(
     const topConceptOf = concept.topConceptOf;
     expect(topConceptOf).toHaveLength(1);
     expect(
-      topConceptOf[0].identifier.equals(
+      topConceptOf[0].$identifier.equals(
         DataFactory.namedNode("http://vocabularies.unesco.org/thesaurus"),
       ),
-    );
+    ).toStrictEqual(true);
   });
 
   it("UNESCO thesaurus concept 10: should have known semantic relations", async () => {
@@ -76,7 +76,7 @@ export function behavesLikeUnescoThesaurusConcept10(
         );
         expect(
           actualConcepts.find((actualConcept) =>
-            actualConcept.identifier.equals(expectedConceptIdentifier),
+            actualConcept.$identifier.equals(expectedConceptIdentifier),
           ),
         ).toBeDefined();
       }
