@@ -2,16 +2,16 @@ import { ModelFactory } from "./ModelFactory.js";
 import {
   Concept,
   ConceptScheme,
-  ConceptSchemeStub,
-  ConceptStub,
   Identifier,
+  PartialConcept,
+  PartialConceptScheme,
 } from "./index.js";
 
 export interface ModelFactories<
   ConceptT extends Concept = Concept,
   ConceptSchemeT extends ConceptScheme = ConceptScheme,
-  ConceptSchemeStubT extends ConceptSchemeStub = ConceptSchemeStub,
-  ConceptStubT extends ConceptStub = ConceptStub,
+  ConceptSchemeStubT extends PartialConceptScheme = PartialConceptScheme,
+  ConceptStubT extends PartialConcept = PartialConcept,
 > {
   readonly concept: ModelFactory<ConceptT>;
   readonly conceptScheme: ModelFactory<ConceptSchemeT>;
@@ -29,15 +29,15 @@ export namespace ModelFactories {
     conceptScheme: ConceptScheme,
     conceptSchemeStub: {
       $fromIdentifier: ($identifier) =>
-        ConceptSchemeStub.$create({ $identifier }),
-      $fromRdf: ConceptSchemeStub.$fromRdf,
+        PartialConceptScheme.$create({ $identifier }),
+      $fromRdf: PartialConceptScheme.$fromRdf,
       $sparqlConstructQueryString:
-        ConceptSchemeStub.$sparqlConstructQueryString,
+        PartialConceptScheme.$sparqlConstructQueryString,
     },
     conceptStub: {
-      $fromIdentifier: ($identifier) => ConceptStub.$create({ $identifier }),
-      $fromRdf: ConceptStub.$fromRdf,
-      $sparqlConstructQueryString: ConceptStub.$sparqlConstructQueryString,
+      $fromIdentifier: ($identifier) => PartialConcept.$create({ $identifier }),
+      $fromRdf: PartialConcept.$fromRdf,
+      $sparqlConstructQueryString: PartialConcept.$sparqlConstructQueryString,
     },
   };
 }

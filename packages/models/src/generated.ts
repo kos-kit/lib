@@ -91,18 +91,18 @@ function $isReadonlyStringArray(x: unknown): x is readonly string[] {
   return Array.isArray(x) && x.every((z) => typeof z === "string");
 }
 type $UnwrapR<T> = T extends purify.Either<any, infer R> ? R : never;
-export interface LabelStub {
-  readonly $identifier: LabelStub.$Identifier;
-  readonly $type: "LabelStub";
+export interface PartialLabel {
+  readonly $identifier: PartialLabel.$Identifier;
+  readonly $type: "PartialLabel";
   readonly literalForm: purify.NonEmptyList<rdfjs.Literal>;
 }
 
-export namespace LabelStub {
+export namespace PartialLabel {
   export function $create(parameters: {
     readonly $identifier?: (rdfjs.BlankNode | rdfjs.NamedNode) | string;
     readonly literalForm: purify.NonEmptyList<rdfjs.Literal>;
-  }): LabelStub {
-    let $identifier: LabelStub.$Identifier;
+  }): PartialLabel {
+    let $identifier: PartialLabel.$Identifier;
     if (typeof parameters.$identifier === "object") {
       $identifier = parameters.$identifier;
     } else if (typeof parameters.$identifier === "string") {
@@ -113,7 +113,7 @@ export namespace LabelStub {
       $identifier = parameters.$identifier satisfies never;
     }
 
-    const $type = "LabelStub" as const;
+    const $type = "PartialLabel" as const;
     const literalForm = parameters.literalForm;
     return { $identifier, $type, literalForm };
   }
@@ -126,7 +126,7 @@ export namespace LabelStub {
       objectSet?: $ObjectSet;
       preferredLanguages?: readonly string[];
     },
-  ): purify.Either<Error, LabelStub> {
+  ): purify.Either<Error, PartialLabel> {
     let {
       ignoreRdfType = false,
       objectSet,
@@ -137,7 +137,7 @@ export namespace LabelStub {
       objectSet = new $RdfjsDatasetObjectSet({ dataset: resource.dataset });
     }
 
-    return LabelStub.$propertiesFromRdf({
+    return PartialLabel.$propertiesFromRdf({
       ...context,
       ignoreRdfType,
       objectSet,
@@ -192,7 +192,7 @@ export namespace LabelStub {
     Error,
     {
       $identifier: rdfjs.BlankNode | rdfjs.NamedNode;
-      $type: "LabelStub";
+      $type: "PartialLabel";
       literalForm: purify.NonEmptyList<rdfjs.Literal>;
     }
   > {
@@ -208,7 +208,7 @@ export namespace LabelStub {
           }
 
           // Check arbitrary rdfs:subClassOf's of the expected type
-          if ($resource.isInstanceOf(LabelStub.$fromRdfType)) {
+          if ($resource.isInstanceOf(PartialLabel.$fromRdfType)) {
             return purify.Either.of(true);
           }
 
@@ -223,8 +223,8 @@ export namespace LabelStub {
       }
     }
 
-    const $identifier: LabelStub.$Identifier = $resource.identifier;
-    const $type = "LabelStub" as const;
+    const $identifier: PartialLabel.$Identifier = $resource.identifier;
+    const $type = "PartialLabel" as const;
     const _literalFormEither: purify.Either<
       Error,
       purify.NonEmptyList<rdfjs.Literal>
@@ -275,7 +275,7 @@ export namespace LabelStub {
             (literalValue) =>
               new rdfjsResource.Resource.TermValue({
                 focusResource: $resource,
-                predicate: LabelStub.$properties.literalForm["identifier"],
+                predicate: PartialLabel.$properties.literalForm["identifier"],
                 term: literalValue,
               }),
           ),
@@ -292,7 +292,7 @@ export namespace LabelStub {
       .map((valuesArray) =>
         rdfjsResource.Resource.Values.fromValue({
           focusResource: $resource,
-          predicate: LabelStub.$properties.literalForm["identifier"],
+          predicate: PartialLabel.$properties.literalForm["identifier"],
           value: valuesArray,
         }),
       )
@@ -321,11 +321,14 @@ export namespace LabelStub {
       prefixes: parameters?.prefixes ?? {},
       queryType: "CONSTRUCT",
       template: (queryParameters.template ?? []).concat(
-        LabelStub.$sparqlConstructTemplateTriples({ ignoreRdfType, subject }),
+        PartialLabel.$sparqlConstructTemplateTriples({
+          ignoreRdfType,
+          subject,
+        }),
       ),
       type: "query",
       where: (queryParameters.where ?? []).concat(
-        LabelStub.$sparqlWherePatterns({
+        PartialLabel.$sparqlWherePatterns({
           ignoreRdfType,
           preferredLanguages,
           subject,
@@ -344,7 +347,7 @@ export namespace LabelStub {
       sparqljs.GeneratorOptions,
   ): string {
     return new sparqljs.Generator(parameters).stringify(
-      LabelStub.$sparqlConstructQuery(parameters),
+      PartialLabel.$sparqlConstructQuery(parameters),
     );
   }
 
@@ -375,7 +378,7 @@ export namespace LabelStub {
 
     triples.push({
       object: dataFactory.variable!(`${variablePrefix}LiteralForm`),
-      predicate: LabelStub.$properties.literalForm["identifier"],
+      predicate: PartialLabel.$properties.literalForm["identifier"],
       subject,
     });
     return triples;
@@ -396,7 +399,10 @@ export namespace LabelStub {
     const rdfTypeVariable = dataFactory.variable!(`${variablePrefix}RdfType`);
     if (!parameters?.ignoreRdfType) {
       requiredPatterns.push(
-        $sparqlInstancesOfPattern({ rdfType: LabelStub.$fromRdfType, subject }),
+        $sparqlInstancesOfPattern({
+          rdfType: PartialLabel.$fromRdfType,
+          subject,
+        }),
         {
           triples: [
             {
@@ -434,7 +440,7 @@ export namespace LabelStub {
         triples: [
           {
             object: dataFactory.variable!(`${variablePrefix}LiteralForm`),
-            predicate: LabelStub.$properties.literalForm["identifier"],
+            predicate: PartialLabel.$properties.literalForm["identifier"],
             subject,
           },
         ],
@@ -485,7 +491,7 @@ export namespace LabelStub {
   }
 
   export function $toRdf(
-    _labelStub: LabelStub,
+    _labelStub: PartialLabel,
     options?: {
       ignoreRdfType?: boolean;
       mutateGraph?: rdfjsResource.MutableResource.MutateGraph;
@@ -507,7 +513,7 @@ export namespace LabelStub {
       resource.add(
         $RdfVocabularies.rdf.type,
         resource.dataFactory.namedNode(
-          "http://kos-kit.github.io/ontology#LabelStub",
+          "http://kos-kit.github.io/ontology#PartialLabel",
         ),
       );
       resource.add(
@@ -519,7 +525,7 @@ export namespace LabelStub {
     }
 
     resource.add(
-      LabelStub.$properties.literalForm["identifier"],
+      PartialLabel.$properties.literalForm["identifier"],
       ..._labelStub.literalForm.flatMap((item) => [item]),
     );
     return resource;
@@ -3308,40 +3314,40 @@ export namespace KosResourceStatic {
 export interface Concept extends KosResource {
   readonly $identifier: Concept.$Identifier;
   readonly $type: "Concept";
-  readonly broader: readonly ConceptStub[];
-  readonly broaderTransitive: readonly ConceptStub[];
-  readonly broadMatch: readonly ConceptStub[];
-  readonly closeMatch: readonly ConceptStub[];
-  readonly exactMatch: readonly ConceptStub[];
-  readonly inScheme: readonly ConceptSchemeStub[];
-  readonly mappingRelation: readonly ConceptStub[];
-  readonly narrower: readonly ConceptStub[];
-  readonly narrowerTransitive: readonly ConceptStub[];
-  readonly narrowMatch: readonly ConceptStub[];
-  readonly related: readonly ConceptStub[];
-  readonly relatedMatch: readonly ConceptStub[];
-  readonly semanticRelation: readonly ConceptStub[];
-  readonly topConceptOf: readonly ConceptSchemeStub[];
+  readonly broader: readonly PartialConcept[];
+  readonly broaderTransitive: readonly PartialConcept[];
+  readonly broadMatch: readonly PartialConcept[];
+  readonly closeMatch: readonly PartialConcept[];
+  readonly exactMatch: readonly PartialConcept[];
+  readonly inScheme: readonly PartialConceptScheme[];
+  readonly mappingRelation: readonly PartialConcept[];
+  readonly narrower: readonly PartialConcept[];
+  readonly narrowerTransitive: readonly PartialConcept[];
+  readonly narrowMatch: readonly PartialConcept[];
+  readonly related: readonly PartialConcept[];
+  readonly relatedMatch: readonly PartialConcept[];
+  readonly semanticRelation: readonly PartialConcept[];
+  readonly topConceptOf: readonly PartialConceptScheme[];
 }
 
 export namespace Concept {
   export function $create(
     parameters: {
       readonly $identifier: rdfjs.NamedNode | string;
-      readonly broader?: readonly ConceptStub[];
-      readonly broaderTransitive?: readonly ConceptStub[];
-      readonly broadMatch?: readonly ConceptStub[];
-      readonly closeMatch?: readonly ConceptStub[];
-      readonly exactMatch?: readonly ConceptStub[];
-      readonly inScheme?: readonly ConceptSchemeStub[];
-      readonly mappingRelation?: readonly ConceptStub[];
-      readonly narrower?: readonly ConceptStub[];
-      readonly narrowerTransitive?: readonly ConceptStub[];
-      readonly narrowMatch?: readonly ConceptStub[];
-      readonly related?: readonly ConceptStub[];
-      readonly relatedMatch?: readonly ConceptStub[];
-      readonly semanticRelation?: readonly ConceptStub[];
-      readonly topConceptOf?: readonly ConceptSchemeStub[];
+      readonly broader?: readonly PartialConcept[];
+      readonly broaderTransitive?: readonly PartialConcept[];
+      readonly broadMatch?: readonly PartialConcept[];
+      readonly closeMatch?: readonly PartialConcept[];
+      readonly exactMatch?: readonly PartialConcept[];
+      readonly inScheme?: readonly PartialConceptScheme[];
+      readonly mappingRelation?: readonly PartialConcept[];
+      readonly narrower?: readonly PartialConcept[];
+      readonly narrowerTransitive?: readonly PartialConcept[];
+      readonly narrowMatch?: readonly PartialConcept[];
+      readonly related?: readonly PartialConcept[];
+      readonly relatedMatch?: readonly PartialConcept[];
+      readonly semanticRelation?: readonly PartialConcept[];
+      readonly topConceptOf?: readonly PartialConceptScheme[];
     } & Parameters<typeof KosResourceStatic.$create>[0],
   ): Concept {
     let $identifier: Concept.$Identifier;
@@ -3354,7 +3360,7 @@ export namespace Concept {
     }
 
     const $type = "Concept" as const;
-    let broader: readonly ConceptStub[];
+    let broader: readonly PartialConcept[];
     if (typeof parameters.broader === "undefined") {
       broader = [];
     } else if (typeof parameters.broader === "object") {
@@ -3363,7 +3369,7 @@ export namespace Concept {
       broader = parameters.broader satisfies never;
     }
 
-    let broaderTransitive: readonly ConceptStub[];
+    let broaderTransitive: readonly PartialConcept[];
     if (typeof parameters.broaderTransitive === "undefined") {
       broaderTransitive = [];
     } else if (typeof parameters.broaderTransitive === "object") {
@@ -3372,7 +3378,7 @@ export namespace Concept {
       broaderTransitive = parameters.broaderTransitive satisfies never;
     }
 
-    let broadMatch: readonly ConceptStub[];
+    let broadMatch: readonly PartialConcept[];
     if (typeof parameters.broadMatch === "undefined") {
       broadMatch = [];
     } else if (typeof parameters.broadMatch === "object") {
@@ -3381,7 +3387,7 @@ export namespace Concept {
       broadMatch = parameters.broadMatch satisfies never;
     }
 
-    let closeMatch: readonly ConceptStub[];
+    let closeMatch: readonly PartialConcept[];
     if (typeof parameters.closeMatch === "undefined") {
       closeMatch = [];
     } else if (typeof parameters.closeMatch === "object") {
@@ -3390,7 +3396,7 @@ export namespace Concept {
       closeMatch = parameters.closeMatch satisfies never;
     }
 
-    let exactMatch: readonly ConceptStub[];
+    let exactMatch: readonly PartialConcept[];
     if (typeof parameters.exactMatch === "undefined") {
       exactMatch = [];
     } else if (typeof parameters.exactMatch === "object") {
@@ -3399,7 +3405,7 @@ export namespace Concept {
       exactMatch = parameters.exactMatch satisfies never;
     }
 
-    let inScheme: readonly ConceptSchemeStub[];
+    let inScheme: readonly PartialConceptScheme[];
     if (typeof parameters.inScheme === "undefined") {
       inScheme = [];
     } else if (typeof parameters.inScheme === "object") {
@@ -3408,7 +3414,7 @@ export namespace Concept {
       inScheme = parameters.inScheme satisfies never;
     }
 
-    let mappingRelation: readonly ConceptStub[];
+    let mappingRelation: readonly PartialConcept[];
     if (typeof parameters.mappingRelation === "undefined") {
       mappingRelation = [];
     } else if (typeof parameters.mappingRelation === "object") {
@@ -3417,7 +3423,7 @@ export namespace Concept {
       mappingRelation = parameters.mappingRelation satisfies never;
     }
 
-    let narrower: readonly ConceptStub[];
+    let narrower: readonly PartialConcept[];
     if (typeof parameters.narrower === "undefined") {
       narrower = [];
     } else if (typeof parameters.narrower === "object") {
@@ -3426,7 +3432,7 @@ export namespace Concept {
       narrower = parameters.narrower satisfies never;
     }
 
-    let narrowerTransitive: readonly ConceptStub[];
+    let narrowerTransitive: readonly PartialConcept[];
     if (typeof parameters.narrowerTransitive === "undefined") {
       narrowerTransitive = [];
     } else if (typeof parameters.narrowerTransitive === "object") {
@@ -3435,7 +3441,7 @@ export namespace Concept {
       narrowerTransitive = parameters.narrowerTransitive satisfies never;
     }
 
-    let narrowMatch: readonly ConceptStub[];
+    let narrowMatch: readonly PartialConcept[];
     if (typeof parameters.narrowMatch === "undefined") {
       narrowMatch = [];
     } else if (typeof parameters.narrowMatch === "object") {
@@ -3444,7 +3450,7 @@ export namespace Concept {
       narrowMatch = parameters.narrowMatch satisfies never;
     }
 
-    let related: readonly ConceptStub[];
+    let related: readonly PartialConcept[];
     if (typeof parameters.related === "undefined") {
       related = [];
     } else if (typeof parameters.related === "object") {
@@ -3453,7 +3459,7 @@ export namespace Concept {
       related = parameters.related satisfies never;
     }
 
-    let relatedMatch: readonly ConceptStub[];
+    let relatedMatch: readonly PartialConcept[];
     if (typeof parameters.relatedMatch === "undefined") {
       relatedMatch = [];
     } else if (typeof parameters.relatedMatch === "object") {
@@ -3462,7 +3468,7 @@ export namespace Concept {
       relatedMatch = parameters.relatedMatch satisfies never;
     }
 
-    let semanticRelation: readonly ConceptStub[];
+    let semanticRelation: readonly PartialConcept[];
     if (typeof parameters.semanticRelation === "undefined") {
       semanticRelation = [];
     } else if (typeof parameters.semanticRelation === "object") {
@@ -3471,7 +3477,7 @@ export namespace Concept {
       semanticRelation = parameters.semanticRelation satisfies never;
     }
 
-    let topConceptOf: readonly ConceptSchemeStub[];
+    let topConceptOf: readonly PartialConceptScheme[];
     if (typeof parameters.topConceptOf === "undefined") {
       topConceptOf = [];
     } else if (typeof parameters.topConceptOf === "object") {
@@ -3626,20 +3632,20 @@ export namespace Concept {
     {
       $identifier: rdfjs.NamedNode;
       $type: "Concept";
-      broader: readonly ConceptStub[];
-      broaderTransitive: readonly ConceptStub[];
-      broadMatch: readonly ConceptStub[];
-      closeMatch: readonly ConceptStub[];
-      exactMatch: readonly ConceptStub[];
-      inScheme: readonly ConceptSchemeStub[];
-      mappingRelation: readonly ConceptStub[];
-      narrower: readonly ConceptStub[];
-      narrowerTransitive: readonly ConceptStub[];
-      narrowMatch: readonly ConceptStub[];
-      related: readonly ConceptStub[];
-      relatedMatch: readonly ConceptStub[];
-      semanticRelation: readonly ConceptStub[];
-      topConceptOf: readonly ConceptSchemeStub[];
+      broader: readonly PartialConcept[];
+      broaderTransitive: readonly PartialConcept[];
+      broadMatch: readonly PartialConcept[];
+      closeMatch: readonly PartialConcept[];
+      exactMatch: readonly PartialConcept[];
+      inScheme: readonly PartialConceptScheme[];
+      mappingRelation: readonly PartialConcept[];
+      narrower: readonly PartialConcept[];
+      narrowerTransitive: readonly PartialConcept[];
+      narrowMatch: readonly PartialConcept[];
+      related: readonly PartialConcept[];
+      relatedMatch: readonly PartialConcept[];
+      semanticRelation: readonly PartialConcept[];
+      topConceptOf: readonly PartialConceptScheme[];
     } & $UnwrapR<ReturnType<typeof KosResourceStatic.$propertiesFromRdf>>
   > {
     const $super0Either = KosResourceStatic.$propertiesFromRdf({
@@ -3694,7 +3700,7 @@ export namespace Concept {
 
     const $identifier: Concept.$Identifier = $resource.identifier;
     const $type = "Concept" as const;
-    const _broaderEither: purify.Either<Error, readonly ConceptStub[]> =
+    const _broaderEither: purify.Either<Error, readonly PartialConcept[]> =
       purify.Either.of<
         Error,
         rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
@@ -3702,7 +3708,7 @@ export namespace Concept {
         .chain((values) =>
           values.chainMap((value) =>
             value.toResource().chain((resource) =>
-              ConceptStub.$fromRdf(resource, {
+              PartialConcept.$fromRdf(resource, {
                 ...$context,
                 ignoreRdfType: true,
                 objectSet: $objectSet,
@@ -3727,7 +3733,7 @@ export namespace Concept {
     const broader = _broaderEither.unsafeCoerce();
     const _broaderTransitiveEither: purify.Either<
       Error,
-      readonly ConceptStub[]
+      readonly PartialConcept[]
     > = purify.Either.of<
       Error,
       rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
@@ -3739,7 +3745,7 @@ export namespace Concept {
       .chain((values) =>
         values.chainMap((value) =>
           value.toResource().chain((resource) =>
-            ConceptStub.$fromRdf(resource, {
+            PartialConcept.$fromRdf(resource, {
               ...$context,
               ignoreRdfType: true,
               objectSet: $objectSet,
@@ -3762,7 +3768,7 @@ export namespace Concept {
     }
 
     const broaderTransitive = _broaderTransitiveEither.unsafeCoerce();
-    const _broadMatchEither: purify.Either<Error, readonly ConceptStub[]> =
+    const _broadMatchEither: purify.Either<Error, readonly PartialConcept[]> =
       purify.Either.of<
         Error,
         rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
@@ -3774,7 +3780,7 @@ export namespace Concept {
         .chain((values) =>
           values.chainMap((value) =>
             value.toResource().chain((resource) =>
-              ConceptStub.$fromRdf(resource, {
+              PartialConcept.$fromRdf(resource, {
                 ...$context,
                 ignoreRdfType: true,
                 objectSet: $objectSet,
@@ -3797,7 +3803,7 @@ export namespace Concept {
     }
 
     const broadMatch = _broadMatchEither.unsafeCoerce();
-    const _closeMatchEither: purify.Either<Error, readonly ConceptStub[]> =
+    const _closeMatchEither: purify.Either<Error, readonly PartialConcept[]> =
       purify.Either.of<
         Error,
         rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
@@ -3809,7 +3815,7 @@ export namespace Concept {
         .chain((values) =>
           values.chainMap((value) =>
             value.toResource().chain((resource) =>
-              ConceptStub.$fromRdf(resource, {
+              PartialConcept.$fromRdf(resource, {
                 ...$context,
                 ignoreRdfType: true,
                 objectSet: $objectSet,
@@ -3832,7 +3838,7 @@ export namespace Concept {
     }
 
     const closeMatch = _closeMatchEither.unsafeCoerce();
-    const _exactMatchEither: purify.Either<Error, readonly ConceptStub[]> =
+    const _exactMatchEither: purify.Either<Error, readonly PartialConcept[]> =
       purify.Either.of<
         Error,
         rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
@@ -3844,7 +3850,7 @@ export namespace Concept {
         .chain((values) =>
           values.chainMap((value) =>
             value.toResource().chain((resource) =>
-              ConceptStub.$fromRdf(resource, {
+              PartialConcept.$fromRdf(resource, {
                 ...$context,
                 ignoreRdfType: true,
                 objectSet: $objectSet,
@@ -3867,73 +3873,77 @@ export namespace Concept {
     }
 
     const exactMatch = _exactMatchEither.unsafeCoerce();
-    const _inSchemeEither: purify.Either<Error, readonly ConceptSchemeStub[]> =
-      purify.Either.of<
-        Error,
-        rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
-      >($resource.values($properties.inScheme["identifier"], { unique: true }))
-        .chain((values) =>
-          values.chainMap((value) =>
-            value.toResource().chain((resource) =>
-              ConceptSchemeStub.$fromRdf(resource, {
-                ...$context,
-                ignoreRdfType: true,
-                objectSet: $objectSet,
-                preferredLanguages: $preferredLanguages,
-              }),
-            ),
+    const _inSchemeEither: purify.Either<
+      Error,
+      readonly PartialConceptScheme[]
+    > = purify.Either.of<
+      Error,
+      rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
+    >($resource.values($properties.inScheme["identifier"], { unique: true }))
+      .chain((values) =>
+        values.chainMap((value) =>
+          value.toResource().chain((resource) =>
+            PartialConceptScheme.$fromRdf(resource, {
+              ...$context,
+              ignoreRdfType: true,
+              objectSet: $objectSet,
+              preferredLanguages: $preferredLanguages,
+            }),
           ),
-        )
-        .map((values) => values.toArray())
-        .map((valuesArray) =>
-          rdfjsResource.Resource.Values.fromValue({
-            focusResource: $resource,
-            predicate: Concept.$properties.inScheme["identifier"],
-            value: valuesArray,
-          }),
-        )
-        .chain((values) => values.head());
+        ),
+      )
+      .map((values) => values.toArray())
+      .map((valuesArray) =>
+        rdfjsResource.Resource.Values.fromValue({
+          focusResource: $resource,
+          predicate: Concept.$properties.inScheme["identifier"],
+          value: valuesArray,
+        }),
+      )
+      .chain((values) => values.head());
     if (_inSchemeEither.isLeft()) {
       return _inSchemeEither;
     }
 
     const inScheme = _inSchemeEither.unsafeCoerce();
-    const _mappingRelationEither: purify.Either<Error, readonly ConceptStub[]> =
-      purify.Either.of<
-        Error,
-        rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
-      >(
-        $resource.values($properties.mappingRelation["identifier"], {
-          unique: true,
+    const _mappingRelationEither: purify.Either<
+      Error,
+      readonly PartialConcept[]
+    > = purify.Either.of<
+      Error,
+      rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
+    >(
+      $resource.values($properties.mappingRelation["identifier"], {
+        unique: true,
+      }),
+    )
+      .chain((values) =>
+        values.chainMap((value) =>
+          value.toResource().chain((resource) =>
+            PartialConcept.$fromRdf(resource, {
+              ...$context,
+              ignoreRdfType: true,
+              objectSet: $objectSet,
+              preferredLanguages: $preferredLanguages,
+            }),
+          ),
+        ),
+      )
+      .map((values) => values.toArray())
+      .map((valuesArray) =>
+        rdfjsResource.Resource.Values.fromValue({
+          focusResource: $resource,
+          predicate: Concept.$properties.mappingRelation["identifier"],
+          value: valuesArray,
         }),
       )
-        .chain((values) =>
-          values.chainMap((value) =>
-            value.toResource().chain((resource) =>
-              ConceptStub.$fromRdf(resource, {
-                ...$context,
-                ignoreRdfType: true,
-                objectSet: $objectSet,
-                preferredLanguages: $preferredLanguages,
-              }),
-            ),
-          ),
-        )
-        .map((values) => values.toArray())
-        .map((valuesArray) =>
-          rdfjsResource.Resource.Values.fromValue({
-            focusResource: $resource,
-            predicate: Concept.$properties.mappingRelation["identifier"],
-            value: valuesArray,
-          }),
-        )
-        .chain((values) => values.head());
+      .chain((values) => values.head());
     if (_mappingRelationEither.isLeft()) {
       return _mappingRelationEither;
     }
 
     const mappingRelation = _mappingRelationEither.unsafeCoerce();
-    const _narrowerEither: purify.Either<Error, readonly ConceptStub[]> =
+    const _narrowerEither: purify.Either<Error, readonly PartialConcept[]> =
       purify.Either.of<
         Error,
         rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
@@ -3941,7 +3951,7 @@ export namespace Concept {
         .chain((values) =>
           values.chainMap((value) =>
             value.toResource().chain((resource) =>
-              ConceptStub.$fromRdf(resource, {
+              PartialConcept.$fromRdf(resource, {
                 ...$context,
                 ignoreRdfType: true,
                 objectSet: $objectSet,
@@ -3966,7 +3976,7 @@ export namespace Concept {
     const narrower = _narrowerEither.unsafeCoerce();
     const _narrowerTransitiveEither: purify.Either<
       Error,
-      readonly ConceptStub[]
+      readonly PartialConcept[]
     > = purify.Either.of<
       Error,
       rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
@@ -3978,7 +3988,7 @@ export namespace Concept {
       .chain((values) =>
         values.chainMap((value) =>
           value.toResource().chain((resource) =>
-            ConceptStub.$fromRdf(resource, {
+            PartialConcept.$fromRdf(resource, {
               ...$context,
               ignoreRdfType: true,
               objectSet: $objectSet,
@@ -4001,7 +4011,7 @@ export namespace Concept {
     }
 
     const narrowerTransitive = _narrowerTransitiveEither.unsafeCoerce();
-    const _narrowMatchEither: purify.Either<Error, readonly ConceptStub[]> =
+    const _narrowMatchEither: purify.Either<Error, readonly PartialConcept[]> =
       purify.Either.of<
         Error,
         rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
@@ -4013,7 +4023,7 @@ export namespace Concept {
         .chain((values) =>
           values.chainMap((value) =>
             value.toResource().chain((resource) =>
-              ConceptStub.$fromRdf(resource, {
+              PartialConcept.$fromRdf(resource, {
                 ...$context,
                 ignoreRdfType: true,
                 objectSet: $objectSet,
@@ -4036,7 +4046,7 @@ export namespace Concept {
     }
 
     const narrowMatch = _narrowMatchEither.unsafeCoerce();
-    const _relatedEither: purify.Either<Error, readonly ConceptStub[]> =
+    const _relatedEither: purify.Either<Error, readonly PartialConcept[]> =
       purify.Either.of<
         Error,
         rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
@@ -4044,7 +4054,7 @@ export namespace Concept {
         .chain((values) =>
           values.chainMap((value) =>
             value.toResource().chain((resource) =>
-              ConceptStub.$fromRdf(resource, {
+              PartialConcept.$fromRdf(resource, {
                 ...$context,
                 ignoreRdfType: true,
                 objectSet: $objectSet,
@@ -4067,7 +4077,7 @@ export namespace Concept {
     }
 
     const related = _relatedEither.unsafeCoerce();
-    const _relatedMatchEither: purify.Either<Error, readonly ConceptStub[]> =
+    const _relatedMatchEither: purify.Either<Error, readonly PartialConcept[]> =
       purify.Either.of<
         Error,
         rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
@@ -4079,7 +4089,7 @@ export namespace Concept {
         .chain((values) =>
           values.chainMap((value) =>
             value.toResource().chain((resource) =>
-              ConceptStub.$fromRdf(resource, {
+              PartialConcept.$fromRdf(resource, {
                 ...$context,
                 ignoreRdfType: true,
                 objectSet: $objectSet,
@@ -4104,7 +4114,7 @@ export namespace Concept {
     const relatedMatch = _relatedMatchEither.unsafeCoerce();
     const _semanticRelationEither: purify.Either<
       Error,
-      readonly ConceptStub[]
+      readonly PartialConcept[]
     > = purify.Either.of<
       Error,
       rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
@@ -4116,7 +4126,7 @@ export namespace Concept {
       .chain((values) =>
         values.chainMap((value) =>
           value.toResource().chain((resource) =>
-            ConceptStub.$fromRdf(resource, {
+            PartialConcept.$fromRdf(resource, {
               ...$context,
               ignoreRdfType: true,
               objectSet: $objectSet,
@@ -4141,7 +4151,7 @@ export namespace Concept {
     const semanticRelation = _semanticRelationEither.unsafeCoerce();
     const _topConceptOfEither: purify.Either<
       Error,
-      readonly ConceptSchemeStub[]
+      readonly PartialConceptScheme[]
     > = purify.Either.of<
       Error,
       rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
@@ -4153,7 +4163,7 @@ export namespace Concept {
       .chain((values) =>
         values.chainMap((value) =>
           value.toResource().chain((resource) =>
-            ConceptSchemeStub.$fromRdf(resource, {
+            PartialConceptScheme.$fromRdf(resource, {
               ...$context,
               ignoreRdfType: true,
               objectSet: $objectSet,
@@ -4278,7 +4288,7 @@ export namespace Concept {
       subject,
     });
     triples.push(
-      ...ConceptStub.$sparqlConstructTemplateTriples({
+      ...PartialConcept.$sparqlConstructTemplateTriples({
         ignoreRdfType: true,
         subject: dataFactory.variable!(`${variablePrefix}Broader`),
         variablePrefix: `${variablePrefix}Broader`,
@@ -4290,7 +4300,7 @@ export namespace Concept {
       subject,
     });
     triples.push(
-      ...ConceptStub.$sparqlConstructTemplateTriples({
+      ...PartialConcept.$sparqlConstructTemplateTriples({
         ignoreRdfType: true,
         subject: dataFactory.variable!(`${variablePrefix}BroaderTransitive`),
         variablePrefix: `${variablePrefix}BroaderTransitive`,
@@ -4302,7 +4312,7 @@ export namespace Concept {
       subject,
     });
     triples.push(
-      ...ConceptStub.$sparqlConstructTemplateTriples({
+      ...PartialConcept.$sparqlConstructTemplateTriples({
         ignoreRdfType: true,
         subject: dataFactory.variable!(`${variablePrefix}BroadMatch`),
         variablePrefix: `${variablePrefix}BroadMatch`,
@@ -4314,7 +4324,7 @@ export namespace Concept {
       subject,
     });
     triples.push(
-      ...ConceptStub.$sparqlConstructTemplateTriples({
+      ...PartialConcept.$sparqlConstructTemplateTriples({
         ignoreRdfType: true,
         subject: dataFactory.variable!(`${variablePrefix}CloseMatch`),
         variablePrefix: `${variablePrefix}CloseMatch`,
@@ -4326,7 +4336,7 @@ export namespace Concept {
       subject,
     });
     triples.push(
-      ...ConceptStub.$sparqlConstructTemplateTriples({
+      ...PartialConcept.$sparqlConstructTemplateTriples({
         ignoreRdfType: true,
         subject: dataFactory.variable!(`${variablePrefix}ExactMatch`),
         variablePrefix: `${variablePrefix}ExactMatch`,
@@ -4338,7 +4348,7 @@ export namespace Concept {
       subject,
     });
     triples.push(
-      ...ConceptSchemeStub.$sparqlConstructTemplateTriples({
+      ...PartialConceptScheme.$sparqlConstructTemplateTriples({
         ignoreRdfType: true,
         subject: dataFactory.variable!(`${variablePrefix}InScheme`),
         variablePrefix: `${variablePrefix}InScheme`,
@@ -4350,7 +4360,7 @@ export namespace Concept {
       subject,
     });
     triples.push(
-      ...ConceptStub.$sparqlConstructTemplateTriples({
+      ...PartialConcept.$sparqlConstructTemplateTriples({
         ignoreRdfType: true,
         subject: dataFactory.variable!(`${variablePrefix}MappingRelation`),
         variablePrefix: `${variablePrefix}MappingRelation`,
@@ -4362,7 +4372,7 @@ export namespace Concept {
       subject,
     });
     triples.push(
-      ...ConceptStub.$sparqlConstructTemplateTriples({
+      ...PartialConcept.$sparqlConstructTemplateTriples({
         ignoreRdfType: true,
         subject: dataFactory.variable!(`${variablePrefix}Narrower`),
         variablePrefix: `${variablePrefix}Narrower`,
@@ -4374,7 +4384,7 @@ export namespace Concept {
       subject,
     });
     triples.push(
-      ...ConceptStub.$sparqlConstructTemplateTriples({
+      ...PartialConcept.$sparqlConstructTemplateTriples({
         ignoreRdfType: true,
         subject: dataFactory.variable!(`${variablePrefix}NarrowerTransitive`),
         variablePrefix: `${variablePrefix}NarrowerTransitive`,
@@ -4386,7 +4396,7 @@ export namespace Concept {
       subject,
     });
     triples.push(
-      ...ConceptStub.$sparqlConstructTemplateTriples({
+      ...PartialConcept.$sparqlConstructTemplateTriples({
         ignoreRdfType: true,
         subject: dataFactory.variable!(`${variablePrefix}NarrowMatch`),
         variablePrefix: `${variablePrefix}NarrowMatch`,
@@ -4398,7 +4408,7 @@ export namespace Concept {
       subject,
     });
     triples.push(
-      ...ConceptStub.$sparqlConstructTemplateTriples({
+      ...PartialConcept.$sparqlConstructTemplateTriples({
         ignoreRdfType: true,
         subject: dataFactory.variable!(`${variablePrefix}Related`),
         variablePrefix: `${variablePrefix}Related`,
@@ -4410,7 +4420,7 @@ export namespace Concept {
       subject,
     });
     triples.push(
-      ...ConceptStub.$sparqlConstructTemplateTriples({
+      ...PartialConcept.$sparqlConstructTemplateTriples({
         ignoreRdfType: true,
         subject: dataFactory.variable!(`${variablePrefix}RelatedMatch`),
         variablePrefix: `${variablePrefix}RelatedMatch`,
@@ -4422,7 +4432,7 @@ export namespace Concept {
       subject,
     });
     triples.push(
-      ...ConceptStub.$sparqlConstructTemplateTriples({
+      ...PartialConcept.$sparqlConstructTemplateTriples({
         ignoreRdfType: true,
         subject: dataFactory.variable!(`${variablePrefix}SemanticRelation`),
         variablePrefix: `${variablePrefix}SemanticRelation`,
@@ -4434,7 +4444,7 @@ export namespace Concept {
       subject,
     });
     triples.push(
-      ...ConceptSchemeStub.$sparqlConstructTemplateTriples({
+      ...PartialConceptScheme.$sparqlConstructTemplateTriples({
         ignoreRdfType: true,
         subject: dataFactory.variable!(`${variablePrefix}TopConceptOf`),
         variablePrefix: `${variablePrefix}TopConceptOf`,
@@ -4516,7 +4526,7 @@ export namespace Concept {
             ],
             type: "bgp",
           },
-          ...ConceptStub.$sparqlWherePatterns({
+          ...PartialConcept.$sparqlWherePatterns({
             ignoreRdfType: true,
             preferredLanguages: parameters?.preferredLanguages,
             subject: dataFactory.variable!(`${variablePrefix}Broader`),
@@ -4539,7 +4549,7 @@ export namespace Concept {
             ],
             type: "bgp",
           },
-          ...ConceptStub.$sparqlWherePatterns({
+          ...PartialConcept.$sparqlWherePatterns({
             ignoreRdfType: true,
             preferredLanguages: parameters?.preferredLanguages,
             subject: dataFactory.variable!(
@@ -4562,7 +4572,7 @@ export namespace Concept {
             ],
             type: "bgp",
           },
-          ...ConceptStub.$sparqlWherePatterns({
+          ...PartialConcept.$sparqlWherePatterns({
             ignoreRdfType: true,
             preferredLanguages: parameters?.preferredLanguages,
             subject: dataFactory.variable!(`${variablePrefix}BroadMatch`),
@@ -4583,7 +4593,7 @@ export namespace Concept {
             ],
             type: "bgp",
           },
-          ...ConceptStub.$sparqlWherePatterns({
+          ...PartialConcept.$sparqlWherePatterns({
             ignoreRdfType: true,
             preferredLanguages: parameters?.preferredLanguages,
             subject: dataFactory.variable!(`${variablePrefix}CloseMatch`),
@@ -4604,7 +4614,7 @@ export namespace Concept {
             ],
             type: "bgp",
           },
-          ...ConceptStub.$sparqlWherePatterns({
+          ...PartialConcept.$sparqlWherePatterns({
             ignoreRdfType: true,
             preferredLanguages: parameters?.preferredLanguages,
             subject: dataFactory.variable!(`${variablePrefix}ExactMatch`),
@@ -4625,7 +4635,7 @@ export namespace Concept {
             ],
             type: "bgp",
           },
-          ...ConceptSchemeStub.$sparqlWherePatterns({
+          ...PartialConceptScheme.$sparqlWherePatterns({
             ignoreRdfType: true,
             preferredLanguages: parameters?.preferredLanguages,
             subject: dataFactory.variable!(`${variablePrefix}InScheme`),
@@ -4648,7 +4658,7 @@ export namespace Concept {
             ],
             type: "bgp",
           },
-          ...ConceptStub.$sparqlWherePatterns({
+          ...PartialConcept.$sparqlWherePatterns({
             ignoreRdfType: true,
             preferredLanguages: parameters?.preferredLanguages,
             subject: dataFactory.variable!(`${variablePrefix}MappingRelation`),
@@ -4669,7 +4679,7 @@ export namespace Concept {
             ],
             type: "bgp",
           },
-          ...ConceptStub.$sparqlWherePatterns({
+          ...PartialConcept.$sparqlWherePatterns({
             ignoreRdfType: true,
             preferredLanguages: parameters?.preferredLanguages,
             subject: dataFactory.variable!(`${variablePrefix}Narrower`),
@@ -4692,7 +4702,7 @@ export namespace Concept {
             ],
             type: "bgp",
           },
-          ...ConceptStub.$sparqlWherePatterns({
+          ...PartialConcept.$sparqlWherePatterns({
             ignoreRdfType: true,
             preferredLanguages: parameters?.preferredLanguages,
             subject: dataFactory.variable!(
@@ -4715,7 +4725,7 @@ export namespace Concept {
             ],
             type: "bgp",
           },
-          ...ConceptStub.$sparqlWherePatterns({
+          ...PartialConcept.$sparqlWherePatterns({
             ignoreRdfType: true,
             preferredLanguages: parameters?.preferredLanguages,
             subject: dataFactory.variable!(`${variablePrefix}NarrowMatch`),
@@ -4736,7 +4746,7 @@ export namespace Concept {
             ],
             type: "bgp",
           },
-          ...ConceptStub.$sparqlWherePatterns({
+          ...PartialConcept.$sparqlWherePatterns({
             ignoreRdfType: true,
             preferredLanguages: parameters?.preferredLanguages,
             subject: dataFactory.variable!(`${variablePrefix}Related`),
@@ -4757,7 +4767,7 @@ export namespace Concept {
             ],
             type: "bgp",
           },
-          ...ConceptStub.$sparqlWherePatterns({
+          ...PartialConcept.$sparqlWherePatterns({
             ignoreRdfType: true,
             preferredLanguages: parameters?.preferredLanguages,
             subject: dataFactory.variable!(`${variablePrefix}RelatedMatch`),
@@ -4780,7 +4790,7 @@ export namespace Concept {
             ],
             type: "bgp",
           },
-          ...ConceptStub.$sparqlWherePatterns({
+          ...PartialConcept.$sparqlWherePatterns({
             ignoreRdfType: true,
             preferredLanguages: parameters?.preferredLanguages,
             subject: dataFactory.variable!(`${variablePrefix}SemanticRelation`),
@@ -4801,7 +4811,7 @@ export namespace Concept {
             ],
             type: "bgp",
           },
-          ...ConceptSchemeStub.$sparqlWherePatterns({
+          ...PartialConceptScheme.$sparqlWherePatterns({
             ignoreRdfType: true,
             preferredLanguages: parameters?.preferredLanguages,
             subject: dataFactory.variable!(`${variablePrefix}TopConceptOf`),
@@ -4855,7 +4865,7 @@ export namespace Concept {
     resource.add(
       Concept.$properties.broader["identifier"],
       ..._concept.broader.flatMap((item) => [
-        ConceptStub.$toRdf(item, {
+        PartialConcept.$toRdf(item, {
           mutateGraph: mutateGraph,
           resourceSet: resourceSet,
         }).identifier,
@@ -4864,7 +4874,7 @@ export namespace Concept {
     resource.add(
       Concept.$properties.broaderTransitive["identifier"],
       ..._concept.broaderTransitive.flatMap((item) => [
-        ConceptStub.$toRdf(item, {
+        PartialConcept.$toRdf(item, {
           mutateGraph: mutateGraph,
           resourceSet: resourceSet,
         }).identifier,
@@ -4873,7 +4883,7 @@ export namespace Concept {
     resource.add(
       Concept.$properties.broadMatch["identifier"],
       ..._concept.broadMatch.flatMap((item) => [
-        ConceptStub.$toRdf(item, {
+        PartialConcept.$toRdf(item, {
           mutateGraph: mutateGraph,
           resourceSet: resourceSet,
         }).identifier,
@@ -4882,7 +4892,7 @@ export namespace Concept {
     resource.add(
       Concept.$properties.closeMatch["identifier"],
       ..._concept.closeMatch.flatMap((item) => [
-        ConceptStub.$toRdf(item, {
+        PartialConcept.$toRdf(item, {
           mutateGraph: mutateGraph,
           resourceSet: resourceSet,
         }).identifier,
@@ -4891,7 +4901,7 @@ export namespace Concept {
     resource.add(
       Concept.$properties.exactMatch["identifier"],
       ..._concept.exactMatch.flatMap((item) => [
-        ConceptStub.$toRdf(item, {
+        PartialConcept.$toRdf(item, {
           mutateGraph: mutateGraph,
           resourceSet: resourceSet,
         }).identifier,
@@ -4900,7 +4910,7 @@ export namespace Concept {
     resource.add(
       Concept.$properties.inScheme["identifier"],
       ..._concept.inScheme.flatMap((item) => [
-        ConceptSchemeStub.$toRdf(item, {
+        PartialConceptScheme.$toRdf(item, {
           mutateGraph: mutateGraph,
           resourceSet: resourceSet,
         }).identifier,
@@ -4909,7 +4919,7 @@ export namespace Concept {
     resource.add(
       Concept.$properties.mappingRelation["identifier"],
       ..._concept.mappingRelation.flatMap((item) => [
-        ConceptStub.$toRdf(item, {
+        PartialConcept.$toRdf(item, {
           mutateGraph: mutateGraph,
           resourceSet: resourceSet,
         }).identifier,
@@ -4918,7 +4928,7 @@ export namespace Concept {
     resource.add(
       Concept.$properties.narrower["identifier"],
       ..._concept.narrower.flatMap((item) => [
-        ConceptStub.$toRdf(item, {
+        PartialConcept.$toRdf(item, {
           mutateGraph: mutateGraph,
           resourceSet: resourceSet,
         }).identifier,
@@ -4927,7 +4937,7 @@ export namespace Concept {
     resource.add(
       Concept.$properties.narrowerTransitive["identifier"],
       ..._concept.narrowerTransitive.flatMap((item) => [
-        ConceptStub.$toRdf(item, {
+        PartialConcept.$toRdf(item, {
           mutateGraph: mutateGraph,
           resourceSet: resourceSet,
         }).identifier,
@@ -4936,7 +4946,7 @@ export namespace Concept {
     resource.add(
       Concept.$properties.narrowMatch["identifier"],
       ..._concept.narrowMatch.flatMap((item) => [
-        ConceptStub.$toRdf(item, {
+        PartialConcept.$toRdf(item, {
           mutateGraph: mutateGraph,
           resourceSet: resourceSet,
         }).identifier,
@@ -4945,7 +4955,7 @@ export namespace Concept {
     resource.add(
       Concept.$properties.related["identifier"],
       ..._concept.related.flatMap((item) => [
-        ConceptStub.$toRdf(item, {
+        PartialConcept.$toRdf(item, {
           mutateGraph: mutateGraph,
           resourceSet: resourceSet,
         }).identifier,
@@ -4954,7 +4964,7 @@ export namespace Concept {
     resource.add(
       Concept.$properties.relatedMatch["identifier"],
       ..._concept.relatedMatch.flatMap((item) => [
-        ConceptStub.$toRdf(item, {
+        PartialConcept.$toRdf(item, {
           mutateGraph: mutateGraph,
           resourceSet: resourceSet,
         }).identifier,
@@ -4963,7 +4973,7 @@ export namespace Concept {
     resource.add(
       Concept.$properties.semanticRelation["identifier"],
       ..._concept.semanticRelation.flatMap((item) => [
-        ConceptStub.$toRdf(item, {
+        PartialConcept.$toRdf(item, {
           mutateGraph: mutateGraph,
           resourceSet: resourceSet,
         }).identifier,
@@ -4972,7 +4982,7 @@ export namespace Concept {
     resource.add(
       Concept.$properties.topConceptOf["identifier"],
       ..._concept.topConceptOf.flatMap((item) => [
-        ConceptSchemeStub.$toRdf(item, {
+        PartialConceptScheme.$toRdf(item, {
           mutateGraph: mutateGraph,
           resourceSet: resourceSet,
         }).identifier,
@@ -4990,11 +5000,11 @@ export namespace Concept {
     }
   }
 }
-export interface KosResourceStub {
+export interface PartialKosResource {
   readonly $identifier: KosResourceStubStatic.$Identifier;
-  readonly $type: "ConceptSchemeStub" | "ConceptStub";
+  readonly $type: "PartialConceptScheme" | "PartialConcept";
   readonly prefLabel: readonly rdfjs.Literal[];
-  readonly prefLabelXl: readonly LabelStub[];
+  readonly prefLabelXl: readonly PartialLabel[];
 }
 
 export namespace KosResourceStubStatic {
@@ -5005,8 +5015,8 @@ export namespace KosResourceStubStatic {
       | readonly boolean[]
       | readonly number[]
       | readonly string[];
-    readonly prefLabelXl?: readonly LabelStub[];
-  }): Omit<KosResourceStub, "$type"> {
+    readonly prefLabelXl?: readonly PartialLabel[];
+  }): Omit<PartialKosResource, "$type"> {
     let $identifier: KosResourceStubStatic.$Identifier;
     if (typeof parameters.$identifier === "object") {
       $identifier = parameters.$identifier;
@@ -5035,7 +5045,7 @@ export namespace KosResourceStubStatic {
       prefLabel = parameters.prefLabel satisfies never;
     }
 
-    let prefLabelXl: readonly LabelStub[];
+    let prefLabelXl: readonly PartialLabel[];
     if (typeof parameters.prefLabelXl === "undefined") {
       prefLabelXl = [];
     } else if (typeof parameters.prefLabelXl === "object") {
@@ -5100,7 +5110,7 @@ export namespace KosResourceStubStatic {
     {
       $identifier: rdfjs.NamedNode;
       prefLabel: readonly rdfjs.Literal[];
-      prefLabelXl: readonly LabelStub[];
+      prefLabelXl: readonly PartialLabel[];
     }
   > {
     if ($resource.identifier.termType !== "NamedNode") {
@@ -5186,7 +5196,7 @@ export namespace KosResourceStubStatic {
     }
 
     const prefLabel = _prefLabelEither.unsafeCoerce();
-    const _prefLabelXlEither: purify.Either<Error, readonly LabelStub[]> =
+    const _prefLabelXlEither: purify.Either<Error, readonly PartialLabel[]> =
       purify.Either.of<
         Error,
         rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
@@ -5198,7 +5208,7 @@ export namespace KosResourceStubStatic {
         .chain((values) =>
           values.chainMap((value) =>
             value.toResource().chain((resource) =>
-              LabelStub.$fromRdf(resource, {
+              PartialLabel.$fromRdf(resource, {
                 ...$context,
                 ignoreRdfType: true,
                 objectSet: $objectSet,
@@ -5293,7 +5303,7 @@ export namespace KosResourceStubStatic {
       subject,
     });
     triples.push(
-      ...LabelStub.$sparqlConstructTemplateTriples({
+      ...PartialLabel.$sparqlConstructTemplateTriples({
         ignoreRdfType: true,
         subject: dataFactory.variable!(`${variablePrefix}PrefLabelXl`),
         variablePrefix: `${variablePrefix}PrefLabelXl`,
@@ -5377,7 +5387,7 @@ export namespace KosResourceStubStatic {
             ],
             type: "bgp",
           },
-          ...LabelStub.$sparqlWherePatterns({
+          ...PartialLabel.$sparqlWherePatterns({
             ignoreRdfType: true,
             preferredLanguages: parameters?.preferredLanguages,
             subject: dataFactory.variable!(`${variablePrefix}PrefLabelXl`),
@@ -5399,7 +5409,7 @@ export namespace KosResourceStubStatic {
   }
 
   export function $toRdf(
-    _kosResourceStub: KosResourceStub,
+    _kosResourceStub: PartialKosResource,
     options?: {
       ignoreRdfType?: boolean;
       mutateGraph?: rdfjsResource.MutableResource.MutateGraph;
@@ -5424,7 +5434,7 @@ export namespace KosResourceStubStatic {
     resource.add(
       KosResourceStubStatic.$properties.prefLabelXl["identifier"],
       ..._kosResourceStub.prefLabelXl.flatMap((item) => [
-        LabelStub.$toRdf(item, {
+        PartialLabel.$toRdf(item, {
           mutateGraph: mutateGraph,
           resourceSet: resourceSet,
         }).identifier,
@@ -5433,18 +5443,18 @@ export namespace KosResourceStubStatic {
     return resource;
   }
 }
-export interface ConceptStub extends KosResourceStub {
-  readonly $identifier: ConceptStub.$Identifier;
-  readonly $type: "ConceptStub";
+export interface PartialConcept extends PartialKosResource {
+  readonly $identifier: PartialConcept.$Identifier;
+  readonly $type: "PartialConcept";
 }
 
-export namespace ConceptStub {
+export namespace PartialConcept {
   export function $create(
     parameters: { readonly $identifier: rdfjs.NamedNode | string } & Parameters<
       typeof KosResourceStubStatic.$create
     >[0],
-  ): ConceptStub {
-    let $identifier: ConceptStub.$Identifier;
+  ): PartialConcept {
+    let $identifier: PartialConcept.$Identifier;
     if (typeof parameters.$identifier === "object") {
       $identifier = parameters.$identifier;
     } else if (typeof parameters.$identifier === "string") {
@@ -5453,7 +5463,7 @@ export namespace ConceptStub {
       $identifier = parameters.$identifier satisfies never;
     }
 
-    const $type = "ConceptStub" as const;
+    const $type = "PartialConcept" as const;
     return { ...KosResourceStubStatic.$create(parameters), $identifier, $type };
   }
 
@@ -5465,7 +5475,7 @@ export namespace ConceptStub {
       objectSet?: $ObjectSet;
       preferredLanguages?: readonly string[];
     },
-  ): purify.Either<Error, ConceptStub> {
+  ): purify.Either<Error, PartialConcept> {
     let {
       ignoreRdfType = false,
       objectSet,
@@ -5476,7 +5486,7 @@ export namespace ConceptStub {
       objectSet = new $RdfjsDatasetObjectSet({ dataset: resource.dataset });
     }
 
-    return ConceptStub.$propertiesFromRdf({
+    return PartialConcept.$propertiesFromRdf({
       ...context,
       ignoreRdfType,
       objectSet,
@@ -5507,7 +5517,7 @@ export namespace ConceptStub {
     resource: rdfjsResource.Resource;
   }): purify.Either<
     Error,
-    { $identifier: rdfjs.NamedNode; $type: "ConceptStub" } & $UnwrapR<
+    { $identifier: rdfjs.NamedNode; $type: "PartialConcept" } & $UnwrapR<
       ReturnType<typeof KosResourceStubStatic.$propertiesFromRdf>
     >
   > {
@@ -5535,7 +5545,7 @@ export namespace ConceptStub {
           }
 
           // Check arbitrary rdfs:subClassOf's of the expected type
-          if ($resource.isInstanceOf(ConceptStub.$fromRdfType)) {
+          if ($resource.isInstanceOf(PartialConcept.$fromRdfType)) {
             return purify.Either.of(true);
           }
 
@@ -5561,8 +5571,8 @@ export namespace ConceptStub {
       );
     }
 
-    const $identifier: ConceptStub.$Identifier = $resource.identifier;
-    const $type = "ConceptStub" as const;
+    const $identifier: PartialConcept.$Identifier = $resource.identifier;
+    const $type = "PartialConcept" as const;
     return purify.Either.of({ ...$super0, $identifier, $type });
   }
 
@@ -5582,11 +5592,14 @@ export namespace ConceptStub {
       prefixes: parameters?.prefixes ?? {},
       queryType: "CONSTRUCT",
       template: (queryParameters.template ?? []).concat(
-        ConceptStub.$sparqlConstructTemplateTriples({ ignoreRdfType, subject }),
+        PartialConcept.$sparqlConstructTemplateTriples({
+          ignoreRdfType,
+          subject,
+        }),
       ),
       type: "query",
       where: (queryParameters.where ?? []).concat(
-        ConceptStub.$sparqlWherePatterns({
+        PartialConcept.$sparqlWherePatterns({
           ignoreRdfType,
           preferredLanguages,
           subject,
@@ -5605,7 +5618,7 @@ export namespace ConceptStub {
       sparqljs.GeneratorOptions,
   ): string {
     return new sparqljs.Generator(parameters).stringify(
-      ConceptStub.$sparqlConstructQuery(parameters),
+      PartialConcept.$sparqlConstructQuery(parameters),
     );
   }
 
@@ -5672,7 +5685,7 @@ export namespace ConceptStub {
     if (!parameters?.ignoreRdfType) {
       requiredPatterns.push(
         $sparqlInstancesOfPattern({
-          rdfType: ConceptStub.$fromRdfType,
+          rdfType: PartialConcept.$fromRdfType,
           subject,
         }),
         {
@@ -5711,7 +5724,7 @@ export namespace ConceptStub {
   }
 
   export function $toRdf(
-    _conceptStub: ConceptStub,
+    _conceptStub: PartialConcept,
     options?: {
       ignoreRdfType?: boolean;
       mutateGraph?: rdfjsResource.MutableResource.MutateGraph;
@@ -5735,7 +5748,7 @@ export namespace ConceptStub {
       resource.add(
         $RdfVocabularies.rdf.type,
         resource.dataFactory.namedNode(
-          "http://kos-kit.github.io/ontology#ConceptStub",
+          "http://kos-kit.github.io/ontology#PartialConcept",
         ),
       );
       resource.add(
@@ -5750,10 +5763,10 @@ export namespace ConceptStub {
   }
 
   export function isConceptStub(
-    object: KosResourceStub,
-  ): object is ConceptStub {
+    object: PartialKosResource,
+  ): object is PartialConcept {
     switch (object.$type) {
-      case "ConceptStub":
+      case "PartialConcept":
         return true;
       default:
         return false;
@@ -5763,7 +5776,7 @@ export namespace ConceptStub {
 export interface ConceptScheme extends KosResource {
   readonly $identifier: ConceptScheme.$Identifier;
   readonly $type: "ConceptScheme";
-  readonly hasTopConcept: readonly ConceptStub[];
+  readonly hasTopConcept: readonly PartialConcept[];
   readonly license: purify.Maybe<rdfjs.NamedNode | rdfjs.Literal>;
   readonly rights: purify.Maybe<rdfjs.Literal>;
   readonly rightsHolder: purify.Maybe<rdfjs.Literal>;
@@ -5773,7 +5786,7 @@ export namespace ConceptScheme {
   export function $create(
     parameters: {
       readonly $identifier: rdfjs.NamedNode | string;
-      readonly hasTopConcept?: readonly ConceptStub[];
+      readonly hasTopConcept?: readonly PartialConcept[];
       readonly license?:
         | (rdfjs.NamedNode | rdfjs.Literal)
         | Date
@@ -5807,7 +5820,7 @@ export namespace ConceptScheme {
     }
 
     const $type = "ConceptScheme" as const;
-    let hasTopConcept: readonly ConceptStub[];
+    let hasTopConcept: readonly PartialConcept[];
     if (typeof parameters.hasTopConcept === "undefined") {
       hasTopConcept = [];
     } else if (typeof parameters.hasTopConcept === "object") {
@@ -5984,7 +5997,7 @@ export namespace ConceptScheme {
     {
       $identifier: rdfjs.NamedNode;
       $type: "ConceptScheme";
-      hasTopConcept: readonly ConceptStub[];
+      hasTopConcept: readonly PartialConcept[];
       license: purify.Maybe<rdfjs.NamedNode | rdfjs.Literal>;
       rights: purify.Maybe<rdfjs.Literal>;
       rightsHolder: purify.Maybe<rdfjs.Literal>;
@@ -6042,36 +6055,38 @@ export namespace ConceptScheme {
 
     const $identifier: ConceptScheme.$Identifier = $resource.identifier;
     const $type = "ConceptScheme" as const;
-    const _hasTopConceptEither: purify.Either<Error, readonly ConceptStub[]> =
-      purify.Either.of<
-        Error,
-        rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
-      >(
-        $resource.values($properties.hasTopConcept["identifier"], {
-          unique: true,
+    const _hasTopConceptEither: purify.Either<
+      Error,
+      readonly PartialConcept[]
+    > = purify.Either.of<
+      Error,
+      rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
+    >(
+      $resource.values($properties.hasTopConcept["identifier"], {
+        unique: true,
+      }),
+    )
+      .chain((values) =>
+        values.chainMap((value) =>
+          value.toResource().chain((resource) =>
+            PartialConcept.$fromRdf(resource, {
+              ...$context,
+              ignoreRdfType: true,
+              objectSet: $objectSet,
+              preferredLanguages: $preferredLanguages,
+            }),
+          ),
+        ),
+      )
+      .map((values) => values.toArray())
+      .map((valuesArray) =>
+        rdfjsResource.Resource.Values.fromValue({
+          focusResource: $resource,
+          predicate: ConceptScheme.$properties.hasTopConcept["identifier"],
+          value: valuesArray,
         }),
       )
-        .chain((values) =>
-          values.chainMap((value) =>
-            value.toResource().chain((resource) =>
-              ConceptStub.$fromRdf(resource, {
-                ...$context,
-                ignoreRdfType: true,
-                objectSet: $objectSet,
-                preferredLanguages: $preferredLanguages,
-              }),
-            ),
-          ),
-        )
-        .map((values) => values.toArray())
-        .map((valuesArray) =>
-          rdfjsResource.Resource.Values.fromValue({
-            focusResource: $resource,
-            predicate: ConceptScheme.$properties.hasTopConcept["identifier"],
-            value: valuesArray,
-          }),
-        )
-        .chain((values) => values.head());
+      .chain((values) => values.head());
     if (_hasTopConceptEither.isLeft()) {
       return _hasTopConceptEither;
     }
@@ -6374,7 +6389,7 @@ export namespace ConceptScheme {
       subject,
     });
     triples.push(
-      ...ConceptStub.$sparqlConstructTemplateTriples({
+      ...PartialConcept.$sparqlConstructTemplateTriples({
         ignoreRdfType: true,
         subject: dataFactory.variable!(`${variablePrefix}HasTopConcept`),
         variablePrefix: `${variablePrefix}HasTopConcept`,
@@ -6476,7 +6491,7 @@ export namespace ConceptScheme {
             ],
             type: "bgp",
           },
-          ...ConceptStub.$sparqlWherePatterns({
+          ...PartialConcept.$sparqlWherePatterns({
             ignoreRdfType: true,
             preferredLanguages: parameters?.preferredLanguages,
             subject: dataFactory.variable!(`${variablePrefix}HasTopConcept`),
@@ -6641,7 +6656,7 @@ export namespace ConceptScheme {
     resource.add(
       ConceptScheme.$properties.hasTopConcept["identifier"],
       ..._conceptScheme.hasTopConcept.flatMap((item) => [
-        ConceptStub.$toRdf(item, {
+        PartialConcept.$toRdf(item, {
           mutateGraph: mutateGraph,
           resourceSet: resourceSet,
         }).identifier,
@@ -6673,18 +6688,18 @@ export namespace ConceptScheme {
     }
   }
 }
-export interface ConceptSchemeStub extends KosResourceStub {
-  readonly $identifier: ConceptSchemeStub.$Identifier;
-  readonly $type: "ConceptSchemeStub";
+export interface PartialConceptScheme extends PartialKosResource {
+  readonly $identifier: PartialConceptScheme.$Identifier;
+  readonly $type: "PartialConceptScheme";
 }
 
-export namespace ConceptSchemeStub {
+export namespace PartialConceptScheme {
   export function $create(
     parameters: { readonly $identifier: rdfjs.NamedNode | string } & Parameters<
       typeof KosResourceStubStatic.$create
     >[0],
-  ): ConceptSchemeStub {
-    let $identifier: ConceptSchemeStub.$Identifier;
+  ): PartialConceptScheme {
+    let $identifier: PartialConceptScheme.$Identifier;
     if (typeof parameters.$identifier === "object") {
       $identifier = parameters.$identifier;
     } else if (typeof parameters.$identifier === "string") {
@@ -6693,7 +6708,7 @@ export namespace ConceptSchemeStub {
       $identifier = parameters.$identifier satisfies never;
     }
 
-    const $type = "ConceptSchemeStub" as const;
+    const $type = "PartialConceptScheme" as const;
     return { ...KosResourceStubStatic.$create(parameters), $identifier, $type };
   }
 
@@ -6705,7 +6720,7 @@ export namespace ConceptSchemeStub {
       objectSet?: $ObjectSet;
       preferredLanguages?: readonly string[];
     },
-  ): purify.Either<Error, ConceptSchemeStub> {
+  ): purify.Either<Error, PartialConceptScheme> {
     let {
       ignoreRdfType = false,
       objectSet,
@@ -6716,7 +6731,7 @@ export namespace ConceptSchemeStub {
       objectSet = new $RdfjsDatasetObjectSet({ dataset: resource.dataset });
     }
 
-    return ConceptSchemeStub.$propertiesFromRdf({
+    return PartialConceptScheme.$propertiesFromRdf({
       ...context,
       ignoreRdfType,
       objectSet,
@@ -6747,7 +6762,7 @@ export namespace ConceptSchemeStub {
     resource: rdfjsResource.Resource;
   }): purify.Either<
     Error,
-    { $identifier: rdfjs.NamedNode; $type: "ConceptSchemeStub" } & $UnwrapR<
+    { $identifier: rdfjs.NamedNode; $type: "PartialConceptScheme" } & $UnwrapR<
       ReturnType<typeof KosResourceStubStatic.$propertiesFromRdf>
     >
   > {
@@ -6775,7 +6790,7 @@ export namespace ConceptSchemeStub {
           }
 
           // Check arbitrary rdfs:subClassOf's of the expected type
-          if ($resource.isInstanceOf(ConceptSchemeStub.$fromRdfType)) {
+          if ($resource.isInstanceOf(PartialConceptScheme.$fromRdfType)) {
             return purify.Either.of(true);
           }
 
@@ -6801,8 +6816,8 @@ export namespace ConceptSchemeStub {
       );
     }
 
-    const $identifier: ConceptSchemeStub.$Identifier = $resource.identifier;
-    const $type = "ConceptSchemeStub" as const;
+    const $identifier: PartialConceptScheme.$Identifier = $resource.identifier;
+    const $type = "PartialConceptScheme" as const;
     return purify.Either.of({ ...$super0, $identifier, $type });
   }
 
@@ -6822,14 +6837,14 @@ export namespace ConceptSchemeStub {
       prefixes: parameters?.prefixes ?? {},
       queryType: "CONSTRUCT",
       template: (queryParameters.template ?? []).concat(
-        ConceptSchemeStub.$sparqlConstructTemplateTriples({
+        PartialConceptScheme.$sparqlConstructTemplateTriples({
           ignoreRdfType,
           subject,
         }),
       ),
       type: "query",
       where: (queryParameters.where ?? []).concat(
-        ConceptSchemeStub.$sparqlWherePatterns({
+        PartialConceptScheme.$sparqlWherePatterns({
           ignoreRdfType,
           preferredLanguages,
           subject,
@@ -6848,7 +6863,7 @@ export namespace ConceptSchemeStub {
       sparqljs.GeneratorOptions,
   ): string {
     return new sparqljs.Generator(parameters).stringify(
-      ConceptSchemeStub.$sparqlConstructQuery(parameters),
+      PartialConceptScheme.$sparqlConstructQuery(parameters),
     );
   }
 
@@ -6917,7 +6932,7 @@ export namespace ConceptSchemeStub {
     if (!parameters?.ignoreRdfType) {
       requiredPatterns.push(
         $sparqlInstancesOfPattern({
-          rdfType: ConceptSchemeStub.$fromRdfType,
+          rdfType: PartialConceptScheme.$fromRdfType,
           subject,
         }),
         {
@@ -6956,7 +6971,7 @@ export namespace ConceptSchemeStub {
   }
 
   export function $toRdf(
-    _conceptSchemeStub: ConceptSchemeStub,
+    _conceptSchemeStub: PartialConceptScheme,
     options?: {
       ignoreRdfType?: boolean;
       mutateGraph?: rdfjsResource.MutableResource.MutateGraph;
@@ -6980,7 +6995,7 @@ export namespace ConceptSchemeStub {
       resource.add(
         $RdfVocabularies.rdf.type,
         resource.dataFactory.namedNode(
-          "http://kos-kit.github.io/ontology#ConceptSchemeStub",
+          "http://kos-kit.github.io/ontology#PartialConceptScheme",
         ),
       );
       resource.add(
@@ -6995,10 +7010,10 @@ export namespace ConceptSchemeStub {
   }
 
   export function isConceptSchemeStub(
-    object: KosResourceStub,
-  ): object is ConceptSchemeStub {
+    object: PartialKosResource,
+  ): object is PartialConceptScheme {
     switch (object.$type) {
-      case "ConceptSchemeStub":
+      case "PartialConceptScheme":
         return true;
       default:
         return false;
@@ -7031,28 +7046,28 @@ export interface $ObjectSet {
     query?: Pick<$ObjectSet.Query<ConceptScheme.$Identifier>, "where">,
   ): Promise<purify.Either<Error, number>>;
   conceptSchemeStub(
-    identifier: ConceptSchemeStub.$Identifier,
-  ): Promise<purify.Either<Error, ConceptSchemeStub>>;
+    identifier: PartialConceptScheme.$Identifier,
+  ): Promise<purify.Either<Error, PartialConceptScheme>>;
   conceptSchemeStubIdentifiers(
-    query?: $ObjectSet.Query<ConceptSchemeStub.$Identifier>,
-  ): Promise<purify.Either<Error, readonly ConceptSchemeStub.$Identifier[]>>;
+    query?: $ObjectSet.Query<PartialConceptScheme.$Identifier>,
+  ): Promise<purify.Either<Error, readonly PartialConceptScheme.$Identifier[]>>;
   conceptSchemeStubs(
-    query?: $ObjectSet.Query<ConceptSchemeStub.$Identifier>,
-  ): Promise<purify.Either<Error, readonly ConceptSchemeStub[]>>;
+    query?: $ObjectSet.Query<PartialConceptScheme.$Identifier>,
+  ): Promise<purify.Either<Error, readonly PartialConceptScheme[]>>;
   conceptSchemeStubsCount(
-    query?: Pick<$ObjectSet.Query<ConceptSchemeStub.$Identifier>, "where">,
+    query?: Pick<$ObjectSet.Query<PartialConceptScheme.$Identifier>, "where">,
   ): Promise<purify.Either<Error, number>>;
   conceptStub(
-    identifier: ConceptStub.$Identifier,
-  ): Promise<purify.Either<Error, ConceptStub>>;
+    identifier: PartialConcept.$Identifier,
+  ): Promise<purify.Either<Error, PartialConcept>>;
   conceptStubIdentifiers(
-    query?: $ObjectSet.Query<ConceptStub.$Identifier>,
-  ): Promise<purify.Either<Error, readonly ConceptStub.$Identifier[]>>;
+    query?: $ObjectSet.Query<PartialConcept.$Identifier>,
+  ): Promise<purify.Either<Error, readonly PartialConcept.$Identifier[]>>;
   conceptStubs(
-    query?: $ObjectSet.Query<ConceptStub.$Identifier>,
-  ): Promise<purify.Either<Error, readonly ConceptStub[]>>;
+    query?: $ObjectSet.Query<PartialConcept.$Identifier>,
+  ): Promise<purify.Either<Error, readonly PartialConcept[]>>;
   conceptStubsCount(
-    query?: Pick<$ObjectSet.Query<ConceptStub.$Identifier>, "where">,
+    query?: Pick<$ObjectSet.Query<PartialConcept.$Identifier>, "where">,
   ): Promise<purify.Either<Error, number>>;
   label(identifier: Label.$Identifier): Promise<purify.Either<Error, Label>>;
   labelIdentifiers(
@@ -7065,16 +7080,16 @@ export interface $ObjectSet {
     query?: Pick<$ObjectSet.Query<Label.$Identifier>, "where">,
   ): Promise<purify.Either<Error, number>>;
   labelStub(
-    identifier: LabelStub.$Identifier,
-  ): Promise<purify.Either<Error, LabelStub>>;
+    identifier: PartialLabel.$Identifier,
+  ): Promise<purify.Either<Error, PartialLabel>>;
   labelStubIdentifiers(
-    query?: $ObjectSet.Query<LabelStub.$Identifier>,
-  ): Promise<purify.Either<Error, readonly LabelStub.$Identifier[]>>;
+    query?: $ObjectSet.Query<PartialLabel.$Identifier>,
+  ): Promise<purify.Either<Error, readonly PartialLabel.$Identifier[]>>;
   labelStubs(
-    query?: $ObjectSet.Query<LabelStub.$Identifier>,
-  ): Promise<purify.Either<Error, readonly LabelStub[]>>;
+    query?: $ObjectSet.Query<PartialLabel.$Identifier>,
+  ): Promise<purify.Either<Error, readonly PartialLabel[]>>;
   labelStubsCount(
-    query?: Pick<$ObjectSet.Query<LabelStub.$Identifier>, "where">,
+    query?: Pick<$ObjectSet.Query<PartialLabel.$Identifier>, "where">,
   ): Promise<purify.Either<Error, number>>;
 }
 
@@ -7160,49 +7175,51 @@ export abstract class $ForwardingObjectSet implements $ObjectSet {
   }
 
   conceptSchemeStub(
-    identifier: ConceptSchemeStub.$Identifier,
-  ): Promise<purify.Either<Error, ConceptSchemeStub>> {
+    identifier: PartialConceptScheme.$Identifier,
+  ): Promise<purify.Either<Error, PartialConceptScheme>> {
     return this.$delegate.conceptSchemeStub(identifier);
   }
 
   conceptSchemeStubIdentifiers(
-    query?: $ObjectSet.Query<ConceptSchemeStub.$Identifier>,
-  ): Promise<purify.Either<Error, readonly ConceptSchemeStub.$Identifier[]>> {
+    query?: $ObjectSet.Query<PartialConceptScheme.$Identifier>,
+  ): Promise<
+    purify.Either<Error, readonly PartialConceptScheme.$Identifier[]>
+  > {
     return this.$delegate.conceptSchemeStubIdentifiers(query);
   }
 
   conceptSchemeStubs(
-    query?: $ObjectSet.Query<ConceptSchemeStub.$Identifier>,
-  ): Promise<purify.Either<Error, readonly ConceptSchemeStub[]>> {
+    query?: $ObjectSet.Query<PartialConceptScheme.$Identifier>,
+  ): Promise<purify.Either<Error, readonly PartialConceptScheme[]>> {
     return this.$delegate.conceptSchemeStubs(query);
   }
 
   conceptSchemeStubsCount(
-    query?: Pick<$ObjectSet.Query<ConceptSchemeStub.$Identifier>, "where">,
+    query?: Pick<$ObjectSet.Query<PartialConceptScheme.$Identifier>, "where">,
   ): Promise<purify.Either<Error, number>> {
     return this.$delegate.conceptSchemeStubsCount(query);
   }
 
   conceptStub(
-    identifier: ConceptStub.$Identifier,
-  ): Promise<purify.Either<Error, ConceptStub>> {
+    identifier: PartialConcept.$Identifier,
+  ): Promise<purify.Either<Error, PartialConcept>> {
     return this.$delegate.conceptStub(identifier);
   }
 
   conceptStubIdentifiers(
-    query?: $ObjectSet.Query<ConceptStub.$Identifier>,
-  ): Promise<purify.Either<Error, readonly ConceptStub.$Identifier[]>> {
+    query?: $ObjectSet.Query<PartialConcept.$Identifier>,
+  ): Promise<purify.Either<Error, readonly PartialConcept.$Identifier[]>> {
     return this.$delegate.conceptStubIdentifiers(query);
   }
 
   conceptStubs(
-    query?: $ObjectSet.Query<ConceptStub.$Identifier>,
-  ): Promise<purify.Either<Error, readonly ConceptStub[]>> {
+    query?: $ObjectSet.Query<PartialConcept.$Identifier>,
+  ): Promise<purify.Either<Error, readonly PartialConcept[]>> {
     return this.$delegate.conceptStubs(query);
   }
 
   conceptStubsCount(
-    query?: Pick<$ObjectSet.Query<ConceptStub.$Identifier>, "where">,
+    query?: Pick<$ObjectSet.Query<PartialConcept.$Identifier>, "where">,
   ): Promise<purify.Either<Error, number>> {
     return this.$delegate.conceptStubsCount(query);
   }
@@ -7230,25 +7247,25 @@ export abstract class $ForwardingObjectSet implements $ObjectSet {
   }
 
   labelStub(
-    identifier: LabelStub.$Identifier,
-  ): Promise<purify.Either<Error, LabelStub>> {
+    identifier: PartialLabel.$Identifier,
+  ): Promise<purify.Either<Error, PartialLabel>> {
     return this.$delegate.labelStub(identifier);
   }
 
   labelStubIdentifiers(
-    query?: $ObjectSet.Query<LabelStub.$Identifier>,
-  ): Promise<purify.Either<Error, readonly LabelStub.$Identifier[]>> {
+    query?: $ObjectSet.Query<PartialLabel.$Identifier>,
+  ): Promise<purify.Either<Error, readonly PartialLabel.$Identifier[]>> {
     return this.$delegate.labelStubIdentifiers(query);
   }
 
   labelStubs(
-    query?: $ObjectSet.Query<LabelStub.$Identifier>,
-  ): Promise<purify.Either<Error, readonly LabelStub[]>> {
+    query?: $ObjectSet.Query<PartialLabel.$Identifier>,
+  ): Promise<purify.Either<Error, readonly PartialLabel[]>> {
     return this.$delegate.labelStubs(query);
   }
 
   labelStubsCount(
-    query?: Pick<$ObjectSet.Query<LabelStub.$Identifier>, "where">,
+    query?: Pick<$ObjectSet.Query<PartialLabel.$Identifier>, "where">,
   ): Promise<purify.Either<Error, number>> {
     return this.$delegate.labelStubsCount(query);
   }
@@ -7396,36 +7413,38 @@ export class $RdfjsDatasetObjectSet implements $ObjectSet {
   }
 
   async conceptSchemeStub(
-    identifier: ConceptSchemeStub.$Identifier,
-  ): Promise<purify.Either<Error, ConceptSchemeStub>> {
+    identifier: PartialConceptScheme.$Identifier,
+  ): Promise<purify.Either<Error, PartialConceptScheme>> {
     return this.conceptSchemeStubSync(identifier);
   }
 
   conceptSchemeStubSync(
-    identifier: ConceptSchemeStub.$Identifier,
-  ): purify.Either<Error, ConceptSchemeStub> {
+    identifier: PartialConceptScheme.$Identifier,
+  ): purify.Either<Error, PartialConceptScheme> {
     return this.conceptSchemeStubsSync({
       where: { identifiers: [identifier], type: "identifiers" },
     }).map((objects) => objects[0]);
   }
 
   async conceptSchemeStubIdentifiers(
-    query?: $ObjectSet.Query<ConceptSchemeStub.$Identifier>,
-  ): Promise<purify.Either<Error, readonly ConceptSchemeStub.$Identifier[]>> {
+    query?: $ObjectSet.Query<PartialConceptScheme.$Identifier>,
+  ): Promise<
+    purify.Either<Error, readonly PartialConceptScheme.$Identifier[]>
+  > {
     return this.conceptSchemeStubIdentifiersSync(query);
   }
 
   conceptSchemeStubIdentifiersSync(
-    query?: $ObjectSet.Query<ConceptSchemeStub.$Identifier>,
-  ): purify.Either<Error, readonly ConceptSchemeStub.$Identifier[]> {
+    query?: $ObjectSet.Query<PartialConceptScheme.$Identifier>,
+  ): purify.Either<Error, readonly PartialConceptScheme.$Identifier[]> {
     return this.$objectIdentifiersSync<
-      ConceptSchemeStub,
-      ConceptSchemeStub.$Identifier
+      PartialConceptScheme,
+      PartialConceptScheme.$Identifier
     >(
       [
         {
-          $fromRdf: ConceptSchemeStub.$fromRdf,
-          $fromRdfTypes: [ConceptSchemeStub.$fromRdfType],
+          $fromRdf: PartialConceptScheme.$fromRdf,
+          $fromRdfTypes: [PartialConceptScheme.$fromRdfType],
         },
       ],
       query,
@@ -7433,19 +7452,22 @@ export class $RdfjsDatasetObjectSet implements $ObjectSet {
   }
 
   async conceptSchemeStubs(
-    query?: $ObjectSet.Query<ConceptSchemeStub.$Identifier>,
-  ): Promise<purify.Either<Error, readonly ConceptSchemeStub[]>> {
+    query?: $ObjectSet.Query<PartialConceptScheme.$Identifier>,
+  ): Promise<purify.Either<Error, readonly PartialConceptScheme[]>> {
     return this.conceptSchemeStubsSync(query);
   }
 
   conceptSchemeStubsSync(
-    query?: $ObjectSet.Query<ConceptSchemeStub.$Identifier>,
-  ): purify.Either<Error, readonly ConceptSchemeStub[]> {
-    return this.$objectsSync<ConceptSchemeStub, ConceptSchemeStub.$Identifier>(
+    query?: $ObjectSet.Query<PartialConceptScheme.$Identifier>,
+  ): purify.Either<Error, readonly PartialConceptScheme[]> {
+    return this.$objectsSync<
+      PartialConceptScheme,
+      PartialConceptScheme.$Identifier
+    >(
       [
         {
-          $fromRdf: ConceptSchemeStub.$fromRdf,
-          $fromRdfTypes: [ConceptSchemeStub.$fromRdfType],
+          $fromRdf: PartialConceptScheme.$fromRdf,
+          $fromRdfTypes: [PartialConceptScheme.$fromRdfType],
         },
       ],
       query,
@@ -7453,22 +7475,22 @@ export class $RdfjsDatasetObjectSet implements $ObjectSet {
   }
 
   async conceptSchemeStubsCount(
-    query?: Pick<$ObjectSet.Query<ConceptSchemeStub.$Identifier>, "where">,
+    query?: Pick<$ObjectSet.Query<PartialConceptScheme.$Identifier>, "where">,
   ): Promise<purify.Either<Error, number>> {
     return this.conceptSchemeStubsCountSync(query);
   }
 
   conceptSchemeStubsCountSync(
-    query?: Pick<$ObjectSet.Query<ConceptSchemeStub.$Identifier>, "where">,
+    query?: Pick<$ObjectSet.Query<PartialConceptScheme.$Identifier>, "where">,
   ): purify.Either<Error, number> {
     return this.$objectsCountSync<
-      ConceptSchemeStub,
-      ConceptSchemeStub.$Identifier
+      PartialConceptScheme,
+      PartialConceptScheme.$Identifier
     >(
       [
         {
-          $fromRdf: ConceptSchemeStub.$fromRdf,
-          $fromRdfTypes: [ConceptSchemeStub.$fromRdfType],
+          $fromRdf: PartialConceptScheme.$fromRdf,
+          $fromRdfTypes: [PartialConceptScheme.$fromRdfType],
         },
       ],
       query,
@@ -7476,33 +7498,36 @@ export class $RdfjsDatasetObjectSet implements $ObjectSet {
   }
 
   async conceptStub(
-    identifier: ConceptStub.$Identifier,
-  ): Promise<purify.Either<Error, ConceptStub>> {
+    identifier: PartialConcept.$Identifier,
+  ): Promise<purify.Either<Error, PartialConcept>> {
     return this.conceptStubSync(identifier);
   }
 
   conceptStubSync(
-    identifier: ConceptStub.$Identifier,
-  ): purify.Either<Error, ConceptStub> {
+    identifier: PartialConcept.$Identifier,
+  ): purify.Either<Error, PartialConcept> {
     return this.conceptStubsSync({
       where: { identifiers: [identifier], type: "identifiers" },
     }).map((objects) => objects[0]);
   }
 
   async conceptStubIdentifiers(
-    query?: $ObjectSet.Query<ConceptStub.$Identifier>,
-  ): Promise<purify.Either<Error, readonly ConceptStub.$Identifier[]>> {
+    query?: $ObjectSet.Query<PartialConcept.$Identifier>,
+  ): Promise<purify.Either<Error, readonly PartialConcept.$Identifier[]>> {
     return this.conceptStubIdentifiersSync(query);
   }
 
   conceptStubIdentifiersSync(
-    query?: $ObjectSet.Query<ConceptStub.$Identifier>,
-  ): purify.Either<Error, readonly ConceptStub.$Identifier[]> {
-    return this.$objectIdentifiersSync<ConceptStub, ConceptStub.$Identifier>(
+    query?: $ObjectSet.Query<PartialConcept.$Identifier>,
+  ): purify.Either<Error, readonly PartialConcept.$Identifier[]> {
+    return this.$objectIdentifiersSync<
+      PartialConcept,
+      PartialConcept.$Identifier
+    >(
       [
         {
-          $fromRdf: ConceptStub.$fromRdf,
-          $fromRdfTypes: [ConceptStub.$fromRdfType],
+          $fromRdf: PartialConcept.$fromRdf,
+          $fromRdfTypes: [PartialConcept.$fromRdfType],
         },
       ],
       query,
@@ -7510,19 +7535,19 @@ export class $RdfjsDatasetObjectSet implements $ObjectSet {
   }
 
   async conceptStubs(
-    query?: $ObjectSet.Query<ConceptStub.$Identifier>,
-  ): Promise<purify.Either<Error, readonly ConceptStub[]>> {
+    query?: $ObjectSet.Query<PartialConcept.$Identifier>,
+  ): Promise<purify.Either<Error, readonly PartialConcept[]>> {
     return this.conceptStubsSync(query);
   }
 
   conceptStubsSync(
-    query?: $ObjectSet.Query<ConceptStub.$Identifier>,
-  ): purify.Either<Error, readonly ConceptStub[]> {
-    return this.$objectsSync<ConceptStub, ConceptStub.$Identifier>(
+    query?: $ObjectSet.Query<PartialConcept.$Identifier>,
+  ): purify.Either<Error, readonly PartialConcept[]> {
+    return this.$objectsSync<PartialConcept, PartialConcept.$Identifier>(
       [
         {
-          $fromRdf: ConceptStub.$fromRdf,
-          $fromRdfTypes: [ConceptStub.$fromRdfType],
+          $fromRdf: PartialConcept.$fromRdf,
+          $fromRdfTypes: [PartialConcept.$fromRdfType],
         },
       ],
       query,
@@ -7530,19 +7555,19 @@ export class $RdfjsDatasetObjectSet implements $ObjectSet {
   }
 
   async conceptStubsCount(
-    query?: Pick<$ObjectSet.Query<ConceptStub.$Identifier>, "where">,
+    query?: Pick<$ObjectSet.Query<PartialConcept.$Identifier>, "where">,
   ): Promise<purify.Either<Error, number>> {
     return this.conceptStubsCountSync(query);
   }
 
   conceptStubsCountSync(
-    query?: Pick<$ObjectSet.Query<ConceptStub.$Identifier>, "where">,
+    query?: Pick<$ObjectSet.Query<PartialConcept.$Identifier>, "where">,
   ): purify.Either<Error, number> {
-    return this.$objectsCountSync<ConceptStub, ConceptStub.$Identifier>(
+    return this.$objectsCountSync<PartialConcept, PartialConcept.$Identifier>(
       [
         {
-          $fromRdf: ConceptStub.$fromRdf,
-          $fromRdfTypes: [ConceptStub.$fromRdfType],
+          $fromRdf: PartialConcept.$fromRdf,
+          $fromRdfTypes: [PartialConcept.$fromRdfType],
         },
       ],
       query,
@@ -7607,33 +7632,33 @@ export class $RdfjsDatasetObjectSet implements $ObjectSet {
   }
 
   async labelStub(
-    identifier: LabelStub.$Identifier,
-  ): Promise<purify.Either<Error, LabelStub>> {
+    identifier: PartialLabel.$Identifier,
+  ): Promise<purify.Either<Error, PartialLabel>> {
     return this.labelStubSync(identifier);
   }
 
   labelStubSync(
-    identifier: LabelStub.$Identifier,
-  ): purify.Either<Error, LabelStub> {
+    identifier: PartialLabel.$Identifier,
+  ): purify.Either<Error, PartialLabel> {
     return this.labelStubsSync({
       where: { identifiers: [identifier], type: "identifiers" },
     }).map((objects) => objects[0]);
   }
 
   async labelStubIdentifiers(
-    query?: $ObjectSet.Query<LabelStub.$Identifier>,
-  ): Promise<purify.Either<Error, readonly LabelStub.$Identifier[]>> {
+    query?: $ObjectSet.Query<PartialLabel.$Identifier>,
+  ): Promise<purify.Either<Error, readonly PartialLabel.$Identifier[]>> {
     return this.labelStubIdentifiersSync(query);
   }
 
   labelStubIdentifiersSync(
-    query?: $ObjectSet.Query<LabelStub.$Identifier>,
-  ): purify.Either<Error, readonly LabelStub.$Identifier[]> {
-    return this.$objectIdentifiersSync<LabelStub, LabelStub.$Identifier>(
+    query?: $ObjectSet.Query<PartialLabel.$Identifier>,
+  ): purify.Either<Error, readonly PartialLabel.$Identifier[]> {
+    return this.$objectIdentifiersSync<PartialLabel, PartialLabel.$Identifier>(
       [
         {
-          $fromRdf: LabelStub.$fromRdf,
-          $fromRdfTypes: [LabelStub.$fromRdfType],
+          $fromRdf: PartialLabel.$fromRdf,
+          $fromRdfTypes: [PartialLabel.$fromRdfType],
         },
       ],
       query,
@@ -7641,19 +7666,19 @@ export class $RdfjsDatasetObjectSet implements $ObjectSet {
   }
 
   async labelStubs(
-    query?: $ObjectSet.Query<LabelStub.$Identifier>,
-  ): Promise<purify.Either<Error, readonly LabelStub[]>> {
+    query?: $ObjectSet.Query<PartialLabel.$Identifier>,
+  ): Promise<purify.Either<Error, readonly PartialLabel[]>> {
     return this.labelStubsSync(query);
   }
 
   labelStubsSync(
-    query?: $ObjectSet.Query<LabelStub.$Identifier>,
-  ): purify.Either<Error, readonly LabelStub[]> {
-    return this.$objectsSync<LabelStub, LabelStub.$Identifier>(
+    query?: $ObjectSet.Query<PartialLabel.$Identifier>,
+  ): purify.Either<Error, readonly PartialLabel[]> {
+    return this.$objectsSync<PartialLabel, PartialLabel.$Identifier>(
       [
         {
-          $fromRdf: LabelStub.$fromRdf,
-          $fromRdfTypes: [LabelStub.$fromRdfType],
+          $fromRdf: PartialLabel.$fromRdf,
+          $fromRdfTypes: [PartialLabel.$fromRdfType],
         },
       ],
       query,
@@ -7661,19 +7686,19 @@ export class $RdfjsDatasetObjectSet implements $ObjectSet {
   }
 
   async labelStubsCount(
-    query?: Pick<$ObjectSet.Query<LabelStub.$Identifier>, "where">,
+    query?: Pick<$ObjectSet.Query<PartialLabel.$Identifier>, "where">,
   ): Promise<purify.Either<Error, number>> {
     return this.labelStubsCountSync(query);
   }
 
   labelStubsCountSync(
-    query?: Pick<$ObjectSet.Query<LabelStub.$Identifier>, "where">,
+    query?: Pick<$ObjectSet.Query<PartialLabel.$Identifier>, "where">,
   ): purify.Either<Error, number> {
-    return this.$objectsCountSync<LabelStub, LabelStub.$Identifier>(
+    return this.$objectsCountSync<PartialLabel, PartialLabel.$Identifier>(
       [
         {
-          $fromRdf: LabelStub.$fromRdf,
-          $fromRdfTypes: [LabelStub.$fromRdfType],
+          $fromRdf: PartialLabel.$fromRdf,
+          $fromRdfTypes: [PartialLabel.$fromRdfType],
         },
       ],
       query,
@@ -7990,8 +8015,8 @@ export class $SparqlObjectSet implements $ObjectSet {
   }
 
   async conceptSchemeStub(
-    identifier: ConceptSchemeStub.$Identifier,
-  ): Promise<purify.Either<Error, ConceptSchemeStub>> {
+    identifier: PartialConceptScheme.$Identifier,
+  ): Promise<purify.Either<Error, PartialConceptScheme>> {
     return (
       await this.conceptSchemeStubs({
         where: { identifiers: [identifier], type: "identifiers" },
@@ -8000,38 +8025,40 @@ export class $SparqlObjectSet implements $ObjectSet {
   }
 
   async conceptSchemeStubIdentifiers(
-    query?: $SparqlObjectSet.Query<ConceptSchemeStub.$Identifier>,
-  ): Promise<purify.Either<Error, readonly ConceptSchemeStub.$Identifier[]>> {
-    return this.$objectIdentifiers<ConceptSchemeStub.$Identifier>(
-      ConceptSchemeStub,
+    query?: $SparqlObjectSet.Query<PartialConceptScheme.$Identifier>,
+  ): Promise<
+    purify.Either<Error, readonly PartialConceptScheme.$Identifier[]>
+  > {
+    return this.$objectIdentifiers<PartialConceptScheme.$Identifier>(
+      PartialConceptScheme,
       query,
     );
   }
 
   async conceptSchemeStubs(
-    query?: $SparqlObjectSet.Query<ConceptSchemeStub.$Identifier>,
-  ): Promise<purify.Either<Error, readonly ConceptSchemeStub[]>> {
-    return this.$objects<ConceptSchemeStub, ConceptSchemeStub.$Identifier>(
-      ConceptSchemeStub,
-      query,
-    );
+    query?: $SparqlObjectSet.Query<PartialConceptScheme.$Identifier>,
+  ): Promise<purify.Either<Error, readonly PartialConceptScheme[]>> {
+    return this.$objects<
+      PartialConceptScheme,
+      PartialConceptScheme.$Identifier
+    >(PartialConceptScheme, query);
   }
 
   async conceptSchemeStubsCount(
     query?: Pick<
-      $SparqlObjectSet.Query<ConceptSchemeStub.$Identifier>,
+      $SparqlObjectSet.Query<PartialConceptScheme.$Identifier>,
       "where"
     >,
   ): Promise<purify.Either<Error, number>> {
-    return this.$objectsCount<ConceptSchemeStub.$Identifier>(
-      ConceptSchemeStub,
+    return this.$objectsCount<PartialConceptScheme.$Identifier>(
+      PartialConceptScheme,
       query,
     );
   }
 
   async conceptStub(
-    identifier: ConceptStub.$Identifier,
-  ): Promise<purify.Either<Error, ConceptStub>> {
+    identifier: PartialConcept.$Identifier,
+  ): Promise<purify.Either<Error, PartialConcept>> {
     return (
       await this.conceptStubs({
         where: { identifiers: [identifier], type: "identifiers" },
@@ -8040,24 +8067,30 @@ export class $SparqlObjectSet implements $ObjectSet {
   }
 
   async conceptStubIdentifiers(
-    query?: $SparqlObjectSet.Query<ConceptStub.$Identifier>,
-  ): Promise<purify.Either<Error, readonly ConceptStub.$Identifier[]>> {
-    return this.$objectIdentifiers<ConceptStub.$Identifier>(ConceptStub, query);
+    query?: $SparqlObjectSet.Query<PartialConcept.$Identifier>,
+  ): Promise<purify.Either<Error, readonly PartialConcept.$Identifier[]>> {
+    return this.$objectIdentifiers<PartialConcept.$Identifier>(
+      PartialConcept,
+      query,
+    );
   }
 
   async conceptStubs(
-    query?: $SparqlObjectSet.Query<ConceptStub.$Identifier>,
-  ): Promise<purify.Either<Error, readonly ConceptStub[]>> {
-    return this.$objects<ConceptStub, ConceptStub.$Identifier>(
-      ConceptStub,
+    query?: $SparqlObjectSet.Query<PartialConcept.$Identifier>,
+  ): Promise<purify.Either<Error, readonly PartialConcept[]>> {
+    return this.$objects<PartialConcept, PartialConcept.$Identifier>(
+      PartialConcept,
       query,
     );
   }
 
   async conceptStubsCount(
-    query?: Pick<$SparqlObjectSet.Query<ConceptStub.$Identifier>, "where">,
+    query?: Pick<$SparqlObjectSet.Query<PartialConcept.$Identifier>, "where">,
   ): Promise<purify.Either<Error, number>> {
-    return this.$objectsCount<ConceptStub.$Identifier>(ConceptStub, query);
+    return this.$objectsCount<PartialConcept.$Identifier>(
+      PartialConcept,
+      query,
+    );
   }
 
   async label(
@@ -8089,8 +8122,8 @@ export class $SparqlObjectSet implements $ObjectSet {
   }
 
   async labelStub(
-    identifier: LabelStub.$Identifier,
-  ): Promise<purify.Either<Error, LabelStub>> {
+    identifier: PartialLabel.$Identifier,
+  ): Promise<purify.Either<Error, PartialLabel>> {
     return (
       await this.labelStubs({
         where: { identifiers: [identifier], type: "identifiers" },
@@ -8099,21 +8132,27 @@ export class $SparqlObjectSet implements $ObjectSet {
   }
 
   async labelStubIdentifiers(
-    query?: $SparqlObjectSet.Query<LabelStub.$Identifier>,
-  ): Promise<purify.Either<Error, readonly LabelStub.$Identifier[]>> {
-    return this.$objectIdentifiers<LabelStub.$Identifier>(LabelStub, query);
+    query?: $SparqlObjectSet.Query<PartialLabel.$Identifier>,
+  ): Promise<purify.Either<Error, readonly PartialLabel.$Identifier[]>> {
+    return this.$objectIdentifiers<PartialLabel.$Identifier>(
+      PartialLabel,
+      query,
+    );
   }
 
   async labelStubs(
-    query?: $SparqlObjectSet.Query<LabelStub.$Identifier>,
-  ): Promise<purify.Either<Error, readonly LabelStub[]>> {
-    return this.$objects<LabelStub, LabelStub.$Identifier>(LabelStub, query);
+    query?: $SparqlObjectSet.Query<PartialLabel.$Identifier>,
+  ): Promise<purify.Either<Error, readonly PartialLabel[]>> {
+    return this.$objects<PartialLabel, PartialLabel.$Identifier>(
+      PartialLabel,
+      query,
+    );
   }
 
   async labelStubsCount(
-    query?: Pick<$SparqlObjectSet.Query<LabelStub.$Identifier>, "where">,
+    query?: Pick<$SparqlObjectSet.Query<PartialLabel.$Identifier>, "where">,
   ): Promise<purify.Either<Error, number>> {
-    return this.$objectsCount<LabelStub.$Identifier>(LabelStub, query);
+    return this.$objectsCount<PartialLabel.$Identifier>(PartialLabel, query);
   }
 
   protected $mapBindingsToCount(

@@ -15,17 +15,17 @@
     shaclmate:tsObjectDeclarationType shaclmate:_TsObjectDeclarationType_Interface ;
     a owl:Ontology .
 
-kos-kit:ConceptSchemeStub
+kos-kit:PartialConceptScheme
     shaclmate:fromRdfType skos:ConceptScheme ;
-    shaclmate:name "ConceptSchemeStub" ;
+    shaclmate:name "PartialConceptScheme" ;
     a owl:Class, sh:NodeShape ;
-    rdfs:subClassOf kos-kit:KosResourceStub .
+    rdfs:subClassOf kos-kit:PartialKosResource .
 
-kos-kit:ConceptStub
+kos-kit:PartialConcept
     shaclmate:fromRdfType skos:Concept ;
-    shaclmate:name "ConceptStub" ;
+    shaclmate:name "PartialConcept" ;
     a owl:Class, sh:NodeShape ;
-    rdfs:subClassOf kos-kit:KosResourceStub .
+    rdfs:subClassOf kos-kit:PartialKosResource .
 
 kos-kit:KosResource
     shaclmate:abstract true ;
@@ -125,33 +125,33 @@ kos-kit:KosResource-scopeNote
     sh:path skos:scopeNote ;
     sh:xone dash:StringOrLangString .
 
-kos-kit:KosResourceStub
+kos-kit:PartialKosResource
     shaclmate:abstract true ;
-    shaclmate:name "KosResourceStub" ;
+    shaclmate:name "PartialKosResource" ;
     a owl:Class, sh:NodeShape ;
     sh:nodeKind sh:IRI ;
-    sh:property kos-kit:KosResourceStub-prefLabel, kos-kit:KosResourceStub-prefLabelXl .
+    sh:property kos-kit:PartialKosResource-prefLabel, kos-kit:PartialKosResource-prefLabelXl .
 
-kos-kit:KosResourceStub-prefLabel
+kos-kit:PartialKosResource-prefLabel
     a sh:PropertyShape ;
     sh:name "prefLabel" ;
     sh:path skos:prefLabel ;
     sh:xone dash:StringOrLangString .
 
-kos-kit:KosResourceStub-prefLabelXl
+kos-kit:PartialKosResource-prefLabelXl
     a sh:PropertyShape ;
     sh:name "prefLabelXl" ;
-    sh:node kos-kit:LabelStub ;
+    sh:node kos-kit:PartialLabel ;
     sh:path skos-xl:prefLabel .
 
-kos-kit:LabelStub
+kos-kit:PartialLabel
     shaclmate:fromRdfType skos-xl:Label ;
-    shaclmate:name "LabelStub" ;
+    shaclmate:name "PartialLabel" ;
     a owl:Class, sh:NodeShape ;
     sh:nodeKind sh:BlankNodeOrIRI ;
-    sh:property kos-kit:LabelStub-literalForm .
+    sh:property kos-kit:PartialLabel-literalForm .
 
-kos-kit:LabelStub-literalForm
+kos-kit:PartialLabel-literalForm
     a sh:PropertyShape ;
     sh:minCount 1 ;
     sh:name "literalForm" ;
@@ -172,85 +172,85 @@ skos:Concept
 skos:Concept-broadMatch
     a sh:PropertyShape ;
     sh:name "broadMatch" ;
-    sh:node kos-kit:ConceptStub ;
+    sh:node kos-kit:PartialConcept ;
     sh:path skos:broadMatch .
 
 skos:Concept-broader
     a sh:PropertyShape ;
     sh:name "broader" ;
-    sh:node kos-kit:ConceptStub ;
+    sh:node kos-kit:PartialConcept ;
     sh:path skos:broader .
 
 skos:Concept-broaderTransitive
     a sh:PropertyShape ;
     sh:name "broaderTransitive" ;
-    sh:node kos-kit:ConceptStub ;
+    sh:node kos-kit:PartialConcept ;
     sh:path skos:broaderTransitive .
 
 skos:Concept-closeMatch
     a sh:PropertyShape ;
     sh:name "closeMatch" ;
-    sh:node kos-kit:ConceptStub ;
+    sh:node kos-kit:PartialConcept ;
     sh:path skos:closeMatch .
 
 skos:Concept-exactMatch
     a sh:PropertyShape ;
     sh:name "exactMatch" ;
-    sh:node kos-kit:ConceptStub ;
+    sh:node kos-kit:PartialConcept ;
     sh:path skos:exactMatch .
 
 skos:Concept-inScheme
     a sh:PropertyShape ;
     sh:name "inScheme" ;
-    sh:node kos-kit:ConceptSchemeStub ;
+    sh:node kos-kit:PartialConceptScheme ;
     sh:path skos:inScheme .
 
 skos:Concept-mappingRelation
     a sh:PropertyShape ;
     sh:name "mappingRelation" ;
-    sh:node kos-kit:ConceptStub ;
+    sh:node kos-kit:PartialConcept ;
     sh:path skos:mappingRelation .
 
 skos:Concept-narrowMatch
     a sh:PropertyShape ;
     sh:name "narrowMatch" ;
-    sh:node kos-kit:ConceptStub ;
+    sh:node kos-kit:PartialConcept ;
     sh:path skos:narrowMatch .
 
 skos:Concept-narrower
     a sh:PropertyShape ;
     sh:name "narrower" ;
-    sh:node kos-kit:ConceptStub ;
+    sh:node kos-kit:PartialConcept ;
     sh:path skos:narrower .
 
 skos:Concept-narrowerTransitive
     a sh:PropertyShape ;
     sh:name "narrowerTransitive" ;
-    sh:node kos-kit:ConceptStub ;
+    sh:node kos-kit:PartialConcept ;
     sh:path skos:narrowerTransitive .
 
 skos:Concept-related
     a sh:PropertyShape ;
     sh:name "related" ;
-    sh:node kos-kit:ConceptStub ;
+    sh:node kos-kit:PartialConcept ;
     sh:path skos:related .
 
 skos:Concept-relatedMatch
     a sh:PropertyShape ;
     sh:name "relatedMatch" ;
-    sh:node kos-kit:ConceptStub ;
+    sh:node kos-kit:PartialConcept ;
     sh:path skos:relatedMatch .
 
 skos:Concept-semanticRelation
     a sh:PropertyShape ;
     sh:name "semanticRelation" ;
-    sh:node kos-kit:ConceptStub ;
+    sh:node kos-kit:PartialConcept ;
     sh:path skos:semanticRelation .
 
 skos:Concept-topConceptOf
     a sh:PropertyShape ;
     sh:name "topConceptOf" ;
-    sh:node kos-kit:ConceptSchemeStub ;
+    sh:node kos-kit:PartialConceptScheme ;
     sh:path skos:topConceptOf .
 
 skos:ConceptScheme
@@ -262,7 +262,7 @@ skos:ConceptScheme
 skos:ConceptScheme-hasTopConcept
     a sh:PropertyShape ;
     sh:name "hasTopConcept" ;
-    sh:node kos-kit:ConceptStub ;
+    sh:node kos-kit:PartialConcept ;
     sh:path skos:hasTopConcept .
 
 skos:ConceptScheme-license

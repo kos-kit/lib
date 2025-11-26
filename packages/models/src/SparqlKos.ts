@@ -11,11 +11,11 @@ import {
   ConceptQuery,
   ConceptScheme,
   ConceptSchemeQuery,
-  ConceptSchemeStub,
-  ConceptStub,
   Identifier,
   Kos,
   LanguageTag,
+  PartialConcept,
+  PartialConceptScheme,
   mapBindingsToCount,
   mapBindingsToIdentifiers,
 } from "./index.js";
@@ -32,8 +32,8 @@ const prefixes = {
 export class SparqlKos<
   ConceptT extends Concept = Concept,
   ConceptSchemeT extends ConceptScheme = ConceptScheme,
-  ConceptSchemeStubT extends ConceptSchemeStub = ConceptSchemeStub,
-  ConceptStubT extends ConceptStub = ConceptStub,
+  ConceptSchemeStubT extends PartialConceptScheme = PartialConceptScheme,
+  ConceptStubT extends PartialConcept = PartialConcept,
 > implements Kos<ConceptT, ConceptSchemeT, ConceptSchemeStubT, ConceptStubT>
 {
   private readonly conceptSchemeVariable: Variable;

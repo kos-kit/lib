@@ -1,16 +1,16 @@
 import {
   Concept,
-  ConceptStub,
+  PartialConcept,
   SemanticRelationProperty,
   semanticRelationProperties,
 } from "./index.js";
 
 export function semanticRelations(
   concept: Concept,
-): readonly [SemanticRelationProperty, readonly ConceptStub[]][] {
+): readonly [SemanticRelationProperty, readonly PartialConcept[]][] {
   const getSemanticallyRelatedConcepts = (
     semanticRelationProperty: SemanticRelationProperty,
-  ): readonly ConceptStub[] => {
+  ): readonly PartialConcept[] => {
     switch (semanticRelationProperty.identifier.value) {
       case "http://www.w3.org/2004/02/skos/core#broader":
         return concept.broader;
