@@ -548,13 +548,13 @@ export namespace LabelStub {
       purify.NonEmptyList<rdfjs.Literal>
     > = purify.Either.of<
       Error,
-      rdfjsResource.Resource.Values<rdfjsResource.Resource.Value>
+      rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
     >($resource.values($properties.literalForm["identifier"], { unique: true }))
       .chain((values) => {
         if (!$preferredLanguages || $preferredLanguages.length === 0) {
           return purify.Either.of<
             Error,
-            rdfjsResource.Resource.Values<rdfjsResource.Resource.Value>
+            rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
           >(values);
         }
 
@@ -587,11 +587,11 @@ export namespace LabelStub {
 
         return purify.Either.of<
           Error,
-          rdfjsResource.Resource.Values<rdfjsResource.Resource.Value>
+          rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
         >(
           filteredLiteralValues!.map(
             (literalValue) =>
-              new rdfjsResource.Resource.Value({
+              new rdfjsResource.Resource.TermValue({
                 object: literalValue,
                 predicate: LabelStub.$properties.literalForm["identifier"],
                 subject: $resource,
@@ -1199,13 +1199,13 @@ export namespace KosResourceStubStatic {
     const _prefLabelEither: purify.Either<Error, readonly rdfjs.Literal[]> =
       purify.Either.of<
         Error,
-        rdfjsResource.Resource.Values<rdfjsResource.Resource.Value>
+        rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
       >($resource.values($properties.prefLabel["identifier"], { unique: true }))
         .chain((values) => {
           if (!$preferredLanguages || $preferredLanguages.length === 0) {
             return purify.Either.of<
               Error,
-              rdfjsResource.Resource.Values<rdfjsResource.Resource.Value>
+              rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
             >(values);
           }
 
@@ -1238,11 +1238,11 @@ export namespace KosResourceStubStatic {
 
           return purify.Either.of<
             Error,
-            rdfjsResource.Resource.Values<rdfjsResource.Resource.Value>
+            rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
           >(
             filteredLiteralValues!.map(
               (literalValue) =>
-                new rdfjsResource.Resource.Value({
+                new rdfjsResource.Resource.TermValue({
                   object: literalValue,
                   predicate:
                     KosResourceStubStatic.$properties.prefLabel["identifier"],
@@ -1270,7 +1270,7 @@ export namespace KosResourceStubStatic {
     const _prefLabelXlEither: purify.Either<Error, readonly LabelStub[]> =
       purify.Either.of<
         Error,
-        rdfjsResource.Resource.Values<rdfjsResource.Resource.Value>
+        rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
       >(
         $resource.values($properties.prefLabelXl["identifier"], {
           unique: true,
@@ -1841,13 +1841,13 @@ export namespace KosResourceStatic {
     const _altLabelEither: purify.Either<Error, readonly rdfjs.Literal[]> =
       purify.Either.of<
         Error,
-        rdfjsResource.Resource.Values<rdfjsResource.Resource.Value>
+        rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
       >($resource.values($properties.altLabel["identifier"], { unique: true }))
         .chain((values) => {
           if (!$preferredLanguages || $preferredLanguages.length === 0) {
             return purify.Either.of<
               Error,
-              rdfjsResource.Resource.Values<rdfjsResource.Resource.Value>
+              rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
             >(values);
           }
 
@@ -1880,11 +1880,11 @@ export namespace KosResourceStatic {
 
           return purify.Either.of<
             Error,
-            rdfjsResource.Resource.Values<rdfjsResource.Resource.Value>
+            rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
           >(
             filteredLiteralValues!.map(
               (literalValue) =>
-                new rdfjsResource.Resource.Value({
+                new rdfjsResource.Resource.TermValue({
                   object: literalValue,
                   predicate:
                     KosResourceStatic.$properties.altLabel["identifier"],
@@ -1911,7 +1911,7 @@ export namespace KosResourceStatic {
     const _altLabelXlEither: purify.Either<Error, readonly Label[]> =
       purify.Either.of<
         Error,
-        rdfjsResource.Resource.Values<rdfjsResource.Resource.Value>
+        rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
       >(
         $resource.values($properties.altLabelXl["identifier"], {
           unique: true,
@@ -1946,7 +1946,7 @@ export namespace KosResourceStatic {
     const _changeNoteEither: purify.Either<Error, readonly rdfjs.Literal[]> =
       purify.Either.of<
         Error,
-        rdfjsResource.Resource.Values<rdfjsResource.Resource.Value>
+        rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
       >(
         $resource.values($properties.changeNote["identifier"], {
           unique: true,
@@ -1956,7 +1956,7 @@ export namespace KosResourceStatic {
           if (!$preferredLanguages || $preferredLanguages.length === 0) {
             return purify.Either.of<
               Error,
-              rdfjsResource.Resource.Values<rdfjsResource.Resource.Value>
+              rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
             >(values);
           }
 
@@ -1989,11 +1989,11 @@ export namespace KosResourceStatic {
 
           return purify.Either.of<
             Error,
-            rdfjsResource.Resource.Values<rdfjsResource.Resource.Value>
+            rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
           >(
             filteredLiteralValues!.map(
               (literalValue) =>
-                new rdfjsResource.Resource.Value({
+                new rdfjsResource.Resource.TermValue({
                   object: literalValue,
                   predicate:
                     KosResourceStatic.$properties.changeNote["identifier"],
@@ -2020,7 +2020,7 @@ export namespace KosResourceStatic {
     const _definitionEither: purify.Either<Error, readonly rdfjs.Literal[]> =
       purify.Either.of<
         Error,
-        rdfjsResource.Resource.Values<rdfjsResource.Resource.Value>
+        rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
       >(
         $resource.values($properties.definition["identifier"], {
           unique: true,
@@ -2030,7 +2030,7 @@ export namespace KosResourceStatic {
           if (!$preferredLanguages || $preferredLanguages.length === 0) {
             return purify.Either.of<
               Error,
-              rdfjsResource.Resource.Values<rdfjsResource.Resource.Value>
+              rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
             >(values);
           }
 
@@ -2063,11 +2063,11 @@ export namespace KosResourceStatic {
 
           return purify.Either.of<
             Error,
-            rdfjsResource.Resource.Values<rdfjsResource.Resource.Value>
+            rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
           >(
             filteredLiteralValues!.map(
               (literalValue) =>
-                new rdfjsResource.Resource.Value({
+                new rdfjsResource.Resource.TermValue({
                   object: literalValue,
                   predicate:
                     KosResourceStatic.$properties.definition["identifier"],
@@ -2094,7 +2094,7 @@ export namespace KosResourceStatic {
     const _editorialNoteEither: purify.Either<Error, readonly rdfjs.Literal[]> =
       purify.Either.of<
         Error,
-        rdfjsResource.Resource.Values<rdfjsResource.Resource.Value>
+        rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
       >(
         $resource.values($properties.editorialNote["identifier"], {
           unique: true,
@@ -2104,7 +2104,7 @@ export namespace KosResourceStatic {
           if (!$preferredLanguages || $preferredLanguages.length === 0) {
             return purify.Either.of<
               Error,
-              rdfjsResource.Resource.Values<rdfjsResource.Resource.Value>
+              rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
             >(values);
           }
 
@@ -2137,11 +2137,11 @@ export namespace KosResourceStatic {
 
           return purify.Either.of<
             Error,
-            rdfjsResource.Resource.Values<rdfjsResource.Resource.Value>
+            rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
           >(
             filteredLiteralValues!.map(
               (literalValue) =>
-                new rdfjsResource.Resource.Value({
+                new rdfjsResource.Resource.TermValue({
                   object: literalValue,
                   predicate:
                     KosResourceStatic.$properties.editorialNote["identifier"],
@@ -2169,13 +2169,13 @@ export namespace KosResourceStatic {
     const _exampleEither: purify.Either<Error, readonly rdfjs.Literal[]> =
       purify.Either.of<
         Error,
-        rdfjsResource.Resource.Values<rdfjsResource.Resource.Value>
+        rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
       >($resource.values($properties.example["identifier"], { unique: true }))
         .chain((values) => {
           if (!$preferredLanguages || $preferredLanguages.length === 0) {
             return purify.Either.of<
               Error,
-              rdfjsResource.Resource.Values<rdfjsResource.Resource.Value>
+              rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
             >(values);
           }
 
@@ -2208,11 +2208,11 @@ export namespace KosResourceStatic {
 
           return purify.Either.of<
             Error,
-            rdfjsResource.Resource.Values<rdfjsResource.Resource.Value>
+            rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
           >(
             filteredLiteralValues!.map(
               (literalValue) =>
-                new rdfjsResource.Resource.Value({
+                new rdfjsResource.Resource.TermValue({
                   object: literalValue,
                   predicate:
                     KosResourceStatic.$properties.example["identifier"],
@@ -2239,7 +2239,7 @@ export namespace KosResourceStatic {
     const _hiddenLabelEither: purify.Either<Error, readonly rdfjs.Literal[]> =
       purify.Either.of<
         Error,
-        rdfjsResource.Resource.Values<rdfjsResource.Resource.Value>
+        rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
       >(
         $resource.values($properties.hiddenLabel["identifier"], {
           unique: true,
@@ -2249,7 +2249,7 @@ export namespace KosResourceStatic {
           if (!$preferredLanguages || $preferredLanguages.length === 0) {
             return purify.Either.of<
               Error,
-              rdfjsResource.Resource.Values<rdfjsResource.Resource.Value>
+              rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
             >(values);
           }
 
@@ -2282,11 +2282,11 @@ export namespace KosResourceStatic {
 
           return purify.Either.of<
             Error,
-            rdfjsResource.Resource.Values<rdfjsResource.Resource.Value>
+            rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
           >(
             filteredLiteralValues!.map(
               (literalValue) =>
-                new rdfjsResource.Resource.Value({
+                new rdfjsResource.Resource.TermValue({
                   object: literalValue,
                   predicate:
                     KosResourceStatic.$properties.hiddenLabel["identifier"],
@@ -2313,7 +2313,7 @@ export namespace KosResourceStatic {
     const _hiddenLabelXlEither: purify.Either<Error, readonly Label[]> =
       purify.Either.of<
         Error,
-        rdfjsResource.Resource.Values<rdfjsResource.Resource.Value>
+        rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
       >(
         $resource.values($properties.hiddenLabelXl["identifier"], {
           unique: true,
@@ -2349,7 +2349,7 @@ export namespace KosResourceStatic {
     const _historyNoteEither: purify.Either<Error, readonly rdfjs.Literal[]> =
       purify.Either.of<
         Error,
-        rdfjsResource.Resource.Values<rdfjsResource.Resource.Value>
+        rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
       >(
         $resource.values($properties.historyNote["identifier"], {
           unique: true,
@@ -2359,7 +2359,7 @@ export namespace KosResourceStatic {
           if (!$preferredLanguages || $preferredLanguages.length === 0) {
             return purify.Either.of<
               Error,
-              rdfjsResource.Resource.Values<rdfjsResource.Resource.Value>
+              rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
             >(values);
           }
 
@@ -2392,11 +2392,11 @@ export namespace KosResourceStatic {
 
           return purify.Either.of<
             Error,
-            rdfjsResource.Resource.Values<rdfjsResource.Resource.Value>
+            rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
           >(
             filteredLiteralValues!.map(
               (literalValue) =>
-                new rdfjsResource.Resource.Value({
+                new rdfjsResource.Resource.TermValue({
                   object: literalValue,
                   predicate:
                     KosResourceStatic.$properties.historyNote["identifier"],
@@ -2425,7 +2425,7 @@ export namespace KosResourceStatic {
       purify.Maybe<Date>
     > = purify.Either.of<
       Error,
-      rdfjsResource.Resource.Values<rdfjsResource.Resource.Value>
+      rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
     >($resource.values($properties.modified["identifier"], { unique: true }))
       .chain((values) => values.chainMap((value) => value.toDate()))
       .map((values) =>
@@ -2446,13 +2446,13 @@ export namespace KosResourceStatic {
     const _notationEither: purify.Either<Error, readonly rdfjs.Literal[]> =
       purify.Either.of<
         Error,
-        rdfjsResource.Resource.Values<rdfjsResource.Resource.Value>
+        rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
       >($resource.values($properties.notation["identifier"], { unique: true }))
         .chain((values) => {
           if (!$preferredLanguages || $preferredLanguages.length === 0) {
             return purify.Either.of<
               Error,
-              rdfjsResource.Resource.Values<rdfjsResource.Resource.Value>
+              rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
             >(values);
           }
 
@@ -2485,11 +2485,11 @@ export namespace KosResourceStatic {
 
           return purify.Either.of<
             Error,
-            rdfjsResource.Resource.Values<rdfjsResource.Resource.Value>
+            rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
           >(
             filteredLiteralValues!.map(
               (literalValue) =>
-                new rdfjsResource.Resource.Value({
+                new rdfjsResource.Resource.TermValue({
                   object: literalValue,
                   predicate:
                     KosResourceStatic.$properties.notation["identifier"],
@@ -2516,13 +2516,13 @@ export namespace KosResourceStatic {
     const _noteEither: purify.Either<Error, readonly rdfjs.Literal[]> =
       purify.Either.of<
         Error,
-        rdfjsResource.Resource.Values<rdfjsResource.Resource.Value>
+        rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
       >($resource.values($properties.note["identifier"], { unique: true }))
         .chain((values) => {
           if (!$preferredLanguages || $preferredLanguages.length === 0) {
             return purify.Either.of<
               Error,
-              rdfjsResource.Resource.Values<rdfjsResource.Resource.Value>
+              rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
             >(values);
           }
 
@@ -2555,11 +2555,11 @@ export namespace KosResourceStatic {
 
           return purify.Either.of<
             Error,
-            rdfjsResource.Resource.Values<rdfjsResource.Resource.Value>
+            rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
           >(
             filteredLiteralValues!.map(
               (literalValue) =>
-                new rdfjsResource.Resource.Value({
+                new rdfjsResource.Resource.TermValue({
                   object: literalValue,
                   predicate: KosResourceStatic.$properties.note["identifier"],
                   subject: $resource,
@@ -2585,13 +2585,13 @@ export namespace KosResourceStatic {
     const _prefLabelEither: purify.Either<Error, readonly rdfjs.Literal[]> =
       purify.Either.of<
         Error,
-        rdfjsResource.Resource.Values<rdfjsResource.Resource.Value>
+        rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
       >($resource.values($properties.prefLabel["identifier"], { unique: true }))
         .chain((values) => {
           if (!$preferredLanguages || $preferredLanguages.length === 0) {
             return purify.Either.of<
               Error,
-              rdfjsResource.Resource.Values<rdfjsResource.Resource.Value>
+              rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
             >(values);
           }
 
@@ -2624,11 +2624,11 @@ export namespace KosResourceStatic {
 
           return purify.Either.of<
             Error,
-            rdfjsResource.Resource.Values<rdfjsResource.Resource.Value>
+            rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
           >(
             filteredLiteralValues!.map(
               (literalValue) =>
-                new rdfjsResource.Resource.Value({
+                new rdfjsResource.Resource.TermValue({
                   object: literalValue,
                   predicate:
                     KosResourceStatic.$properties.prefLabel["identifier"],
@@ -2655,7 +2655,7 @@ export namespace KosResourceStatic {
     const _prefLabelXlEither: purify.Either<Error, readonly Label[]> =
       purify.Either.of<
         Error,
-        rdfjsResource.Resource.Values<rdfjsResource.Resource.Value>
+        rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
       >(
         $resource.values($properties.prefLabelXl["identifier"], {
           unique: true,
@@ -2690,13 +2690,13 @@ export namespace KosResourceStatic {
     const _scopeNoteEither: purify.Either<Error, readonly rdfjs.Literal[]> =
       purify.Either.of<
         Error,
-        rdfjsResource.Resource.Values<rdfjsResource.Resource.Value>
+        rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
       >($resource.values($properties.scopeNote["identifier"], { unique: true }))
         .chain((values) => {
           if (!$preferredLanguages || $preferredLanguages.length === 0) {
             return purify.Either.of<
               Error,
-              rdfjsResource.Resource.Values<rdfjsResource.Resource.Value>
+              rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
             >(values);
           }
 
@@ -2729,11 +2729,11 @@ export namespace KosResourceStatic {
 
           return purify.Either.of<
             Error,
-            rdfjsResource.Resource.Values<rdfjsResource.Resource.Value>
+            rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
           >(
             filteredLiteralValues!.map(
               (literalValue) =>
-                new rdfjsResource.Resource.Value({
+                new rdfjsResource.Resource.TermValue({
                   object: literalValue,
                   predicate:
                     KosResourceStatic.$properties.scopeNote["identifier"],
@@ -4016,7 +4016,7 @@ export namespace ConceptScheme {
     const _hasTopConceptEither: purify.Either<Error, readonly ConceptStub[]> =
       purify.Either.of<
         Error,
-        rdfjsResource.Resource.Values<rdfjsResource.Resource.Value>
+        rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
       >(
         $resource.values($properties.hasTopConcept["identifier"], {
           unique: true,
@@ -4053,7 +4053,7 @@ export namespace ConceptScheme {
       purify.Maybe<rdfjs.NamedNode | rdfjs.Literal>
     > = purify.Either.of<
       Error,
-      rdfjsResource.Resource.Values<rdfjsResource.Resource.Value>
+      rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
     >($resource.values($properties.license["identifier"], { unique: true }))
       .chain((values) =>
         values.chainMap((value) =>
@@ -4102,13 +4102,13 @@ export namespace ConceptScheme {
       purify.Maybe<rdfjs.Literal>
     > = purify.Either.of<
       Error,
-      rdfjsResource.Resource.Values<rdfjsResource.Resource.Value>
+      rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
     >($resource.values($properties.rights["identifier"], { unique: true }))
       .chain((values) => {
         if (!$preferredLanguages || $preferredLanguages.length === 0) {
           return purify.Either.of<
             Error,
-            rdfjsResource.Resource.Values<rdfjsResource.Resource.Value>
+            rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
           >(values);
         }
 
@@ -4141,11 +4141,11 @@ export namespace ConceptScheme {
 
         return purify.Either.of<
           Error,
-          rdfjsResource.Resource.Values<rdfjsResource.Resource.Value>
+          rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
         >(
           filteredLiteralValues!.map(
             (literalValue) =>
-              new rdfjsResource.Resource.Value({
+              new rdfjsResource.Resource.TermValue({
                 object: literalValue,
                 predicate: ConceptScheme.$properties.rights["identifier"],
                 subject: $resource,
@@ -4176,7 +4176,7 @@ export namespace ConceptScheme {
       purify.Maybe<rdfjs.Literal>
     > = purify.Either.of<
       Error,
-      rdfjsResource.Resource.Values<rdfjsResource.Resource.Value>
+      rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
     >(
       $resource.values($properties.rightsHolder["identifier"], {
         unique: true,
@@ -4186,7 +4186,7 @@ export namespace ConceptScheme {
         if (!$preferredLanguages || $preferredLanguages.length === 0) {
           return purify.Either.of<
             Error,
-            rdfjsResource.Resource.Values<rdfjsResource.Resource.Value>
+            rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
           >(values);
         }
 
@@ -4219,11 +4219,11 @@ export namespace ConceptScheme {
 
         return purify.Either.of<
           Error,
-          rdfjsResource.Resource.Values<rdfjsResource.Resource.Value>
+          rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
         >(
           filteredLiteralValues!.map(
             (literalValue) =>
-              new rdfjsResource.Resource.Value({
+              new rdfjsResource.Resource.TermValue({
                 object: literalValue,
                 predicate: ConceptScheme.$properties.rightsHolder["identifier"],
                 subject: $resource,
@@ -5789,7 +5789,7 @@ export namespace Concept {
     const _broaderEither: purify.Either<Error, readonly ConceptStub[]> =
       purify.Either.of<
         Error,
-        rdfjsResource.Resource.Values<rdfjsResource.Resource.Value>
+        rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
       >($resource.values($properties.broader["identifier"], { unique: true }))
         .chain((values) =>
           values.chainMap((value) =>
@@ -5822,7 +5822,7 @@ export namespace Concept {
       readonly ConceptStub[]
     > = purify.Either.of<
       Error,
-      rdfjsResource.Resource.Values<rdfjsResource.Resource.Value>
+      rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
     >(
       $resource.values($properties.broaderTransitive["identifier"], {
         unique: true,
@@ -5857,7 +5857,7 @@ export namespace Concept {
     const _broadMatchEither: purify.Either<Error, readonly ConceptStub[]> =
       purify.Either.of<
         Error,
-        rdfjsResource.Resource.Values<rdfjsResource.Resource.Value>
+        rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
       >(
         $resource.values($properties.broadMatch["identifier"], {
           unique: true,
@@ -5892,7 +5892,7 @@ export namespace Concept {
     const _closeMatchEither: purify.Either<Error, readonly ConceptStub[]> =
       purify.Either.of<
         Error,
-        rdfjsResource.Resource.Values<rdfjsResource.Resource.Value>
+        rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
       >(
         $resource.values($properties.closeMatch["identifier"], {
           unique: true,
@@ -5927,7 +5927,7 @@ export namespace Concept {
     const _exactMatchEither: purify.Either<Error, readonly ConceptStub[]> =
       purify.Either.of<
         Error,
-        rdfjsResource.Resource.Values<rdfjsResource.Resource.Value>
+        rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
       >(
         $resource.values($properties.exactMatch["identifier"], {
           unique: true,
@@ -5962,7 +5962,7 @@ export namespace Concept {
     const _inSchemeEither: purify.Either<Error, readonly ConceptSchemeStub[]> =
       purify.Either.of<
         Error,
-        rdfjsResource.Resource.Values<rdfjsResource.Resource.Value>
+        rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
       >($resource.values($properties.inScheme["identifier"], { unique: true }))
         .chain((values) =>
           values.chainMap((value) =>
@@ -5993,7 +5993,7 @@ export namespace Concept {
     const _mappingRelationEither: purify.Either<Error, readonly ConceptStub[]> =
       purify.Either.of<
         Error,
-        rdfjsResource.Resource.Values<rdfjsResource.Resource.Value>
+        rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
       >(
         $resource.values($properties.mappingRelation["identifier"], {
           unique: true,
@@ -6028,7 +6028,7 @@ export namespace Concept {
     const _narrowerEither: purify.Either<Error, readonly ConceptStub[]> =
       purify.Either.of<
         Error,
-        rdfjsResource.Resource.Values<rdfjsResource.Resource.Value>
+        rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
       >($resource.values($properties.narrower["identifier"], { unique: true }))
         .chain((values) =>
           values.chainMap((value) =>
@@ -6061,7 +6061,7 @@ export namespace Concept {
       readonly ConceptStub[]
     > = purify.Either.of<
       Error,
-      rdfjsResource.Resource.Values<rdfjsResource.Resource.Value>
+      rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
     >(
       $resource.values($properties.narrowerTransitive["identifier"], {
         unique: true,
@@ -6096,7 +6096,7 @@ export namespace Concept {
     const _narrowMatchEither: purify.Either<Error, readonly ConceptStub[]> =
       purify.Either.of<
         Error,
-        rdfjsResource.Resource.Values<rdfjsResource.Resource.Value>
+        rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
       >(
         $resource.values($properties.narrowMatch["identifier"], {
           unique: true,
@@ -6131,7 +6131,7 @@ export namespace Concept {
     const _relatedEither: purify.Either<Error, readonly ConceptStub[]> =
       purify.Either.of<
         Error,
-        rdfjsResource.Resource.Values<rdfjsResource.Resource.Value>
+        rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
       >($resource.values($properties.related["identifier"], { unique: true }))
         .chain((values) =>
           values.chainMap((value) =>
@@ -6162,7 +6162,7 @@ export namespace Concept {
     const _relatedMatchEither: purify.Either<Error, readonly ConceptStub[]> =
       purify.Either.of<
         Error,
-        rdfjsResource.Resource.Values<rdfjsResource.Resource.Value>
+        rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
       >(
         $resource.values($properties.relatedMatch["identifier"], {
           unique: true,
@@ -6199,7 +6199,7 @@ export namespace Concept {
       readonly ConceptStub[]
     > = purify.Either.of<
       Error,
-      rdfjsResource.Resource.Values<rdfjsResource.Resource.Value>
+      rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
     >(
       $resource.values($properties.semanticRelation["identifier"], {
         unique: true,
@@ -6236,7 +6236,7 @@ export namespace Concept {
       readonly ConceptSchemeStub[]
     > = purify.Either.of<
       Error,
-      rdfjsResource.Resource.Values<rdfjsResource.Resource.Value>
+      rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
     >(
       $resource.values($properties.topConceptOf["identifier"], {
         unique: true,
@@ -7278,13 +7278,13 @@ export namespace Label {
       purify.NonEmptyList<rdfjs.Literal>
     > = purify.Either.of<
       Error,
-      rdfjsResource.Resource.Values<rdfjsResource.Resource.Value>
+      rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
     >($resource.values($properties.literalForm["identifier"], { unique: true }))
       .chain((values) => {
         if (!$preferredLanguages || $preferredLanguages.length === 0) {
           return purify.Either.of<
             Error,
-            rdfjsResource.Resource.Values<rdfjsResource.Resource.Value>
+            rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
           >(values);
         }
 
@@ -7317,11 +7317,11 @@ export namespace Label {
 
         return purify.Either.of<
           Error,
-          rdfjsResource.Resource.Values<rdfjsResource.Resource.Value>
+          rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
         >(
           filteredLiteralValues!.map(
             (literalValue) =>
-              new rdfjsResource.Resource.Value({
+              new rdfjsResource.Resource.TermValue({
                 object: literalValue,
                 predicate: Label.$properties.literalForm["identifier"],
                 subject: $resource,

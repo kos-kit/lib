@@ -31,7 +31,7 @@ const externalDependencyVersions = {
   n3: { n3: "^1.26.0" },
   rimraf: { rimraf: "^6.0.1" },
   "purify-ts": { "purify-ts": "~2.1.0" },
-  "rdfjs-resource": { "rdfjs-resource": "1.0.24" },
+  "rdfjs-resource": { "rdfjs-resource": "1.0.25" },
   typescript: { typescript: "5.8.2" },
   vitest: { vitest: "^3.2.4" },
 };
@@ -41,7 +41,6 @@ const packages: readonly Package[] = [
     externalDependencies: {
       ...externalDependencyVersions["@rdfjs/term-set"],
       ...externalDependencyVersions["@rdfjs/types"],
-      "@shaclmate/runtime": "3.0.3",
       ...externalDependencyVersions["@tpluscode/rdf-ns-builders"],
       ...externalDependencyVersions["@types/rdfjs__term-set"],
       ...externalDependencyVersions["purify-ts"],
