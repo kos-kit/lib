@@ -87,6 +87,7 @@ for (const package_ of packages) {
     for (const fileNameGlob of ["*.js", "*.d.ts", "*.ttl"]) {
       files.add(
         path.join(
+          "dist",
           path.relative(packageDirectoryPath, dirent.parentPath),
           fileNameGlob,
         ),
@@ -115,9 +116,14 @@ for (const package_ of packages) {
           ...externalDependencyVersions["@vitest/coverage-v8"],
         },
         files: [...files].sort(),
-        main: "index.js",
+        main: "./dist/index.js",
         license: "Apache-2.0",
         name: `@kos-kit/${package_.name}`,
+        packageManager: "npm@10.9.0",
+        repository: {
+          type: "git",
+          url: "git+https://github.com/kos-kit/lib",
+        },
         scripts: {
           build: "tsc -b",
           "build:noEmit": "tsc --noEmit",
@@ -135,12 +141,8 @@ for (const package_ of packages) {
           "test:watch": "vitest watch",
           unlink: `npm unlink -g @kos-kit/${package_.name}`,
         },
-        repository: {
-          type: "git",
-          url: "git+https://github.com/kos-kit/lib",
-        },
         type: "module",
-        types: "index.d.ts",
+        types: "./dist/index.d.ts",
         version: VERSION,
       },
       undefined,

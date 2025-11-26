@@ -1,8 +1,5 @@
 coverage/
-*.d.ts
-*.d.ts.map
-*.js
-*.js.map
+dist/
 node_modules/
 tsconfig.tsbuildinfo
 .vscode/
