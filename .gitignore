@@ -2,4 +2,5 @@ coverage/
 dist/
 node_modules/
 tsconfig.tsbuildinfo
+.turbo/
 .vscode/
