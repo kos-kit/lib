@@ -6,7 +6,14 @@
   },
   "devDependencies": {
     "oxigraph": "0.4.7",
-    "vitest-fetch-mock": "^0.3.0"
+    "vitest-fetch-mock": "^0.3.0",
+    "@biomejs/biome": "1.9.4",
+    "@tsconfig/strictest": "^2.0.5",
+    "depcheck": "^1.4.7",
+    "rimraf": "^6.0.1",
+    "typescript": "5.8.2",
+    "vitest": "^3.2.4",
+    "@vitest/coverage-v8": "^3.2.4"
   },
   "files": [
     "*.d.ts",
@@ -18,24 +25,19 @@
   "name": "@kos-kit/sparql-client",
   "scripts": {
     "build": "tsc -b",
+    "build:noEmit": "tsc --noEmit",
     "check": "biome check",
     "check:write": "biome check --write",
     "check:write:unsafe": "biome check --write --unsafe",
     "clean": "rimraf -g **/*.d.ts* **/*.js **/*.js.map tsconfig.tsbuildinfo",
-    "format": "biome format",
-    "format:write": "biome format --write",
-    "format:write:unsafe": "biome format --write --unsafe",
-    "rebuild": "run-s clean build",
+    "depcheck": "depcheck .",
+    "dev": "tsc -w --preserveWatchOutput",
+    "dev:noEmit": "tsc --noEmit -w --preserveWatchOutput",
     "link-dependencies": "npm link rdfjs-resource",
-    "lint": "biome lint",
-    "lint:write": "biome lint --write",
-    "lint:write:unsafe": "biome lint --write --unsafe",
     "test": "biome check && vitest run",
     "test:coverage": "biome check && vitest run --coverage",
     "test:watch": "vitest watch",
-    "unlink": "npm unlink -g @kos-kit/sparql-client",
-    "watch": "tsc -w --preserveWatchOutput",
-    "watch:noEmit": "tsc -w --noEmit --preserveWatchOutput"
+    "unlink": "npm unlink -g @kos-kit/sparql-client"
   },
   "repository": {
     "type": "git",

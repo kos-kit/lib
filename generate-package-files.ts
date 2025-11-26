@@ -6,7 +6,7 @@ import { stringify as stringifyYaml } from "yaml";
 
 const VERSION = "2.0.116";
 
-type PackageName = "models" | "next-utils" | "search" | "sparql-client";
+type PackageName = "models" | "sparql-client";
 
 interface Package {
   devDependencies?: Record<string, string>;
@@ -17,15 +17,22 @@ interface Package {
 }
 
 const externalDependencyVersions = {
+  "@biomejs/biome": { "@biomejs/biome": "1.9.4" },
   "@rdfjs/term-set": { "@rdfjs/term-set": "^2.0.3" },
   "@rdfjs/types": { "@rdfjs/types": "^1.1.0" },
+  "@tsconfig/strictest": { "@tsconfig/strictest": "^2.0.5" },
   "@tpluscode/rdf-ns-builders": { "@tpluscode/rdf-ns-builders": "^4.3.0" },
   "@types/n3": { "@types/n3": "^1.26.0" },
   "@types/rdfjs__term-set": { "@types/rdfjs__term-set": "^2.0.9" },
+  "@vitest/coverage-v8": { "@vitest/coverage-v8": "^3.2.4" },
+  depcheck: { depcheck: "^1.4.7" },
   oxigraph: { oxigraph: "0.4.7" },
   n3: { n3: "^1.26.0" },
+  rimraf: { rimraf: "^6.0.1" },
   "purify-ts": { "purify-ts": "~2.1.0" },
   "rdfjs-resource": { "rdfjs-resource": "1.0.24" },
+  typescript: { typescript: "5.8.2" },
+  vitest: { vitest: "^3.2.4" },
 };
 
 const packages: readonly Package[] = [
@@ -41,34 +48,6 @@ const packages: readonly Package[] = [
     },
     internalDependencies: ["sparql-client"],
     name: "models",
-  },
-  {
-    externalDependencies: {
-      ...externalDependencyVersions["@rdfjs/types"],
-      ...externalDependencyVersions["@types/n3"],
-      "@types/npmcli__promise-spawn": "6.0.3",
-      "@types/unbzip2-stream": "^1.4.3",
-      "base-x": "^3.0.9",
-      envalid: "^8.0.0",
-      "jsonld-streaming-parser": "^3.4.0",
-      mime: "^4.0.4",
-      "@npmcli/promise-spawn": "^8.0.0",
-      ...externalDependencyVersions["n3"],
-      ...externalDependencyVersions["purify-ts"],
-      "unbzip2-stream": "^1.4.3",
-    },
-    name: "next-utils",
-  },
-  {
-    externalDependencies: {
-      ...externalDependencyVersions["@rdfjs/types"],
-      "@types/lunr": "^2.3.7",
-      lunr: "^2.3.9",
-      ...externalDependencyVersions["purify-ts"],
-      ...externalDependencyVersions["rdfjs-resource"],
-    },
-    internalDependencies: ["models"],
-    name: "search",
   },
   {
     devDependencies: {
@@ -125,32 +104,36 @@ for (const package_ of packages) {
           ...internalDependencies,
           ...package_.externalDependencies,
         },
-        devDependencies: package_.devDependencies,
+        devDependencies: {
+          ...package_.devDependencies,
+          ...externalDependencyVersions["@biomejs/biome"],
+          ...externalDependencyVersions["@tsconfig/strictest"],
+          ...externalDependencyVersions["depcheck"],
+          ...externalDependencyVersions["rimraf"],
+          ...externalDependencyVersions["typescript"],
+          ...externalDependencyVersions["vitest"],
+          ...externalDependencyVersions["@vitest/coverage-v8"],
+        },
         files: [...files].sort(),
         main: "index.js",
         license: "Apache-2.0",
         name: `@kos-kit/${package_.name}`,
         scripts: {
           build: "tsc -b",
+          "build:noEmit": "tsc --noEmit",
           check: "biome check",
           "check:write": "biome check --write",
           "check:write:unsafe": "biome check --write --unsafe",
           clean:
             "rimraf -g **/*.d.ts* **/*.js **/*.js.map tsconfig.tsbuildinfo",
-          format: "biome format",
-          "format:write": "biome format --write",
-          "format:write:unsafe": "biome format --write --unsafe",
-          rebuild: "run-s clean build",
+          depcheck: "depcheck .",
+          dev: "tsc -w --preserveWatchOutput",
+          "dev:noEmit": "tsc --noEmit -w --preserveWatchOutput",
           "link-dependencies": "npm link rdfjs-resource",
-          lint: "biome lint",
-          "lint:write": "biome lint --write",
-          "lint:write:unsafe": "biome lint --write --unsafe",
           test: "biome check && vitest run",
           "test:coverage": "biome check && vitest run --coverage",
           "test:watch": "vitest watch",
           unlink: `npm unlink -g @kos-kit/${package_.name}`,
-          watch: "tsc -w --preserveWatchOutput",
-          "watch:noEmit": "tsc -w --noEmit --preserveWatchOutput",
         },
         repository: {
           type: "git",
@@ -165,7 +148,7 @@ for (const package_ of packages) {
     )}\n`,
   );
 
-  for (const fileName of ["biome.json", "LICENSE", "tsconfig.json"]) {
+  for (const fileName of ["biome.json", "LICENSE"]) {
     // const rootFilePath = path.resolve(__dirname, fileName);
     const packageFilePath = path.resolve(packageDirectoryPath, fileName);
     if (fs.existsSync(packageFilePath)) {
@@ -173,6 +156,53 @@ for (const package_ of packages) {
     }
     fs.symlinkSync(`../../${fileName}`, packageFilePath);
   }
+
+  fs.writeFileSync(
+    path.resolve(packageDirectoryPath, "tsconfig.json"),
+    JSON.stringify(
+      {
+        compilerOptions: {
+          baseUrl: "src",
+          declaration: true,
+          declarationMap: true,
+          exactOptionalPropertyTypes: false,
+          experimentalDecorators: true,
+          forceConsistentCasingInFileNames: true,
+          incremental: true,
+          noUncheckedIndexedAccess: false,
+          outDir: "dist",
+          sourceMap: true,
+        },
+        extends: ["@tsconfig/strictest/tsconfig.json"],
+        include: ["src/**/*.ts"],
+      },
+      undefined,
+      2,
+    ),
+  );
+
+  fs.writeFileSync(
+    path.join(packageDirectoryPath, "__tests__", "tsconfig.json"),
+    JSON.stringify(
+      {
+        compilerOptions: {
+          baseUrl: ".",
+          exactOptionalPropertyTypes: false,
+          experimentalDecorators: true,
+          forceConsistentCasingInFileNames: true,
+          noEmit: true,
+          noUncheckedIndexedAccess: false,
+        },
+        extends: [
+          "@tsconfig/strictest/tsconfig.json",
+          "@tsconfig/node18/tsconfig.json",
+        ],
+        include: ["./**/*.ts"],
+      },
+      undefined,
+      2,
+    ),
+  );
 }
 
 // Root package.json
@@ -181,55 +211,33 @@ fs.writeFileSync(
   `${JSON.stringify(
     {
       devDependencies: {
-        "@biomejs/biome": "1.9.4",
-        "@tsconfig/strictest": "^2.0.5",
-        "@types/node": "^22",
-        "@vitest/coverage-v8": "^2.0.5",
-        "npm-run-all": "^4.1.5",
-        rimraf: "^6.0.1",
         tsx: "^4.16.2",
-        typescript: "~5.6",
-        vitest: "^2.0.5",
+        turbo: "^2.5.5",
         yaml: "^2.5.0",
       },
-      name: "@kos-kit/lib",
+      name: "shaclmate",
       optionalDependencies: {
         "@biomejs/cli-linux-x64": "1.9.4",
         "@rollup/rollup-linux-x64-gnu": "4.24.0",
       },
+      packageManager: "npm@10.9.0",
       private: true,
       scripts: {
-        build: "npm run build --workspaces",
-        check: "npm run check --workspaces",
-        "check:write": "npm run check:write --workspaces",
-        "check:write:unsafe": "npm run check:write --workspaces",
-        clean: "npm run clean --workspaces",
-        "generate-package-files": "tsx generate-package-files.ts",
+        build: "turbo run build",
+        "build:packages": 'turbo run --filter "./packages/*" build',
+        "build:noEmit": "turbo run build:noEmit",
+        check: "biome check",
+        "check:write": "biome check --write",
+        "check:write:unsafe": "biome check --write --unsafe",
+        clean: "turbo run clean",
+        depcheck: "turbo run depcheck",
+        dev: "turbo run dev dev:tests",
+        "dev:noEmit": "turbo run dev:noEmit dev:tests",
         link: "npm link --workspaces",
-        "link-dependencies": "npm run link-dependencies --workspaces",
-        lint: "npm run lint --workspaces",
-        rebuild: "npm run rebuild --workspaces",
-        test: "npm run test --if-present --workspaces",
-        "test:coverage": "npm run test:coverage --if-present --workspaces",
-        unlink: "npm run unlink --workspaces",
-        watch: "run-p watch:*",
-        ...packages.reduce(
-          (watchEntries, package_) => {
-            watchEntries[`watch:${package_.name}`] =
-              `npm run watch -w @kos-kit/${package_.name}`;
-            return watchEntries;
-          },
-          {} as Record<string, string>,
-        ),
-        "watch:noEmit": "run-p watch:noEmit:*",
-        ...packages.reduce(
-          (watchEntries, package_) => {
-            watchEntries[`watch:noEmit:${package_.name}`] =
-              `npm run watch:noEmit -w @kos-kit/${package_.name}`;
-            return watchEntries;
-          },
-          {} as Record<string, string>,
-        ),
+        "link-dependencies": "turbo run link-dependencies",
+        test: "turbo run test",
+        "test:coverage": "turbo run test:coverage",
+        unlink: "turbo run unlink",
       },
       workspaces: packages.map((package_) => `packages/${package_.name}`),
     },
