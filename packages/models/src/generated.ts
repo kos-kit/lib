@@ -46,6 +46,18 @@ export namespace $RdfVocabularies {
     );
   }
 }
+function $isReadonlyObjectArray(x: unknown): x is readonly object[] {
+  return Array.isArray(x) && x.every((z) => typeof z === "object");
+}
+function $isReadonlyBooleanArray(x: unknown): x is readonly boolean[] {
+  return Array.isArray(x) && x.every((z) => typeof z === "boolean");
+}
+function $isReadonlyNumberArray(x: unknown): x is readonly number[] {
+  return Array.isArray(x) && x.every((z) => typeof z === "number");
+}
+function $isReadonlyStringArray(x: unknown): x is readonly string[] {
+  return Array.isArray(x) && x.every((z) => typeof z === "string");
+}
 /**
  * A sparqljs.Pattern that's the equivalent of ?subject rdf:type/rdfs:subClassOf* ?rdfType .
  */
@@ -78,892 +90,66 @@ export function $sparqlInstancesOfPattern({
     type: "bgp",
   };
 }
-function $isReadonlyObjectArray(x: unknown): x is readonly object[] {
-  return Array.isArray(x) && x.every((z) => typeof z === "object");
-}
-function $isReadonlyBooleanArray(x: unknown): x is readonly boolean[] {
-  return Array.isArray(x) && x.every((z) => typeof z === "boolean");
-}
-function $isReadonlyNumberArray(x: unknown): x is readonly number[] {
-  return Array.isArray(x) && x.every((z) => typeof z === "number");
-}
-function $isReadonlyStringArray(x: unknown): x is readonly string[] {
-  return Array.isArray(x) && x.every((z) => typeof z === "string");
+/**
+ * Type of lazy properties that return a set of objects. This is a class instead of an interface so it can be instanceof'd elsewhere.
+ */
+export class $LazyObjectSet<
+  ObjectIdentifierT extends rdfjs.BlankNode | rdfjs.NamedNode,
+  PartialObjectT extends { $identifier: ObjectIdentifierT },
+  ResolvedObjectT extends { $identifier: ObjectIdentifierT },
+> {
+  readonly partials: readonly PartialObjectT[];
+  private readonly resolver: (
+    identifiers: readonly ObjectIdentifierT[],
+  ) => Promise<purify.Either<Error, readonly ResolvedObjectT[]>>;
+
+  constructor({
+    partials,
+    resolver,
+  }: {
+    partials: readonly PartialObjectT[];
+    resolver: (
+      identifiers: readonly ObjectIdentifierT[],
+    ) => Promise<purify.Either<Error, readonly ResolvedObjectT[]>>;
+  }) {
+    this.partials = partials;
+    this.resolver = resolver;
+  }
+
+  get length(): number {
+    return this.partials.length;
+  }
+
+  async resolve(options?: { limit?: number; offset?: number }): Promise<
+    purify.Either<Error, readonly ResolvedObjectT[]>
+  > {
+    if (this.partials.length === 0) {
+      return purify.Either.of([]);
+    }
+
+    const limit = options?.limit ?? Number.MAX_SAFE_INTEGER;
+    if (limit <= 0) {
+      return purify.Either.of([]);
+    }
+
+    let offset = options?.offset ?? 0;
+    if (offset < 0) {
+      offset = 0;
+    }
+
+    return await this.resolver(
+      this.partials
+        .slice(offset, offset + limit)
+        .map((partial) => partial.$identifier),
+    );
+  }
 }
 type $UnwrapR<T> = T extends purify.Either<any, infer R> ? R : never;
-export interface PartialLabel {
-  readonly $identifier: PartialLabel.$Identifier;
-  readonly $type: "PartialLabel";
-  readonly literalForm: purify.NonEmptyList<rdfjs.Literal>;
-}
-
-export namespace PartialLabel {
-  export function $create(parameters: {
-    readonly $identifier?: (rdfjs.BlankNode | rdfjs.NamedNode) | string;
-    readonly literalForm: purify.NonEmptyList<rdfjs.Literal>;
-  }): PartialLabel {
-    let $identifier: PartialLabel.$Identifier;
-    if (typeof parameters.$identifier === "object") {
-      $identifier = parameters.$identifier;
-    } else if (typeof parameters.$identifier === "string") {
-      $identifier = dataFactory.namedNode(parameters.$identifier);
-    } else if (typeof parameters.$identifier === "undefined") {
-      $identifier = dataFactory.blankNode();
-    } else {
-      $identifier = parameters.$identifier satisfies never;
-    }
-
-    const $type = "PartialLabel" as const;
-    const literalForm = parameters.literalForm;
-    return { $identifier, $type, literalForm };
-  }
-
-  export function $fromRdf(
-    resource: rdfjsResource.Resource,
-    options?: {
-      [_index: string]: any;
-      ignoreRdfType?: boolean;
-      objectSet?: $ObjectSet;
-      preferredLanguages?: readonly string[];
-    },
-  ): purify.Either<Error, PartialLabel> {
-    let {
-      ignoreRdfType = false,
-      objectSet,
-      preferredLanguages,
-      ...context
-    } = options ?? {};
-    if (!objectSet) {
-      objectSet = new $RdfjsDatasetObjectSet({ dataset: resource.dataset });
-    }
-
-    return PartialLabel.$propertiesFromRdf({
-      ...context,
-      ignoreRdfType,
-      objectSet,
-      preferredLanguages,
-      resource,
-    });
-  }
-
-  export const $fromRdfType: rdfjs.NamedNode<string> = dataFactory.namedNode(
-    "http://www.w3.org/2008/05/skos-xl#Label",
-  );
-  export type $Identifier = rdfjs.BlankNode | rdfjs.NamedNode;
-
-  export namespace $Identifier {
-    export function fromString(
-      identifier: string,
-    ): purify.Either<Error, rdfjsResource.Resource.Identifier> {
-      return purify.Either.encase(() =>
-        rdfjsResource.Resource.Identifier.fromString({
-          dataFactory,
-          identifier,
-        }),
-      );
-    }
-
-    export const // biome-ignore lint/suspicious/noShadowRestrictedNames:
-      toString = rdfjsResource.Resource.Identifier.toString;
-  }
-
-  export const $properties = {
-    literalForm: {
-      identifier: dataFactory.namedNode(
-        "http://www.w3.org/2008/05/skos-xl#literalForm",
-      ),
-    },
-  };
-
-  export function $propertiesFromRdf({
-    ignoreRdfType: $ignoreRdfType,
-    objectSet: $objectSet,
-    preferredLanguages: $preferredLanguages,
-    resource: $resource,
-    // @ts-ignore
-    ...$context
-  }: {
-    [_index: string]: any;
-    ignoreRdfType: boolean;
-    objectSet: $ObjectSet;
-    preferredLanguages?: readonly string[];
-    resource: rdfjsResource.Resource;
-  }): purify.Either<
-    Error,
-    {
-      $identifier: rdfjs.BlankNode | rdfjs.NamedNode;
-      $type: "PartialLabel";
-      literalForm: purify.NonEmptyList<rdfjs.Literal>;
-    }
-  > {
-    if (!$ignoreRdfType) {
-      const $rdfTypeCheck: purify.Either<Error, true> = $resource
-        .value($RdfVocabularies.rdf.type)
-        .chain((actualRdfType) => actualRdfType.toIri())
-        .chain((actualRdfType) => {
-          // Check the expected type and its known subtypes
-          switch (actualRdfType.value) {
-            case "http://www.w3.org/2008/05/skos-xl#Label":
-              return purify.Either.of(true);
-          }
-
-          // Check arbitrary rdfs:subClassOf's of the expected type
-          if ($resource.isInstanceOf(PartialLabel.$fromRdfType)) {
-            return purify.Either.of(true);
-          }
-
-          return purify.Left(
-            new Error(
-              `${rdfjsResource.Resource.Identifier.toString($resource.identifier)} has unexpected RDF type (actual: ${actualRdfType.value}, expected: http://www.w3.org/2008/05/skos-xl#Label)`,
-            ),
-          );
-        });
-      if ($rdfTypeCheck.isLeft()) {
-        return $rdfTypeCheck;
-      }
-    }
-
-    const $identifier: PartialLabel.$Identifier = $resource.identifier;
-    const $type = "PartialLabel" as const;
-    const _literalFormEither: purify.Either<
-      Error,
-      purify.NonEmptyList<rdfjs.Literal>
-    > = purify.Either.of<
-      Error,
-      rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
-    >($resource.values($properties.literalForm["identifier"], { unique: true }))
-      .chain((values) => {
-        if (!$preferredLanguages || $preferredLanguages.length === 0) {
-          return purify.Either.of<
-            Error,
-            rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
-          >(values);
-        }
-
-        const literalValuesEither = values.chainMap((value) =>
-          value.toLiteral(),
-        );
-        if (literalValuesEither.isLeft()) {
-          return literalValuesEither;
-        }
-        const literalValues = literalValuesEither.unsafeCoerce();
-
-        // Return all literals for the first preferredLanguage, then all literals for the second preferredLanguage, etc.
-        // Within a preferredLanguage the literals may be in any order.
-        let filteredLiteralValues:
-          | rdfjsResource.Resource.Values<rdfjs.Literal>
-          | undefined;
-        for (const preferredLanguage of $preferredLanguages) {
-          if (!filteredLiteralValues) {
-            filteredLiteralValues = literalValues.filter(
-              (value) => value.language === preferredLanguage,
-            );
-          } else {
-            filteredLiteralValues = filteredLiteralValues.concat(
-              ...literalValues
-                .filter((value) => value.language === preferredLanguage)
-                .toArray(),
-            );
-          }
-        }
-
-        return purify.Either.of<
-          Error,
-          rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
-        >(
-          filteredLiteralValues!.map(
-            (literalValue) =>
-              new rdfjsResource.Resource.TermValue({
-                focusResource: $resource,
-                predicate: PartialLabel.$properties.literalForm["identifier"],
-                term: literalValue,
-              }),
-          ),
-        );
-      })
-      .chain((values) => values.chainMap((value) => value.toLiteral()))
-      .chain((values) =>
-        purify.NonEmptyList.fromArray(values.toArray()).toEither(
-          new Error(
-            `${rdfjsResource.Resource.Identifier.toString($resource.identifier)} is an empty set`,
-          ),
-        ),
-      )
-      .map((valuesArray) =>
-        rdfjsResource.Resource.Values.fromValue({
-          focusResource: $resource,
-          predicate: PartialLabel.$properties.literalForm["identifier"],
-          value: valuesArray,
-        }),
-      )
-      .chain((values) => values.head());
-    if (_literalFormEither.isLeft()) {
-      return _literalFormEither;
-    }
-
-    const literalForm = _literalFormEither.unsafeCoerce();
-    return purify.Either.of({ $identifier, $type, literalForm });
-  }
-
-  export function $sparqlConstructQuery(
-    parameters?: {
-      ignoreRdfType?: boolean;
-      prefixes?: { [prefix: string]: string };
-      preferredLanguages?: readonly string[];
-      subject?: sparqljs.Triple["subject"];
-    } & Omit<sparqljs.ConstructQuery, "prefixes" | "queryType" | "type">,
-  ): sparqljs.ConstructQuery {
-    const { ignoreRdfType, preferredLanguages, subject, ...queryParameters } =
-      parameters ?? {};
-
-    return {
-      ...queryParameters,
-      prefixes: parameters?.prefixes ?? {},
-      queryType: "CONSTRUCT",
-      template: (queryParameters.template ?? []).concat(
-        PartialLabel.$sparqlConstructTemplateTriples({
-          ignoreRdfType,
-          subject,
-        }),
-      ),
-      type: "query",
-      where: (queryParameters.where ?? []).concat(
-        PartialLabel.$sparqlWherePatterns({
-          ignoreRdfType,
-          preferredLanguages,
-          subject,
-        }),
-      ),
-    };
-  }
-
-  export function $sparqlConstructQueryString(
-    parameters?: {
-      ignoreRdfType?: boolean;
-      preferredLanguages?: readonly string[];
-      subject?: sparqljs.Triple["subject"];
-      variablePrefix?: string;
-    } & Omit<sparqljs.ConstructQuery, "prefixes" | "queryType" | "type"> &
-      sparqljs.GeneratorOptions,
-  ): string {
-    return new sparqljs.Generator(parameters).stringify(
-      PartialLabel.$sparqlConstructQuery(parameters),
-    );
-  }
-
-  export function $sparqlConstructTemplateTriples(parameters?: {
-    ignoreRdfType?: boolean;
-    subject?: sparqljs.Triple["subject"];
-    variablePrefix?: string;
-  }): readonly sparqljs.Triple[] {
-    const subject = parameters?.subject ?? dataFactory.variable!("labelStub");
-    const triples: sparqljs.Triple[] = [];
-    const variablePrefix =
-      parameters?.variablePrefix ??
-      (subject.termType === "Variable" ? subject.value : "labelStub");
-    if (!parameters?.ignoreRdfType) {
-      triples.push(
-        {
-          subject,
-          predicate: $RdfVocabularies.rdf.type,
-          object: dataFactory.variable!(`${variablePrefix}RdfType`),
-        },
-        {
-          subject: dataFactory.variable!(`${variablePrefix}RdfType`),
-          predicate: $RdfVocabularies.rdfs.subClassOf,
-          object: dataFactory.variable!(`${variablePrefix}RdfClass`),
-        },
-      );
-    }
-
-    triples.push({
-      object: dataFactory.variable!(`${variablePrefix}LiteralForm`),
-      predicate: PartialLabel.$properties.literalForm["identifier"],
-      subject,
-    });
-    return triples;
-  }
-
-  export function $sparqlWherePatterns(parameters?: {
-    ignoreRdfType?: boolean;
-    preferredLanguages?: readonly string[];
-    subject?: sparqljs.Triple["subject"];
-    variablePrefix?: string;
-  }): readonly sparqljs.Pattern[] {
-    const optionalPatterns: sparqljs.OptionalPattern[] = [];
-    const requiredPatterns: sparqljs.Pattern[] = [];
-    const subject = parameters?.subject ?? dataFactory.variable!("labelStub");
-    const variablePrefix =
-      parameters?.variablePrefix ??
-      (subject.termType === "Variable" ? subject.value : "labelStub");
-    const rdfTypeVariable = dataFactory.variable!(`${variablePrefix}RdfType`);
-    if (!parameters?.ignoreRdfType) {
-      requiredPatterns.push(
-        $sparqlInstancesOfPattern({
-          rdfType: PartialLabel.$fromRdfType,
-          subject,
-        }),
-        {
-          triples: [
-            {
-              subject,
-              predicate: $RdfVocabularies.rdf.type,
-              object: rdfTypeVariable,
-            },
-          ],
-          type: "bgp" as const,
-        },
-      );
-      optionalPatterns.push({
-        patterns: [
-          {
-            triples: [
-              {
-                subject: rdfTypeVariable,
-                predicate: {
-                  items: [$RdfVocabularies.rdfs.subClassOf],
-                  pathType: "+" as const,
-                  type: "path" as const,
-                },
-                object: dataFactory.variable!(`${variablePrefix}RdfClass`),
-              },
-            ],
-            type: "bgp" as const,
-          },
-        ],
-        type: "optional" as const,
-      });
-    }
-
-    const propertyPatterns: readonly sparqljs.Pattern[] = [
-      {
-        triples: [
-          {
-            object: dataFactory.variable!(`${variablePrefix}LiteralForm`),
-            predicate: PartialLabel.$properties.literalForm["identifier"],
-            subject,
-          },
-        ],
-        type: "bgp",
-      },
-      ...[parameters?.preferredLanguages ?? []]
-        .filter((languages) => languages.length > 0)
-        .map((languages) =>
-          languages.map((language) => ({
-            type: "operation" as const,
-            operator: "=",
-            args: [
-              {
-                type: "operation" as const,
-                operator: "lang",
-                args: [dataFactory.variable!(`${variablePrefix}LiteralForm`)],
-              },
-              dataFactory.literal(language),
-            ],
-          })),
-        )
-        .map((langEqualsExpressions) => ({
-          type: "filter" as const,
-          expression: langEqualsExpressions.reduce(
-            (reducedExpression, langEqualsExpression) => {
-              if (reducedExpression === null) {
-                return langEqualsExpression;
-              }
-              return {
-                type: "operation" as const,
-                operator: "||",
-                args: [reducedExpression, langEqualsExpression],
-              };
-            },
-            null as sparqljs.Expression | null,
-          ) as sparqljs.Expression,
-        })),
-    ];
-    for (const pattern of propertyPatterns) {
-      if (pattern.type === "optional") {
-        optionalPatterns.push(pattern);
-      } else {
-        requiredPatterns.push(pattern);
-      }
-    }
-
-    return requiredPatterns.concat(optionalPatterns);
-  }
-
-  export function $toRdf(
-    _labelStub: PartialLabel,
-    options?: {
-      ignoreRdfType?: boolean;
-      mutateGraph?: rdfjsResource.MutableResource.MutateGraph;
-      resourceSet?: rdfjsResource.MutableResourceSet;
-    },
-  ): rdfjsResource.MutableResource {
-    const ignoreRdfType = !!options?.ignoreRdfType;
-    const mutateGraph = options?.mutateGraph;
-    const resourceSet =
-      options?.resourceSet ??
-      new rdfjsResource.MutableResourceSet({
-        dataFactory,
-        dataset: datasetFactory.dataset(),
-      });
-    const resource = resourceSet.mutableResource(_labelStub.$identifier, {
-      mutateGraph,
-    });
-    if (!ignoreRdfType) {
-      resource.add(
-        $RdfVocabularies.rdf.type,
-        resource.dataFactory.namedNode(
-          "http://kos-kit.github.io/ontology#PartialLabel",
-        ),
-      );
-      resource.add(
-        $RdfVocabularies.rdf.type,
-        resource.dataFactory.namedNode(
-          "http://www.w3.org/2008/05/skos-xl#Label",
-        ),
-      );
-    }
-
-    resource.add(
-      PartialLabel.$properties.literalForm["identifier"],
-      ..._labelStub.literalForm.flatMap((item) => [item]),
-    );
-    return resource;
-  }
-}
-export interface Label {
-  readonly $identifier: Label.$Identifier;
-  readonly $type: "Label";
-  readonly literalForm: purify.NonEmptyList<rdfjs.Literal>;
-}
-
-export namespace Label {
-  export function $create(parameters: {
-    readonly $identifier?: (rdfjs.BlankNode | rdfjs.NamedNode) | string;
-    readonly literalForm: purify.NonEmptyList<rdfjs.Literal>;
-  }): Label {
-    let $identifier: Label.$Identifier;
-    if (typeof parameters.$identifier === "object") {
-      $identifier = parameters.$identifier;
-    } else if (typeof parameters.$identifier === "string") {
-      $identifier = dataFactory.namedNode(parameters.$identifier);
-    } else if (typeof parameters.$identifier === "undefined") {
-      $identifier = dataFactory.blankNode();
-    } else {
-      $identifier = parameters.$identifier satisfies never;
-    }
-
-    const $type = "Label" as const;
-    const literalForm = parameters.literalForm;
-    return { $identifier, $type, literalForm };
-  }
-
-  export function $fromRdf(
-    resource: rdfjsResource.Resource,
-    options?: {
-      [_index: string]: any;
-      ignoreRdfType?: boolean;
-      objectSet?: $ObjectSet;
-      preferredLanguages?: readonly string[];
-    },
-  ): purify.Either<Error, Label> {
-    let {
-      ignoreRdfType = false,
-      objectSet,
-      preferredLanguages,
-      ...context
-    } = options ?? {};
-    if (!objectSet) {
-      objectSet = new $RdfjsDatasetObjectSet({ dataset: resource.dataset });
-    }
-
-    return Label.$propertiesFromRdf({
-      ...context,
-      ignoreRdfType,
-      objectSet,
-      preferredLanguages,
-      resource,
-    });
-  }
-
-  export const $fromRdfType: rdfjs.NamedNode<string> = dataFactory.namedNode(
-    "http://www.w3.org/2008/05/skos-xl#Label",
-  );
-  export type $Identifier = rdfjs.BlankNode | rdfjs.NamedNode;
-
-  export namespace $Identifier {
-    export function fromString(
-      identifier: string,
-    ): purify.Either<Error, rdfjsResource.Resource.Identifier> {
-      return purify.Either.encase(() =>
-        rdfjsResource.Resource.Identifier.fromString({
-          dataFactory,
-          identifier,
-        }),
-      );
-    }
-
-    export const // biome-ignore lint/suspicious/noShadowRestrictedNames:
-      toString = rdfjsResource.Resource.Identifier.toString;
-  }
-
-  export const $properties = {
-    literalForm: {
-      identifier: dataFactory.namedNode(
-        "http://www.w3.org/2008/05/skos-xl#literalForm",
-      ),
-    },
-  };
-
-  export function $propertiesFromRdf({
-    ignoreRdfType: $ignoreRdfType,
-    objectSet: $objectSet,
-    preferredLanguages: $preferredLanguages,
-    resource: $resource,
-    // @ts-ignore
-    ...$context
-  }: {
-    [_index: string]: any;
-    ignoreRdfType: boolean;
-    objectSet: $ObjectSet;
-    preferredLanguages?: readonly string[];
-    resource: rdfjsResource.Resource;
-  }): purify.Either<
-    Error,
-    {
-      $identifier: rdfjs.BlankNode | rdfjs.NamedNode;
-      $type: "Label";
-      literalForm: purify.NonEmptyList<rdfjs.Literal>;
-    }
-  > {
-    if (!$ignoreRdfType) {
-      const $rdfTypeCheck: purify.Either<Error, true> = $resource
-        .value($RdfVocabularies.rdf.type)
-        .chain((actualRdfType) => actualRdfType.toIri())
-        .chain((actualRdfType) => {
-          // Check the expected type and its known subtypes
-          switch (actualRdfType.value) {
-            case "http://www.w3.org/2008/05/skos-xl#Label":
-              return purify.Either.of(true);
-          }
-
-          // Check arbitrary rdfs:subClassOf's of the expected type
-          if ($resource.isInstanceOf(Label.$fromRdfType)) {
-            return purify.Either.of(true);
-          }
-
-          return purify.Left(
-            new Error(
-              `${rdfjsResource.Resource.Identifier.toString($resource.identifier)} has unexpected RDF type (actual: ${actualRdfType.value}, expected: http://www.w3.org/2008/05/skos-xl#Label)`,
-            ),
-          );
-        });
-      if ($rdfTypeCheck.isLeft()) {
-        return $rdfTypeCheck;
-      }
-    }
-
-    const $identifier: Label.$Identifier = $resource.identifier;
-    const $type = "Label" as const;
-    const _literalFormEither: purify.Either<
-      Error,
-      purify.NonEmptyList<rdfjs.Literal>
-    > = purify.Either.of<
-      Error,
-      rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
-    >($resource.values($properties.literalForm["identifier"], { unique: true }))
-      .chain((values) => {
-        if (!$preferredLanguages || $preferredLanguages.length === 0) {
-          return purify.Either.of<
-            Error,
-            rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
-          >(values);
-        }
-
-        const literalValuesEither = values.chainMap((value) =>
-          value.toLiteral(),
-        );
-        if (literalValuesEither.isLeft()) {
-          return literalValuesEither;
-        }
-        const literalValues = literalValuesEither.unsafeCoerce();
-
-        // Return all literals for the first preferredLanguage, then all literals for the second preferredLanguage, etc.
-        // Within a preferredLanguage the literals may be in any order.
-        let filteredLiteralValues:
-          | rdfjsResource.Resource.Values<rdfjs.Literal>
-          | undefined;
-        for (const preferredLanguage of $preferredLanguages) {
-          if (!filteredLiteralValues) {
-            filteredLiteralValues = literalValues.filter(
-              (value) => value.language === preferredLanguage,
-            );
-          } else {
-            filteredLiteralValues = filteredLiteralValues.concat(
-              ...literalValues
-                .filter((value) => value.language === preferredLanguage)
-                .toArray(),
-            );
-          }
-        }
-
-        return purify.Either.of<
-          Error,
-          rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
-        >(
-          filteredLiteralValues!.map(
-            (literalValue) =>
-              new rdfjsResource.Resource.TermValue({
-                focusResource: $resource,
-                predicate: Label.$properties.literalForm["identifier"],
-                term: literalValue,
-              }),
-          ),
-        );
-      })
-      .chain((values) => values.chainMap((value) => value.toLiteral()))
-      .chain((values) =>
-        purify.NonEmptyList.fromArray(values.toArray()).toEither(
-          new Error(
-            `${rdfjsResource.Resource.Identifier.toString($resource.identifier)} is an empty set`,
-          ),
-        ),
-      )
-      .map((valuesArray) =>
-        rdfjsResource.Resource.Values.fromValue({
-          focusResource: $resource,
-          predicate: Label.$properties.literalForm["identifier"],
-          value: valuesArray,
-        }),
-      )
-      .chain((values) => values.head());
-    if (_literalFormEither.isLeft()) {
-      return _literalFormEither;
-    }
-
-    const literalForm = _literalFormEither.unsafeCoerce();
-    return purify.Either.of({ $identifier, $type, literalForm });
-  }
-
-  export function $sparqlConstructQuery(
-    parameters?: {
-      ignoreRdfType?: boolean;
-      prefixes?: { [prefix: string]: string };
-      preferredLanguages?: readonly string[];
-      subject?: sparqljs.Triple["subject"];
-    } & Omit<sparqljs.ConstructQuery, "prefixes" | "queryType" | "type">,
-  ): sparqljs.ConstructQuery {
-    const { ignoreRdfType, preferredLanguages, subject, ...queryParameters } =
-      parameters ?? {};
-
-    return {
-      ...queryParameters,
-      prefixes: parameters?.prefixes ?? {},
-      queryType: "CONSTRUCT",
-      template: (queryParameters.template ?? []).concat(
-        Label.$sparqlConstructTemplateTriples({ ignoreRdfType, subject }),
-      ),
-      type: "query",
-      where: (queryParameters.where ?? []).concat(
-        Label.$sparqlWherePatterns({
-          ignoreRdfType,
-          preferredLanguages,
-          subject,
-        }),
-      ),
-    };
-  }
-
-  export function $sparqlConstructQueryString(
-    parameters?: {
-      ignoreRdfType?: boolean;
-      preferredLanguages?: readonly string[];
-      subject?: sparqljs.Triple["subject"];
-      variablePrefix?: string;
-    } & Omit<sparqljs.ConstructQuery, "prefixes" | "queryType" | "type"> &
-      sparqljs.GeneratorOptions,
-  ): string {
-    return new sparqljs.Generator(parameters).stringify(
-      Label.$sparqlConstructQuery(parameters),
-    );
-  }
-
-  export function $sparqlConstructTemplateTriples(parameters?: {
-    ignoreRdfType?: boolean;
-    subject?: sparqljs.Triple["subject"];
-    variablePrefix?: string;
-  }): readonly sparqljs.Triple[] {
-    const subject = parameters?.subject ?? dataFactory.variable!("label");
-    const triples: sparqljs.Triple[] = [];
-    const variablePrefix =
-      parameters?.variablePrefix ??
-      (subject.termType === "Variable" ? subject.value : "label");
-    if (!parameters?.ignoreRdfType) {
-      triples.push(
-        {
-          subject,
-          predicate: $RdfVocabularies.rdf.type,
-          object: dataFactory.variable!(`${variablePrefix}RdfType`),
-        },
-        {
-          subject: dataFactory.variable!(`${variablePrefix}RdfType`),
-          predicate: $RdfVocabularies.rdfs.subClassOf,
-          object: dataFactory.variable!(`${variablePrefix}RdfClass`),
-        },
-      );
-    }
-
-    triples.push({
-      object: dataFactory.variable!(`${variablePrefix}LiteralForm`),
-      predicate: Label.$properties.literalForm["identifier"],
-      subject,
-    });
-    return triples;
-  }
-
-  export function $sparqlWherePatterns(parameters?: {
-    ignoreRdfType?: boolean;
-    preferredLanguages?: readonly string[];
-    subject?: sparqljs.Triple["subject"];
-    variablePrefix?: string;
-  }): readonly sparqljs.Pattern[] {
-    const optionalPatterns: sparqljs.OptionalPattern[] = [];
-    const requiredPatterns: sparqljs.Pattern[] = [];
-    const subject = parameters?.subject ?? dataFactory.variable!("label");
-    const variablePrefix =
-      parameters?.variablePrefix ??
-      (subject.termType === "Variable" ? subject.value : "label");
-    const rdfTypeVariable = dataFactory.variable!(`${variablePrefix}RdfType`);
-    if (!parameters?.ignoreRdfType) {
-      requiredPatterns.push(
-        $sparqlInstancesOfPattern({ rdfType: Label.$fromRdfType, subject }),
-        {
-          triples: [
-            {
-              subject,
-              predicate: $RdfVocabularies.rdf.type,
-              object: rdfTypeVariable,
-            },
-          ],
-          type: "bgp" as const,
-        },
-      );
-      optionalPatterns.push({
-        patterns: [
-          {
-            triples: [
-              {
-                subject: rdfTypeVariable,
-                predicate: {
-                  items: [$RdfVocabularies.rdfs.subClassOf],
-                  pathType: "+" as const,
-                  type: "path" as const,
-                },
-                object: dataFactory.variable!(`${variablePrefix}RdfClass`),
-              },
-            ],
-            type: "bgp" as const,
-          },
-        ],
-        type: "optional" as const,
-      });
-    }
-
-    const propertyPatterns: readonly sparqljs.Pattern[] = [
-      {
-        triples: [
-          {
-            object: dataFactory.variable!(`${variablePrefix}LiteralForm`),
-            predicate: Label.$properties.literalForm["identifier"],
-            subject,
-          },
-        ],
-        type: "bgp",
-      },
-      ...[parameters?.preferredLanguages ?? []]
-        .filter((languages) => languages.length > 0)
-        .map((languages) =>
-          languages.map((language) => ({
-            type: "operation" as const,
-            operator: "=",
-            args: [
-              {
-                type: "operation" as const,
-                operator: "lang",
-                args: [dataFactory.variable!(`${variablePrefix}LiteralForm`)],
-              },
-              dataFactory.literal(language),
-            ],
-          })),
-        )
-        .map((langEqualsExpressions) => ({
-          type: "filter" as const,
-          expression: langEqualsExpressions.reduce(
-            (reducedExpression, langEqualsExpression) => {
-              if (reducedExpression === null) {
-                return langEqualsExpression;
-              }
-              return {
-                type: "operation" as const,
-                operator: "||",
-                args: [reducedExpression, langEqualsExpression],
-              };
-            },
-            null as sparqljs.Expression | null,
-          ) as sparqljs.Expression,
-        })),
-    ];
-    for (const pattern of propertyPatterns) {
-      if (pattern.type === "optional") {
-        optionalPatterns.push(pattern);
-      } else {
-        requiredPatterns.push(pattern);
-      }
-    }
-
-    return requiredPatterns.concat(optionalPatterns);
-  }
-
-  export function $toRdf(
-    _label: Label,
-    options?: {
-      ignoreRdfType?: boolean;
-      mutateGraph?: rdfjsResource.MutableResource.MutateGraph;
-      resourceSet?: rdfjsResource.MutableResourceSet;
-    },
-  ): rdfjsResource.MutableResource {
-    const ignoreRdfType = !!options?.ignoreRdfType;
-    const mutateGraph = options?.mutateGraph;
-    const resourceSet =
-      options?.resourceSet ??
-      new rdfjsResource.MutableResourceSet({
-        dataFactory,
-        dataset: datasetFactory.dataset(),
-      });
-    const resource = resourceSet.mutableResource(_label.$identifier, {
-      mutateGraph,
-    });
-    if (!ignoreRdfType) {
-      resource.add(
-        $RdfVocabularies.rdf.type,
-        resource.dataFactory.namedNode(
-          "http://www.w3.org/2008/05/skos-xl#Label",
-        ),
-      );
-    }
-
-    resource.add(
-      Label.$properties.literalForm["identifier"],
-      ..._label.literalForm.flatMap((item) => [item]),
-    );
-    return resource;
-  }
-}
 export interface KosResource {
   readonly $identifier: KosResourceStatic.$Identifier;
   readonly $type: "Concept" | "ConceptScheme";
   readonly altLabel: readonly rdfjs.Literal[];
-  readonly altLabelXl: readonly Label[];
+  readonly altLabelXl: $LazyObjectSet<Label.$Identifier, PartialLabel, Label>;
   readonly changeNote: readonly rdfjs.Literal[];
   readonly definition: readonly rdfjs.Literal[];
   readonly editorialNote: readonly rdfjs.Literal[];
@@ -975,7 +161,7 @@ export interface KosResource {
   readonly notation: readonly rdfjs.Literal[];
   readonly note: readonly rdfjs.Literal[];
   readonly prefLabel: readonly rdfjs.Literal[];
-  readonly prefLabelXl: readonly Label[];
+  readonly prefLabelXl: $LazyObjectSet<Label.$Identifier, PartialLabel, Label>;
   readonly scopeNote: readonly rdfjs.Literal[];
 }
 
@@ -987,7 +173,9 @@ export namespace KosResourceStatic {
       | readonly boolean[]
       | readonly number[]
       | readonly string[];
-    readonly altLabelXl?: readonly Label[];
+    readonly altLabelXl?:
+      | $LazyObjectSet<Label.$Identifier, PartialLabel, Label>
+      | readonly Label[];
     readonly changeNote?:
       | readonly rdfjs.Literal[]
       | readonly boolean[]
@@ -1035,7 +223,9 @@ export namespace KosResourceStatic {
       | readonly boolean[]
       | readonly number[]
       | readonly string[];
-    readonly prefLabelXl?: readonly Label[];
+    readonly prefLabelXl?:
+      | $LazyObjectSet<Label.$Identifier, PartialLabel, Label>
+      | readonly Label[];
     readonly scopeNote?:
       | readonly rdfjs.Literal[]
       | readonly boolean[]
@@ -1070,11 +260,27 @@ export namespace KosResourceStatic {
       altLabel = parameters.altLabel satisfies never;
     }
 
-    let altLabelXl: readonly Label[];
-    if (typeof parameters.altLabelXl === "undefined") {
-      altLabelXl = [];
-    } else if (typeof parameters.altLabelXl === "object") {
+    let altLabelXl: $LazyObjectSet<Label.$Identifier, PartialLabel, Label>;
+    if (
+      typeof parameters.altLabelXl === "object" &&
+      parameters.altLabelXl instanceof $LazyObjectSet
+    ) {
       altLabelXl = parameters.altLabelXl;
+    } else if (typeof parameters.altLabelXl === "object") {
+      altLabelXl = new $LazyObjectSet<Label.$Identifier, PartialLabel, Label>({
+        partials: parameters.altLabelXl.map((object) =>
+          PartialLabel.$create(object),
+        ),
+        resolver: async () =>
+          purify.Either.of(parameters.altLabelXl as readonly Label[]),
+      });
+    } else if (typeof parameters.altLabelXl === "undefined") {
+      altLabelXl = new $LazyObjectSet<Label.$Identifier, PartialLabel, Label>({
+        partials: [],
+        resolver: async () => {
+          throw new Error("should never be called");
+        },
+      });
     } else {
       altLabelXl = parameters.altLabelXl satisfies never;
     }
@@ -1283,11 +489,27 @@ export namespace KosResourceStatic {
       prefLabel = parameters.prefLabel satisfies never;
     }
 
-    let prefLabelXl: readonly Label[];
-    if (typeof parameters.prefLabelXl === "undefined") {
-      prefLabelXl = [];
-    } else if (typeof parameters.prefLabelXl === "object") {
+    let prefLabelXl: $LazyObjectSet<Label.$Identifier, PartialLabel, Label>;
+    if (
+      typeof parameters.prefLabelXl === "object" &&
+      parameters.prefLabelXl instanceof $LazyObjectSet
+    ) {
       prefLabelXl = parameters.prefLabelXl;
+    } else if (typeof parameters.prefLabelXl === "object") {
+      prefLabelXl = new $LazyObjectSet<Label.$Identifier, PartialLabel, Label>({
+        partials: parameters.prefLabelXl.map((object) =>
+          PartialLabel.$create(object),
+        ),
+        resolver: async () =>
+          purify.Either.of(parameters.prefLabelXl as readonly Label[]),
+      });
+    } else if (typeof parameters.prefLabelXl === "undefined") {
+      prefLabelXl = new $LazyObjectSet<Label.$Identifier, PartialLabel, Label>({
+        partials: [],
+        resolver: async () => {
+          throw new Error("should never be called");
+        },
+      });
     } else {
       prefLabelXl = parameters.prefLabelXl satisfies never;
     }
@@ -1447,7 +669,7 @@ export namespace KosResourceStatic {
     {
       $identifier: rdfjs.NamedNode;
       altLabel: readonly rdfjs.Literal[];
-      altLabelXl: readonly Label[];
+      altLabelXl: $LazyObjectSet<Label.$Identifier, PartialLabel, Label>;
       changeNote: readonly rdfjs.Literal[];
       definition: readonly rdfjs.Literal[];
       editorialNote: readonly rdfjs.Literal[];
@@ -1459,7 +681,7 @@ export namespace KosResourceStatic {
       notation: readonly rdfjs.Literal[];
       note: readonly rdfjs.Literal[];
       prefLabel: readonly rdfjs.Literal[];
-      prefLabelXl: readonly Label[];
+      prefLabelXl: $LazyObjectSet<Label.$Identifier, PartialLabel, Label>;
       scopeNote: readonly rdfjs.Literal[];
     }
   > {
@@ -1545,36 +767,46 @@ export namespace KosResourceStatic {
     }
 
     const altLabel = _altLabelEither.unsafeCoerce();
-    const _altLabelXlEither: purify.Either<Error, readonly Label[]> =
-      purify.Either.of<
-        Error,
-        rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
-      >(
-        $resource.values($properties.altLabelXl["identifier"], {
-          unique: true,
+    const _altLabelXlEither: purify.Either<
+      Error,
+      $LazyObjectSet<Label.$Identifier, PartialLabel, Label>
+    > = purify.Either.of<
+      Error,
+      rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
+    >($resource.values($properties.altLabelXl["identifier"], { unique: true }))
+      .chain((values) =>
+        values.chainMap((value) =>
+          value.toResource().chain((resource) =>
+            PartialLabel.$fromRdf(resource, {
+              ...$context,
+              ignoreRdfType: true,
+              objectSet: $objectSet,
+              preferredLanguages: $preferredLanguages,
+            }),
+          ),
+        ),
+      )
+      .map((values) => values.toArray())
+      .map((valuesArray) =>
+        rdfjsResource.Resource.Values.fromValue({
+          focusResource: $resource,
+          predicate: KosResourceStatic.$properties.altLabelXl["identifier"],
+          value: valuesArray,
         }),
       )
-        .chain((values) =>
-          values.chainMap((value) =>
-            value.toResource().chain((resource) =>
-              Label.$fromRdf(resource, {
-                ...$context,
-                ignoreRdfType: true,
-                objectSet: $objectSet,
-                preferredLanguages: $preferredLanguages,
-              }),
-            ),
-          ),
-        )
-        .map((values) => values.toArray())
-        .map((valuesArray) =>
-          rdfjsResource.Resource.Values.fromValue({
-            focusResource: $resource,
-            predicate: KosResourceStatic.$properties.altLabelXl["identifier"],
-            value: valuesArray,
-          }),
-        )
-        .chain((values) => values.head());
+      .map((values) =>
+        values.map(
+          (partials) =>
+            new $LazyObjectSet<Label.$Identifier, PartialLabel, Label>({
+              partials,
+              resolver: (identifiers) =>
+                $objectSet.labels({
+                  where: { identifiers, type: "identifiers" },
+                }),
+            }),
+        ),
+      )
+      .chain((values) => values.head());
     if (_altLabelXlEither.isLeft()) {
       return _altLabelXlEither;
     }
@@ -2289,36 +1521,46 @@ export namespace KosResourceStatic {
     }
 
     const prefLabel = _prefLabelEither.unsafeCoerce();
-    const _prefLabelXlEither: purify.Either<Error, readonly Label[]> =
-      purify.Either.of<
-        Error,
-        rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
-      >(
-        $resource.values($properties.prefLabelXl["identifier"], {
-          unique: true,
+    const _prefLabelXlEither: purify.Either<
+      Error,
+      $LazyObjectSet<Label.$Identifier, PartialLabel, Label>
+    > = purify.Either.of<
+      Error,
+      rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
+    >($resource.values($properties.prefLabelXl["identifier"], { unique: true }))
+      .chain((values) =>
+        values.chainMap((value) =>
+          value.toResource().chain((resource) =>
+            PartialLabel.$fromRdf(resource, {
+              ...$context,
+              ignoreRdfType: true,
+              objectSet: $objectSet,
+              preferredLanguages: $preferredLanguages,
+            }),
+          ),
+        ),
+      )
+      .map((values) => values.toArray())
+      .map((valuesArray) =>
+        rdfjsResource.Resource.Values.fromValue({
+          focusResource: $resource,
+          predicate: KosResourceStatic.$properties.prefLabelXl["identifier"],
+          value: valuesArray,
         }),
       )
-        .chain((values) =>
-          values.chainMap((value) =>
-            value.toResource().chain((resource) =>
-              Label.$fromRdf(resource, {
-                ...$context,
-                ignoreRdfType: true,
-                objectSet: $objectSet,
-                preferredLanguages: $preferredLanguages,
-              }),
-            ),
-          ),
-        )
-        .map((values) => values.toArray())
-        .map((valuesArray) =>
-          rdfjsResource.Resource.Values.fromValue({
-            focusResource: $resource,
-            predicate: KosResourceStatic.$properties.prefLabelXl["identifier"],
-            value: valuesArray,
-          }),
-        )
-        .chain((values) => values.head());
+      .map((values) =>
+        values.map(
+          (partials) =>
+            new $LazyObjectSet<Label.$Identifier, PartialLabel, Label>({
+              partials,
+              resolver: (identifiers) =>
+                $objectSet.labels({
+                  where: { identifiers, type: "identifiers" },
+                }),
+            }),
+        ),
+      )
+      .chain((values) => values.head());
     if (_prefLabelXlEither.isLeft()) {
       return _prefLabelXlEither;
     }
@@ -2481,7 +1723,7 @@ export namespace KosResourceStatic {
       subject,
     });
     triples.push(
-      ...Label.$sparqlConstructTemplateTriples({
+      ...PartialLabel.$sparqlConstructTemplateTriples({
         ignoreRdfType: true,
         subject: dataFactory.variable!(`${variablePrefix}AltLabelXl`),
         variablePrefix: `${variablePrefix}AltLabelXl`,
@@ -2555,7 +1797,7 @@ export namespace KosResourceStatic {
       subject,
     });
     triples.push(
-      ...Label.$sparqlConstructTemplateTriples({
+      ...PartialLabel.$sparqlConstructTemplateTriples({
         ignoreRdfType: true,
         subject: dataFactory.variable!(`${variablePrefix}PrefLabelXl`),
         variablePrefix: `${variablePrefix}PrefLabelXl`,
@@ -2642,7 +1884,7 @@ export namespace KosResourceStatic {
             ],
             type: "bgp",
           },
-          ...Label.$sparqlWherePatterns({
+          ...PartialLabel.$sparqlWherePatterns({
             ignoreRdfType: true,
             preferredLanguages: parameters?.preferredLanguages,
             subject: dataFactory.variable!(`${variablePrefix}AltLabelXl`),
@@ -3140,7 +2382,7 @@ export namespace KosResourceStatic {
             ],
             type: "bgp",
           },
-          ...Label.$sparqlWherePatterns({
+          ...PartialLabel.$sparqlWherePatterns({
             ignoreRdfType: true,
             preferredLanguages: parameters?.preferredLanguages,
             subject: dataFactory.variable!(`${variablePrefix}PrefLabelXl`),
@@ -3234,8 +2476,8 @@ export namespace KosResourceStatic {
     );
     resource.add(
       KosResourceStatic.$properties.altLabelXl["identifier"],
-      ..._kosResource.altLabelXl.flatMap((item) => [
-        Label.$toRdf(item, {
+      ..._kosResource.altLabelXl.partials.flatMap((item) => [
+        PartialLabel.$toRdf(item, {
           mutateGraph: mutateGraph,
           resourceSet: resourceSet,
         }).identifier,
@@ -3297,8 +2539,8 @@ export namespace KosResourceStatic {
     );
     resource.add(
       KosResourceStatic.$properties.prefLabelXl["identifier"],
-      ..._kosResource.prefLabelXl.flatMap((item) => [
-        Label.$toRdf(item, {
+      ..._kosResource.prefLabelXl.partials.flatMap((item) => [
+        PartialLabel.$toRdf(item, {
           mutateGraph: mutateGraph,
           resourceSet: resourceSet,
         }).identifier,
@@ -3311,43 +2553,1916 @@ export namespace KosResourceStatic {
     return resource;
   }
 }
+export interface ConceptScheme extends KosResource {
+  readonly $identifier: ConceptScheme.$Identifier;
+  readonly $type: "ConceptScheme";
+  readonly hasTopConcept: $LazyObjectSet<
+    Concept.$Identifier,
+    PartialConcept,
+    Concept
+  >;
+  readonly license: purify.Maybe<rdfjs.NamedNode | rdfjs.Literal>;
+  readonly rights: purify.Maybe<rdfjs.Literal>;
+  readonly rightsHolder: purify.Maybe<rdfjs.Literal>;
+}
+
+export namespace ConceptScheme {
+  export function $create(
+    parameters: {
+      readonly $identifier: rdfjs.NamedNode | string;
+      readonly hasTopConcept?:
+        | $LazyObjectSet<Concept.$Identifier, PartialConcept, Concept>
+        | readonly Concept[];
+      readonly license?:
+        | (rdfjs.NamedNode | rdfjs.Literal)
+        | Date
+        | boolean
+        | number
+        | purify.Maybe<rdfjs.NamedNode | rdfjs.Literal>
+        | string;
+      readonly rights?:
+        | rdfjs.Literal
+        | Date
+        | boolean
+        | number
+        | purify.Maybe<rdfjs.Literal>
+        | string;
+      readonly rightsHolder?:
+        | rdfjs.Literal
+        | Date
+        | boolean
+        | number
+        | purify.Maybe<rdfjs.Literal>
+        | string;
+    } & Parameters<typeof KosResourceStatic.$create>[0],
+  ): ConceptScheme {
+    let $identifier: ConceptScheme.$Identifier;
+    if (typeof parameters.$identifier === "object") {
+      $identifier = parameters.$identifier;
+    } else if (typeof parameters.$identifier === "string") {
+      $identifier = dataFactory.namedNode(parameters.$identifier);
+    } else {
+      $identifier = parameters.$identifier satisfies never;
+    }
+
+    const $type = "ConceptScheme" as const;
+    let hasTopConcept: $LazyObjectSet<
+      Concept.$Identifier,
+      PartialConcept,
+      Concept
+    >;
+    if (
+      typeof parameters.hasTopConcept === "object" &&
+      parameters.hasTopConcept instanceof $LazyObjectSet
+    ) {
+      hasTopConcept = parameters.hasTopConcept;
+    } else if (typeof parameters.hasTopConcept === "object") {
+      hasTopConcept = new $LazyObjectSet<
+        Concept.$Identifier,
+        PartialConcept,
+        Concept
+      >({
+        partials: parameters.hasTopConcept.map((object) =>
+          PartialConcept.$create(object),
+        ),
+        resolver: async () =>
+          purify.Either.of(parameters.hasTopConcept as readonly Concept[]),
+      });
+    } else if (typeof parameters.hasTopConcept === "undefined") {
+      hasTopConcept = new $LazyObjectSet<
+        Concept.$Identifier,
+        PartialConcept,
+        Concept
+      >({
+        partials: [],
+        resolver: async () => {
+          throw new Error("should never be called");
+        },
+      });
+    } else {
+      hasTopConcept = parameters.hasTopConcept satisfies never;
+    }
+
+    let license: purify.Maybe<rdfjs.NamedNode | rdfjs.Literal>;
+    if (purify.Maybe.isMaybe(parameters.license)) {
+      license = parameters.license;
+    } else if (typeof parameters.license === "boolean") {
+      license = purify.Maybe.of(
+        rdfLiteral.toRdf(parameters.license, { dataFactory }),
+      );
+    } else if (
+      typeof parameters.license === "object" &&
+      parameters.license instanceof Date
+    ) {
+      license = purify.Maybe.of(
+        rdfLiteral.toRdf(parameters.license, { dataFactory }),
+      );
+    } else if (typeof parameters.license === "number") {
+      license = purify.Maybe.of(
+        rdfLiteral.toRdf(parameters.license, { dataFactory }),
+      );
+    } else if (typeof parameters.license === "string") {
+      license = purify.Maybe.of(dataFactory.literal(parameters.license));
+    } else if (typeof parameters.license === "object") {
+      license = purify.Maybe.of(parameters.license);
+    } else if (typeof parameters.license === "undefined") {
+      license = purify.Maybe.empty();
+    } else {
+      license = parameters.license satisfies never;
+    }
+
+    let rights: purify.Maybe<rdfjs.Literal>;
+    if (purify.Maybe.isMaybe(parameters.rights)) {
+      rights = parameters.rights;
+    } else if (typeof parameters.rights === "boolean") {
+      rights = purify.Maybe.of(
+        rdfLiteral.toRdf(parameters.rights, { dataFactory }),
+      );
+    } else if (
+      typeof parameters.rights === "object" &&
+      parameters.rights instanceof Date
+    ) {
+      rights = purify.Maybe.of(
+        rdfLiteral.toRdf(parameters.rights, { dataFactory }),
+      );
+    } else if (typeof parameters.rights === "number") {
+      rights = purify.Maybe.of(
+        rdfLiteral.toRdf(parameters.rights, { dataFactory }),
+      );
+    } else if (typeof parameters.rights === "string") {
+      rights = purify.Maybe.of(dataFactory.literal(parameters.rights));
+    } else if (typeof parameters.rights === "object") {
+      rights = purify.Maybe.of(parameters.rights);
+    } else if (typeof parameters.rights === "undefined") {
+      rights = purify.Maybe.empty();
+    } else {
+      rights = parameters.rights satisfies never;
+    }
+
+    let rightsHolder: purify.Maybe<rdfjs.Literal>;
+    if (purify.Maybe.isMaybe(parameters.rightsHolder)) {
+      rightsHolder = parameters.rightsHolder;
+    } else if (typeof parameters.rightsHolder === "boolean") {
+      rightsHolder = purify.Maybe.of(
+        rdfLiteral.toRdf(parameters.rightsHolder, { dataFactory }),
+      );
+    } else if (
+      typeof parameters.rightsHolder === "object" &&
+      parameters.rightsHolder instanceof Date
+    ) {
+      rightsHolder = purify.Maybe.of(
+        rdfLiteral.toRdf(parameters.rightsHolder, { dataFactory }),
+      );
+    } else if (typeof parameters.rightsHolder === "number") {
+      rightsHolder = purify.Maybe.of(
+        rdfLiteral.toRdf(parameters.rightsHolder, { dataFactory }),
+      );
+    } else if (typeof parameters.rightsHolder === "string") {
+      rightsHolder = purify.Maybe.of(
+        dataFactory.literal(parameters.rightsHolder),
+      );
+    } else if (typeof parameters.rightsHolder === "object") {
+      rightsHolder = purify.Maybe.of(parameters.rightsHolder);
+    } else if (typeof parameters.rightsHolder === "undefined") {
+      rightsHolder = purify.Maybe.empty();
+    } else {
+      rightsHolder = parameters.rightsHolder satisfies never;
+    }
+
+    return {
+      ...KosResourceStatic.$create(parameters),
+      $identifier,
+      $type,
+      hasTopConcept,
+      license,
+      rights,
+      rightsHolder,
+    };
+  }
+
+  export function $fromRdf(
+    resource: rdfjsResource.Resource,
+    options?: {
+      [_index: string]: any;
+      ignoreRdfType?: boolean;
+      objectSet?: $ObjectSet;
+      preferredLanguages?: readonly string[];
+    },
+  ): purify.Either<Error, ConceptScheme> {
+    let {
+      ignoreRdfType = false,
+      objectSet,
+      preferredLanguages,
+      ...context
+    } = options ?? {};
+    if (!objectSet) {
+      objectSet = new $RdfjsDatasetObjectSet({ dataset: resource.dataset });
+    }
+
+    return ConceptScheme.$propertiesFromRdf({
+      ...context,
+      ignoreRdfType,
+      objectSet,
+      preferredLanguages,
+      resource,
+    });
+  }
+
+  export const $fromRdfType: rdfjs.NamedNode<string> = dataFactory.namedNode(
+    "http://www.w3.org/2004/02/skos/core#ConceptScheme",
+  );
+  export type $Identifier = KosResourceStatic.$Identifier;
+  export const $Identifier = KosResourceStatic.$Identifier;
+  export const $properties = {
+    ...KosResourceStatic.$properties,
+    hasTopConcept: {
+      identifier: dataFactory.namedNode(
+        "http://www.w3.org/2004/02/skos/core#hasTopConcept",
+      ),
+    },
+    license: {
+      identifier: dataFactory.namedNode("http://purl.org/dc/terms/license"),
+    },
+    rights: {
+      identifier: dataFactory.namedNode("http://purl.org/dc/terms/rights"),
+    },
+    rightsHolder: {
+      identifier: dataFactory.namedNode(
+        "http://purl.org/dc/terms/rightsHolder",
+      ),
+    },
+  };
+
+  export function $propertiesFromRdf({
+    ignoreRdfType: $ignoreRdfType,
+    objectSet: $objectSet,
+    preferredLanguages: $preferredLanguages,
+    resource: $resource,
+    // @ts-ignore
+    ...$context
+  }: {
+    [_index: string]: any;
+    ignoreRdfType: boolean;
+    objectSet: $ObjectSet;
+    preferredLanguages?: readonly string[];
+    resource: rdfjsResource.Resource;
+  }): purify.Either<
+    Error,
+    {
+      $identifier: rdfjs.NamedNode;
+      $type: "ConceptScheme";
+      hasTopConcept: $LazyObjectSet<
+        Concept.$Identifier,
+        PartialConcept,
+        Concept
+      >;
+      license: purify.Maybe<rdfjs.NamedNode | rdfjs.Literal>;
+      rights: purify.Maybe<rdfjs.Literal>;
+      rightsHolder: purify.Maybe<rdfjs.Literal>;
+    } & $UnwrapR<ReturnType<typeof KosResourceStatic.$propertiesFromRdf>>
+  > {
+    const $super0Either = KosResourceStatic.$propertiesFromRdf({
+      ...$context,
+      ignoreRdfType: true,
+      objectSet: $objectSet,
+      preferredLanguages: $preferredLanguages,
+      resource: $resource,
+    });
+    if ($super0Either.isLeft()) {
+      return $super0Either;
+    }
+
+    const $super0 = $super0Either.unsafeCoerce();
+    if (!$ignoreRdfType) {
+      const $rdfTypeCheck: purify.Either<Error, true> = $resource
+        .value($RdfVocabularies.rdf.type)
+        .chain((actualRdfType) => actualRdfType.toIri())
+        .chain((actualRdfType) => {
+          // Check the expected type and its known subtypes
+          switch (actualRdfType.value) {
+            case "http://www.w3.org/2004/02/skos/core#ConceptScheme":
+              return purify.Either.of(true);
+          }
+
+          // Check arbitrary rdfs:subClassOf's of the expected type
+          if ($resource.isInstanceOf(ConceptScheme.$fromRdfType)) {
+            return purify.Either.of(true);
+          }
+
+          return purify.Left(
+            new Error(
+              `${rdfjsResource.Resource.Identifier.toString($resource.identifier)} has unexpected RDF type (actual: ${actualRdfType.value}, expected: http://www.w3.org/2004/02/skos/core#ConceptScheme)`,
+            ),
+          );
+        });
+      if ($rdfTypeCheck.isLeft()) {
+        return $rdfTypeCheck;
+      }
+    }
+
+    if ($resource.identifier.termType !== "NamedNode") {
+      return purify.Left(
+        new rdfjsResource.Resource.MistypedTermValueError({
+          actualValue: $resource.identifier,
+          expectedValueType: "(rdfjs.NamedNode)",
+          focusResource: $resource,
+          predicate: $RdfVocabularies.rdf.subject,
+        }),
+      );
+    }
+
+    const $identifier: ConceptScheme.$Identifier = $resource.identifier;
+    const $type = "ConceptScheme" as const;
+    const _hasTopConceptEither: purify.Either<
+      Error,
+      $LazyObjectSet<Concept.$Identifier, PartialConcept, Concept>
+    > = purify.Either.of<
+      Error,
+      rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
+    >(
+      $resource.values($properties.hasTopConcept["identifier"], {
+        unique: true,
+      }),
+    )
+      .chain((values) =>
+        values.chainMap((value) =>
+          value.toResource().chain((resource) =>
+            PartialConcept.$fromRdf(resource, {
+              ...$context,
+              ignoreRdfType: true,
+              objectSet: $objectSet,
+              preferredLanguages: $preferredLanguages,
+            }),
+          ),
+        ),
+      )
+      .map((values) => values.toArray())
+      .map((valuesArray) =>
+        rdfjsResource.Resource.Values.fromValue({
+          focusResource: $resource,
+          predicate: ConceptScheme.$properties.hasTopConcept["identifier"],
+          value: valuesArray,
+        }),
+      )
+      .map((values) =>
+        values.map(
+          (partials) =>
+            new $LazyObjectSet<Concept.$Identifier, PartialConcept, Concept>({
+              partials,
+              resolver: (identifiers) =>
+                $objectSet.concepts({
+                  where: { identifiers, type: "identifiers" },
+                }),
+            }),
+        ),
+      )
+      .chain((values) => values.head());
+    if (_hasTopConceptEither.isLeft()) {
+      return _hasTopConceptEither;
+    }
+
+    const hasTopConcept = _hasTopConceptEither.unsafeCoerce();
+    const _licenseEither: purify.Either<
+      Error,
+      purify.Maybe<rdfjs.NamedNode | rdfjs.Literal>
+    > = purify.Either.of<
+      Error,
+      rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
+    >($resource.values($properties.license["identifier"], { unique: true }))
+      .chain((values) =>
+        values.chainMap((value) =>
+          purify.Either.of<
+            Error,
+            rdfjs.BlankNode | rdfjs.Literal | rdfjs.NamedNode
+          >(value.toTerm()).chain((term) => {
+            switch (term.termType) {
+              case "NamedNode":
+              case "Literal":
+                return purify.Either.of<Error, rdfjs.NamedNode | rdfjs.Literal>(
+                  term,
+                );
+              default:
+                return purify.Left<Error, rdfjs.NamedNode | rdfjs.Literal>(
+                  new rdfjsResource.Resource.MistypedTermValueError({
+                    actualValue: term,
+                    expectedValueType: "(rdfjs.NamedNode | rdfjs.Literal)",
+                    focusResource: $resource,
+                    predicate: ConceptScheme.$properties.license["identifier"],
+                  }),
+                );
+            }
+          }),
+        ),
+      )
+      .map((values) =>
+        values.length > 0
+          ? values.map((value) => purify.Maybe.of(value))
+          : rdfjsResource.Resource.Values.fromValue<
+              purify.Maybe<rdfjs.NamedNode | rdfjs.Literal>
+            >({
+              focusResource: $resource,
+              predicate: ConceptScheme.$properties.license["identifier"],
+              value: purify.Maybe.empty(),
+            }),
+      )
+      .chain((values) => values.head());
+    if (_licenseEither.isLeft()) {
+      return _licenseEither;
+    }
+
+    const license = _licenseEither.unsafeCoerce();
+    const _rightsEither: purify.Either<
+      Error,
+      purify.Maybe<rdfjs.Literal>
+    > = purify.Either.of<
+      Error,
+      rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
+    >($resource.values($properties.rights["identifier"], { unique: true }))
+      .chain((values) => {
+        if (!$preferredLanguages || $preferredLanguages.length === 0) {
+          return purify.Either.of<
+            Error,
+            rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
+          >(values);
+        }
+
+        const literalValuesEither = values.chainMap((value) =>
+          value.toLiteral(),
+        );
+        if (literalValuesEither.isLeft()) {
+          return literalValuesEither;
+        }
+        const literalValues = literalValuesEither.unsafeCoerce();
+
+        // Return all literals for the first preferredLanguage, then all literals for the second preferredLanguage, etc.
+        // Within a preferredLanguage the literals may be in any order.
+        let filteredLiteralValues:
+          | rdfjsResource.Resource.Values<rdfjs.Literal>
+          | undefined;
+        for (const preferredLanguage of $preferredLanguages) {
+          if (!filteredLiteralValues) {
+            filteredLiteralValues = literalValues.filter(
+              (value) => value.language === preferredLanguage,
+            );
+          } else {
+            filteredLiteralValues = filteredLiteralValues.concat(
+              ...literalValues
+                .filter((value) => value.language === preferredLanguage)
+                .toArray(),
+            );
+          }
+        }
+
+        return purify.Either.of<
+          Error,
+          rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
+        >(
+          filteredLiteralValues!.map(
+            (literalValue) =>
+              new rdfjsResource.Resource.TermValue({
+                focusResource: $resource,
+                predicate: ConceptScheme.$properties.rights["identifier"],
+                term: literalValue,
+              }),
+          ),
+        );
+      })
+      .chain((values) => values.chainMap((value) => value.toLiteral()))
+      .map((values) =>
+        values.length > 0
+          ? values.map((value) => purify.Maybe.of(value))
+          : rdfjsResource.Resource.Values.fromValue<
+              purify.Maybe<rdfjs.Literal>
+            >({
+              focusResource: $resource,
+              predicate: ConceptScheme.$properties.rights["identifier"],
+              value: purify.Maybe.empty(),
+            }),
+      )
+      .chain((values) => values.head());
+    if (_rightsEither.isLeft()) {
+      return _rightsEither;
+    }
+
+    const rights = _rightsEither.unsafeCoerce();
+    const _rightsHolderEither: purify.Either<
+      Error,
+      purify.Maybe<rdfjs.Literal>
+    > = purify.Either.of<
+      Error,
+      rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
+    >(
+      $resource.values($properties.rightsHolder["identifier"], {
+        unique: true,
+      }),
+    )
+      .chain((values) => {
+        if (!$preferredLanguages || $preferredLanguages.length === 0) {
+          return purify.Either.of<
+            Error,
+            rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
+          >(values);
+        }
+
+        const literalValuesEither = values.chainMap((value) =>
+          value.toLiteral(),
+        );
+        if (literalValuesEither.isLeft()) {
+          return literalValuesEither;
+        }
+        const literalValues = literalValuesEither.unsafeCoerce();
+
+        // Return all literals for the first preferredLanguage, then all literals for the second preferredLanguage, etc.
+        // Within a preferredLanguage the literals may be in any order.
+        let filteredLiteralValues:
+          | rdfjsResource.Resource.Values<rdfjs.Literal>
+          | undefined;
+        for (const preferredLanguage of $preferredLanguages) {
+          if (!filteredLiteralValues) {
+            filteredLiteralValues = literalValues.filter(
+              (value) => value.language === preferredLanguage,
+            );
+          } else {
+            filteredLiteralValues = filteredLiteralValues.concat(
+              ...literalValues
+                .filter((value) => value.language === preferredLanguage)
+                .toArray(),
+            );
+          }
+        }
+
+        return purify.Either.of<
+          Error,
+          rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
+        >(
+          filteredLiteralValues!.map(
+            (literalValue) =>
+              new rdfjsResource.Resource.TermValue({
+                focusResource: $resource,
+                predicate: ConceptScheme.$properties.rightsHolder["identifier"],
+                term: literalValue,
+              }),
+          ),
+        );
+      })
+      .chain((values) => values.chainMap((value) => value.toLiteral()))
+      .map((values) =>
+        values.length > 0
+          ? values.map((value) => purify.Maybe.of(value))
+          : rdfjsResource.Resource.Values.fromValue<
+              purify.Maybe<rdfjs.Literal>
+            >({
+              focusResource: $resource,
+              predicate: ConceptScheme.$properties.rightsHolder["identifier"],
+              value: purify.Maybe.empty(),
+            }),
+      )
+      .chain((values) => values.head());
+    if (_rightsHolderEither.isLeft()) {
+      return _rightsHolderEither;
+    }
+
+    const rightsHolder = _rightsHolderEither.unsafeCoerce();
+    return purify.Either.of({
+      ...$super0,
+      $identifier,
+      $type,
+      hasTopConcept,
+      license,
+      rights,
+      rightsHolder,
+    });
+  }
+
+  export function $sparqlConstructQuery(
+    parameters?: {
+      ignoreRdfType?: boolean;
+      prefixes?: { [prefix: string]: string };
+      preferredLanguages?: readonly string[];
+      subject?: sparqljs.Triple["subject"];
+    } & Omit<sparqljs.ConstructQuery, "prefixes" | "queryType" | "type">,
+  ): sparqljs.ConstructQuery {
+    const { ignoreRdfType, preferredLanguages, subject, ...queryParameters } =
+      parameters ?? {};
+
+    return {
+      ...queryParameters,
+      prefixes: parameters?.prefixes ?? {},
+      queryType: "CONSTRUCT",
+      template: (queryParameters.template ?? []).concat(
+        ConceptScheme.$sparqlConstructTemplateTriples({
+          ignoreRdfType,
+          subject,
+        }),
+      ),
+      type: "query",
+      where: (queryParameters.where ?? []).concat(
+        ConceptScheme.$sparqlWherePatterns({
+          ignoreRdfType,
+          preferredLanguages,
+          subject,
+        }),
+      ),
+    };
+  }
+
+  export function $sparqlConstructQueryString(
+    parameters?: {
+      ignoreRdfType?: boolean;
+      preferredLanguages?: readonly string[];
+      subject?: sparqljs.Triple["subject"];
+      variablePrefix?: string;
+    } & Omit<sparqljs.ConstructQuery, "prefixes" | "queryType" | "type"> &
+      sparqljs.GeneratorOptions,
+  ): string {
+    return new sparqljs.Generator(parameters).stringify(
+      ConceptScheme.$sparqlConstructQuery(parameters),
+    );
+  }
+
+  export function $sparqlConstructTemplateTriples(parameters?: {
+    ignoreRdfType?: boolean;
+    subject?: sparqljs.Triple["subject"];
+    variablePrefix?: string;
+  }): readonly sparqljs.Triple[] {
+    const subject =
+      parameters?.subject ?? dataFactory.variable!("conceptScheme");
+    const triples: sparqljs.Triple[] = [];
+    const variablePrefix =
+      parameters?.variablePrefix ??
+      (subject.termType === "Variable" ? subject.value : "conceptScheme");
+    triples.push(
+      ...KosResourceStatic.$sparqlConstructTemplateTriples({
+        ignoreRdfType: true,
+        subject,
+        variablePrefix,
+      }),
+    );
+    if (!parameters?.ignoreRdfType) {
+      triples.push(
+        {
+          subject,
+          predicate: $RdfVocabularies.rdf.type,
+          object: dataFactory.variable!(`${variablePrefix}RdfType`),
+        },
+        {
+          subject: dataFactory.variable!(`${variablePrefix}RdfType`),
+          predicate: $RdfVocabularies.rdfs.subClassOf,
+          object: dataFactory.variable!(`${variablePrefix}RdfClass`),
+        },
+      );
+    }
+
+    triples.push({
+      object: dataFactory.variable!(`${variablePrefix}HasTopConcept`),
+      predicate: ConceptScheme.$properties.hasTopConcept["identifier"],
+      subject,
+    });
+    triples.push(
+      ...PartialConcept.$sparqlConstructTemplateTriples({
+        ignoreRdfType: true,
+        subject: dataFactory.variable!(`${variablePrefix}HasTopConcept`),
+        variablePrefix: `${variablePrefix}HasTopConcept`,
+      }),
+    );
+    triples.push({
+      object: dataFactory.variable!(`${variablePrefix}License`),
+      predicate: ConceptScheme.$properties.license["identifier"],
+      subject,
+    });
+    triples.push({
+      object: dataFactory.variable!(`${variablePrefix}Rights`),
+      predicate: ConceptScheme.$properties.rights["identifier"],
+      subject,
+    });
+    triples.push({
+      object: dataFactory.variable!(`${variablePrefix}RightsHolder`),
+      predicate: ConceptScheme.$properties.rightsHolder["identifier"],
+      subject,
+    });
+    return triples;
+  }
+
+  export function $sparqlWherePatterns(parameters?: {
+    ignoreRdfType?: boolean;
+    preferredLanguages?: readonly string[];
+    subject?: sparqljs.Triple["subject"];
+    variablePrefix?: string;
+  }): readonly sparqljs.Pattern[] {
+    const optionalPatterns: sparqljs.OptionalPattern[] = [];
+    const requiredPatterns: sparqljs.Pattern[] = [];
+    const subject =
+      parameters?.subject ?? dataFactory.variable!("conceptScheme");
+    const variablePrefix =
+      parameters?.variablePrefix ??
+      (subject.termType === "Variable" ? subject.value : "conceptScheme");
+    for (const pattern of KosResourceStatic.$sparqlWherePatterns({
+      ignoreRdfType: true,
+      subject,
+      variablePrefix,
+    })) {
+      if (pattern.type === "optional") {
+        optionalPatterns.push(pattern);
+      } else {
+        requiredPatterns.push(pattern);
+      }
+    }
+
+    const rdfTypeVariable = dataFactory.variable!(`${variablePrefix}RdfType`);
+    if (!parameters?.ignoreRdfType) {
+      requiredPatterns.push(
+        $sparqlInstancesOfPattern({
+          rdfType: ConceptScheme.$fromRdfType,
+          subject,
+        }),
+        {
+          triples: [
+            {
+              subject,
+              predicate: $RdfVocabularies.rdf.type,
+              object: rdfTypeVariable,
+            },
+          ],
+          type: "bgp" as const,
+        },
+      );
+      optionalPatterns.push({
+        patterns: [
+          {
+            triples: [
+              {
+                subject: rdfTypeVariable,
+                predicate: {
+                  items: [$RdfVocabularies.rdfs.subClassOf],
+                  pathType: "+" as const,
+                  type: "path" as const,
+                },
+                object: dataFactory.variable!(`${variablePrefix}RdfClass`),
+              },
+            ],
+            type: "bgp" as const,
+          },
+        ],
+        type: "optional" as const,
+      });
+    }
+
+    const propertyPatterns: readonly sparqljs.Pattern[] = [
+      {
+        patterns: [
+          {
+            triples: [
+              {
+                object: dataFactory.variable!(`${variablePrefix}HasTopConcept`),
+                predicate:
+                  ConceptScheme.$properties.hasTopConcept["identifier"],
+                subject,
+              },
+            ],
+            type: "bgp",
+          },
+          ...PartialConcept.$sparqlWherePatterns({
+            ignoreRdfType: true,
+            preferredLanguages: parameters?.preferredLanguages,
+            subject: dataFactory.variable!(`${variablePrefix}HasTopConcept`),
+            variablePrefix: `${variablePrefix}HasTopConcept`,
+          }),
+        ],
+        type: "optional",
+      },
+      {
+        patterns: [
+          {
+            triples: [
+              {
+                object: dataFactory.variable!(`${variablePrefix}License`),
+                predicate: ConceptScheme.$properties.license["identifier"],
+                subject,
+              },
+            ],
+            type: "bgp",
+          },
+        ],
+        type: "optional",
+      },
+      {
+        patterns: [
+          {
+            triples: [
+              {
+                object: dataFactory.variable!(`${variablePrefix}Rights`),
+                predicate: ConceptScheme.$properties.rights["identifier"],
+                subject,
+              },
+            ],
+            type: "bgp",
+          },
+          ...[parameters?.preferredLanguages ?? []]
+            .filter((languages) => languages.length > 0)
+            .map((languages) =>
+              languages.map((language) => ({
+                type: "operation" as const,
+                operator: "=",
+                args: [
+                  {
+                    type: "operation" as const,
+                    operator: "lang",
+                    args: [dataFactory.variable!(`${variablePrefix}Rights`)],
+                  },
+                  dataFactory.literal(language),
+                ],
+              })),
+            )
+            .map((langEqualsExpressions) => ({
+              type: "filter" as const,
+              expression: langEqualsExpressions.reduce(
+                (reducedExpression, langEqualsExpression) => {
+                  if (reducedExpression === null) {
+                    return langEqualsExpression;
+                  }
+                  return {
+                    type: "operation" as const,
+                    operator: "||",
+                    args: [reducedExpression, langEqualsExpression],
+                  };
+                },
+                null as sparqljs.Expression | null,
+              ) as sparqljs.Expression,
+            })),
+        ],
+        type: "optional",
+      },
+      {
+        patterns: [
+          {
+            triples: [
+              {
+                object: dataFactory.variable!(`${variablePrefix}RightsHolder`),
+                predicate: ConceptScheme.$properties.rightsHolder["identifier"],
+                subject,
+              },
+            ],
+            type: "bgp",
+          },
+          ...[parameters?.preferredLanguages ?? []]
+            .filter((languages) => languages.length > 0)
+            .map((languages) =>
+              languages.map((language) => ({
+                type: "operation" as const,
+                operator: "=",
+                args: [
+                  {
+                    type: "operation" as const,
+                    operator: "lang",
+                    args: [
+                      dataFactory.variable!(`${variablePrefix}RightsHolder`),
+                    ],
+                  },
+                  dataFactory.literal(language),
+                ],
+              })),
+            )
+            .map((langEqualsExpressions) => ({
+              type: "filter" as const,
+              expression: langEqualsExpressions.reduce(
+                (reducedExpression, langEqualsExpression) => {
+                  if (reducedExpression === null) {
+                    return langEqualsExpression;
+                  }
+                  return {
+                    type: "operation" as const,
+                    operator: "||",
+                    args: [reducedExpression, langEqualsExpression],
+                  };
+                },
+                null as sparqljs.Expression | null,
+              ) as sparqljs.Expression,
+            })),
+        ],
+        type: "optional",
+      },
+    ];
+    for (const pattern of propertyPatterns) {
+      if (pattern.type === "optional") {
+        optionalPatterns.push(pattern);
+      } else {
+        requiredPatterns.push(pattern);
+      }
+    }
+
+    return requiredPatterns.concat(optionalPatterns);
+  }
+
+  export function $toRdf(
+    _conceptScheme: ConceptScheme,
+    options?: {
+      ignoreRdfType?: boolean;
+      mutateGraph?: rdfjsResource.MutableResource.MutateGraph;
+      resourceSet?: rdfjsResource.MutableResourceSet;
+    },
+  ): rdfjsResource.MutableResource<rdfjs.NamedNode> {
+    const ignoreRdfType = !!options?.ignoreRdfType;
+    const mutateGraph = options?.mutateGraph;
+    const resourceSet =
+      options?.resourceSet ??
+      new rdfjsResource.MutableResourceSet({
+        dataFactory,
+        dataset: datasetFactory.dataset(),
+      });
+    const resource = KosResourceStatic.$toRdf(_conceptScheme, {
+      ignoreRdfType: true,
+      mutateGraph,
+      resourceSet,
+    });
+    if (!ignoreRdfType) {
+      resource.add(
+        $RdfVocabularies.rdf.type,
+        resource.dataFactory.namedNode(
+          "http://www.w3.org/2004/02/skos/core#ConceptScheme",
+        ),
+      );
+    }
+
+    resource.add(
+      ConceptScheme.$properties.hasTopConcept["identifier"],
+      ..._conceptScheme.hasTopConcept.partials.flatMap((item) => [
+        PartialConcept.$toRdf(item, {
+          mutateGraph: mutateGraph,
+          resourceSet: resourceSet,
+        }).identifier,
+      ]),
+    );
+    resource.add(
+      ConceptScheme.$properties.license["identifier"],
+      ..._conceptScheme.license.toList(),
+    );
+    resource.add(
+      ConceptScheme.$properties.rights["identifier"],
+      ..._conceptScheme.rights.toList(),
+    );
+    resource.add(
+      ConceptScheme.$properties.rightsHolder["identifier"],
+      ..._conceptScheme.rightsHolder.toList(),
+    );
+    return resource;
+  }
+
+  export function isConceptScheme(
+    object: KosResource,
+  ): object is ConceptScheme {
+    switch (object.$type) {
+      case "ConceptScheme":
+        return true;
+      default:
+        return false;
+    }
+  }
+}
+export interface PartialKosResource {
+  readonly $identifier: PartialKosResourceStatic.$Identifier;
+  readonly $type: "PartialConcept" | "PartialConceptScheme";
+  readonly prefLabel: readonly rdfjs.Literal[];
+  readonly prefLabelXl: $LazyObjectSet<Label.$Identifier, PartialLabel, Label>;
+}
+
+export namespace PartialKosResourceStatic {
+  export function $create(parameters: {
+    readonly $identifier: rdfjs.NamedNode | string;
+    readonly prefLabel?:
+      | readonly rdfjs.Literal[]
+      | readonly boolean[]
+      | readonly number[]
+      | readonly string[];
+    readonly prefLabelXl?:
+      | $LazyObjectSet<Label.$Identifier, PartialLabel, Label>
+      | readonly Label[];
+  }): Omit<PartialKosResource, "$type"> {
+    let $identifier: PartialKosResourceStatic.$Identifier;
+    if (typeof parameters.$identifier === "object") {
+      $identifier = parameters.$identifier;
+    } else if (typeof parameters.$identifier === "string") {
+      $identifier = dataFactory.namedNode(parameters.$identifier);
+    } else {
+      $identifier = parameters.$identifier satisfies never;
+    }
+
+    let prefLabel: readonly rdfjs.Literal[];
+    if (typeof parameters.prefLabel === "undefined") {
+      prefLabel = [];
+    } else if ($isReadonlyObjectArray(parameters.prefLabel)) {
+      prefLabel = parameters.prefLabel;
+    } else if ($isReadonlyBooleanArray(parameters.prefLabel)) {
+      prefLabel = parameters.prefLabel.map((item) =>
+        rdfLiteral.toRdf(item, { dataFactory }),
+      );
+    } else if ($isReadonlyNumberArray(parameters.prefLabel)) {
+      prefLabel = parameters.prefLabel.map((item) =>
+        rdfLiteral.toRdf(item, { dataFactory }),
+      );
+    } else if ($isReadonlyStringArray(parameters.prefLabel)) {
+      prefLabel = parameters.prefLabel.map((item) => dataFactory.literal(item));
+    } else {
+      prefLabel = parameters.prefLabel satisfies never;
+    }
+
+    let prefLabelXl: $LazyObjectSet<Label.$Identifier, PartialLabel, Label>;
+    if (
+      typeof parameters.prefLabelXl === "object" &&
+      parameters.prefLabelXl instanceof $LazyObjectSet
+    ) {
+      prefLabelXl = parameters.prefLabelXl;
+    } else if (typeof parameters.prefLabelXl === "object") {
+      prefLabelXl = new $LazyObjectSet<Label.$Identifier, PartialLabel, Label>({
+        partials: parameters.prefLabelXl.map((object) =>
+          PartialLabel.$create(object),
+        ),
+        resolver: async () =>
+          purify.Either.of(parameters.prefLabelXl as readonly Label[]),
+      });
+    } else if (typeof parameters.prefLabelXl === "undefined") {
+      prefLabelXl = new $LazyObjectSet<Label.$Identifier, PartialLabel, Label>({
+        partials: [],
+        resolver: async () => {
+          throw new Error("should never be called");
+        },
+      });
+    } else {
+      prefLabelXl = parameters.prefLabelXl satisfies never;
+    }
+
+    return { $identifier, prefLabel, prefLabelXl };
+  }
+
+  export type $Identifier = rdfjs.NamedNode;
+
+  export namespace $Identifier {
+    export function fromString(
+      identifier: string,
+    ): purify.Either<Error, rdfjs.NamedNode> {
+      return purify.Either.encase(() =>
+        rdfjsResource.Resource.Identifier.fromString({
+          dataFactory,
+          identifier,
+        }),
+      ).chain((identifier) =>
+        identifier.termType === "NamedNode"
+          ? purify.Either.of(identifier)
+          : purify.Left(new Error("expected identifier to be NamedNode")),
+      ) as purify.Either<Error, rdfjs.NamedNode>;
+    }
+
+    export const // biome-ignore lint/suspicious/noShadowRestrictedNames:
+      toString = rdfjsResource.Resource.Identifier.toString;
+  }
+
+  export const $properties = {
+    prefLabel: {
+      identifier: dataFactory.namedNode(
+        "http://www.w3.org/2004/02/skos/core#prefLabel",
+      ),
+    },
+    prefLabelXl: {
+      identifier: dataFactory.namedNode(
+        "http://www.w3.org/2008/05/skos-xl#prefLabel",
+      ),
+    },
+  };
+
+  export function $propertiesFromRdf({
+    ignoreRdfType: $ignoreRdfType,
+    objectSet: $objectSet,
+    preferredLanguages: $preferredLanguages,
+    resource: $resource,
+    // @ts-ignore
+    ...$context
+  }: {
+    [_index: string]: any;
+    ignoreRdfType: boolean;
+    objectSet: $ObjectSet;
+    preferredLanguages?: readonly string[];
+    resource: rdfjsResource.Resource;
+  }): purify.Either<
+    Error,
+    {
+      $identifier: rdfjs.NamedNode;
+      prefLabel: readonly rdfjs.Literal[];
+      prefLabelXl: $LazyObjectSet<Label.$Identifier, PartialLabel, Label>;
+    }
+  > {
+    if ($resource.identifier.termType !== "NamedNode") {
+      return purify.Left(
+        new rdfjsResource.Resource.MistypedTermValueError({
+          actualValue: $resource.identifier,
+          expectedValueType: "(rdfjs.NamedNode)",
+          focusResource: $resource,
+          predicate: $RdfVocabularies.rdf.subject,
+        }),
+      );
+    }
+
+    const $identifier: PartialKosResourceStatic.$Identifier =
+      $resource.identifier;
+    const _prefLabelEither: purify.Either<Error, readonly rdfjs.Literal[]> =
+      purify.Either.of<
+        Error,
+        rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
+      >($resource.values($properties.prefLabel["identifier"], { unique: true }))
+        .chain((values) => {
+          if (!$preferredLanguages || $preferredLanguages.length === 0) {
+            return purify.Either.of<
+              Error,
+              rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
+            >(values);
+          }
+
+          const literalValuesEither = values.chainMap((value) =>
+            value.toLiteral(),
+          );
+          if (literalValuesEither.isLeft()) {
+            return literalValuesEither;
+          }
+          const literalValues = literalValuesEither.unsafeCoerce();
+
+          // Return all literals for the first preferredLanguage, then all literals for the second preferredLanguage, etc.
+          // Within a preferredLanguage the literals may be in any order.
+          let filteredLiteralValues:
+            | rdfjsResource.Resource.Values<rdfjs.Literal>
+            | undefined;
+          for (const preferredLanguage of $preferredLanguages) {
+            if (!filteredLiteralValues) {
+              filteredLiteralValues = literalValues.filter(
+                (value) => value.language === preferredLanguage,
+              );
+            } else {
+              filteredLiteralValues = filteredLiteralValues.concat(
+                ...literalValues
+                  .filter((value) => value.language === preferredLanguage)
+                  .toArray(),
+              );
+            }
+          }
+
+          return purify.Either.of<
+            Error,
+            rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
+          >(
+            filteredLiteralValues!.map(
+              (literalValue) =>
+                new rdfjsResource.Resource.TermValue({
+                  focusResource: $resource,
+                  predicate:
+                    PartialKosResourceStatic.$properties.prefLabel[
+                      "identifier"
+                    ],
+                  term: literalValue,
+                }),
+            ),
+          );
+        })
+        .chain((values) => values.chainMap((value) => value.toLiteral()))
+        .map((values) => values.toArray())
+        .map((valuesArray) =>
+          rdfjsResource.Resource.Values.fromValue({
+            focusResource: $resource,
+            predicate:
+              PartialKosResourceStatic.$properties.prefLabel["identifier"],
+            value: valuesArray,
+          }),
+        )
+        .chain((values) => values.head());
+    if (_prefLabelEither.isLeft()) {
+      return _prefLabelEither;
+    }
+
+    const prefLabel = _prefLabelEither.unsafeCoerce();
+    const _prefLabelXlEither: purify.Either<
+      Error,
+      $LazyObjectSet<Label.$Identifier, PartialLabel, Label>
+    > = purify.Either.of<
+      Error,
+      rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
+    >($resource.values($properties.prefLabelXl["identifier"], { unique: true }))
+      .chain((values) =>
+        values.chainMap((value) =>
+          value.toResource().chain((resource) =>
+            PartialLabel.$fromRdf(resource, {
+              ...$context,
+              ignoreRdfType: true,
+              objectSet: $objectSet,
+              preferredLanguages: $preferredLanguages,
+            }),
+          ),
+        ),
+      )
+      .map((values) => values.toArray())
+      .map((valuesArray) =>
+        rdfjsResource.Resource.Values.fromValue({
+          focusResource: $resource,
+          predicate:
+            PartialKosResourceStatic.$properties.prefLabelXl["identifier"],
+          value: valuesArray,
+        }),
+      )
+      .map((values) =>
+        values.map(
+          (partials) =>
+            new $LazyObjectSet<Label.$Identifier, PartialLabel, Label>({
+              partials,
+              resolver: (identifiers) =>
+                $objectSet.labels({
+                  where: { identifiers, type: "identifiers" },
+                }),
+            }),
+        ),
+      )
+      .chain((values) => values.head());
+    if (_prefLabelXlEither.isLeft()) {
+      return _prefLabelXlEither;
+    }
+
+    const prefLabelXl = _prefLabelXlEither.unsafeCoerce();
+    return purify.Either.of({ $identifier, prefLabel, prefLabelXl });
+  }
+
+  export function $sparqlConstructQuery(
+    parameters?: {
+      ignoreRdfType?: boolean;
+      prefixes?: { [prefix: string]: string };
+      preferredLanguages?: readonly string[];
+      subject?: sparqljs.Triple["subject"];
+    } & Omit<sparqljs.ConstructQuery, "prefixes" | "queryType" | "type">,
+  ): sparqljs.ConstructQuery {
+    const { ignoreRdfType, preferredLanguages, subject, ...queryParameters } =
+      parameters ?? {};
+
+    return {
+      ...queryParameters,
+      prefixes: parameters?.prefixes ?? {},
+      queryType: "CONSTRUCT",
+      template: (queryParameters.template ?? []).concat(
+        PartialKosResourceStatic.$sparqlConstructTemplateTriples({
+          ignoreRdfType,
+          subject,
+        }),
+      ),
+      type: "query",
+      where: (queryParameters.where ?? []).concat(
+        PartialKosResourceStatic.$sparqlWherePatterns({
+          ignoreRdfType,
+          preferredLanguages,
+          subject,
+        }),
+      ),
+    };
+  }
+
+  export function $sparqlConstructQueryString(
+    parameters?: {
+      ignoreRdfType?: boolean;
+      preferredLanguages?: readonly string[];
+      subject?: sparqljs.Triple["subject"];
+      variablePrefix?: string;
+    } & Omit<sparqljs.ConstructQuery, "prefixes" | "queryType" | "type"> &
+      sparqljs.GeneratorOptions,
+  ): string {
+    return new sparqljs.Generator(parameters).stringify(
+      PartialKosResourceStatic.$sparqlConstructQuery(parameters),
+    );
+  }
+
+  export function $sparqlConstructTemplateTriples(parameters?: {
+    ignoreRdfType?: boolean;
+    subject?: sparqljs.Triple["subject"];
+    variablePrefix?: string;
+  }): readonly sparqljs.Triple[] {
+    const subject =
+      parameters?.subject ?? dataFactory.variable!("partialKosResource");
+    const triples: sparqljs.Triple[] = [];
+    const variablePrefix =
+      parameters?.variablePrefix ??
+      (subject.termType === "Variable" ? subject.value : "partialKosResource");
+    triples.push({
+      object: dataFactory.variable!(`${variablePrefix}PrefLabel`),
+      predicate: PartialKosResourceStatic.$properties.prefLabel["identifier"],
+      subject,
+    });
+    triples.push({
+      object: dataFactory.variable!(`${variablePrefix}PrefLabelXl`),
+      predicate: PartialKosResourceStatic.$properties.prefLabelXl["identifier"],
+      subject,
+    });
+    triples.push(
+      ...PartialLabel.$sparqlConstructTemplateTriples({
+        ignoreRdfType: true,
+        subject: dataFactory.variable!(`${variablePrefix}PrefLabelXl`),
+        variablePrefix: `${variablePrefix}PrefLabelXl`,
+      }),
+    );
+    return triples;
+  }
+
+  export function $sparqlWherePatterns(parameters?: {
+    ignoreRdfType?: boolean;
+    preferredLanguages?: readonly string[];
+    subject?: sparqljs.Triple["subject"];
+    variablePrefix?: string;
+  }): readonly sparqljs.Pattern[] {
+    const optionalPatterns: sparqljs.OptionalPattern[] = [];
+    const requiredPatterns: sparqljs.Pattern[] = [];
+    const subject =
+      parameters?.subject ?? dataFactory.variable!("partialKosResource");
+    const variablePrefix =
+      parameters?.variablePrefix ??
+      (subject.termType === "Variable" ? subject.value : "partialKosResource");
+    const propertyPatterns: readonly sparqljs.Pattern[] = [
+      {
+        patterns: [
+          {
+            triples: [
+              {
+                object: dataFactory.variable!(`${variablePrefix}PrefLabel`),
+                predicate:
+                  PartialKosResourceStatic.$properties.prefLabel["identifier"],
+                subject,
+              },
+            ],
+            type: "bgp",
+          },
+          ...[parameters?.preferredLanguages ?? []]
+            .filter((languages) => languages.length > 0)
+            .map((languages) =>
+              languages.map((language) => ({
+                type: "operation" as const,
+                operator: "=",
+                args: [
+                  {
+                    type: "operation" as const,
+                    operator: "lang",
+                    args: [dataFactory.variable!(`${variablePrefix}PrefLabel`)],
+                  },
+                  dataFactory.literal(language),
+                ],
+              })),
+            )
+            .map((langEqualsExpressions) => ({
+              type: "filter" as const,
+              expression: langEqualsExpressions.reduce(
+                (reducedExpression, langEqualsExpression) => {
+                  if (reducedExpression === null) {
+                    return langEqualsExpression;
+                  }
+                  return {
+                    type: "operation" as const,
+                    operator: "||",
+                    args: [reducedExpression, langEqualsExpression],
+                  };
+                },
+                null as sparqljs.Expression | null,
+              ) as sparqljs.Expression,
+            })),
+        ],
+        type: "optional",
+      },
+      {
+        patterns: [
+          {
+            triples: [
+              {
+                object: dataFactory.variable!(`${variablePrefix}PrefLabelXl`),
+                predicate:
+                  PartialKosResourceStatic.$properties.prefLabelXl[
+                    "identifier"
+                  ],
+                subject,
+              },
+            ],
+            type: "bgp",
+          },
+          ...PartialLabel.$sparqlWherePatterns({
+            ignoreRdfType: true,
+            preferredLanguages: parameters?.preferredLanguages,
+            subject: dataFactory.variable!(`${variablePrefix}PrefLabelXl`),
+            variablePrefix: `${variablePrefix}PrefLabelXl`,
+          }),
+        ],
+        type: "optional",
+      },
+    ];
+    for (const pattern of propertyPatterns) {
+      if (pattern.type === "optional") {
+        optionalPatterns.push(pattern);
+      } else {
+        requiredPatterns.push(pattern);
+      }
+    }
+
+    return requiredPatterns.concat(optionalPatterns);
+  }
+
+  export function $toRdf(
+    _partialKosResource: PartialKosResource,
+    options?: {
+      ignoreRdfType?: boolean;
+      mutateGraph?: rdfjsResource.MutableResource.MutateGraph;
+      resourceSet?: rdfjsResource.MutableResourceSet;
+    },
+  ): rdfjsResource.MutableResource<rdfjs.NamedNode> {
+    const mutateGraph = options?.mutateGraph;
+    const resourceSet =
+      options?.resourceSet ??
+      new rdfjsResource.MutableResourceSet({
+        dataFactory,
+        dataset: datasetFactory.dataset(),
+      });
+    const resource = resourceSet.mutableNamedResource(
+      _partialKosResource.$identifier,
+      { mutateGraph },
+    );
+    resource.add(
+      PartialKosResourceStatic.$properties.prefLabel["identifier"],
+      ..._partialKosResource.prefLabel.flatMap((item) => [item]),
+    );
+    resource.add(
+      PartialKosResourceStatic.$properties.prefLabelXl["identifier"],
+      ..._partialKosResource.prefLabelXl.partials.flatMap((item) => [
+        PartialLabel.$toRdf(item, {
+          mutateGraph: mutateGraph,
+          resourceSet: resourceSet,
+        }).identifier,
+      ]),
+    );
+    return resource;
+  }
+}
+export interface PartialConceptScheme extends PartialKosResource {
+  readonly $identifier: PartialConceptScheme.$Identifier;
+  readonly $type: "PartialConceptScheme";
+}
+
+export namespace PartialConceptScheme {
+  export function $create(
+    parameters: { readonly $identifier: rdfjs.NamedNode | string } & Parameters<
+      typeof PartialKosResourceStatic.$create
+    >[0],
+  ): PartialConceptScheme {
+    let $identifier: PartialConceptScheme.$Identifier;
+    if (typeof parameters.$identifier === "object") {
+      $identifier = parameters.$identifier;
+    } else if (typeof parameters.$identifier === "string") {
+      $identifier = dataFactory.namedNode(parameters.$identifier);
+    } else {
+      $identifier = parameters.$identifier satisfies never;
+    }
+
+    const $type = "PartialConceptScheme" as const;
+    return {
+      ...PartialKosResourceStatic.$create(parameters),
+      $identifier,
+      $type,
+    };
+  }
+
+  export function $fromRdf(
+    resource: rdfjsResource.Resource,
+    options?: {
+      [_index: string]: any;
+      ignoreRdfType?: boolean;
+      objectSet?: $ObjectSet;
+      preferredLanguages?: readonly string[];
+    },
+  ): purify.Either<Error, PartialConceptScheme> {
+    let {
+      ignoreRdfType = false,
+      objectSet,
+      preferredLanguages,
+      ...context
+    } = options ?? {};
+    if (!objectSet) {
+      objectSet = new $RdfjsDatasetObjectSet({ dataset: resource.dataset });
+    }
+
+    return PartialConceptScheme.$propertiesFromRdf({
+      ...context,
+      ignoreRdfType,
+      objectSet,
+      preferredLanguages,
+      resource,
+    });
+  }
+
+  export const $fromRdfType: rdfjs.NamedNode<string> = dataFactory.namedNode(
+    "http://www.w3.org/2004/02/skos/core#ConceptScheme",
+  );
+  export type $Identifier = PartialKosResourceStatic.$Identifier;
+  export const $Identifier = PartialKosResourceStatic.$Identifier;
+  export const $properties = { ...PartialKosResourceStatic.$properties };
+
+  export function $propertiesFromRdf({
+    ignoreRdfType: $ignoreRdfType,
+    objectSet: $objectSet,
+    preferredLanguages: $preferredLanguages,
+    resource: $resource,
+    // @ts-ignore
+    ...$context
+  }: {
+    [_index: string]: any;
+    ignoreRdfType: boolean;
+    objectSet: $ObjectSet;
+    preferredLanguages?: readonly string[];
+    resource: rdfjsResource.Resource;
+  }): purify.Either<
+    Error,
+    { $identifier: rdfjs.NamedNode; $type: "PartialConceptScheme" } & $UnwrapR<
+      ReturnType<typeof PartialKosResourceStatic.$propertiesFromRdf>
+    >
+  > {
+    const $super0Either = PartialKosResourceStatic.$propertiesFromRdf({
+      ...$context,
+      ignoreRdfType: true,
+      objectSet: $objectSet,
+      preferredLanguages: $preferredLanguages,
+      resource: $resource,
+    });
+    if ($super0Either.isLeft()) {
+      return $super0Either;
+    }
+
+    const $super0 = $super0Either.unsafeCoerce();
+    if (!$ignoreRdfType) {
+      const $rdfTypeCheck: purify.Either<Error, true> = $resource
+        .value($RdfVocabularies.rdf.type)
+        .chain((actualRdfType) => actualRdfType.toIri())
+        .chain((actualRdfType) => {
+          // Check the expected type and its known subtypes
+          switch (actualRdfType.value) {
+            case "http://www.w3.org/2004/02/skos/core#ConceptScheme":
+              return purify.Either.of(true);
+          }
+
+          // Check arbitrary rdfs:subClassOf's of the expected type
+          if ($resource.isInstanceOf(PartialConceptScheme.$fromRdfType)) {
+            return purify.Either.of(true);
+          }
+
+          return purify.Left(
+            new Error(
+              `${rdfjsResource.Resource.Identifier.toString($resource.identifier)} has unexpected RDF type (actual: ${actualRdfType.value}, expected: http://www.w3.org/2004/02/skos/core#ConceptScheme)`,
+            ),
+          );
+        });
+      if ($rdfTypeCheck.isLeft()) {
+        return $rdfTypeCheck;
+      }
+    }
+
+    if ($resource.identifier.termType !== "NamedNode") {
+      return purify.Left(
+        new rdfjsResource.Resource.MistypedTermValueError({
+          actualValue: $resource.identifier,
+          expectedValueType: "(rdfjs.NamedNode)",
+          focusResource: $resource,
+          predicate: $RdfVocabularies.rdf.subject,
+        }),
+      );
+    }
+
+    const $identifier: PartialConceptScheme.$Identifier = $resource.identifier;
+    const $type = "PartialConceptScheme" as const;
+    return purify.Either.of({ ...$super0, $identifier, $type });
+  }
+
+  export function $sparqlConstructQuery(
+    parameters?: {
+      ignoreRdfType?: boolean;
+      prefixes?: { [prefix: string]: string };
+      preferredLanguages?: readonly string[];
+      subject?: sparqljs.Triple["subject"];
+    } & Omit<sparqljs.ConstructQuery, "prefixes" | "queryType" | "type">,
+  ): sparqljs.ConstructQuery {
+    const { ignoreRdfType, preferredLanguages, subject, ...queryParameters } =
+      parameters ?? {};
+
+    return {
+      ...queryParameters,
+      prefixes: parameters?.prefixes ?? {},
+      queryType: "CONSTRUCT",
+      template: (queryParameters.template ?? []).concat(
+        PartialConceptScheme.$sparqlConstructTemplateTriples({
+          ignoreRdfType,
+          subject,
+        }),
+      ),
+      type: "query",
+      where: (queryParameters.where ?? []).concat(
+        PartialConceptScheme.$sparqlWherePatterns({
+          ignoreRdfType,
+          preferredLanguages,
+          subject,
+        }),
+      ),
+    };
+  }
+
+  export function $sparqlConstructQueryString(
+    parameters?: {
+      ignoreRdfType?: boolean;
+      preferredLanguages?: readonly string[];
+      subject?: sparqljs.Triple["subject"];
+      variablePrefix?: string;
+    } & Omit<sparqljs.ConstructQuery, "prefixes" | "queryType" | "type"> &
+      sparqljs.GeneratorOptions,
+  ): string {
+    return new sparqljs.Generator(parameters).stringify(
+      PartialConceptScheme.$sparqlConstructQuery(parameters),
+    );
+  }
+
+  export function $sparqlConstructTemplateTriples(parameters?: {
+    ignoreRdfType?: boolean;
+    subject?: sparqljs.Triple["subject"];
+    variablePrefix?: string;
+  }): readonly sparqljs.Triple[] {
+    const subject =
+      parameters?.subject ?? dataFactory.variable!("partialConceptScheme");
+    const triples: sparqljs.Triple[] = [];
+    const variablePrefix =
+      parameters?.variablePrefix ??
+      (subject.termType === "Variable"
+        ? subject.value
+        : "partialConceptScheme");
+    triples.push(
+      ...PartialKosResourceStatic.$sparqlConstructTemplateTriples({
+        ignoreRdfType: true,
+        subject,
+        variablePrefix,
+      }),
+    );
+    if (!parameters?.ignoreRdfType) {
+      triples.push(
+        {
+          subject,
+          predicate: $RdfVocabularies.rdf.type,
+          object: dataFactory.variable!(`${variablePrefix}RdfType`),
+        },
+        {
+          subject: dataFactory.variable!(`${variablePrefix}RdfType`),
+          predicate: $RdfVocabularies.rdfs.subClassOf,
+          object: dataFactory.variable!(`${variablePrefix}RdfClass`),
+        },
+      );
+    }
+
+    return triples;
+  }
+
+  export function $sparqlWherePatterns(parameters?: {
+    ignoreRdfType?: boolean;
+    preferredLanguages?: readonly string[];
+    subject?: sparqljs.Triple["subject"];
+    variablePrefix?: string;
+  }): readonly sparqljs.Pattern[] {
+    const optionalPatterns: sparqljs.OptionalPattern[] = [];
+    const requiredPatterns: sparqljs.Pattern[] = [];
+    const subject =
+      parameters?.subject ?? dataFactory.variable!("partialConceptScheme");
+    const variablePrefix =
+      parameters?.variablePrefix ??
+      (subject.termType === "Variable"
+        ? subject.value
+        : "partialConceptScheme");
+    for (const pattern of PartialKosResourceStatic.$sparqlWherePatterns({
+      ignoreRdfType: true,
+      subject,
+      variablePrefix,
+    })) {
+      if (pattern.type === "optional") {
+        optionalPatterns.push(pattern);
+      } else {
+        requiredPatterns.push(pattern);
+      }
+    }
+
+    const rdfTypeVariable = dataFactory.variable!(`${variablePrefix}RdfType`);
+    if (!parameters?.ignoreRdfType) {
+      requiredPatterns.push(
+        $sparqlInstancesOfPattern({
+          rdfType: PartialConceptScheme.$fromRdfType,
+          subject,
+        }),
+        {
+          triples: [
+            {
+              subject,
+              predicate: $RdfVocabularies.rdf.type,
+              object: rdfTypeVariable,
+            },
+          ],
+          type: "bgp" as const,
+        },
+      );
+      optionalPatterns.push({
+        patterns: [
+          {
+            triples: [
+              {
+                subject: rdfTypeVariable,
+                predicate: {
+                  items: [$RdfVocabularies.rdfs.subClassOf],
+                  pathType: "+" as const,
+                  type: "path" as const,
+                },
+                object: dataFactory.variable!(`${variablePrefix}RdfClass`),
+              },
+            ],
+            type: "bgp" as const,
+          },
+        ],
+        type: "optional" as const,
+      });
+    }
+
+    return requiredPatterns.concat(optionalPatterns);
+  }
+
+  export function $toRdf(
+    _partialConceptScheme: PartialConceptScheme,
+    options?: {
+      ignoreRdfType?: boolean;
+      mutateGraph?: rdfjsResource.MutableResource.MutateGraph;
+      resourceSet?: rdfjsResource.MutableResourceSet;
+    },
+  ): rdfjsResource.MutableResource<rdfjs.NamedNode> {
+    const ignoreRdfType = !!options?.ignoreRdfType;
+    const mutateGraph = options?.mutateGraph;
+    const resourceSet =
+      options?.resourceSet ??
+      new rdfjsResource.MutableResourceSet({
+        dataFactory,
+        dataset: datasetFactory.dataset(),
+      });
+    const resource = PartialKosResourceStatic.$toRdf(_partialConceptScheme, {
+      ignoreRdfType: true,
+      mutateGraph,
+      resourceSet,
+    });
+    if (!ignoreRdfType) {
+      resource.add(
+        $RdfVocabularies.rdf.type,
+        resource.dataFactory.namedNode(
+          "http://kos-kit.github.io/ontology#PartialConceptScheme",
+        ),
+      );
+      resource.add(
+        $RdfVocabularies.rdf.type,
+        resource.dataFactory.namedNode(
+          "http://www.w3.org/2004/02/skos/core#ConceptScheme",
+        ),
+      );
+    }
+
+    return resource;
+  }
+
+  export function isPartialConceptScheme(
+    object: PartialKosResource,
+  ): object is PartialConceptScheme {
+    switch (object.$type) {
+      case "PartialConceptScheme":
+        return true;
+      default:
+        return false;
+    }
+  }
+}
 export interface Concept extends KosResource {
   readonly $identifier: Concept.$Identifier;
   readonly $type: "Concept";
-  readonly broader: readonly PartialConcept[];
-  readonly broaderTransitive: readonly PartialConcept[];
-  readonly broadMatch: readonly PartialConcept[];
-  readonly closeMatch: readonly PartialConcept[];
-  readonly exactMatch: readonly PartialConcept[];
-  readonly inScheme: readonly PartialConceptScheme[];
-  readonly mappingRelation: readonly PartialConcept[];
-  readonly narrower: readonly PartialConcept[];
-  readonly narrowerTransitive: readonly PartialConcept[];
-  readonly narrowMatch: readonly PartialConcept[];
-  readonly related: readonly PartialConcept[];
-  readonly relatedMatch: readonly PartialConcept[];
-  readonly semanticRelation: readonly PartialConcept[];
-  readonly topConceptOf: readonly PartialConceptScheme[];
+  readonly broader: $LazyObjectSet<
+    Concept.$Identifier,
+    PartialConcept,
+    Concept
+  >;
+  readonly broaderTransitive: $LazyObjectSet<
+    Concept.$Identifier,
+    PartialConcept,
+    Concept
+  >;
+  readonly broadMatch: $LazyObjectSet<
+    Concept.$Identifier,
+    PartialConcept,
+    Concept
+  >;
+  readonly closeMatch: $LazyObjectSet<
+    Concept.$Identifier,
+    PartialConcept,
+    Concept
+  >;
+  readonly exactMatch: $LazyObjectSet<
+    Concept.$Identifier,
+    PartialConcept,
+    Concept
+  >;
+  readonly inScheme: $LazyObjectSet<
+    ConceptScheme.$Identifier,
+    PartialConceptScheme,
+    ConceptScheme
+  >;
+  readonly mappingRelation: $LazyObjectSet<
+    Concept.$Identifier,
+    PartialConcept,
+    Concept
+  >;
+  readonly narrower: $LazyObjectSet<
+    Concept.$Identifier,
+    PartialConcept,
+    Concept
+  >;
+  readonly narrowerTransitive: $LazyObjectSet<
+    Concept.$Identifier,
+    PartialConcept,
+    Concept
+  >;
+  readonly narrowMatch: $LazyObjectSet<
+    Concept.$Identifier,
+    PartialConcept,
+    Concept
+  >;
+  readonly related: $LazyObjectSet<
+    Concept.$Identifier,
+    PartialConcept,
+    Concept
+  >;
+  readonly relatedMatch: $LazyObjectSet<
+    Concept.$Identifier,
+    PartialConcept,
+    Concept
+  >;
+  readonly semanticRelation: $LazyObjectSet<
+    Concept.$Identifier,
+    PartialConcept,
+    Concept
+  >;
+  readonly topConceptOf: $LazyObjectSet<
+    ConceptScheme.$Identifier,
+    PartialConceptScheme,
+    ConceptScheme
+  >;
 }
 
 export namespace Concept {
   export function $create(
     parameters: {
       readonly $identifier: rdfjs.NamedNode | string;
-      readonly broader?: readonly PartialConcept[];
-      readonly broaderTransitive?: readonly PartialConcept[];
-      readonly broadMatch?: readonly PartialConcept[];
-      readonly closeMatch?: readonly PartialConcept[];
-      readonly exactMatch?: readonly PartialConcept[];
-      readonly inScheme?: readonly PartialConceptScheme[];
-      readonly mappingRelation?: readonly PartialConcept[];
-      readonly narrower?: readonly PartialConcept[];
-      readonly narrowerTransitive?: readonly PartialConcept[];
-      readonly narrowMatch?: readonly PartialConcept[];
-      readonly related?: readonly PartialConcept[];
-      readonly relatedMatch?: readonly PartialConcept[];
-      readonly semanticRelation?: readonly PartialConcept[];
-      readonly topConceptOf?: readonly PartialConceptScheme[];
+      readonly broader?:
+        | $LazyObjectSet<Concept.$Identifier, PartialConcept, Concept>
+        | readonly Concept[];
+      readonly broaderTransitive?:
+        | $LazyObjectSet<Concept.$Identifier, PartialConcept, Concept>
+        | readonly Concept[];
+      readonly broadMatch?:
+        | $LazyObjectSet<Concept.$Identifier, PartialConcept, Concept>
+        | readonly Concept[];
+      readonly closeMatch?:
+        | $LazyObjectSet<Concept.$Identifier, PartialConcept, Concept>
+        | readonly Concept[];
+      readonly exactMatch?:
+        | $LazyObjectSet<Concept.$Identifier, PartialConcept, Concept>
+        | readonly Concept[];
+      readonly inScheme?:
+        | $LazyObjectSet<
+            ConceptScheme.$Identifier,
+            PartialConceptScheme,
+            ConceptScheme
+          >
+        | readonly ConceptScheme[];
+      readonly mappingRelation?:
+        | $LazyObjectSet<Concept.$Identifier, PartialConcept, Concept>
+        | readonly Concept[];
+      readonly narrower?:
+        | $LazyObjectSet<Concept.$Identifier, PartialConcept, Concept>
+        | readonly Concept[];
+      readonly narrowerTransitive?:
+        | $LazyObjectSet<Concept.$Identifier, PartialConcept, Concept>
+        | readonly Concept[];
+      readonly narrowMatch?:
+        | $LazyObjectSet<Concept.$Identifier, PartialConcept, Concept>
+        | readonly Concept[];
+      readonly related?:
+        | $LazyObjectSet<Concept.$Identifier, PartialConcept, Concept>
+        | readonly Concept[];
+      readonly relatedMatch?:
+        | $LazyObjectSet<Concept.$Identifier, PartialConcept, Concept>
+        | readonly Concept[];
+      readonly semanticRelation?:
+        | $LazyObjectSet<Concept.$Identifier, PartialConcept, Concept>
+        | readonly Concept[];
+      readonly topConceptOf?:
+        | $LazyObjectSet<
+            ConceptScheme.$Identifier,
+            PartialConceptScheme,
+            ConceptScheme
+          >
+        | readonly ConceptScheme[];
     } & Parameters<typeof KosResourceStatic.$create>[0],
   ): Concept {
     let $identifier: Concept.$Identifier;
@@ -3360,128 +4475,508 @@ export namespace Concept {
     }
 
     const $type = "Concept" as const;
-    let broader: readonly PartialConcept[];
-    if (typeof parameters.broader === "undefined") {
-      broader = [];
-    } else if (typeof parameters.broader === "object") {
+    let broader: $LazyObjectSet<Concept.$Identifier, PartialConcept, Concept>;
+    if (
+      typeof parameters.broader === "object" &&
+      parameters.broader instanceof $LazyObjectSet
+    ) {
       broader = parameters.broader;
+    } else if (typeof parameters.broader === "object") {
+      broader = new $LazyObjectSet<
+        Concept.$Identifier,
+        PartialConcept,
+        Concept
+      >({
+        partials: parameters.broader.map((object) =>
+          PartialConcept.$create(object),
+        ),
+        resolver: async () =>
+          purify.Either.of(parameters.broader as readonly Concept[]),
+      });
+    } else if (typeof parameters.broader === "undefined") {
+      broader = new $LazyObjectSet<
+        Concept.$Identifier,
+        PartialConcept,
+        Concept
+      >({
+        partials: [],
+        resolver: async () => {
+          throw new Error("should never be called");
+        },
+      });
     } else {
       broader = parameters.broader satisfies never;
     }
 
-    let broaderTransitive: readonly PartialConcept[];
-    if (typeof parameters.broaderTransitive === "undefined") {
-      broaderTransitive = [];
-    } else if (typeof parameters.broaderTransitive === "object") {
+    let broaderTransitive: $LazyObjectSet<
+      Concept.$Identifier,
+      PartialConcept,
+      Concept
+    >;
+    if (
+      typeof parameters.broaderTransitive === "object" &&
+      parameters.broaderTransitive instanceof $LazyObjectSet
+    ) {
       broaderTransitive = parameters.broaderTransitive;
+    } else if (typeof parameters.broaderTransitive === "object") {
+      broaderTransitive = new $LazyObjectSet<
+        Concept.$Identifier,
+        PartialConcept,
+        Concept
+      >({
+        partials: parameters.broaderTransitive.map((object) =>
+          PartialConcept.$create(object),
+        ),
+        resolver: async () =>
+          purify.Either.of(parameters.broaderTransitive as readonly Concept[]),
+      });
+    } else if (typeof parameters.broaderTransitive === "undefined") {
+      broaderTransitive = new $LazyObjectSet<
+        Concept.$Identifier,
+        PartialConcept,
+        Concept
+      >({
+        partials: [],
+        resolver: async () => {
+          throw new Error("should never be called");
+        },
+      });
     } else {
       broaderTransitive = parameters.broaderTransitive satisfies never;
     }
 
-    let broadMatch: readonly PartialConcept[];
-    if (typeof parameters.broadMatch === "undefined") {
-      broadMatch = [];
-    } else if (typeof parameters.broadMatch === "object") {
+    let broadMatch: $LazyObjectSet<
+      Concept.$Identifier,
+      PartialConcept,
+      Concept
+    >;
+    if (
+      typeof parameters.broadMatch === "object" &&
+      parameters.broadMatch instanceof $LazyObjectSet
+    ) {
       broadMatch = parameters.broadMatch;
+    } else if (typeof parameters.broadMatch === "object") {
+      broadMatch = new $LazyObjectSet<
+        Concept.$Identifier,
+        PartialConcept,
+        Concept
+      >({
+        partials: parameters.broadMatch.map((object) =>
+          PartialConcept.$create(object),
+        ),
+        resolver: async () =>
+          purify.Either.of(parameters.broadMatch as readonly Concept[]),
+      });
+    } else if (typeof parameters.broadMatch === "undefined") {
+      broadMatch = new $LazyObjectSet<
+        Concept.$Identifier,
+        PartialConcept,
+        Concept
+      >({
+        partials: [],
+        resolver: async () => {
+          throw new Error("should never be called");
+        },
+      });
     } else {
       broadMatch = parameters.broadMatch satisfies never;
     }
 
-    let closeMatch: readonly PartialConcept[];
-    if (typeof parameters.closeMatch === "undefined") {
-      closeMatch = [];
-    } else if (typeof parameters.closeMatch === "object") {
+    let closeMatch: $LazyObjectSet<
+      Concept.$Identifier,
+      PartialConcept,
+      Concept
+    >;
+    if (
+      typeof parameters.closeMatch === "object" &&
+      parameters.closeMatch instanceof $LazyObjectSet
+    ) {
       closeMatch = parameters.closeMatch;
+    } else if (typeof parameters.closeMatch === "object") {
+      closeMatch = new $LazyObjectSet<
+        Concept.$Identifier,
+        PartialConcept,
+        Concept
+      >({
+        partials: parameters.closeMatch.map((object) =>
+          PartialConcept.$create(object),
+        ),
+        resolver: async () =>
+          purify.Either.of(parameters.closeMatch as readonly Concept[]),
+      });
+    } else if (typeof parameters.closeMatch === "undefined") {
+      closeMatch = new $LazyObjectSet<
+        Concept.$Identifier,
+        PartialConcept,
+        Concept
+      >({
+        partials: [],
+        resolver: async () => {
+          throw new Error("should never be called");
+        },
+      });
     } else {
       closeMatch = parameters.closeMatch satisfies never;
     }
 
-    let exactMatch: readonly PartialConcept[];
-    if (typeof parameters.exactMatch === "undefined") {
-      exactMatch = [];
-    } else if (typeof parameters.exactMatch === "object") {
+    let exactMatch: $LazyObjectSet<
+      Concept.$Identifier,
+      PartialConcept,
+      Concept
+    >;
+    if (
+      typeof parameters.exactMatch === "object" &&
+      parameters.exactMatch instanceof $LazyObjectSet
+    ) {
       exactMatch = parameters.exactMatch;
+    } else if (typeof parameters.exactMatch === "object") {
+      exactMatch = new $LazyObjectSet<
+        Concept.$Identifier,
+        PartialConcept,
+        Concept
+      >({
+        partials: parameters.exactMatch.map((object) =>
+          PartialConcept.$create(object),
+        ),
+        resolver: async () =>
+          purify.Either.of(parameters.exactMatch as readonly Concept[]),
+      });
+    } else if (typeof parameters.exactMatch === "undefined") {
+      exactMatch = new $LazyObjectSet<
+        Concept.$Identifier,
+        PartialConcept,
+        Concept
+      >({
+        partials: [],
+        resolver: async () => {
+          throw new Error("should never be called");
+        },
+      });
     } else {
       exactMatch = parameters.exactMatch satisfies never;
     }
 
-    let inScheme: readonly PartialConceptScheme[];
-    if (typeof parameters.inScheme === "undefined") {
-      inScheme = [];
-    } else if (typeof parameters.inScheme === "object") {
+    let inScheme: $LazyObjectSet<
+      ConceptScheme.$Identifier,
+      PartialConceptScheme,
+      ConceptScheme
+    >;
+    if (
+      typeof parameters.inScheme === "object" &&
+      parameters.inScheme instanceof $LazyObjectSet
+    ) {
       inScheme = parameters.inScheme;
+    } else if (typeof parameters.inScheme === "object") {
+      inScheme = new $LazyObjectSet<
+        ConceptScheme.$Identifier,
+        PartialConceptScheme,
+        ConceptScheme
+      >({
+        partials: parameters.inScheme.map((object) =>
+          PartialConceptScheme.$create(object),
+        ),
+        resolver: async () =>
+          purify.Either.of(parameters.inScheme as readonly ConceptScheme[]),
+      });
+    } else if (typeof parameters.inScheme === "undefined") {
+      inScheme = new $LazyObjectSet<
+        ConceptScheme.$Identifier,
+        PartialConceptScheme,
+        ConceptScheme
+      >({
+        partials: [],
+        resolver: async () => {
+          throw new Error("should never be called");
+        },
+      });
     } else {
       inScheme = parameters.inScheme satisfies never;
     }
 
-    let mappingRelation: readonly PartialConcept[];
-    if (typeof parameters.mappingRelation === "undefined") {
-      mappingRelation = [];
-    } else if (typeof parameters.mappingRelation === "object") {
+    let mappingRelation: $LazyObjectSet<
+      Concept.$Identifier,
+      PartialConcept,
+      Concept
+    >;
+    if (
+      typeof parameters.mappingRelation === "object" &&
+      parameters.mappingRelation instanceof $LazyObjectSet
+    ) {
       mappingRelation = parameters.mappingRelation;
+    } else if (typeof parameters.mappingRelation === "object") {
+      mappingRelation = new $LazyObjectSet<
+        Concept.$Identifier,
+        PartialConcept,
+        Concept
+      >({
+        partials: parameters.mappingRelation.map((object) =>
+          PartialConcept.$create(object),
+        ),
+        resolver: async () =>
+          purify.Either.of(parameters.mappingRelation as readonly Concept[]),
+      });
+    } else if (typeof parameters.mappingRelation === "undefined") {
+      mappingRelation = new $LazyObjectSet<
+        Concept.$Identifier,
+        PartialConcept,
+        Concept
+      >({
+        partials: [],
+        resolver: async () => {
+          throw new Error("should never be called");
+        },
+      });
     } else {
       mappingRelation = parameters.mappingRelation satisfies never;
     }
 
-    let narrower: readonly PartialConcept[];
-    if (typeof parameters.narrower === "undefined") {
-      narrower = [];
-    } else if (typeof parameters.narrower === "object") {
+    let narrower: $LazyObjectSet<Concept.$Identifier, PartialConcept, Concept>;
+    if (
+      typeof parameters.narrower === "object" &&
+      parameters.narrower instanceof $LazyObjectSet
+    ) {
       narrower = parameters.narrower;
+    } else if (typeof parameters.narrower === "object") {
+      narrower = new $LazyObjectSet<
+        Concept.$Identifier,
+        PartialConcept,
+        Concept
+      >({
+        partials: parameters.narrower.map((object) =>
+          PartialConcept.$create(object),
+        ),
+        resolver: async () =>
+          purify.Either.of(parameters.narrower as readonly Concept[]),
+      });
+    } else if (typeof parameters.narrower === "undefined") {
+      narrower = new $LazyObjectSet<
+        Concept.$Identifier,
+        PartialConcept,
+        Concept
+      >({
+        partials: [],
+        resolver: async () => {
+          throw new Error("should never be called");
+        },
+      });
     } else {
       narrower = parameters.narrower satisfies never;
     }
 
-    let narrowerTransitive: readonly PartialConcept[];
-    if (typeof parameters.narrowerTransitive === "undefined") {
-      narrowerTransitive = [];
-    } else if (typeof parameters.narrowerTransitive === "object") {
+    let narrowerTransitive: $LazyObjectSet<
+      Concept.$Identifier,
+      PartialConcept,
+      Concept
+    >;
+    if (
+      typeof parameters.narrowerTransitive === "object" &&
+      parameters.narrowerTransitive instanceof $LazyObjectSet
+    ) {
       narrowerTransitive = parameters.narrowerTransitive;
+    } else if (typeof parameters.narrowerTransitive === "object") {
+      narrowerTransitive = new $LazyObjectSet<
+        Concept.$Identifier,
+        PartialConcept,
+        Concept
+      >({
+        partials: parameters.narrowerTransitive.map((object) =>
+          PartialConcept.$create(object),
+        ),
+        resolver: async () =>
+          purify.Either.of(parameters.narrowerTransitive as readonly Concept[]),
+      });
+    } else if (typeof parameters.narrowerTransitive === "undefined") {
+      narrowerTransitive = new $LazyObjectSet<
+        Concept.$Identifier,
+        PartialConcept,
+        Concept
+      >({
+        partials: [],
+        resolver: async () => {
+          throw new Error("should never be called");
+        },
+      });
     } else {
       narrowerTransitive = parameters.narrowerTransitive satisfies never;
     }
 
-    let narrowMatch: readonly PartialConcept[];
-    if (typeof parameters.narrowMatch === "undefined") {
-      narrowMatch = [];
-    } else if (typeof parameters.narrowMatch === "object") {
+    let narrowMatch: $LazyObjectSet<
+      Concept.$Identifier,
+      PartialConcept,
+      Concept
+    >;
+    if (
+      typeof parameters.narrowMatch === "object" &&
+      parameters.narrowMatch instanceof $LazyObjectSet
+    ) {
       narrowMatch = parameters.narrowMatch;
+    } else if (typeof parameters.narrowMatch === "object") {
+      narrowMatch = new $LazyObjectSet<
+        Concept.$Identifier,
+        PartialConcept,
+        Concept
+      >({
+        partials: parameters.narrowMatch.map((object) =>
+          PartialConcept.$create(object),
+        ),
+        resolver: async () =>
+          purify.Either.of(parameters.narrowMatch as readonly Concept[]),
+      });
+    } else if (typeof parameters.narrowMatch === "undefined") {
+      narrowMatch = new $LazyObjectSet<
+        Concept.$Identifier,
+        PartialConcept,
+        Concept
+      >({
+        partials: [],
+        resolver: async () => {
+          throw new Error("should never be called");
+        },
+      });
     } else {
       narrowMatch = parameters.narrowMatch satisfies never;
     }
 
-    let related: readonly PartialConcept[];
-    if (typeof parameters.related === "undefined") {
-      related = [];
-    } else if (typeof parameters.related === "object") {
+    let related: $LazyObjectSet<Concept.$Identifier, PartialConcept, Concept>;
+    if (
+      typeof parameters.related === "object" &&
+      parameters.related instanceof $LazyObjectSet
+    ) {
       related = parameters.related;
+    } else if (typeof parameters.related === "object") {
+      related = new $LazyObjectSet<
+        Concept.$Identifier,
+        PartialConcept,
+        Concept
+      >({
+        partials: parameters.related.map((object) =>
+          PartialConcept.$create(object),
+        ),
+        resolver: async () =>
+          purify.Either.of(parameters.related as readonly Concept[]),
+      });
+    } else if (typeof parameters.related === "undefined") {
+      related = new $LazyObjectSet<
+        Concept.$Identifier,
+        PartialConcept,
+        Concept
+      >({
+        partials: [],
+        resolver: async () => {
+          throw new Error("should never be called");
+        },
+      });
     } else {
       related = parameters.related satisfies never;
     }
 
-    let relatedMatch: readonly PartialConcept[];
-    if (typeof parameters.relatedMatch === "undefined") {
-      relatedMatch = [];
-    } else if (typeof parameters.relatedMatch === "object") {
+    let relatedMatch: $LazyObjectSet<
+      Concept.$Identifier,
+      PartialConcept,
+      Concept
+    >;
+    if (
+      typeof parameters.relatedMatch === "object" &&
+      parameters.relatedMatch instanceof $LazyObjectSet
+    ) {
       relatedMatch = parameters.relatedMatch;
+    } else if (typeof parameters.relatedMatch === "object") {
+      relatedMatch = new $LazyObjectSet<
+        Concept.$Identifier,
+        PartialConcept,
+        Concept
+      >({
+        partials: parameters.relatedMatch.map((object) =>
+          PartialConcept.$create(object),
+        ),
+        resolver: async () =>
+          purify.Either.of(parameters.relatedMatch as readonly Concept[]),
+      });
+    } else if (typeof parameters.relatedMatch === "undefined") {
+      relatedMatch = new $LazyObjectSet<
+        Concept.$Identifier,
+        PartialConcept,
+        Concept
+      >({
+        partials: [],
+        resolver: async () => {
+          throw new Error("should never be called");
+        },
+      });
     } else {
       relatedMatch = parameters.relatedMatch satisfies never;
     }
 
-    let semanticRelation: readonly PartialConcept[];
-    if (typeof parameters.semanticRelation === "undefined") {
-      semanticRelation = [];
-    } else if (typeof parameters.semanticRelation === "object") {
+    let semanticRelation: $LazyObjectSet<
+      Concept.$Identifier,
+      PartialConcept,
+      Concept
+    >;
+    if (
+      typeof parameters.semanticRelation === "object" &&
+      parameters.semanticRelation instanceof $LazyObjectSet
+    ) {
       semanticRelation = parameters.semanticRelation;
+    } else if (typeof parameters.semanticRelation === "object") {
+      semanticRelation = new $LazyObjectSet<
+        Concept.$Identifier,
+        PartialConcept,
+        Concept
+      >({
+        partials: parameters.semanticRelation.map((object) =>
+          PartialConcept.$create(object),
+        ),
+        resolver: async () =>
+          purify.Either.of(parameters.semanticRelation as readonly Concept[]),
+      });
+    } else if (typeof parameters.semanticRelation === "undefined") {
+      semanticRelation = new $LazyObjectSet<
+        Concept.$Identifier,
+        PartialConcept,
+        Concept
+      >({
+        partials: [],
+        resolver: async () => {
+          throw new Error("should never be called");
+        },
+      });
     } else {
       semanticRelation = parameters.semanticRelation satisfies never;
     }
 
-    let topConceptOf: readonly PartialConceptScheme[];
-    if (typeof parameters.topConceptOf === "undefined") {
-      topConceptOf = [];
-    } else if (typeof parameters.topConceptOf === "object") {
+    let topConceptOf: $LazyObjectSet<
+      ConceptScheme.$Identifier,
+      PartialConceptScheme,
+      ConceptScheme
+    >;
+    if (
+      typeof parameters.topConceptOf === "object" &&
+      parameters.topConceptOf instanceof $LazyObjectSet
+    ) {
       topConceptOf = parameters.topConceptOf;
+    } else if (typeof parameters.topConceptOf === "object") {
+      topConceptOf = new $LazyObjectSet<
+        ConceptScheme.$Identifier,
+        PartialConceptScheme,
+        ConceptScheme
+      >({
+        partials: parameters.topConceptOf.map((object) =>
+          PartialConceptScheme.$create(object),
+        ),
+        resolver: async () =>
+          purify.Either.of(parameters.topConceptOf as readonly ConceptScheme[]),
+      });
+    } else if (typeof parameters.topConceptOf === "undefined") {
+      topConceptOf = new $LazyObjectSet<
+        ConceptScheme.$Identifier,
+        PartialConceptScheme,
+        ConceptScheme
+      >({
+        partials: [],
+        resolver: async () => {
+          throw new Error("should never be called");
+        },
+      });
     } else {
       topConceptOf = parameters.topConceptOf satisfies never;
     }
@@ -3632,20 +5127,48 @@ export namespace Concept {
     {
       $identifier: rdfjs.NamedNode;
       $type: "Concept";
-      broader: readonly PartialConcept[];
-      broaderTransitive: readonly PartialConcept[];
-      broadMatch: readonly PartialConcept[];
-      closeMatch: readonly PartialConcept[];
-      exactMatch: readonly PartialConcept[];
-      inScheme: readonly PartialConceptScheme[];
-      mappingRelation: readonly PartialConcept[];
-      narrower: readonly PartialConcept[];
-      narrowerTransitive: readonly PartialConcept[];
-      narrowMatch: readonly PartialConcept[];
-      related: readonly PartialConcept[];
-      relatedMatch: readonly PartialConcept[];
-      semanticRelation: readonly PartialConcept[];
-      topConceptOf: readonly PartialConceptScheme[];
+      broader: $LazyObjectSet<Concept.$Identifier, PartialConcept, Concept>;
+      broaderTransitive: $LazyObjectSet<
+        Concept.$Identifier,
+        PartialConcept,
+        Concept
+      >;
+      broadMatch: $LazyObjectSet<Concept.$Identifier, PartialConcept, Concept>;
+      closeMatch: $LazyObjectSet<Concept.$Identifier, PartialConcept, Concept>;
+      exactMatch: $LazyObjectSet<Concept.$Identifier, PartialConcept, Concept>;
+      inScheme: $LazyObjectSet<
+        ConceptScheme.$Identifier,
+        PartialConceptScheme,
+        ConceptScheme
+      >;
+      mappingRelation: $LazyObjectSet<
+        Concept.$Identifier,
+        PartialConcept,
+        Concept
+      >;
+      narrower: $LazyObjectSet<Concept.$Identifier, PartialConcept, Concept>;
+      narrowerTransitive: $LazyObjectSet<
+        Concept.$Identifier,
+        PartialConcept,
+        Concept
+      >;
+      narrowMatch: $LazyObjectSet<Concept.$Identifier, PartialConcept, Concept>;
+      related: $LazyObjectSet<Concept.$Identifier, PartialConcept, Concept>;
+      relatedMatch: $LazyObjectSet<
+        Concept.$Identifier,
+        PartialConcept,
+        Concept
+      >;
+      semanticRelation: $LazyObjectSet<
+        Concept.$Identifier,
+        PartialConcept,
+        Concept
+      >;
+      topConceptOf: $LazyObjectSet<
+        ConceptScheme.$Identifier,
+        PartialConceptScheme,
+        ConceptScheme
+      >;
     } & $UnwrapR<ReturnType<typeof KosResourceStatic.$propertiesFromRdf>>
   > {
     const $super0Either = KosResourceStatic.$propertiesFromRdf({
@@ -3700,32 +5223,46 @@ export namespace Concept {
 
     const $identifier: Concept.$Identifier = $resource.identifier;
     const $type = "Concept" as const;
-    const _broaderEither: purify.Either<Error, readonly PartialConcept[]> =
-      purify.Either.of<
-        Error,
-        rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
-      >($resource.values($properties.broader["identifier"], { unique: true }))
-        .chain((values) =>
-          values.chainMap((value) =>
-            value.toResource().chain((resource) =>
-              PartialConcept.$fromRdf(resource, {
-                ...$context,
-                ignoreRdfType: true,
-                objectSet: $objectSet,
-                preferredLanguages: $preferredLanguages,
-              }),
-            ),
+    const _broaderEither: purify.Either<
+      Error,
+      $LazyObjectSet<Concept.$Identifier, PartialConcept, Concept>
+    > = purify.Either.of<
+      Error,
+      rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
+    >($resource.values($properties.broader["identifier"], { unique: true }))
+      .chain((values) =>
+        values.chainMap((value) =>
+          value.toResource().chain((resource) =>
+            PartialConcept.$fromRdf(resource, {
+              ...$context,
+              ignoreRdfType: true,
+              objectSet: $objectSet,
+              preferredLanguages: $preferredLanguages,
+            }),
           ),
-        )
-        .map((values) => values.toArray())
-        .map((valuesArray) =>
-          rdfjsResource.Resource.Values.fromValue({
-            focusResource: $resource,
-            predicate: Concept.$properties.broader["identifier"],
-            value: valuesArray,
-          }),
-        )
-        .chain((values) => values.head());
+        ),
+      )
+      .map((values) => values.toArray())
+      .map((valuesArray) =>
+        rdfjsResource.Resource.Values.fromValue({
+          focusResource: $resource,
+          predicate: Concept.$properties.broader["identifier"],
+          value: valuesArray,
+        }),
+      )
+      .map((values) =>
+        values.map(
+          (partials) =>
+            new $LazyObjectSet<Concept.$Identifier, PartialConcept, Concept>({
+              partials,
+              resolver: (identifiers) =>
+                $objectSet.concepts({
+                  where: { identifiers, type: "identifiers" },
+                }),
+            }),
+        ),
+      )
+      .chain((values) => values.head());
     if (_broaderEither.isLeft()) {
       return _broaderEither;
     }
@@ -3733,7 +5270,7 @@ export namespace Concept {
     const broader = _broaderEither.unsafeCoerce();
     const _broaderTransitiveEither: purify.Either<
       Error,
-      readonly PartialConcept[]
+      $LazyObjectSet<Concept.$Identifier, PartialConcept, Concept>
     > = purify.Either.of<
       Error,
       rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
@@ -3762,112 +5299,154 @@ export namespace Concept {
           value: valuesArray,
         }),
       )
+      .map((values) =>
+        values.map(
+          (partials) =>
+            new $LazyObjectSet<Concept.$Identifier, PartialConcept, Concept>({
+              partials,
+              resolver: (identifiers) =>
+                $objectSet.concepts({
+                  where: { identifiers, type: "identifiers" },
+                }),
+            }),
+        ),
+      )
       .chain((values) => values.head());
     if (_broaderTransitiveEither.isLeft()) {
       return _broaderTransitiveEither;
     }
 
     const broaderTransitive = _broaderTransitiveEither.unsafeCoerce();
-    const _broadMatchEither: purify.Either<Error, readonly PartialConcept[]> =
-      purify.Either.of<
-        Error,
-        rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
-      >(
-        $resource.values($properties.broadMatch["identifier"], {
-          unique: true,
+    const _broadMatchEither: purify.Either<
+      Error,
+      $LazyObjectSet<Concept.$Identifier, PartialConcept, Concept>
+    > = purify.Either.of<
+      Error,
+      rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
+    >($resource.values($properties.broadMatch["identifier"], { unique: true }))
+      .chain((values) =>
+        values.chainMap((value) =>
+          value.toResource().chain((resource) =>
+            PartialConcept.$fromRdf(resource, {
+              ...$context,
+              ignoreRdfType: true,
+              objectSet: $objectSet,
+              preferredLanguages: $preferredLanguages,
+            }),
+          ),
+        ),
+      )
+      .map((values) => values.toArray())
+      .map((valuesArray) =>
+        rdfjsResource.Resource.Values.fromValue({
+          focusResource: $resource,
+          predicate: Concept.$properties.broadMatch["identifier"],
+          value: valuesArray,
         }),
       )
-        .chain((values) =>
-          values.chainMap((value) =>
-            value.toResource().chain((resource) =>
-              PartialConcept.$fromRdf(resource, {
-                ...$context,
-                ignoreRdfType: true,
-                objectSet: $objectSet,
-                preferredLanguages: $preferredLanguages,
-              }),
-            ),
-          ),
-        )
-        .map((values) => values.toArray())
-        .map((valuesArray) =>
-          rdfjsResource.Resource.Values.fromValue({
-            focusResource: $resource,
-            predicate: Concept.$properties.broadMatch["identifier"],
-            value: valuesArray,
-          }),
-        )
-        .chain((values) => values.head());
+      .map((values) =>
+        values.map(
+          (partials) =>
+            new $LazyObjectSet<Concept.$Identifier, PartialConcept, Concept>({
+              partials,
+              resolver: (identifiers) =>
+                $objectSet.concepts({
+                  where: { identifiers, type: "identifiers" },
+                }),
+            }),
+        ),
+      )
+      .chain((values) => values.head());
     if (_broadMatchEither.isLeft()) {
       return _broadMatchEither;
     }
 
     const broadMatch = _broadMatchEither.unsafeCoerce();
-    const _closeMatchEither: purify.Either<Error, readonly PartialConcept[]> =
-      purify.Either.of<
-        Error,
-        rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
-      >(
-        $resource.values($properties.closeMatch["identifier"], {
-          unique: true,
+    const _closeMatchEither: purify.Either<
+      Error,
+      $LazyObjectSet<Concept.$Identifier, PartialConcept, Concept>
+    > = purify.Either.of<
+      Error,
+      rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
+    >($resource.values($properties.closeMatch["identifier"], { unique: true }))
+      .chain((values) =>
+        values.chainMap((value) =>
+          value.toResource().chain((resource) =>
+            PartialConcept.$fromRdf(resource, {
+              ...$context,
+              ignoreRdfType: true,
+              objectSet: $objectSet,
+              preferredLanguages: $preferredLanguages,
+            }),
+          ),
+        ),
+      )
+      .map((values) => values.toArray())
+      .map((valuesArray) =>
+        rdfjsResource.Resource.Values.fromValue({
+          focusResource: $resource,
+          predicate: Concept.$properties.closeMatch["identifier"],
+          value: valuesArray,
         }),
       )
-        .chain((values) =>
-          values.chainMap((value) =>
-            value.toResource().chain((resource) =>
-              PartialConcept.$fromRdf(resource, {
-                ...$context,
-                ignoreRdfType: true,
-                objectSet: $objectSet,
-                preferredLanguages: $preferredLanguages,
-              }),
-            ),
-          ),
-        )
-        .map((values) => values.toArray())
-        .map((valuesArray) =>
-          rdfjsResource.Resource.Values.fromValue({
-            focusResource: $resource,
-            predicate: Concept.$properties.closeMatch["identifier"],
-            value: valuesArray,
-          }),
-        )
-        .chain((values) => values.head());
+      .map((values) =>
+        values.map(
+          (partials) =>
+            new $LazyObjectSet<Concept.$Identifier, PartialConcept, Concept>({
+              partials,
+              resolver: (identifiers) =>
+                $objectSet.concepts({
+                  where: { identifiers, type: "identifiers" },
+                }),
+            }),
+        ),
+      )
+      .chain((values) => values.head());
     if (_closeMatchEither.isLeft()) {
       return _closeMatchEither;
     }
 
     const closeMatch = _closeMatchEither.unsafeCoerce();
-    const _exactMatchEither: purify.Either<Error, readonly PartialConcept[]> =
-      purify.Either.of<
-        Error,
-        rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
-      >(
-        $resource.values($properties.exactMatch["identifier"], {
-          unique: true,
+    const _exactMatchEither: purify.Either<
+      Error,
+      $LazyObjectSet<Concept.$Identifier, PartialConcept, Concept>
+    > = purify.Either.of<
+      Error,
+      rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
+    >($resource.values($properties.exactMatch["identifier"], { unique: true }))
+      .chain((values) =>
+        values.chainMap((value) =>
+          value.toResource().chain((resource) =>
+            PartialConcept.$fromRdf(resource, {
+              ...$context,
+              ignoreRdfType: true,
+              objectSet: $objectSet,
+              preferredLanguages: $preferredLanguages,
+            }),
+          ),
+        ),
+      )
+      .map((values) => values.toArray())
+      .map((valuesArray) =>
+        rdfjsResource.Resource.Values.fromValue({
+          focusResource: $resource,
+          predicate: Concept.$properties.exactMatch["identifier"],
+          value: valuesArray,
         }),
       )
-        .chain((values) =>
-          values.chainMap((value) =>
-            value.toResource().chain((resource) =>
-              PartialConcept.$fromRdf(resource, {
-                ...$context,
-                ignoreRdfType: true,
-                objectSet: $objectSet,
-                preferredLanguages: $preferredLanguages,
-              }),
-            ),
-          ),
-        )
-        .map((values) => values.toArray())
-        .map((valuesArray) =>
-          rdfjsResource.Resource.Values.fromValue({
-            focusResource: $resource,
-            predicate: Concept.$properties.exactMatch["identifier"],
-            value: valuesArray,
-          }),
-        )
-        .chain((values) => values.head());
+      .map((values) =>
+        values.map(
+          (partials) =>
+            new $LazyObjectSet<Concept.$Identifier, PartialConcept, Concept>({
+              partials,
+              resolver: (identifiers) =>
+                $objectSet.concepts({
+                  where: { identifiers, type: "identifiers" },
+                }),
+            }),
+        ),
+      )
+      .chain((values) => values.head());
     if (_exactMatchEither.isLeft()) {
       return _exactMatchEither;
     }
@@ -3875,7 +5454,11 @@ export namespace Concept {
     const exactMatch = _exactMatchEither.unsafeCoerce();
     const _inSchemeEither: purify.Either<
       Error,
-      readonly PartialConceptScheme[]
+      $LazyObjectSet<
+        ConceptScheme.$Identifier,
+        PartialConceptScheme,
+        ConceptScheme
+      >
     > = purify.Either.of<
       Error,
       rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
@@ -3900,6 +5483,22 @@ export namespace Concept {
           value: valuesArray,
         }),
       )
+      .map((values) =>
+        values.map(
+          (partials) =>
+            new $LazyObjectSet<
+              ConceptScheme.$Identifier,
+              PartialConceptScheme,
+              ConceptScheme
+            >({
+              partials,
+              resolver: (identifiers) =>
+                $objectSet.conceptSchemes({
+                  where: { identifiers, type: "identifiers" },
+                }),
+            }),
+        ),
+      )
       .chain((values) => values.head());
     if (_inSchemeEither.isLeft()) {
       return _inSchemeEither;
@@ -3908,7 +5507,7 @@ export namespace Concept {
     const inScheme = _inSchemeEither.unsafeCoerce();
     const _mappingRelationEither: purify.Either<
       Error,
-      readonly PartialConcept[]
+      $LazyObjectSet<Concept.$Identifier, PartialConcept, Concept>
     > = purify.Either.of<
       Error,
       rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
@@ -3937,38 +5536,64 @@ export namespace Concept {
           value: valuesArray,
         }),
       )
+      .map((values) =>
+        values.map(
+          (partials) =>
+            new $LazyObjectSet<Concept.$Identifier, PartialConcept, Concept>({
+              partials,
+              resolver: (identifiers) =>
+                $objectSet.concepts({
+                  where: { identifiers, type: "identifiers" },
+                }),
+            }),
+        ),
+      )
       .chain((values) => values.head());
     if (_mappingRelationEither.isLeft()) {
       return _mappingRelationEither;
     }
 
     const mappingRelation = _mappingRelationEither.unsafeCoerce();
-    const _narrowerEither: purify.Either<Error, readonly PartialConcept[]> =
-      purify.Either.of<
-        Error,
-        rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
-      >($resource.values($properties.narrower["identifier"], { unique: true }))
-        .chain((values) =>
-          values.chainMap((value) =>
-            value.toResource().chain((resource) =>
-              PartialConcept.$fromRdf(resource, {
-                ...$context,
-                ignoreRdfType: true,
-                objectSet: $objectSet,
-                preferredLanguages: $preferredLanguages,
-              }),
-            ),
+    const _narrowerEither: purify.Either<
+      Error,
+      $LazyObjectSet<Concept.$Identifier, PartialConcept, Concept>
+    > = purify.Either.of<
+      Error,
+      rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
+    >($resource.values($properties.narrower["identifier"], { unique: true }))
+      .chain((values) =>
+        values.chainMap((value) =>
+          value.toResource().chain((resource) =>
+            PartialConcept.$fromRdf(resource, {
+              ...$context,
+              ignoreRdfType: true,
+              objectSet: $objectSet,
+              preferredLanguages: $preferredLanguages,
+            }),
           ),
-        )
-        .map((values) => values.toArray())
-        .map((valuesArray) =>
-          rdfjsResource.Resource.Values.fromValue({
-            focusResource: $resource,
-            predicate: Concept.$properties.narrower["identifier"],
-            value: valuesArray,
-          }),
-        )
-        .chain((values) => values.head());
+        ),
+      )
+      .map((values) => values.toArray())
+      .map((valuesArray) =>
+        rdfjsResource.Resource.Values.fromValue({
+          focusResource: $resource,
+          predicate: Concept.$properties.narrower["identifier"],
+          value: valuesArray,
+        }),
+      )
+      .map((values) =>
+        values.map(
+          (partials) =>
+            new $LazyObjectSet<Concept.$Identifier, PartialConcept, Concept>({
+              partials,
+              resolver: (identifiers) =>
+                $objectSet.concepts({
+                  where: { identifiers, type: "identifiers" },
+                }),
+            }),
+        ),
+      )
+      .chain((values) => values.head());
     if (_narrowerEither.isLeft()) {
       return _narrowerEither;
     }
@@ -3976,7 +5601,7 @@ export namespace Concept {
     const narrower = _narrowerEither.unsafeCoerce();
     const _narrowerTransitiveEither: purify.Either<
       Error,
-      readonly PartialConcept[]
+      $LazyObjectSet<Concept.$Identifier, PartialConcept, Concept>
     > = purify.Either.of<
       Error,
       rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
@@ -4005,108 +5630,158 @@ export namespace Concept {
           value: valuesArray,
         }),
       )
+      .map((values) =>
+        values.map(
+          (partials) =>
+            new $LazyObjectSet<Concept.$Identifier, PartialConcept, Concept>({
+              partials,
+              resolver: (identifiers) =>
+                $objectSet.concepts({
+                  where: { identifiers, type: "identifiers" },
+                }),
+            }),
+        ),
+      )
       .chain((values) => values.head());
     if (_narrowerTransitiveEither.isLeft()) {
       return _narrowerTransitiveEither;
     }
 
     const narrowerTransitive = _narrowerTransitiveEither.unsafeCoerce();
-    const _narrowMatchEither: purify.Either<Error, readonly PartialConcept[]> =
-      purify.Either.of<
-        Error,
-        rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
-      >(
-        $resource.values($properties.narrowMatch["identifier"], {
-          unique: true,
+    const _narrowMatchEither: purify.Either<
+      Error,
+      $LazyObjectSet<Concept.$Identifier, PartialConcept, Concept>
+    > = purify.Either.of<
+      Error,
+      rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
+    >($resource.values($properties.narrowMatch["identifier"], { unique: true }))
+      .chain((values) =>
+        values.chainMap((value) =>
+          value.toResource().chain((resource) =>
+            PartialConcept.$fromRdf(resource, {
+              ...$context,
+              ignoreRdfType: true,
+              objectSet: $objectSet,
+              preferredLanguages: $preferredLanguages,
+            }),
+          ),
+        ),
+      )
+      .map((values) => values.toArray())
+      .map((valuesArray) =>
+        rdfjsResource.Resource.Values.fromValue({
+          focusResource: $resource,
+          predicate: Concept.$properties.narrowMatch["identifier"],
+          value: valuesArray,
         }),
       )
-        .chain((values) =>
-          values.chainMap((value) =>
-            value.toResource().chain((resource) =>
-              PartialConcept.$fromRdf(resource, {
-                ...$context,
-                ignoreRdfType: true,
-                objectSet: $objectSet,
-                preferredLanguages: $preferredLanguages,
-              }),
-            ),
-          ),
-        )
-        .map((values) => values.toArray())
-        .map((valuesArray) =>
-          rdfjsResource.Resource.Values.fromValue({
-            focusResource: $resource,
-            predicate: Concept.$properties.narrowMatch["identifier"],
-            value: valuesArray,
-          }),
-        )
-        .chain((values) => values.head());
+      .map((values) =>
+        values.map(
+          (partials) =>
+            new $LazyObjectSet<Concept.$Identifier, PartialConcept, Concept>({
+              partials,
+              resolver: (identifiers) =>
+                $objectSet.concepts({
+                  where: { identifiers, type: "identifiers" },
+                }),
+            }),
+        ),
+      )
+      .chain((values) => values.head());
     if (_narrowMatchEither.isLeft()) {
       return _narrowMatchEither;
     }
 
     const narrowMatch = _narrowMatchEither.unsafeCoerce();
-    const _relatedEither: purify.Either<Error, readonly PartialConcept[]> =
-      purify.Either.of<
-        Error,
-        rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
-      >($resource.values($properties.related["identifier"], { unique: true }))
-        .chain((values) =>
-          values.chainMap((value) =>
-            value.toResource().chain((resource) =>
-              PartialConcept.$fromRdf(resource, {
-                ...$context,
-                ignoreRdfType: true,
-                objectSet: $objectSet,
-                preferredLanguages: $preferredLanguages,
-              }),
-            ),
+    const _relatedEither: purify.Either<
+      Error,
+      $LazyObjectSet<Concept.$Identifier, PartialConcept, Concept>
+    > = purify.Either.of<
+      Error,
+      rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
+    >($resource.values($properties.related["identifier"], { unique: true }))
+      .chain((values) =>
+        values.chainMap((value) =>
+          value.toResource().chain((resource) =>
+            PartialConcept.$fromRdf(resource, {
+              ...$context,
+              ignoreRdfType: true,
+              objectSet: $objectSet,
+              preferredLanguages: $preferredLanguages,
+            }),
           ),
-        )
-        .map((values) => values.toArray())
-        .map((valuesArray) =>
-          rdfjsResource.Resource.Values.fromValue({
-            focusResource: $resource,
-            predicate: Concept.$properties.related["identifier"],
-            value: valuesArray,
-          }),
-        )
-        .chain((values) => values.head());
+        ),
+      )
+      .map((values) => values.toArray())
+      .map((valuesArray) =>
+        rdfjsResource.Resource.Values.fromValue({
+          focusResource: $resource,
+          predicate: Concept.$properties.related["identifier"],
+          value: valuesArray,
+        }),
+      )
+      .map((values) =>
+        values.map(
+          (partials) =>
+            new $LazyObjectSet<Concept.$Identifier, PartialConcept, Concept>({
+              partials,
+              resolver: (identifiers) =>
+                $objectSet.concepts({
+                  where: { identifiers, type: "identifiers" },
+                }),
+            }),
+        ),
+      )
+      .chain((values) => values.head());
     if (_relatedEither.isLeft()) {
       return _relatedEither;
     }
 
     const related = _relatedEither.unsafeCoerce();
-    const _relatedMatchEither: purify.Either<Error, readonly PartialConcept[]> =
-      purify.Either.of<
-        Error,
-        rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
-      >(
-        $resource.values($properties.relatedMatch["identifier"], {
-          unique: true,
+    const _relatedMatchEither: purify.Either<
+      Error,
+      $LazyObjectSet<Concept.$Identifier, PartialConcept, Concept>
+    > = purify.Either.of<
+      Error,
+      rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
+    >(
+      $resource.values($properties.relatedMatch["identifier"], {
+        unique: true,
+      }),
+    )
+      .chain((values) =>
+        values.chainMap((value) =>
+          value.toResource().chain((resource) =>
+            PartialConcept.$fromRdf(resource, {
+              ...$context,
+              ignoreRdfType: true,
+              objectSet: $objectSet,
+              preferredLanguages: $preferredLanguages,
+            }),
+          ),
+        ),
+      )
+      .map((values) => values.toArray())
+      .map((valuesArray) =>
+        rdfjsResource.Resource.Values.fromValue({
+          focusResource: $resource,
+          predicate: Concept.$properties.relatedMatch["identifier"],
+          value: valuesArray,
         }),
       )
-        .chain((values) =>
-          values.chainMap((value) =>
-            value.toResource().chain((resource) =>
-              PartialConcept.$fromRdf(resource, {
-                ...$context,
-                ignoreRdfType: true,
-                objectSet: $objectSet,
-                preferredLanguages: $preferredLanguages,
-              }),
-            ),
-          ),
-        )
-        .map((values) => values.toArray())
-        .map((valuesArray) =>
-          rdfjsResource.Resource.Values.fromValue({
-            focusResource: $resource,
-            predicate: Concept.$properties.relatedMatch["identifier"],
-            value: valuesArray,
-          }),
-        )
-        .chain((values) => values.head());
+      .map((values) =>
+        values.map(
+          (partials) =>
+            new $LazyObjectSet<Concept.$Identifier, PartialConcept, Concept>({
+              partials,
+              resolver: (identifiers) =>
+                $objectSet.concepts({
+                  where: { identifiers, type: "identifiers" },
+                }),
+            }),
+        ),
+      )
+      .chain((values) => values.head());
     if (_relatedMatchEither.isLeft()) {
       return _relatedMatchEither;
     }
@@ -4114,7 +5789,7 @@ export namespace Concept {
     const relatedMatch = _relatedMatchEither.unsafeCoerce();
     const _semanticRelationEither: purify.Either<
       Error,
-      readonly PartialConcept[]
+      $LazyObjectSet<Concept.$Identifier, PartialConcept, Concept>
     > = purify.Either.of<
       Error,
       rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
@@ -4143,6 +5818,18 @@ export namespace Concept {
           value: valuesArray,
         }),
       )
+      .map((values) =>
+        values.map(
+          (partials) =>
+            new $LazyObjectSet<Concept.$Identifier, PartialConcept, Concept>({
+              partials,
+              resolver: (identifiers) =>
+                $objectSet.concepts({
+                  where: { identifiers, type: "identifiers" },
+                }),
+            }),
+        ),
+      )
       .chain((values) => values.head());
     if (_semanticRelationEither.isLeft()) {
       return _semanticRelationEither;
@@ -4151,7 +5838,11 @@ export namespace Concept {
     const semanticRelation = _semanticRelationEither.unsafeCoerce();
     const _topConceptOfEither: purify.Either<
       Error,
-      readonly PartialConceptScheme[]
+      $LazyObjectSet<
+        ConceptScheme.$Identifier,
+        PartialConceptScheme,
+        ConceptScheme
+      >
     > = purify.Either.of<
       Error,
       rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
@@ -4179,6 +5870,22 @@ export namespace Concept {
           predicate: Concept.$properties.topConceptOf["identifier"],
           value: valuesArray,
         }),
+      )
+      .map((values) =>
+        values.map(
+          (partials) =>
+            new $LazyObjectSet<
+              ConceptScheme.$Identifier,
+              PartialConceptScheme,
+              ConceptScheme
+            >({
+              partials,
+              resolver: (identifiers) =>
+                $objectSet.conceptSchemes({
+                  where: { identifiers, type: "identifiers" },
+                }),
+            }),
+        ),
       )
       .chain((values) => values.head());
     if (_topConceptOfEither.isLeft()) {
@@ -4864,7 +6571,7 @@ export namespace Concept {
 
     resource.add(
       Concept.$properties.broader["identifier"],
-      ..._concept.broader.flatMap((item) => [
+      ..._concept.broader.partials.flatMap((item) => [
         PartialConcept.$toRdf(item, {
           mutateGraph: mutateGraph,
           resourceSet: resourceSet,
@@ -4873,7 +6580,7 @@ export namespace Concept {
     );
     resource.add(
       Concept.$properties.broaderTransitive["identifier"],
-      ..._concept.broaderTransitive.flatMap((item) => [
+      ..._concept.broaderTransitive.partials.flatMap((item) => [
         PartialConcept.$toRdf(item, {
           mutateGraph: mutateGraph,
           resourceSet: resourceSet,
@@ -4882,7 +6589,7 @@ export namespace Concept {
     );
     resource.add(
       Concept.$properties.broadMatch["identifier"],
-      ..._concept.broadMatch.flatMap((item) => [
+      ..._concept.broadMatch.partials.flatMap((item) => [
         PartialConcept.$toRdf(item, {
           mutateGraph: mutateGraph,
           resourceSet: resourceSet,
@@ -4891,7 +6598,7 @@ export namespace Concept {
     );
     resource.add(
       Concept.$properties.closeMatch["identifier"],
-      ..._concept.closeMatch.flatMap((item) => [
+      ..._concept.closeMatch.partials.flatMap((item) => [
         PartialConcept.$toRdf(item, {
           mutateGraph: mutateGraph,
           resourceSet: resourceSet,
@@ -4900,7 +6607,7 @@ export namespace Concept {
     );
     resource.add(
       Concept.$properties.exactMatch["identifier"],
-      ..._concept.exactMatch.flatMap((item) => [
+      ..._concept.exactMatch.partials.flatMap((item) => [
         PartialConcept.$toRdf(item, {
           mutateGraph: mutateGraph,
           resourceSet: resourceSet,
@@ -4909,7 +6616,7 @@ export namespace Concept {
     );
     resource.add(
       Concept.$properties.inScheme["identifier"],
-      ..._concept.inScheme.flatMap((item) => [
+      ..._concept.inScheme.partials.flatMap((item) => [
         PartialConceptScheme.$toRdf(item, {
           mutateGraph: mutateGraph,
           resourceSet: resourceSet,
@@ -4918,7 +6625,7 @@ export namespace Concept {
     );
     resource.add(
       Concept.$properties.mappingRelation["identifier"],
-      ..._concept.mappingRelation.flatMap((item) => [
+      ..._concept.mappingRelation.partials.flatMap((item) => [
         PartialConcept.$toRdf(item, {
           mutateGraph: mutateGraph,
           resourceSet: resourceSet,
@@ -4927,7 +6634,7 @@ export namespace Concept {
     );
     resource.add(
       Concept.$properties.narrower["identifier"],
-      ..._concept.narrower.flatMap((item) => [
+      ..._concept.narrower.partials.flatMap((item) => [
         PartialConcept.$toRdf(item, {
           mutateGraph: mutateGraph,
           resourceSet: resourceSet,
@@ -4936,7 +6643,7 @@ export namespace Concept {
     );
     resource.add(
       Concept.$properties.narrowerTransitive["identifier"],
-      ..._concept.narrowerTransitive.flatMap((item) => [
+      ..._concept.narrowerTransitive.partials.flatMap((item) => [
         PartialConcept.$toRdf(item, {
           mutateGraph: mutateGraph,
           resourceSet: resourceSet,
@@ -4945,7 +6652,7 @@ export namespace Concept {
     );
     resource.add(
       Concept.$properties.narrowMatch["identifier"],
-      ..._concept.narrowMatch.flatMap((item) => [
+      ..._concept.narrowMatch.partials.flatMap((item) => [
         PartialConcept.$toRdf(item, {
           mutateGraph: mutateGraph,
           resourceSet: resourceSet,
@@ -4954,7 +6661,7 @@ export namespace Concept {
     );
     resource.add(
       Concept.$properties.related["identifier"],
-      ..._concept.related.flatMap((item) => [
+      ..._concept.related.partials.flatMap((item) => [
         PartialConcept.$toRdf(item, {
           mutateGraph: mutateGraph,
           resourceSet: resourceSet,
@@ -4963,7 +6670,7 @@ export namespace Concept {
     );
     resource.add(
       Concept.$properties.relatedMatch["identifier"],
-      ..._concept.relatedMatch.flatMap((item) => [
+      ..._concept.relatedMatch.partials.flatMap((item) => [
         PartialConcept.$toRdf(item, {
           mutateGraph: mutateGraph,
           resourceSet: resourceSet,
@@ -4972,7 +6679,7 @@ export namespace Concept {
     );
     resource.add(
       Concept.$properties.semanticRelation["identifier"],
-      ..._concept.semanticRelation.flatMap((item) => [
+      ..._concept.semanticRelation.partials.flatMap((item) => [
         PartialConcept.$toRdf(item, {
           mutateGraph: mutateGraph,
           resourceSet: resourceSet,
@@ -4981,7 +6688,7 @@ export namespace Concept {
     );
     resource.add(
       Concept.$properties.topConceptOf["identifier"],
-      ..._concept.topConceptOf.flatMap((item) => [
+      ..._concept.topConceptOf.partials.flatMap((item) => [
         PartialConceptScheme.$toRdf(item, {
           mutateGraph: mutateGraph,
           resourceSet: resourceSet,
@@ -5000,449 +6707,6 @@ export namespace Concept {
     }
   }
 }
-export interface PartialKosResource {
-  readonly $identifier: KosResourceStubStatic.$Identifier;
-  readonly $type: "PartialConceptScheme" | "PartialConcept";
-  readonly prefLabel: readonly rdfjs.Literal[];
-  readonly prefLabelXl: readonly PartialLabel[];
-}
-
-export namespace KosResourceStubStatic {
-  export function $create(parameters: {
-    readonly $identifier: rdfjs.NamedNode | string;
-    readonly prefLabel?:
-      | readonly rdfjs.Literal[]
-      | readonly boolean[]
-      | readonly number[]
-      | readonly string[];
-    readonly prefLabelXl?: readonly PartialLabel[];
-  }): Omit<PartialKosResource, "$type"> {
-    let $identifier: KosResourceStubStatic.$Identifier;
-    if (typeof parameters.$identifier === "object") {
-      $identifier = parameters.$identifier;
-    } else if (typeof parameters.$identifier === "string") {
-      $identifier = dataFactory.namedNode(parameters.$identifier);
-    } else {
-      $identifier = parameters.$identifier satisfies never;
-    }
-
-    let prefLabel: readonly rdfjs.Literal[];
-    if (typeof parameters.prefLabel === "undefined") {
-      prefLabel = [];
-    } else if ($isReadonlyObjectArray(parameters.prefLabel)) {
-      prefLabel = parameters.prefLabel;
-    } else if ($isReadonlyBooleanArray(parameters.prefLabel)) {
-      prefLabel = parameters.prefLabel.map((item) =>
-        rdfLiteral.toRdf(item, { dataFactory }),
-      );
-    } else if ($isReadonlyNumberArray(parameters.prefLabel)) {
-      prefLabel = parameters.prefLabel.map((item) =>
-        rdfLiteral.toRdf(item, { dataFactory }),
-      );
-    } else if ($isReadonlyStringArray(parameters.prefLabel)) {
-      prefLabel = parameters.prefLabel.map((item) => dataFactory.literal(item));
-    } else {
-      prefLabel = parameters.prefLabel satisfies never;
-    }
-
-    let prefLabelXl: readonly PartialLabel[];
-    if (typeof parameters.prefLabelXl === "undefined") {
-      prefLabelXl = [];
-    } else if (typeof parameters.prefLabelXl === "object") {
-      prefLabelXl = parameters.prefLabelXl;
-    } else {
-      prefLabelXl = parameters.prefLabelXl satisfies never;
-    }
-
-    return { $identifier, prefLabel, prefLabelXl };
-  }
-
-  export type $Identifier = rdfjs.NamedNode;
-
-  export namespace $Identifier {
-    export function fromString(
-      identifier: string,
-    ): purify.Either<Error, rdfjs.NamedNode> {
-      return purify.Either.encase(() =>
-        rdfjsResource.Resource.Identifier.fromString({
-          dataFactory,
-          identifier,
-        }),
-      ).chain((identifier) =>
-        identifier.termType === "NamedNode"
-          ? purify.Either.of(identifier)
-          : purify.Left(new Error("expected identifier to be NamedNode")),
-      ) as purify.Either<Error, rdfjs.NamedNode>;
-    }
-
-    export const // biome-ignore lint/suspicious/noShadowRestrictedNames:
-      toString = rdfjsResource.Resource.Identifier.toString;
-  }
-
-  export const $properties = {
-    prefLabel: {
-      identifier: dataFactory.namedNode(
-        "http://www.w3.org/2004/02/skos/core#prefLabel",
-      ),
-    },
-    prefLabelXl: {
-      identifier: dataFactory.namedNode(
-        "http://www.w3.org/2008/05/skos-xl#prefLabel",
-      ),
-    },
-  };
-
-  export function $propertiesFromRdf({
-    ignoreRdfType: $ignoreRdfType,
-    objectSet: $objectSet,
-    preferredLanguages: $preferredLanguages,
-    resource: $resource,
-    // @ts-ignore
-    ...$context
-  }: {
-    [_index: string]: any;
-    ignoreRdfType: boolean;
-    objectSet: $ObjectSet;
-    preferredLanguages?: readonly string[];
-    resource: rdfjsResource.Resource;
-  }): purify.Either<
-    Error,
-    {
-      $identifier: rdfjs.NamedNode;
-      prefLabel: readonly rdfjs.Literal[];
-      prefLabelXl: readonly PartialLabel[];
-    }
-  > {
-    if ($resource.identifier.termType !== "NamedNode") {
-      return purify.Left(
-        new rdfjsResource.Resource.MistypedTermValueError({
-          actualValue: $resource.identifier,
-          expectedValueType: "(rdfjs.NamedNode)",
-          focusResource: $resource,
-          predicate: $RdfVocabularies.rdf.subject,
-        }),
-      );
-    }
-
-    const $identifier: KosResourceStubStatic.$Identifier = $resource.identifier;
-    const _prefLabelEither: purify.Either<Error, readonly rdfjs.Literal[]> =
-      purify.Either.of<
-        Error,
-        rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
-      >($resource.values($properties.prefLabel["identifier"], { unique: true }))
-        .chain((values) => {
-          if (!$preferredLanguages || $preferredLanguages.length === 0) {
-            return purify.Either.of<
-              Error,
-              rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
-            >(values);
-          }
-
-          const literalValuesEither = values.chainMap((value) =>
-            value.toLiteral(),
-          );
-          if (literalValuesEither.isLeft()) {
-            return literalValuesEither;
-          }
-          const literalValues = literalValuesEither.unsafeCoerce();
-
-          // Return all literals for the first preferredLanguage, then all literals for the second preferredLanguage, etc.
-          // Within a preferredLanguage the literals may be in any order.
-          let filteredLiteralValues:
-            | rdfjsResource.Resource.Values<rdfjs.Literal>
-            | undefined;
-          for (const preferredLanguage of $preferredLanguages) {
-            if (!filteredLiteralValues) {
-              filteredLiteralValues = literalValues.filter(
-                (value) => value.language === preferredLanguage,
-              );
-            } else {
-              filteredLiteralValues = filteredLiteralValues.concat(
-                ...literalValues
-                  .filter((value) => value.language === preferredLanguage)
-                  .toArray(),
-              );
-            }
-          }
-
-          return purify.Either.of<
-            Error,
-            rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
-          >(
-            filteredLiteralValues!.map(
-              (literalValue) =>
-                new rdfjsResource.Resource.TermValue({
-                  focusResource: $resource,
-                  predicate:
-                    KosResourceStubStatic.$properties.prefLabel["identifier"],
-                  term: literalValue,
-                }),
-            ),
-          );
-        })
-        .chain((values) => values.chainMap((value) => value.toLiteral()))
-        .map((values) => values.toArray())
-        .map((valuesArray) =>
-          rdfjsResource.Resource.Values.fromValue({
-            focusResource: $resource,
-            predicate:
-              KosResourceStubStatic.$properties.prefLabel["identifier"],
-            value: valuesArray,
-          }),
-        )
-        .chain((values) => values.head());
-    if (_prefLabelEither.isLeft()) {
-      return _prefLabelEither;
-    }
-
-    const prefLabel = _prefLabelEither.unsafeCoerce();
-    const _prefLabelXlEither: purify.Either<Error, readonly PartialLabel[]> =
-      purify.Either.of<
-        Error,
-        rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
-      >(
-        $resource.values($properties.prefLabelXl["identifier"], {
-          unique: true,
-        }),
-      )
-        .chain((values) =>
-          values.chainMap((value) =>
-            value.toResource().chain((resource) =>
-              PartialLabel.$fromRdf(resource, {
-                ...$context,
-                ignoreRdfType: true,
-                objectSet: $objectSet,
-                preferredLanguages: $preferredLanguages,
-              }),
-            ),
-          ),
-        )
-        .map((values) => values.toArray())
-        .map((valuesArray) =>
-          rdfjsResource.Resource.Values.fromValue({
-            focusResource: $resource,
-            predicate:
-              KosResourceStubStatic.$properties.prefLabelXl["identifier"],
-            value: valuesArray,
-          }),
-        )
-        .chain((values) => values.head());
-    if (_prefLabelXlEither.isLeft()) {
-      return _prefLabelXlEither;
-    }
-
-    const prefLabelXl = _prefLabelXlEither.unsafeCoerce();
-    return purify.Either.of({ $identifier, prefLabel, prefLabelXl });
-  }
-
-  export function $sparqlConstructQuery(
-    parameters?: {
-      ignoreRdfType?: boolean;
-      prefixes?: { [prefix: string]: string };
-      preferredLanguages?: readonly string[];
-      subject?: sparqljs.Triple["subject"];
-    } & Omit<sparqljs.ConstructQuery, "prefixes" | "queryType" | "type">,
-  ): sparqljs.ConstructQuery {
-    const { ignoreRdfType, preferredLanguages, subject, ...queryParameters } =
-      parameters ?? {};
-
-    return {
-      ...queryParameters,
-      prefixes: parameters?.prefixes ?? {},
-      queryType: "CONSTRUCT",
-      template: (queryParameters.template ?? []).concat(
-        KosResourceStubStatic.$sparqlConstructTemplateTriples({
-          ignoreRdfType,
-          subject,
-        }),
-      ),
-      type: "query",
-      where: (queryParameters.where ?? []).concat(
-        KosResourceStubStatic.$sparqlWherePatterns({
-          ignoreRdfType,
-          preferredLanguages,
-          subject,
-        }),
-      ),
-    };
-  }
-
-  export function $sparqlConstructQueryString(
-    parameters?: {
-      ignoreRdfType?: boolean;
-      preferredLanguages?: readonly string[];
-      subject?: sparqljs.Triple["subject"];
-      variablePrefix?: string;
-    } & Omit<sparqljs.ConstructQuery, "prefixes" | "queryType" | "type"> &
-      sparqljs.GeneratorOptions,
-  ): string {
-    return new sparqljs.Generator(parameters).stringify(
-      KosResourceStubStatic.$sparqlConstructQuery(parameters),
-    );
-  }
-
-  export function $sparqlConstructTemplateTriples(parameters?: {
-    ignoreRdfType?: boolean;
-    subject?: sparqljs.Triple["subject"];
-    variablePrefix?: string;
-  }): readonly sparqljs.Triple[] {
-    const subject =
-      parameters?.subject ?? dataFactory.variable!("kosResourceStub");
-    const triples: sparqljs.Triple[] = [];
-    const variablePrefix =
-      parameters?.variablePrefix ??
-      (subject.termType === "Variable" ? subject.value : "kosResourceStub");
-    triples.push({
-      object: dataFactory.variable!(`${variablePrefix}PrefLabel`),
-      predicate: KosResourceStubStatic.$properties.prefLabel["identifier"],
-      subject,
-    });
-    triples.push({
-      object: dataFactory.variable!(`${variablePrefix}PrefLabelXl`),
-      predicate: KosResourceStubStatic.$properties.prefLabelXl["identifier"],
-      subject,
-    });
-    triples.push(
-      ...PartialLabel.$sparqlConstructTemplateTriples({
-        ignoreRdfType: true,
-        subject: dataFactory.variable!(`${variablePrefix}PrefLabelXl`),
-        variablePrefix: `${variablePrefix}PrefLabelXl`,
-      }),
-    );
-    return triples;
-  }
-
-  export function $sparqlWherePatterns(parameters?: {
-    ignoreRdfType?: boolean;
-    preferredLanguages?: readonly string[];
-    subject?: sparqljs.Triple["subject"];
-    variablePrefix?: string;
-  }): readonly sparqljs.Pattern[] {
-    const optionalPatterns: sparqljs.OptionalPattern[] = [];
-    const requiredPatterns: sparqljs.Pattern[] = [];
-    const subject =
-      parameters?.subject ?? dataFactory.variable!("kosResourceStub");
-    const variablePrefix =
-      parameters?.variablePrefix ??
-      (subject.termType === "Variable" ? subject.value : "kosResourceStub");
-    const propertyPatterns: readonly sparqljs.Pattern[] = [
-      {
-        patterns: [
-          {
-            triples: [
-              {
-                object: dataFactory.variable!(`${variablePrefix}PrefLabel`),
-                predicate:
-                  KosResourceStubStatic.$properties.prefLabel["identifier"],
-                subject,
-              },
-            ],
-            type: "bgp",
-          },
-          ...[parameters?.preferredLanguages ?? []]
-            .filter((languages) => languages.length > 0)
-            .map((languages) =>
-              languages.map((language) => ({
-                type: "operation" as const,
-                operator: "=",
-                args: [
-                  {
-                    type: "operation" as const,
-                    operator: "lang",
-                    args: [dataFactory.variable!(`${variablePrefix}PrefLabel`)],
-                  },
-                  dataFactory.literal(language),
-                ],
-              })),
-            )
-            .map((langEqualsExpressions) => ({
-              type: "filter" as const,
-              expression: langEqualsExpressions.reduce(
-                (reducedExpression, langEqualsExpression) => {
-                  if (reducedExpression === null) {
-                    return langEqualsExpression;
-                  }
-                  return {
-                    type: "operation" as const,
-                    operator: "||",
-                    args: [reducedExpression, langEqualsExpression],
-                  };
-                },
-                null as sparqljs.Expression | null,
-              ) as sparqljs.Expression,
-            })),
-        ],
-        type: "optional",
-      },
-      {
-        patterns: [
-          {
-            triples: [
-              {
-                object: dataFactory.variable!(`${variablePrefix}PrefLabelXl`),
-                predicate:
-                  KosResourceStubStatic.$properties.prefLabelXl["identifier"],
-                subject,
-              },
-            ],
-            type: "bgp",
-          },
-          ...PartialLabel.$sparqlWherePatterns({
-            ignoreRdfType: true,
-            preferredLanguages: parameters?.preferredLanguages,
-            subject: dataFactory.variable!(`${variablePrefix}PrefLabelXl`),
-            variablePrefix: `${variablePrefix}PrefLabelXl`,
-          }),
-        ],
-        type: "optional",
-      },
-    ];
-    for (const pattern of propertyPatterns) {
-      if (pattern.type === "optional") {
-        optionalPatterns.push(pattern);
-      } else {
-        requiredPatterns.push(pattern);
-      }
-    }
-
-    return requiredPatterns.concat(optionalPatterns);
-  }
-
-  export function $toRdf(
-    _kosResourceStub: PartialKosResource,
-    options?: {
-      ignoreRdfType?: boolean;
-      mutateGraph?: rdfjsResource.MutableResource.MutateGraph;
-      resourceSet?: rdfjsResource.MutableResourceSet;
-    },
-  ): rdfjsResource.MutableResource<rdfjs.NamedNode> {
-    const mutateGraph = options?.mutateGraph;
-    const resourceSet =
-      options?.resourceSet ??
-      new rdfjsResource.MutableResourceSet({
-        dataFactory,
-        dataset: datasetFactory.dataset(),
-      });
-    const resource = resourceSet.mutableNamedResource(
-      _kosResourceStub.$identifier,
-      { mutateGraph },
-    );
-    resource.add(
-      KosResourceStubStatic.$properties.prefLabel["identifier"],
-      ..._kosResourceStub.prefLabel.flatMap((item) => [item]),
-    );
-    resource.add(
-      KosResourceStubStatic.$properties.prefLabelXl["identifier"],
-      ..._kosResourceStub.prefLabelXl.flatMap((item) => [
-        PartialLabel.$toRdf(item, {
-          mutateGraph: mutateGraph,
-          resourceSet: resourceSet,
-        }).identifier,
-      ]),
-    );
-    return resource;
-  }
-}
 export interface PartialConcept extends PartialKosResource {
   readonly $identifier: PartialConcept.$Identifier;
   readonly $type: "PartialConcept";
@@ -5451,7 +6715,7 @@ export interface PartialConcept extends PartialKosResource {
 export namespace PartialConcept {
   export function $create(
     parameters: { readonly $identifier: rdfjs.NamedNode | string } & Parameters<
-      typeof KosResourceStubStatic.$create
+      typeof PartialKosResourceStatic.$create
     >[0],
   ): PartialConcept {
     let $identifier: PartialConcept.$Identifier;
@@ -5464,7 +6728,11 @@ export namespace PartialConcept {
     }
 
     const $type = "PartialConcept" as const;
-    return { ...KosResourceStubStatic.$create(parameters), $identifier, $type };
+    return {
+      ...PartialKosResourceStatic.$create(parameters),
+      $identifier,
+      $type,
+    };
   }
 
   export function $fromRdf(
@@ -5498,9 +6766,9 @@ export namespace PartialConcept {
   export const $fromRdfType: rdfjs.NamedNode<string> = dataFactory.namedNode(
     "http://www.w3.org/2004/02/skos/core#Concept",
   );
-  export type $Identifier = KosResourceStubStatic.$Identifier;
-  export const $Identifier = KosResourceStubStatic.$Identifier;
-  export const $properties = { ...KosResourceStubStatic.$properties };
+  export type $Identifier = PartialKosResourceStatic.$Identifier;
+  export const $Identifier = PartialKosResourceStatic.$Identifier;
+  export const $properties = { ...PartialKosResourceStatic.$properties };
 
   export function $propertiesFromRdf({
     ignoreRdfType: $ignoreRdfType,
@@ -5518,10 +6786,10 @@ export namespace PartialConcept {
   }): purify.Either<
     Error,
     { $identifier: rdfjs.NamedNode; $type: "PartialConcept" } & $UnwrapR<
-      ReturnType<typeof KosResourceStubStatic.$propertiesFromRdf>
+      ReturnType<typeof PartialKosResourceStatic.$propertiesFromRdf>
     >
   > {
-    const $super0Either = KosResourceStubStatic.$propertiesFromRdf({
+    const $super0Either = PartialKosResourceStatic.$propertiesFromRdf({
       ...$context,
       ignoreRdfType: true,
       objectSet: $objectSet,
@@ -5627,13 +6895,14 @@ export namespace PartialConcept {
     subject?: sparqljs.Triple["subject"];
     variablePrefix?: string;
   }): readonly sparqljs.Triple[] {
-    const subject = parameters?.subject ?? dataFactory.variable!("conceptStub");
+    const subject =
+      parameters?.subject ?? dataFactory.variable!("partialConcept");
     const triples: sparqljs.Triple[] = [];
     const variablePrefix =
       parameters?.variablePrefix ??
-      (subject.termType === "Variable" ? subject.value : "conceptStub");
+      (subject.termType === "Variable" ? subject.value : "partialConcept");
     triples.push(
-      ...KosResourceStubStatic.$sparqlConstructTemplateTriples({
+      ...PartialKosResourceStatic.$sparqlConstructTemplateTriples({
         ignoreRdfType: true,
         subject,
         variablePrefix,
@@ -5665,11 +6934,12 @@ export namespace PartialConcept {
   }): readonly sparqljs.Pattern[] {
     const optionalPatterns: sparqljs.OptionalPattern[] = [];
     const requiredPatterns: sparqljs.Pattern[] = [];
-    const subject = parameters?.subject ?? dataFactory.variable!("conceptStub");
+    const subject =
+      parameters?.subject ?? dataFactory.variable!("partialConcept");
     const variablePrefix =
       parameters?.variablePrefix ??
-      (subject.termType === "Variable" ? subject.value : "conceptStub");
-    for (const pattern of KosResourceStubStatic.$sparqlWherePatterns({
+      (subject.termType === "Variable" ? subject.value : "partialConcept");
+    for (const pattern of PartialKosResourceStatic.$sparqlWherePatterns({
       ignoreRdfType: true,
       subject,
       variablePrefix,
@@ -5724,7 +6994,7 @@ export namespace PartialConcept {
   }
 
   export function $toRdf(
-    _conceptStub: PartialConcept,
+    _partialConcept: PartialConcept,
     options?: {
       ignoreRdfType?: boolean;
       mutateGraph?: rdfjsResource.MutableResource.MutateGraph;
@@ -5739,7 +7009,7 @@ export namespace PartialConcept {
         dataFactory,
         dataset: datasetFactory.dataset(),
       });
-    const resource = KosResourceStubStatic.$toRdf(_conceptStub, {
+    const resource = PartialKosResourceStatic.$toRdf(_partialConcept, {
       ignoreRdfType: true,
       mutateGraph,
       resourceSet,
@@ -5762,7 +7032,7 @@ export namespace PartialConcept {
     return resource;
   }
 
-  export function isConceptStub(
+  export function isPartialConcept(
     object: PartialKosResource,
   ): object is PartialConcept {
     switch (object.$type) {
@@ -5773,157 +7043,31 @@ export namespace PartialConcept {
     }
   }
 }
-export interface ConceptScheme extends KosResource {
-  readonly $identifier: ConceptScheme.$Identifier;
-  readonly $type: "ConceptScheme";
-  readonly hasTopConcept: readonly PartialConcept[];
-  readonly license: purify.Maybe<rdfjs.NamedNode | rdfjs.Literal>;
-  readonly rights: purify.Maybe<rdfjs.Literal>;
-  readonly rightsHolder: purify.Maybe<rdfjs.Literal>;
+export interface Label {
+  readonly $identifier: Label.$Identifier;
+  readonly $type: "Label";
+  readonly literalForm: purify.NonEmptyList<rdfjs.Literal>;
 }
 
-export namespace ConceptScheme {
-  export function $create(
-    parameters: {
-      readonly $identifier: rdfjs.NamedNode | string;
-      readonly hasTopConcept?: readonly PartialConcept[];
-      readonly license?:
-        | (rdfjs.NamedNode | rdfjs.Literal)
-        | Date
-        | boolean
-        | number
-        | purify.Maybe<rdfjs.NamedNode | rdfjs.Literal>
-        | string;
-      readonly rights?:
-        | rdfjs.Literal
-        | Date
-        | boolean
-        | number
-        | purify.Maybe<rdfjs.Literal>
-        | string;
-      readonly rightsHolder?:
-        | rdfjs.Literal
-        | Date
-        | boolean
-        | number
-        | purify.Maybe<rdfjs.Literal>
-        | string;
-    } & Parameters<typeof KosResourceStatic.$create>[0],
-  ): ConceptScheme {
-    let $identifier: ConceptScheme.$Identifier;
+export namespace Label {
+  export function $create(parameters: {
+    readonly $identifier?: (rdfjs.BlankNode | rdfjs.NamedNode) | string;
+    readonly literalForm: purify.NonEmptyList<rdfjs.Literal>;
+  }): Label {
+    let $identifier: Label.$Identifier;
     if (typeof parameters.$identifier === "object") {
       $identifier = parameters.$identifier;
     } else if (typeof parameters.$identifier === "string") {
       $identifier = dataFactory.namedNode(parameters.$identifier);
+    } else if (typeof parameters.$identifier === "undefined") {
+      $identifier = dataFactory.blankNode();
     } else {
       $identifier = parameters.$identifier satisfies never;
     }
 
-    const $type = "ConceptScheme" as const;
-    let hasTopConcept: readonly PartialConcept[];
-    if (typeof parameters.hasTopConcept === "undefined") {
-      hasTopConcept = [];
-    } else if (typeof parameters.hasTopConcept === "object") {
-      hasTopConcept = parameters.hasTopConcept;
-    } else {
-      hasTopConcept = parameters.hasTopConcept satisfies never;
-    }
-
-    let license: purify.Maybe<rdfjs.NamedNode | rdfjs.Literal>;
-    if (purify.Maybe.isMaybe(parameters.license)) {
-      license = parameters.license;
-    } else if (typeof parameters.license === "boolean") {
-      license = purify.Maybe.of(
-        rdfLiteral.toRdf(parameters.license, { dataFactory }),
-      );
-    } else if (
-      typeof parameters.license === "object" &&
-      parameters.license instanceof Date
-    ) {
-      license = purify.Maybe.of(
-        rdfLiteral.toRdf(parameters.license, { dataFactory }),
-      );
-    } else if (typeof parameters.license === "number") {
-      license = purify.Maybe.of(
-        rdfLiteral.toRdf(parameters.license, { dataFactory }),
-      );
-    } else if (typeof parameters.license === "string") {
-      license = purify.Maybe.of(dataFactory.literal(parameters.license));
-    } else if (typeof parameters.license === "object") {
-      license = purify.Maybe.of(parameters.license);
-    } else if (typeof parameters.license === "undefined") {
-      license = purify.Maybe.empty();
-    } else {
-      license = parameters.license satisfies never;
-    }
-
-    let rights: purify.Maybe<rdfjs.Literal>;
-    if (purify.Maybe.isMaybe(parameters.rights)) {
-      rights = parameters.rights;
-    } else if (typeof parameters.rights === "boolean") {
-      rights = purify.Maybe.of(
-        rdfLiteral.toRdf(parameters.rights, { dataFactory }),
-      );
-    } else if (
-      typeof parameters.rights === "object" &&
-      parameters.rights instanceof Date
-    ) {
-      rights = purify.Maybe.of(
-        rdfLiteral.toRdf(parameters.rights, { dataFactory }),
-      );
-    } else if (typeof parameters.rights === "number") {
-      rights = purify.Maybe.of(
-        rdfLiteral.toRdf(parameters.rights, { dataFactory }),
-      );
-    } else if (typeof parameters.rights === "string") {
-      rights = purify.Maybe.of(dataFactory.literal(parameters.rights));
-    } else if (typeof parameters.rights === "object") {
-      rights = purify.Maybe.of(parameters.rights);
-    } else if (typeof parameters.rights === "undefined") {
-      rights = purify.Maybe.empty();
-    } else {
-      rights = parameters.rights satisfies never;
-    }
-
-    let rightsHolder: purify.Maybe<rdfjs.Literal>;
-    if (purify.Maybe.isMaybe(parameters.rightsHolder)) {
-      rightsHolder = parameters.rightsHolder;
-    } else if (typeof parameters.rightsHolder === "boolean") {
-      rightsHolder = purify.Maybe.of(
-        rdfLiteral.toRdf(parameters.rightsHolder, { dataFactory }),
-      );
-    } else if (
-      typeof parameters.rightsHolder === "object" &&
-      parameters.rightsHolder instanceof Date
-    ) {
-      rightsHolder = purify.Maybe.of(
-        rdfLiteral.toRdf(parameters.rightsHolder, { dataFactory }),
-      );
-    } else if (typeof parameters.rightsHolder === "number") {
-      rightsHolder = purify.Maybe.of(
-        rdfLiteral.toRdf(parameters.rightsHolder, { dataFactory }),
-      );
-    } else if (typeof parameters.rightsHolder === "string") {
-      rightsHolder = purify.Maybe.of(
-        dataFactory.literal(parameters.rightsHolder),
-      );
-    } else if (typeof parameters.rightsHolder === "object") {
-      rightsHolder = purify.Maybe.of(parameters.rightsHolder);
-    } else if (typeof parameters.rightsHolder === "undefined") {
-      rightsHolder = purify.Maybe.empty();
-    } else {
-      rightsHolder = parameters.rightsHolder satisfies never;
-    }
-
-    return {
-      ...KosResourceStatic.$create(parameters),
-      $identifier,
-      $type,
-      hasTopConcept,
-      license,
-      rights,
-      rightsHolder,
-    };
+    const $type = "Label" as const;
+    const literalForm = parameters.literalForm;
+    return { $identifier, $type, literalForm };
   }
 
   export function $fromRdf(
@@ -5934,7 +7078,7 @@ export namespace ConceptScheme {
       objectSet?: $ObjectSet;
       preferredLanguages?: readonly string[];
     },
-  ): purify.Either<Error, ConceptScheme> {
+  ): purify.Either<Error, Label> {
     let {
       ignoreRdfType = false,
       objectSet,
@@ -5945,7 +7089,7 @@ export namespace ConceptScheme {
       objectSet = new $RdfjsDatasetObjectSet({ dataset: resource.dataset });
     }
 
-    return ConceptScheme.$propertiesFromRdf({
+    return Label.$propertiesFromRdf({
       ...context,
       ignoreRdfType,
       objectSet,
@@ -5955,26 +7099,30 @@ export namespace ConceptScheme {
   }
 
   export const $fromRdfType: rdfjs.NamedNode<string> = dataFactory.namedNode(
-    "http://www.w3.org/2004/02/skos/core#ConceptScheme",
+    "http://www.w3.org/2008/05/skos-xl#Label",
   );
-  export type $Identifier = KosResourceStatic.$Identifier;
-  export const $Identifier = KosResourceStatic.$Identifier;
+  export type $Identifier = rdfjs.BlankNode | rdfjs.NamedNode;
+
+  export namespace $Identifier {
+    export function fromString(
+      identifier: string,
+    ): purify.Either<Error, rdfjsResource.Resource.Identifier> {
+      return purify.Either.encase(() =>
+        rdfjsResource.Resource.Identifier.fromString({
+          dataFactory,
+          identifier,
+        }),
+      );
+    }
+
+    export const // biome-ignore lint/suspicious/noShadowRestrictedNames:
+      toString = rdfjsResource.Resource.Identifier.toString;
+  }
+
   export const $properties = {
-    ...KosResourceStatic.$properties,
-    hasTopConcept: {
+    literalForm: {
       identifier: dataFactory.namedNode(
-        "http://www.w3.org/2004/02/skos/core#hasTopConcept",
-      ),
-    },
-    license: {
-      identifier: dataFactory.namedNode("http://purl.org/dc/terms/license"),
-    },
-    rights: {
-      identifier: dataFactory.namedNode("http://purl.org/dc/terms/rights"),
-    },
-    rightsHolder: {
-      identifier: dataFactory.namedNode(
-        "http://purl.org/dc/terms/rightsHolder",
+        "http://www.w3.org/2008/05/skos-xl#literalForm",
       ),
     },
   };
@@ -5995,26 +7143,11 @@ export namespace ConceptScheme {
   }): purify.Either<
     Error,
     {
-      $identifier: rdfjs.NamedNode;
-      $type: "ConceptScheme";
-      hasTopConcept: readonly PartialConcept[];
-      license: purify.Maybe<rdfjs.NamedNode | rdfjs.Literal>;
-      rights: purify.Maybe<rdfjs.Literal>;
-      rightsHolder: purify.Maybe<rdfjs.Literal>;
-    } & $UnwrapR<ReturnType<typeof KosResourceStatic.$propertiesFromRdf>>
-  > {
-    const $super0Either = KosResourceStatic.$propertiesFromRdf({
-      ...$context,
-      ignoreRdfType: true,
-      objectSet: $objectSet,
-      preferredLanguages: $preferredLanguages,
-      resource: $resource,
-    });
-    if ($super0Either.isLeft()) {
-      return $super0Either;
+      $identifier: rdfjs.BlankNode | rdfjs.NamedNode;
+      $type: "Label";
+      literalForm: purify.NonEmptyList<rdfjs.Literal>;
     }
-
-    const $super0 = $super0Either.unsafeCoerce();
+  > {
     if (!$ignoreRdfType) {
       const $rdfTypeCheck: purify.Either<Error, true> = $resource
         .value($RdfVocabularies.rdf.type)
@@ -6022,18 +7155,18 @@ export namespace ConceptScheme {
         .chain((actualRdfType) => {
           // Check the expected type and its known subtypes
           switch (actualRdfType.value) {
-            case "http://www.w3.org/2004/02/skos/core#ConceptScheme":
+            case "http://www.w3.org/2008/05/skos-xl#Label":
               return purify.Either.of(true);
           }
 
           // Check arbitrary rdfs:subClassOf's of the expected type
-          if ($resource.isInstanceOf(ConceptScheme.$fromRdfType)) {
+          if ($resource.isInstanceOf(Label.$fromRdfType)) {
             return purify.Either.of(true);
           }
 
           return purify.Left(
             new Error(
-              `${rdfjsResource.Resource.Identifier.toString($resource.identifier)} has unexpected RDF type (actual: ${actualRdfType.value}, expected: http://www.w3.org/2004/02/skos/core#ConceptScheme)`,
+              `${rdfjsResource.Resource.Identifier.toString($resource.identifier)} has unexpected RDF type (actual: ${actualRdfType.value}, expected: http://www.w3.org/2008/05/skos-xl#Label)`,
             ),
           );
         });
@@ -6042,266 +7175,86 @@ export namespace ConceptScheme {
       }
     }
 
-    if ($resource.identifier.termType !== "NamedNode") {
-      return purify.Left(
-        new rdfjsResource.Resource.MistypedTermValueError({
-          actualValue: $resource.identifier,
-          expectedValueType: "(rdfjs.NamedNode)",
-          focusResource: $resource,
-          predicate: $RdfVocabularies.rdf.subject,
-        }),
-      );
-    }
-
-    const $identifier: ConceptScheme.$Identifier = $resource.identifier;
-    const $type = "ConceptScheme" as const;
-    const _hasTopConceptEither: purify.Either<
+    const $identifier: Label.$Identifier = $resource.identifier;
+    const $type = "Label" as const;
+    const _literalFormEither: purify.Either<
       Error,
-      readonly PartialConcept[]
+      purify.NonEmptyList<rdfjs.Literal>
     > = purify.Either.of<
       Error,
       rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
-    >(
-      $resource.values($properties.hasTopConcept["identifier"], {
-        unique: true,
-      }),
-    )
+    >($resource.values($properties.literalForm["identifier"], { unique: true }))
+      .chain((values) => {
+        if (!$preferredLanguages || $preferredLanguages.length === 0) {
+          return purify.Either.of<
+            Error,
+            rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
+          >(values);
+        }
+
+        const literalValuesEither = values.chainMap((value) =>
+          value.toLiteral(),
+        );
+        if (literalValuesEither.isLeft()) {
+          return literalValuesEither;
+        }
+        const literalValues = literalValuesEither.unsafeCoerce();
+
+        // Return all literals for the first preferredLanguage, then all literals for the second preferredLanguage, etc.
+        // Within a preferredLanguage the literals may be in any order.
+        let filteredLiteralValues:
+          | rdfjsResource.Resource.Values<rdfjs.Literal>
+          | undefined;
+        for (const preferredLanguage of $preferredLanguages) {
+          if (!filteredLiteralValues) {
+            filteredLiteralValues = literalValues.filter(
+              (value) => value.language === preferredLanguage,
+            );
+          } else {
+            filteredLiteralValues = filteredLiteralValues.concat(
+              ...literalValues
+                .filter((value) => value.language === preferredLanguage)
+                .toArray(),
+            );
+          }
+        }
+
+        return purify.Either.of<
+          Error,
+          rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
+        >(
+          filteredLiteralValues!.map(
+            (literalValue) =>
+              new rdfjsResource.Resource.TermValue({
+                focusResource: $resource,
+                predicate: Label.$properties.literalForm["identifier"],
+                term: literalValue,
+              }),
+          ),
+        );
+      })
+      .chain((values) => values.chainMap((value) => value.toLiteral()))
       .chain((values) =>
-        values.chainMap((value) =>
-          value.toResource().chain((resource) =>
-            PartialConcept.$fromRdf(resource, {
-              ...$context,
-              ignoreRdfType: true,
-              objectSet: $objectSet,
-              preferredLanguages: $preferredLanguages,
-            }),
+        purify.NonEmptyList.fromArray(values.toArray()).toEither(
+          new Error(
+            `${rdfjsResource.Resource.Identifier.toString($resource.identifier)} is an empty set`,
           ),
         ),
       )
-      .map((values) => values.toArray())
       .map((valuesArray) =>
         rdfjsResource.Resource.Values.fromValue({
           focusResource: $resource,
-          predicate: ConceptScheme.$properties.hasTopConcept["identifier"],
+          predicate: Label.$properties.literalForm["identifier"],
           value: valuesArray,
         }),
       )
       .chain((values) => values.head());
-    if (_hasTopConceptEither.isLeft()) {
-      return _hasTopConceptEither;
+    if (_literalFormEither.isLeft()) {
+      return _literalFormEither;
     }
 
-    const hasTopConcept = _hasTopConceptEither.unsafeCoerce();
-    const _licenseEither: purify.Either<
-      Error,
-      purify.Maybe<rdfjs.NamedNode | rdfjs.Literal>
-    > = purify.Either.of<
-      Error,
-      rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
-    >($resource.values($properties.license["identifier"], { unique: true }))
-      .chain((values) =>
-        values.chainMap((value) =>
-          purify.Either.of<
-            Error,
-            rdfjs.BlankNode | rdfjs.Literal | rdfjs.NamedNode
-          >(value.toTerm()).chain((term) => {
-            switch (term.termType) {
-              case "NamedNode":
-              case "Literal":
-                return purify.Either.of<Error, rdfjs.NamedNode | rdfjs.Literal>(
-                  term,
-                );
-              default:
-                return purify.Left<Error, rdfjs.NamedNode | rdfjs.Literal>(
-                  new rdfjsResource.Resource.MistypedTermValueError({
-                    actualValue: term,
-                    expectedValueType: "(rdfjs.NamedNode | rdfjs.Literal)",
-                    focusResource: $resource,
-                    predicate: ConceptScheme.$properties.license["identifier"],
-                  }),
-                );
-            }
-          }),
-        ),
-      )
-      .map((values) =>
-        values.length > 0
-          ? values.map((value) => purify.Maybe.of(value))
-          : rdfjsResource.Resource.Values.fromValue<
-              purify.Maybe<rdfjs.NamedNode | rdfjs.Literal>
-            >({
-              focusResource: $resource,
-              predicate: ConceptScheme.$properties.license["identifier"],
-              value: purify.Maybe.empty(),
-            }),
-      )
-      .chain((values) => values.head());
-    if (_licenseEither.isLeft()) {
-      return _licenseEither;
-    }
-
-    const license = _licenseEither.unsafeCoerce();
-    const _rightsEither: purify.Either<
-      Error,
-      purify.Maybe<rdfjs.Literal>
-    > = purify.Either.of<
-      Error,
-      rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
-    >($resource.values($properties.rights["identifier"], { unique: true }))
-      .chain((values) => {
-        if (!$preferredLanguages || $preferredLanguages.length === 0) {
-          return purify.Either.of<
-            Error,
-            rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
-          >(values);
-        }
-
-        const literalValuesEither = values.chainMap((value) =>
-          value.toLiteral(),
-        );
-        if (literalValuesEither.isLeft()) {
-          return literalValuesEither;
-        }
-        const literalValues = literalValuesEither.unsafeCoerce();
-
-        // Return all literals for the first preferredLanguage, then all literals for the second preferredLanguage, etc.
-        // Within a preferredLanguage the literals may be in any order.
-        let filteredLiteralValues:
-          | rdfjsResource.Resource.Values<rdfjs.Literal>
-          | undefined;
-        for (const preferredLanguage of $preferredLanguages) {
-          if (!filteredLiteralValues) {
-            filteredLiteralValues = literalValues.filter(
-              (value) => value.language === preferredLanguage,
-            );
-          } else {
-            filteredLiteralValues = filteredLiteralValues.concat(
-              ...literalValues
-                .filter((value) => value.language === preferredLanguage)
-                .toArray(),
-            );
-          }
-        }
-
-        return purify.Either.of<
-          Error,
-          rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
-        >(
-          filteredLiteralValues!.map(
-            (literalValue) =>
-              new rdfjsResource.Resource.TermValue({
-                focusResource: $resource,
-                predicate: ConceptScheme.$properties.rights["identifier"],
-                term: literalValue,
-              }),
-          ),
-        );
-      })
-      .chain((values) => values.chainMap((value) => value.toLiteral()))
-      .map((values) =>
-        values.length > 0
-          ? values.map((value) => purify.Maybe.of(value))
-          : rdfjsResource.Resource.Values.fromValue<
-              purify.Maybe<rdfjs.Literal>
-            >({
-              focusResource: $resource,
-              predicate: ConceptScheme.$properties.rights["identifier"],
-              value: purify.Maybe.empty(),
-            }),
-      )
-      .chain((values) => values.head());
-    if (_rightsEither.isLeft()) {
-      return _rightsEither;
-    }
-
-    const rights = _rightsEither.unsafeCoerce();
-    const _rightsHolderEither: purify.Either<
-      Error,
-      purify.Maybe<rdfjs.Literal>
-    > = purify.Either.of<
-      Error,
-      rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
-    >(
-      $resource.values($properties.rightsHolder["identifier"], {
-        unique: true,
-      }),
-    )
-      .chain((values) => {
-        if (!$preferredLanguages || $preferredLanguages.length === 0) {
-          return purify.Either.of<
-            Error,
-            rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
-          >(values);
-        }
-
-        const literalValuesEither = values.chainMap((value) =>
-          value.toLiteral(),
-        );
-        if (literalValuesEither.isLeft()) {
-          return literalValuesEither;
-        }
-        const literalValues = literalValuesEither.unsafeCoerce();
-
-        // Return all literals for the first preferredLanguage, then all literals for the second preferredLanguage, etc.
-        // Within a preferredLanguage the literals may be in any order.
-        let filteredLiteralValues:
-          | rdfjsResource.Resource.Values<rdfjs.Literal>
-          | undefined;
-        for (const preferredLanguage of $preferredLanguages) {
-          if (!filteredLiteralValues) {
-            filteredLiteralValues = literalValues.filter(
-              (value) => value.language === preferredLanguage,
-            );
-          } else {
-            filteredLiteralValues = filteredLiteralValues.concat(
-              ...literalValues
-                .filter((value) => value.language === preferredLanguage)
-                .toArray(),
-            );
-          }
-        }
-
-        return purify.Either.of<
-          Error,
-          rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
-        >(
-          filteredLiteralValues!.map(
-            (literalValue) =>
-              new rdfjsResource.Resource.TermValue({
-                focusResource: $resource,
-                predicate: ConceptScheme.$properties.rightsHolder["identifier"],
-                term: literalValue,
-              }),
-          ),
-        );
-      })
-      .chain((values) => values.chainMap((value) => value.toLiteral()))
-      .map((values) =>
-        values.length > 0
-          ? values.map((value) => purify.Maybe.of(value))
-          : rdfjsResource.Resource.Values.fromValue<
-              purify.Maybe<rdfjs.Literal>
-            >({
-              focusResource: $resource,
-              predicate: ConceptScheme.$properties.rightsHolder["identifier"],
-              value: purify.Maybe.empty(),
-            }),
-      )
-      .chain((values) => values.head());
-    if (_rightsHolderEither.isLeft()) {
-      return _rightsHolderEither;
-    }
-
-    const rightsHolder = _rightsHolderEither.unsafeCoerce();
-    return purify.Either.of({
-      ...$super0,
-      $identifier,
-      $type,
-      hasTopConcept,
-      license,
-      rights,
-      rightsHolder,
-    });
+    const literalForm = _literalFormEither.unsafeCoerce();
+    return purify.Either.of({ $identifier, $type, literalForm });
   }
 
   export function $sparqlConstructQuery(
@@ -6320,14 +7273,11 @@ export namespace ConceptScheme {
       prefixes: parameters?.prefixes ?? {},
       queryType: "CONSTRUCT",
       template: (queryParameters.template ?? []).concat(
-        ConceptScheme.$sparqlConstructTemplateTriples({
-          ignoreRdfType,
-          subject,
-        }),
+        Label.$sparqlConstructTemplateTriples({ ignoreRdfType, subject }),
       ),
       type: "query",
       where: (queryParameters.where ?? []).concat(
-        ConceptScheme.$sparqlWherePatterns({
+        Label.$sparqlWherePatterns({
           ignoreRdfType,
           preferredLanguages,
           subject,
@@ -6346,7 +7296,7 @@ export namespace ConceptScheme {
       sparqljs.GeneratorOptions,
   ): string {
     return new sparqljs.Generator(parameters).stringify(
-      ConceptScheme.$sparqlConstructQuery(parameters),
+      Label.$sparqlConstructQuery(parameters),
     );
   }
 
@@ -6355,19 +7305,11 @@ export namespace ConceptScheme {
     subject?: sparqljs.Triple["subject"];
     variablePrefix?: string;
   }): readonly sparqljs.Triple[] {
-    const subject =
-      parameters?.subject ?? dataFactory.variable!("conceptScheme");
+    const subject = parameters?.subject ?? dataFactory.variable!("label");
     const triples: sparqljs.Triple[] = [];
     const variablePrefix =
       parameters?.variablePrefix ??
-      (subject.termType === "Variable" ? subject.value : "conceptScheme");
-    triples.push(
-      ...KosResourceStatic.$sparqlConstructTemplateTriples({
-        ignoreRdfType: true,
-        subject,
-        variablePrefix,
-      }),
-    );
+      (subject.termType === "Variable" ? subject.value : "label");
     if (!parameters?.ignoreRdfType) {
       triples.push(
         {
@@ -6384,30 +7326,440 @@ export namespace ConceptScheme {
     }
 
     triples.push({
-      object: dataFactory.variable!(`${variablePrefix}HasTopConcept`),
-      predicate: ConceptScheme.$properties.hasTopConcept["identifier"],
+      object: dataFactory.variable!(`${variablePrefix}LiteralForm`),
+      predicate: Label.$properties.literalForm["identifier"],
       subject,
     });
-    triples.push(
-      ...PartialConcept.$sparqlConstructTemplateTriples({
-        ignoreRdfType: true,
-        subject: dataFactory.variable!(`${variablePrefix}HasTopConcept`),
-        variablePrefix: `${variablePrefix}HasTopConcept`,
-      }),
+    return triples;
+  }
+
+  export function $sparqlWherePatterns(parameters?: {
+    ignoreRdfType?: boolean;
+    preferredLanguages?: readonly string[];
+    subject?: sparqljs.Triple["subject"];
+    variablePrefix?: string;
+  }): readonly sparqljs.Pattern[] {
+    const optionalPatterns: sparqljs.OptionalPattern[] = [];
+    const requiredPatterns: sparqljs.Pattern[] = [];
+    const subject = parameters?.subject ?? dataFactory.variable!("label");
+    const variablePrefix =
+      parameters?.variablePrefix ??
+      (subject.termType === "Variable" ? subject.value : "label");
+    const rdfTypeVariable = dataFactory.variable!(`${variablePrefix}RdfType`);
+    if (!parameters?.ignoreRdfType) {
+      requiredPatterns.push(
+        $sparqlInstancesOfPattern({ rdfType: Label.$fromRdfType, subject }),
+        {
+          triples: [
+            {
+              subject,
+              predicate: $RdfVocabularies.rdf.type,
+              object: rdfTypeVariable,
+            },
+          ],
+          type: "bgp" as const,
+        },
+      );
+      optionalPatterns.push({
+        patterns: [
+          {
+            triples: [
+              {
+                subject: rdfTypeVariable,
+                predicate: {
+                  items: [$RdfVocabularies.rdfs.subClassOf],
+                  pathType: "+" as const,
+                  type: "path" as const,
+                },
+                object: dataFactory.variable!(`${variablePrefix}RdfClass`),
+              },
+            ],
+            type: "bgp" as const,
+          },
+        ],
+        type: "optional" as const,
+      });
+    }
+
+    const propertyPatterns: readonly sparqljs.Pattern[] = [
+      {
+        triples: [
+          {
+            object: dataFactory.variable!(`${variablePrefix}LiteralForm`),
+            predicate: Label.$properties.literalForm["identifier"],
+            subject,
+          },
+        ],
+        type: "bgp",
+      },
+      ...[parameters?.preferredLanguages ?? []]
+        .filter((languages) => languages.length > 0)
+        .map((languages) =>
+          languages.map((language) => ({
+            type: "operation" as const,
+            operator: "=",
+            args: [
+              {
+                type: "operation" as const,
+                operator: "lang",
+                args: [dataFactory.variable!(`${variablePrefix}LiteralForm`)],
+              },
+              dataFactory.literal(language),
+            ],
+          })),
+        )
+        .map((langEqualsExpressions) => ({
+          type: "filter" as const,
+          expression: langEqualsExpressions.reduce(
+            (reducedExpression, langEqualsExpression) => {
+              if (reducedExpression === null) {
+                return langEqualsExpression;
+              }
+              return {
+                type: "operation" as const,
+                operator: "||",
+                args: [reducedExpression, langEqualsExpression],
+              };
+            },
+            null as sparqljs.Expression | null,
+          ) as sparqljs.Expression,
+        })),
+    ];
+    for (const pattern of propertyPatterns) {
+      if (pattern.type === "optional") {
+        optionalPatterns.push(pattern);
+      } else {
+        requiredPatterns.push(pattern);
+      }
+    }
+
+    return requiredPatterns.concat(optionalPatterns);
+  }
+
+  export function $toRdf(
+    _label: Label,
+    options?: {
+      ignoreRdfType?: boolean;
+      mutateGraph?: rdfjsResource.MutableResource.MutateGraph;
+      resourceSet?: rdfjsResource.MutableResourceSet;
+    },
+  ): rdfjsResource.MutableResource {
+    const ignoreRdfType = !!options?.ignoreRdfType;
+    const mutateGraph = options?.mutateGraph;
+    const resourceSet =
+      options?.resourceSet ??
+      new rdfjsResource.MutableResourceSet({
+        dataFactory,
+        dataset: datasetFactory.dataset(),
+      });
+    const resource = resourceSet.mutableResource(_label.$identifier, {
+      mutateGraph,
+    });
+    if (!ignoreRdfType) {
+      resource.add(
+        $RdfVocabularies.rdf.type,
+        resource.dataFactory.namedNode(
+          "http://www.w3.org/2008/05/skos-xl#Label",
+        ),
+      );
+    }
+
+    resource.add(
+      Label.$properties.literalForm["identifier"],
+      ..._label.literalForm.flatMap((item) => [item]),
     );
-    triples.push({
-      object: dataFactory.variable!(`${variablePrefix}License`),
-      predicate: ConceptScheme.$properties.license["identifier"],
-      subject,
+    return resource;
+  }
+}
+export interface PartialLabel {
+  readonly $identifier: PartialLabel.$Identifier;
+  readonly $type: "PartialLabel";
+  readonly literalForm: purify.NonEmptyList<rdfjs.Literal>;
+}
+
+export namespace PartialLabel {
+  export function $create(parameters: {
+    readonly $identifier?: (rdfjs.BlankNode | rdfjs.NamedNode) | string;
+    readonly literalForm: purify.NonEmptyList<rdfjs.Literal>;
+  }): PartialLabel {
+    let $identifier: PartialLabel.$Identifier;
+    if (typeof parameters.$identifier === "object") {
+      $identifier = parameters.$identifier;
+    } else if (typeof parameters.$identifier === "string") {
+      $identifier = dataFactory.namedNode(parameters.$identifier);
+    } else if (typeof parameters.$identifier === "undefined") {
+      $identifier = dataFactory.blankNode();
+    } else {
+      $identifier = parameters.$identifier satisfies never;
+    }
+
+    const $type = "PartialLabel" as const;
+    const literalForm = parameters.literalForm;
+    return { $identifier, $type, literalForm };
+  }
+
+  export function $fromRdf(
+    resource: rdfjsResource.Resource,
+    options?: {
+      [_index: string]: any;
+      ignoreRdfType?: boolean;
+      objectSet?: $ObjectSet;
+      preferredLanguages?: readonly string[];
+    },
+  ): purify.Either<Error, PartialLabel> {
+    let {
+      ignoreRdfType = false,
+      objectSet,
+      preferredLanguages,
+      ...context
+    } = options ?? {};
+    if (!objectSet) {
+      objectSet = new $RdfjsDatasetObjectSet({ dataset: resource.dataset });
+    }
+
+    return PartialLabel.$propertiesFromRdf({
+      ...context,
+      ignoreRdfType,
+      objectSet,
+      preferredLanguages,
+      resource,
     });
+  }
+
+  export const $fromRdfType: rdfjs.NamedNode<string> = dataFactory.namedNode(
+    "http://www.w3.org/2008/05/skos-xl#Label",
+  );
+  export type $Identifier = rdfjs.BlankNode | rdfjs.NamedNode;
+
+  export namespace $Identifier {
+    export function fromString(
+      identifier: string,
+    ): purify.Either<Error, rdfjsResource.Resource.Identifier> {
+      return purify.Either.encase(() =>
+        rdfjsResource.Resource.Identifier.fromString({
+          dataFactory,
+          identifier,
+        }),
+      );
+    }
+
+    export const // biome-ignore lint/suspicious/noShadowRestrictedNames:
+      toString = rdfjsResource.Resource.Identifier.toString;
+  }
+
+  export const $properties = {
+    literalForm: {
+      identifier: dataFactory.namedNode(
+        "http://www.w3.org/2008/05/skos-xl#literalForm",
+      ),
+    },
+  };
+
+  export function $propertiesFromRdf({
+    ignoreRdfType: $ignoreRdfType,
+    objectSet: $objectSet,
+    preferredLanguages: $preferredLanguages,
+    resource: $resource,
+    // @ts-ignore
+    ...$context
+  }: {
+    [_index: string]: any;
+    ignoreRdfType: boolean;
+    objectSet: $ObjectSet;
+    preferredLanguages?: readonly string[];
+    resource: rdfjsResource.Resource;
+  }): purify.Either<
+    Error,
+    {
+      $identifier: rdfjs.BlankNode | rdfjs.NamedNode;
+      $type: "PartialLabel";
+      literalForm: purify.NonEmptyList<rdfjs.Literal>;
+    }
+  > {
+    if (!$ignoreRdfType) {
+      const $rdfTypeCheck: purify.Either<Error, true> = $resource
+        .value($RdfVocabularies.rdf.type)
+        .chain((actualRdfType) => actualRdfType.toIri())
+        .chain((actualRdfType) => {
+          // Check the expected type and its known subtypes
+          switch (actualRdfType.value) {
+            case "http://www.w3.org/2008/05/skos-xl#Label":
+              return purify.Either.of(true);
+          }
+
+          // Check arbitrary rdfs:subClassOf's of the expected type
+          if ($resource.isInstanceOf(PartialLabel.$fromRdfType)) {
+            return purify.Either.of(true);
+          }
+
+          return purify.Left(
+            new Error(
+              `${rdfjsResource.Resource.Identifier.toString($resource.identifier)} has unexpected RDF type (actual: ${actualRdfType.value}, expected: http://www.w3.org/2008/05/skos-xl#Label)`,
+            ),
+          );
+        });
+      if ($rdfTypeCheck.isLeft()) {
+        return $rdfTypeCheck;
+      }
+    }
+
+    const $identifier: PartialLabel.$Identifier = $resource.identifier;
+    const $type = "PartialLabel" as const;
+    const _literalFormEither: purify.Either<
+      Error,
+      purify.NonEmptyList<rdfjs.Literal>
+    > = purify.Either.of<
+      Error,
+      rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
+    >($resource.values($properties.literalForm["identifier"], { unique: true }))
+      .chain((values) => {
+        if (!$preferredLanguages || $preferredLanguages.length === 0) {
+          return purify.Either.of<
+            Error,
+            rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
+          >(values);
+        }
+
+        const literalValuesEither = values.chainMap((value) =>
+          value.toLiteral(),
+        );
+        if (literalValuesEither.isLeft()) {
+          return literalValuesEither;
+        }
+        const literalValues = literalValuesEither.unsafeCoerce();
+
+        // Return all literals for the first preferredLanguage, then all literals for the second preferredLanguage, etc.
+        // Within a preferredLanguage the literals may be in any order.
+        let filteredLiteralValues:
+          | rdfjsResource.Resource.Values<rdfjs.Literal>
+          | undefined;
+        for (const preferredLanguage of $preferredLanguages) {
+          if (!filteredLiteralValues) {
+            filteredLiteralValues = literalValues.filter(
+              (value) => value.language === preferredLanguage,
+            );
+          } else {
+            filteredLiteralValues = filteredLiteralValues.concat(
+              ...literalValues
+                .filter((value) => value.language === preferredLanguage)
+                .toArray(),
+            );
+          }
+        }
+
+        return purify.Either.of<
+          Error,
+          rdfjsResource.Resource.Values<rdfjsResource.Resource.TermValue>
+        >(
+          filteredLiteralValues!.map(
+            (literalValue) =>
+              new rdfjsResource.Resource.TermValue({
+                focusResource: $resource,
+                predicate: PartialLabel.$properties.literalForm["identifier"],
+                term: literalValue,
+              }),
+          ),
+        );
+      })
+      .chain((values) => values.chainMap((value) => value.toLiteral()))
+      .chain((values) =>
+        purify.NonEmptyList.fromArray(values.toArray()).toEither(
+          new Error(
+            `${rdfjsResource.Resource.Identifier.toString($resource.identifier)} is an empty set`,
+          ),
+        ),
+      )
+      .map((valuesArray) =>
+        rdfjsResource.Resource.Values.fromValue({
+          focusResource: $resource,
+          predicate: PartialLabel.$properties.literalForm["identifier"],
+          value: valuesArray,
+        }),
+      )
+      .chain((values) => values.head());
+    if (_literalFormEither.isLeft()) {
+      return _literalFormEither;
+    }
+
+    const literalForm = _literalFormEither.unsafeCoerce();
+    return purify.Either.of({ $identifier, $type, literalForm });
+  }
+
+  export function $sparqlConstructQuery(
+    parameters?: {
+      ignoreRdfType?: boolean;
+      prefixes?: { [prefix: string]: string };
+      preferredLanguages?: readonly string[];
+      subject?: sparqljs.Triple["subject"];
+    } & Omit<sparqljs.ConstructQuery, "prefixes" | "queryType" | "type">,
+  ): sparqljs.ConstructQuery {
+    const { ignoreRdfType, preferredLanguages, subject, ...queryParameters } =
+      parameters ?? {};
+
+    return {
+      ...queryParameters,
+      prefixes: parameters?.prefixes ?? {},
+      queryType: "CONSTRUCT",
+      template: (queryParameters.template ?? []).concat(
+        PartialLabel.$sparqlConstructTemplateTriples({
+          ignoreRdfType,
+          subject,
+        }),
+      ),
+      type: "query",
+      where: (queryParameters.where ?? []).concat(
+        PartialLabel.$sparqlWherePatterns({
+          ignoreRdfType,
+          preferredLanguages,
+          subject,
+        }),
+      ),
+    };
+  }
+
+  export function $sparqlConstructQueryString(
+    parameters?: {
+      ignoreRdfType?: boolean;
+      preferredLanguages?: readonly string[];
+      subject?: sparqljs.Triple["subject"];
+      variablePrefix?: string;
+    } & Omit<sparqljs.ConstructQuery, "prefixes" | "queryType" | "type"> &
+      sparqljs.GeneratorOptions,
+  ): string {
+    return new sparqljs.Generator(parameters).stringify(
+      PartialLabel.$sparqlConstructQuery(parameters),
+    );
+  }
+
+  export function $sparqlConstructTemplateTriples(parameters?: {
+    ignoreRdfType?: boolean;
+    subject?: sparqljs.Triple["subject"];
+    variablePrefix?: string;
+  }): readonly sparqljs.Triple[] {
+    const subject =
+      parameters?.subject ?? dataFactory.variable!("partialLabel");
+    const triples: sparqljs.Triple[] = [];
+    const variablePrefix =
+      parameters?.variablePrefix ??
+      (subject.termType === "Variable" ? subject.value : "partialLabel");
+    if (!parameters?.ignoreRdfType) {
+      triples.push(
+        {
+          subject,
+          predicate: $RdfVocabularies.rdf.type,
+          object: dataFactory.variable!(`${variablePrefix}RdfType`),
+        },
+        {
+          subject: dataFactory.variable!(`${variablePrefix}RdfType`),
+          predicate: $RdfVocabularies.rdfs.subClassOf,
+          object: dataFactory.variable!(`${variablePrefix}RdfClass`),
+        },
+      );
+    }
+
     triples.push({
-      object: dataFactory.variable!(`${variablePrefix}Rights`),
-      predicate: ConceptScheme.$properties.rights["identifier"],
-      subject,
-    });
-    triples.push({
-      object: dataFactory.variable!(`${variablePrefix}RightsHolder`),
-      predicate: ConceptScheme.$properties.rightsHolder["identifier"],
+      object: dataFactory.variable!(`${variablePrefix}LiteralForm`),
+      predicate: PartialLabel.$properties.literalForm["identifier"],
       subject,
     });
     return triples;
@@ -6422,27 +7774,15 @@ export namespace ConceptScheme {
     const optionalPatterns: sparqljs.OptionalPattern[] = [];
     const requiredPatterns: sparqljs.Pattern[] = [];
     const subject =
-      parameters?.subject ?? dataFactory.variable!("conceptScheme");
+      parameters?.subject ?? dataFactory.variable!("partialLabel");
     const variablePrefix =
       parameters?.variablePrefix ??
-      (subject.termType === "Variable" ? subject.value : "conceptScheme");
-    for (const pattern of KosResourceStatic.$sparqlWherePatterns({
-      ignoreRdfType: true,
-      subject,
-      variablePrefix,
-    })) {
-      if (pattern.type === "optional") {
-        optionalPatterns.push(pattern);
-      } else {
-        requiredPatterns.push(pattern);
-      }
-    }
-
+      (subject.termType === "Variable" ? subject.value : "partialLabel");
     const rdfTypeVariable = dataFactory.variable!(`${variablePrefix}RdfType`);
     if (!parameters?.ignoreRdfType) {
       requiredPatterns.push(
         $sparqlInstancesOfPattern({
-          rdfType: ConceptScheme.$fromRdfType,
+          rdfType: PartialLabel.$fromRdfType,
           subject,
         }),
         {
@@ -6479,138 +7819,47 @@ export namespace ConceptScheme {
 
     const propertyPatterns: readonly sparqljs.Pattern[] = [
       {
-        patterns: [
+        triples: [
           {
-            triples: [
-              {
-                object: dataFactory.variable!(`${variablePrefix}HasTopConcept`),
-                predicate:
-                  ConceptScheme.$properties.hasTopConcept["identifier"],
-                subject,
-              },
-            ],
-            type: "bgp",
-          },
-          ...PartialConcept.$sparqlWherePatterns({
-            ignoreRdfType: true,
-            preferredLanguages: parameters?.preferredLanguages,
-            subject: dataFactory.variable!(`${variablePrefix}HasTopConcept`),
-            variablePrefix: `${variablePrefix}HasTopConcept`,
-          }),
-        ],
-        type: "optional",
-      },
-      {
-        patterns: [
-          {
-            triples: [
-              {
-                object: dataFactory.variable!(`${variablePrefix}License`),
-                predicate: ConceptScheme.$properties.license["identifier"],
-                subject,
-              },
-            ],
-            type: "bgp",
+            object: dataFactory.variable!(`${variablePrefix}LiteralForm`),
+            predicate: PartialLabel.$properties.literalForm["identifier"],
+            subject,
           },
         ],
-        type: "optional",
+        type: "bgp",
       },
-      {
-        patterns: [
-          {
-            triples: [
+      ...[parameters?.preferredLanguages ?? []]
+        .filter((languages) => languages.length > 0)
+        .map((languages) =>
+          languages.map((language) => ({
+            type: "operation" as const,
+            operator: "=",
+            args: [
               {
-                object: dataFactory.variable!(`${variablePrefix}Rights`),
-                predicate: ConceptScheme.$properties.rights["identifier"],
-                subject,
-              },
-            ],
-            type: "bgp",
-          },
-          ...[parameters?.preferredLanguages ?? []]
-            .filter((languages) => languages.length > 0)
-            .map((languages) =>
-              languages.map((language) => ({
                 type: "operation" as const,
-                operator: "=",
-                args: [
-                  {
-                    type: "operation" as const,
-                    operator: "lang",
-                    args: [dataFactory.variable!(`${variablePrefix}Rights`)],
-                  },
-                  dataFactory.literal(language),
-                ],
-              })),
-            )
-            .map((langEqualsExpressions) => ({
-              type: "filter" as const,
-              expression: langEqualsExpressions.reduce(
-                (reducedExpression, langEqualsExpression) => {
-                  if (reducedExpression === null) {
-                    return langEqualsExpression;
-                  }
-                  return {
-                    type: "operation" as const,
-                    operator: "||",
-                    args: [reducedExpression, langEqualsExpression],
-                  };
-                },
-                null as sparqljs.Expression | null,
-              ) as sparqljs.Expression,
-            })),
-        ],
-        type: "optional",
-      },
-      {
-        patterns: [
-          {
-            triples: [
-              {
-                object: dataFactory.variable!(`${variablePrefix}RightsHolder`),
-                predicate: ConceptScheme.$properties.rightsHolder["identifier"],
-                subject,
+                operator: "lang",
+                args: [dataFactory.variable!(`${variablePrefix}LiteralForm`)],
               },
+              dataFactory.literal(language),
             ],
-            type: "bgp",
-          },
-          ...[parameters?.preferredLanguages ?? []]
-            .filter((languages) => languages.length > 0)
-            .map((languages) =>
-              languages.map((language) => ({
+          })),
+        )
+        .map((langEqualsExpressions) => ({
+          type: "filter" as const,
+          expression: langEqualsExpressions.reduce(
+            (reducedExpression, langEqualsExpression) => {
+              if (reducedExpression === null) {
+                return langEqualsExpression;
+              }
+              return {
                 type: "operation" as const,
-                operator: "=",
-                args: [
-                  {
-                    type: "operation" as const,
-                    operator: "lang",
-                    args: [
-                      dataFactory.variable!(`${variablePrefix}RightsHolder`),
-                    ],
-                  },
-                  dataFactory.literal(language),
-                ],
-              })),
-            )
-            .map((langEqualsExpressions) => ({
-              type: "filter" as const,
-              expression: langEqualsExpressions.reduce(
-                (reducedExpression, langEqualsExpression) => {
-                  if (reducedExpression === null) {
-                    return langEqualsExpression;
-                  }
-                  return {
-                    type: "operation" as const,
-                    operator: "||",
-                    args: [reducedExpression, langEqualsExpression],
-                  };
-                },
-                null as sparqljs.Expression | null,
-              ) as sparqljs.Expression,
-            })),
-        ],
-        type: "optional",
-      },
+                operator: "||",
+                args: [reducedExpression, langEqualsExpression],
+              };
+            },
+            null as sparqljs.Expression | null,
+          ) as sparqljs.Expression,
+        })),
     ];
     for (const pattern of propertyPatterns) {
       if (pattern.type === "optional") {
@@ -6624,13 +7873,13 @@ export namespace ConceptScheme {
   }
 
   export function $toRdf(
-    _conceptScheme: ConceptScheme,
+    _partialLabel: PartialLabel,
     options?: {
       ignoreRdfType?: boolean;
       mutateGraph?: rdfjsResource.MutableResource.MutateGraph;
       resourceSet?: rdfjsResource.MutableResourceSet;
     },
-  ): rdfjsResource.MutableResource<rdfjs.NamedNode> {
+  ): rdfjsResource.MutableResource {
     const ignoreRdfType = !!options?.ignoreRdfType;
     const mutateGraph = options?.mutateGraph;
     const resourceSet =
@@ -6639,385 +7888,29 @@ export namespace ConceptScheme {
         dataFactory,
         dataset: datasetFactory.dataset(),
       });
-    const resource = KosResourceStatic.$toRdf(_conceptScheme, {
-      ignoreRdfType: true,
+    const resource = resourceSet.mutableResource(_partialLabel.$identifier, {
       mutateGraph,
-      resourceSet,
     });
     if (!ignoreRdfType) {
       resource.add(
         $RdfVocabularies.rdf.type,
         resource.dataFactory.namedNode(
-          "http://www.w3.org/2004/02/skos/core#ConceptScheme",
-        ),
-      );
-    }
-
-    resource.add(
-      ConceptScheme.$properties.hasTopConcept["identifier"],
-      ..._conceptScheme.hasTopConcept.flatMap((item) => [
-        PartialConcept.$toRdf(item, {
-          mutateGraph: mutateGraph,
-          resourceSet: resourceSet,
-        }).identifier,
-      ]),
-    );
-    resource.add(
-      ConceptScheme.$properties.license["identifier"],
-      ..._conceptScheme.license.toList(),
-    );
-    resource.add(
-      ConceptScheme.$properties.rights["identifier"],
-      ..._conceptScheme.rights.toList(),
-    );
-    resource.add(
-      ConceptScheme.$properties.rightsHolder["identifier"],
-      ..._conceptScheme.rightsHolder.toList(),
-    );
-    return resource;
-  }
-
-  export function isConceptScheme(
-    object: KosResource,
-  ): object is ConceptScheme {
-    switch (object.$type) {
-      case "ConceptScheme":
-        return true;
-      default:
-        return false;
-    }
-  }
-}
-export interface PartialConceptScheme extends PartialKosResource {
-  readonly $identifier: PartialConceptScheme.$Identifier;
-  readonly $type: "PartialConceptScheme";
-}
-
-export namespace PartialConceptScheme {
-  export function $create(
-    parameters: { readonly $identifier: rdfjs.NamedNode | string } & Parameters<
-      typeof KosResourceStubStatic.$create
-    >[0],
-  ): PartialConceptScheme {
-    let $identifier: PartialConceptScheme.$Identifier;
-    if (typeof parameters.$identifier === "object") {
-      $identifier = parameters.$identifier;
-    } else if (typeof parameters.$identifier === "string") {
-      $identifier = dataFactory.namedNode(parameters.$identifier);
-    } else {
-      $identifier = parameters.$identifier satisfies never;
-    }
-
-    const $type = "PartialConceptScheme" as const;
-    return { ...KosResourceStubStatic.$create(parameters), $identifier, $type };
-  }
-
-  export function $fromRdf(
-    resource: rdfjsResource.Resource,
-    options?: {
-      [_index: string]: any;
-      ignoreRdfType?: boolean;
-      objectSet?: $ObjectSet;
-      preferredLanguages?: readonly string[];
-    },
-  ): purify.Either<Error, PartialConceptScheme> {
-    let {
-      ignoreRdfType = false,
-      objectSet,
-      preferredLanguages,
-      ...context
-    } = options ?? {};
-    if (!objectSet) {
-      objectSet = new $RdfjsDatasetObjectSet({ dataset: resource.dataset });
-    }
-
-    return PartialConceptScheme.$propertiesFromRdf({
-      ...context,
-      ignoreRdfType,
-      objectSet,
-      preferredLanguages,
-      resource,
-    });
-  }
-
-  export const $fromRdfType: rdfjs.NamedNode<string> = dataFactory.namedNode(
-    "http://www.w3.org/2004/02/skos/core#ConceptScheme",
-  );
-  export type $Identifier = KosResourceStubStatic.$Identifier;
-  export const $Identifier = KosResourceStubStatic.$Identifier;
-  export const $properties = { ...KosResourceStubStatic.$properties };
-
-  export function $propertiesFromRdf({
-    ignoreRdfType: $ignoreRdfType,
-    objectSet: $objectSet,
-    preferredLanguages: $preferredLanguages,
-    resource: $resource,
-    // @ts-ignore
-    ...$context
-  }: {
-    [_index: string]: any;
-    ignoreRdfType: boolean;
-    objectSet: $ObjectSet;
-    preferredLanguages?: readonly string[];
-    resource: rdfjsResource.Resource;
-  }): purify.Either<
-    Error,
-    { $identifier: rdfjs.NamedNode; $type: "PartialConceptScheme" } & $UnwrapR<
-      ReturnType<typeof KosResourceStubStatic.$propertiesFromRdf>
-    >
-  > {
-    const $super0Either = KosResourceStubStatic.$propertiesFromRdf({
-      ...$context,
-      ignoreRdfType: true,
-      objectSet: $objectSet,
-      preferredLanguages: $preferredLanguages,
-      resource: $resource,
-    });
-    if ($super0Either.isLeft()) {
-      return $super0Either;
-    }
-
-    const $super0 = $super0Either.unsafeCoerce();
-    if (!$ignoreRdfType) {
-      const $rdfTypeCheck: purify.Either<Error, true> = $resource
-        .value($RdfVocabularies.rdf.type)
-        .chain((actualRdfType) => actualRdfType.toIri())
-        .chain((actualRdfType) => {
-          // Check the expected type and its known subtypes
-          switch (actualRdfType.value) {
-            case "http://www.w3.org/2004/02/skos/core#ConceptScheme":
-              return purify.Either.of(true);
-          }
-
-          // Check arbitrary rdfs:subClassOf's of the expected type
-          if ($resource.isInstanceOf(PartialConceptScheme.$fromRdfType)) {
-            return purify.Either.of(true);
-          }
-
-          return purify.Left(
-            new Error(
-              `${rdfjsResource.Resource.Identifier.toString($resource.identifier)} has unexpected RDF type (actual: ${actualRdfType.value}, expected: http://www.w3.org/2004/02/skos/core#ConceptScheme)`,
-            ),
-          );
-        });
-      if ($rdfTypeCheck.isLeft()) {
-        return $rdfTypeCheck;
-      }
-    }
-
-    if ($resource.identifier.termType !== "NamedNode") {
-      return purify.Left(
-        new rdfjsResource.Resource.MistypedTermValueError({
-          actualValue: $resource.identifier,
-          expectedValueType: "(rdfjs.NamedNode)",
-          focusResource: $resource,
-          predicate: $RdfVocabularies.rdf.subject,
-        }),
-      );
-    }
-
-    const $identifier: PartialConceptScheme.$Identifier = $resource.identifier;
-    const $type = "PartialConceptScheme" as const;
-    return purify.Either.of({ ...$super0, $identifier, $type });
-  }
-
-  export function $sparqlConstructQuery(
-    parameters?: {
-      ignoreRdfType?: boolean;
-      prefixes?: { [prefix: string]: string };
-      preferredLanguages?: readonly string[];
-      subject?: sparqljs.Triple["subject"];
-    } & Omit<sparqljs.ConstructQuery, "prefixes" | "queryType" | "type">,
-  ): sparqljs.ConstructQuery {
-    const { ignoreRdfType, preferredLanguages, subject, ...queryParameters } =
-      parameters ?? {};
-
-    return {
-      ...queryParameters,
-      prefixes: parameters?.prefixes ?? {},
-      queryType: "CONSTRUCT",
-      template: (queryParameters.template ?? []).concat(
-        PartialConceptScheme.$sparqlConstructTemplateTriples({
-          ignoreRdfType,
-          subject,
-        }),
-      ),
-      type: "query",
-      where: (queryParameters.where ?? []).concat(
-        PartialConceptScheme.$sparqlWherePatterns({
-          ignoreRdfType,
-          preferredLanguages,
-          subject,
-        }),
-      ),
-    };
-  }
-
-  export function $sparqlConstructQueryString(
-    parameters?: {
-      ignoreRdfType?: boolean;
-      preferredLanguages?: readonly string[];
-      subject?: sparqljs.Triple["subject"];
-      variablePrefix?: string;
-    } & Omit<sparqljs.ConstructQuery, "prefixes" | "queryType" | "type"> &
-      sparqljs.GeneratorOptions,
-  ): string {
-    return new sparqljs.Generator(parameters).stringify(
-      PartialConceptScheme.$sparqlConstructQuery(parameters),
-    );
-  }
-
-  export function $sparqlConstructTemplateTriples(parameters?: {
-    ignoreRdfType?: boolean;
-    subject?: sparqljs.Triple["subject"];
-    variablePrefix?: string;
-  }): readonly sparqljs.Triple[] {
-    const subject =
-      parameters?.subject ?? dataFactory.variable!("conceptSchemeStub");
-    const triples: sparqljs.Triple[] = [];
-    const variablePrefix =
-      parameters?.variablePrefix ??
-      (subject.termType === "Variable" ? subject.value : "conceptSchemeStub");
-    triples.push(
-      ...KosResourceStubStatic.$sparqlConstructTemplateTriples({
-        ignoreRdfType: true,
-        subject,
-        variablePrefix,
-      }),
-    );
-    if (!parameters?.ignoreRdfType) {
-      triples.push(
-        {
-          subject,
-          predicate: $RdfVocabularies.rdf.type,
-          object: dataFactory.variable!(`${variablePrefix}RdfType`),
-        },
-        {
-          subject: dataFactory.variable!(`${variablePrefix}RdfType`),
-          predicate: $RdfVocabularies.rdfs.subClassOf,
-          object: dataFactory.variable!(`${variablePrefix}RdfClass`),
-        },
-      );
-    }
-
-    return triples;
-  }
-
-  export function $sparqlWherePatterns(parameters?: {
-    ignoreRdfType?: boolean;
-    preferredLanguages?: readonly string[];
-    subject?: sparqljs.Triple["subject"];
-    variablePrefix?: string;
-  }): readonly sparqljs.Pattern[] {
-    const optionalPatterns: sparqljs.OptionalPattern[] = [];
-    const requiredPatterns: sparqljs.Pattern[] = [];
-    const subject =
-      parameters?.subject ?? dataFactory.variable!("conceptSchemeStub");
-    const variablePrefix =
-      parameters?.variablePrefix ??
-      (subject.termType === "Variable" ? subject.value : "conceptSchemeStub");
-    for (const pattern of KosResourceStubStatic.$sparqlWherePatterns({
-      ignoreRdfType: true,
-      subject,
-      variablePrefix,
-    })) {
-      if (pattern.type === "optional") {
-        optionalPatterns.push(pattern);
-      } else {
-        requiredPatterns.push(pattern);
-      }
-    }
-
-    const rdfTypeVariable = dataFactory.variable!(`${variablePrefix}RdfType`);
-    if (!parameters?.ignoreRdfType) {
-      requiredPatterns.push(
-        $sparqlInstancesOfPattern({
-          rdfType: PartialConceptScheme.$fromRdfType,
-          subject,
-        }),
-        {
-          triples: [
-            {
-              subject,
-              predicate: $RdfVocabularies.rdf.type,
-              object: rdfTypeVariable,
-            },
-          ],
-          type: "bgp" as const,
-        },
-      );
-      optionalPatterns.push({
-        patterns: [
-          {
-            triples: [
-              {
-                subject: rdfTypeVariable,
-                predicate: {
-                  items: [$RdfVocabularies.rdfs.subClassOf],
-                  pathType: "+" as const,
-                  type: "path" as const,
-                },
-                object: dataFactory.variable!(`${variablePrefix}RdfClass`),
-              },
-            ],
-            type: "bgp" as const,
-          },
-        ],
-        type: "optional" as const,
-      });
-    }
-
-    return requiredPatterns.concat(optionalPatterns);
-  }
-
-  export function $toRdf(
-    _conceptSchemeStub: PartialConceptScheme,
-    options?: {
-      ignoreRdfType?: boolean;
-      mutateGraph?: rdfjsResource.MutableResource.MutateGraph;
-      resourceSet?: rdfjsResource.MutableResourceSet;
-    },
-  ): rdfjsResource.MutableResource<rdfjs.NamedNode> {
-    const ignoreRdfType = !!options?.ignoreRdfType;
-    const mutateGraph = options?.mutateGraph;
-    const resourceSet =
-      options?.resourceSet ??
-      new rdfjsResource.MutableResourceSet({
-        dataFactory,
-        dataset: datasetFactory.dataset(),
-      });
-    const resource = KosResourceStubStatic.$toRdf(_conceptSchemeStub, {
-      ignoreRdfType: true,
-      mutateGraph,
-      resourceSet,
-    });
-    if (!ignoreRdfType) {
-      resource.add(
-        $RdfVocabularies.rdf.type,
-        resource.dataFactory.namedNode(
-          "http://kos-kit.github.io/ontology#PartialConceptScheme",
+          "http://kos-kit.github.io/ontology#PartialLabel",
         ),
       );
       resource.add(
         $RdfVocabularies.rdf.type,
         resource.dataFactory.namedNode(
-          "http://www.w3.org/2004/02/skos/core#ConceptScheme",
+          "http://www.w3.org/2008/05/skos-xl#Label",
         ),
       );
     }
 
+    resource.add(
+      PartialLabel.$properties.literalForm["identifier"],
+      ..._partialLabel.literalForm.flatMap((item) => [item]),
+    );
     return resource;
-  }
-
-  export function isConceptSchemeStub(
-    object: PartialKosResource,
-  ): object is PartialConceptScheme {
-    switch (object.$type) {
-      case "PartialConceptScheme":
-        return true;
-      default:
-        return false;
-    }
   }
 }
 export interface $ObjectSet {
@@ -7045,30 +7938,6 @@ export interface $ObjectSet {
   conceptSchemesCount(
     query?: Pick<$ObjectSet.Query<ConceptScheme.$Identifier>, "where">,
   ): Promise<purify.Either<Error, number>>;
-  conceptSchemeStub(
-    identifier: PartialConceptScheme.$Identifier,
-  ): Promise<purify.Either<Error, PartialConceptScheme>>;
-  conceptSchemeStubIdentifiers(
-    query?: $ObjectSet.Query<PartialConceptScheme.$Identifier>,
-  ): Promise<purify.Either<Error, readonly PartialConceptScheme.$Identifier[]>>;
-  conceptSchemeStubs(
-    query?: $ObjectSet.Query<PartialConceptScheme.$Identifier>,
-  ): Promise<purify.Either<Error, readonly PartialConceptScheme[]>>;
-  conceptSchemeStubsCount(
-    query?: Pick<$ObjectSet.Query<PartialConceptScheme.$Identifier>, "where">,
-  ): Promise<purify.Either<Error, number>>;
-  conceptStub(
-    identifier: PartialConcept.$Identifier,
-  ): Promise<purify.Either<Error, PartialConcept>>;
-  conceptStubIdentifiers(
-    query?: $ObjectSet.Query<PartialConcept.$Identifier>,
-  ): Promise<purify.Either<Error, readonly PartialConcept.$Identifier[]>>;
-  conceptStubs(
-    query?: $ObjectSet.Query<PartialConcept.$Identifier>,
-  ): Promise<purify.Either<Error, readonly PartialConcept[]>>;
-  conceptStubsCount(
-    query?: Pick<$ObjectSet.Query<PartialConcept.$Identifier>, "where">,
-  ): Promise<purify.Either<Error, number>>;
   label(identifier: Label.$Identifier): Promise<purify.Either<Error, Label>>;
   labelIdentifiers(
     query?: $ObjectSet.Query<Label.$Identifier>,
@@ -7079,16 +7948,40 @@ export interface $ObjectSet {
   labelsCount(
     query?: Pick<$ObjectSet.Query<Label.$Identifier>, "where">,
   ): Promise<purify.Either<Error, number>>;
-  labelStub(
+  partialConcept(
+    identifier: PartialConcept.$Identifier,
+  ): Promise<purify.Either<Error, PartialConcept>>;
+  partialConceptIdentifiers(
+    query?: $ObjectSet.Query<PartialConcept.$Identifier>,
+  ): Promise<purify.Either<Error, readonly PartialConcept.$Identifier[]>>;
+  partialConcepts(
+    query?: $ObjectSet.Query<PartialConcept.$Identifier>,
+  ): Promise<purify.Either<Error, readonly PartialConcept[]>>;
+  partialConceptsCount(
+    query?: Pick<$ObjectSet.Query<PartialConcept.$Identifier>, "where">,
+  ): Promise<purify.Either<Error, number>>;
+  partialConceptScheme(
+    identifier: PartialConceptScheme.$Identifier,
+  ): Promise<purify.Either<Error, PartialConceptScheme>>;
+  partialConceptSchemeIdentifiers(
+    query?: $ObjectSet.Query<PartialConceptScheme.$Identifier>,
+  ): Promise<purify.Either<Error, readonly PartialConceptScheme.$Identifier[]>>;
+  partialConceptSchemes(
+    query?: $ObjectSet.Query<PartialConceptScheme.$Identifier>,
+  ): Promise<purify.Either<Error, readonly PartialConceptScheme[]>>;
+  partialConceptSchemesCount(
+    query?: Pick<$ObjectSet.Query<PartialConceptScheme.$Identifier>, "where">,
+  ): Promise<purify.Either<Error, number>>;
+  partialLabel(
     identifier: PartialLabel.$Identifier,
   ): Promise<purify.Either<Error, PartialLabel>>;
-  labelStubIdentifiers(
+  partialLabelIdentifiers(
     query?: $ObjectSet.Query<PartialLabel.$Identifier>,
   ): Promise<purify.Either<Error, readonly PartialLabel.$Identifier[]>>;
-  labelStubs(
+  partialLabels(
     query?: $ObjectSet.Query<PartialLabel.$Identifier>,
   ): Promise<purify.Either<Error, readonly PartialLabel[]>>;
-  labelStubsCount(
+  partialLabelsCount(
     query?: Pick<$ObjectSet.Query<PartialLabel.$Identifier>, "where">,
   ): Promise<purify.Either<Error, number>>;
 }
@@ -7174,56 +8067,6 @@ export abstract class $ForwardingObjectSet implements $ObjectSet {
     return this.$delegate.conceptSchemesCount(query);
   }
 
-  conceptSchemeStub(
-    identifier: PartialConceptScheme.$Identifier,
-  ): Promise<purify.Either<Error, PartialConceptScheme>> {
-    return this.$delegate.conceptSchemeStub(identifier);
-  }
-
-  conceptSchemeStubIdentifiers(
-    query?: $ObjectSet.Query<PartialConceptScheme.$Identifier>,
-  ): Promise<
-    purify.Either<Error, readonly PartialConceptScheme.$Identifier[]>
-  > {
-    return this.$delegate.conceptSchemeStubIdentifiers(query);
-  }
-
-  conceptSchemeStubs(
-    query?: $ObjectSet.Query<PartialConceptScheme.$Identifier>,
-  ): Promise<purify.Either<Error, readonly PartialConceptScheme[]>> {
-    return this.$delegate.conceptSchemeStubs(query);
-  }
-
-  conceptSchemeStubsCount(
-    query?: Pick<$ObjectSet.Query<PartialConceptScheme.$Identifier>, "where">,
-  ): Promise<purify.Either<Error, number>> {
-    return this.$delegate.conceptSchemeStubsCount(query);
-  }
-
-  conceptStub(
-    identifier: PartialConcept.$Identifier,
-  ): Promise<purify.Either<Error, PartialConcept>> {
-    return this.$delegate.conceptStub(identifier);
-  }
-
-  conceptStubIdentifiers(
-    query?: $ObjectSet.Query<PartialConcept.$Identifier>,
-  ): Promise<purify.Either<Error, readonly PartialConcept.$Identifier[]>> {
-    return this.$delegate.conceptStubIdentifiers(query);
-  }
-
-  conceptStubs(
-    query?: $ObjectSet.Query<PartialConcept.$Identifier>,
-  ): Promise<purify.Either<Error, readonly PartialConcept[]>> {
-    return this.$delegate.conceptStubs(query);
-  }
-
-  conceptStubsCount(
-    query?: Pick<$ObjectSet.Query<PartialConcept.$Identifier>, "where">,
-  ): Promise<purify.Either<Error, number>> {
-    return this.$delegate.conceptStubsCount(query);
-  }
-
   label(identifier: Label.$Identifier): Promise<purify.Either<Error, Label>> {
     return this.$delegate.label(identifier);
   }
@@ -7246,28 +8089,78 @@ export abstract class $ForwardingObjectSet implements $ObjectSet {
     return this.$delegate.labelsCount(query);
   }
 
-  labelStub(
+  partialConcept(
+    identifier: PartialConcept.$Identifier,
+  ): Promise<purify.Either<Error, PartialConcept>> {
+    return this.$delegate.partialConcept(identifier);
+  }
+
+  partialConceptIdentifiers(
+    query?: $ObjectSet.Query<PartialConcept.$Identifier>,
+  ): Promise<purify.Either<Error, readonly PartialConcept.$Identifier[]>> {
+    return this.$delegate.partialConceptIdentifiers(query);
+  }
+
+  partialConcepts(
+    query?: $ObjectSet.Query<PartialConcept.$Identifier>,
+  ): Promise<purify.Either<Error, readonly PartialConcept[]>> {
+    return this.$delegate.partialConcepts(query);
+  }
+
+  partialConceptsCount(
+    query?: Pick<$ObjectSet.Query<PartialConcept.$Identifier>, "where">,
+  ): Promise<purify.Either<Error, number>> {
+    return this.$delegate.partialConceptsCount(query);
+  }
+
+  partialConceptScheme(
+    identifier: PartialConceptScheme.$Identifier,
+  ): Promise<purify.Either<Error, PartialConceptScheme>> {
+    return this.$delegate.partialConceptScheme(identifier);
+  }
+
+  partialConceptSchemeIdentifiers(
+    query?: $ObjectSet.Query<PartialConceptScheme.$Identifier>,
+  ): Promise<
+    purify.Either<Error, readonly PartialConceptScheme.$Identifier[]>
+  > {
+    return this.$delegate.partialConceptSchemeIdentifiers(query);
+  }
+
+  partialConceptSchemes(
+    query?: $ObjectSet.Query<PartialConceptScheme.$Identifier>,
+  ): Promise<purify.Either<Error, readonly PartialConceptScheme[]>> {
+    return this.$delegate.partialConceptSchemes(query);
+  }
+
+  partialConceptSchemesCount(
+    query?: Pick<$ObjectSet.Query<PartialConceptScheme.$Identifier>, "where">,
+  ): Promise<purify.Either<Error, number>> {
+    return this.$delegate.partialConceptSchemesCount(query);
+  }
+
+  partialLabel(
     identifier: PartialLabel.$Identifier,
   ): Promise<purify.Either<Error, PartialLabel>> {
-    return this.$delegate.labelStub(identifier);
+    return this.$delegate.partialLabel(identifier);
   }
 
-  labelStubIdentifiers(
+  partialLabelIdentifiers(
     query?: $ObjectSet.Query<PartialLabel.$Identifier>,
   ): Promise<purify.Either<Error, readonly PartialLabel.$Identifier[]>> {
-    return this.$delegate.labelStubIdentifiers(query);
+    return this.$delegate.partialLabelIdentifiers(query);
   }
 
-  labelStubs(
+  partialLabels(
     query?: $ObjectSet.Query<PartialLabel.$Identifier>,
   ): Promise<purify.Either<Error, readonly PartialLabel[]>> {
-    return this.$delegate.labelStubs(query);
+    return this.$delegate.partialLabels(query);
   }
 
-  labelStubsCount(
+  partialLabelsCount(
     query?: Pick<$ObjectSet.Query<PartialLabel.$Identifier>, "where">,
   ): Promise<purify.Either<Error, number>> {
-    return this.$delegate.labelStubsCount(query);
+    return this.$delegate.partialLabelsCount(query);
   }
 }
 
@@ -7412,168 +8305,6 @@ export class $RdfjsDatasetObjectSet implements $ObjectSet {
     );
   }
 
-  async conceptSchemeStub(
-    identifier: PartialConceptScheme.$Identifier,
-  ): Promise<purify.Either<Error, PartialConceptScheme>> {
-    return this.conceptSchemeStubSync(identifier);
-  }
-
-  conceptSchemeStubSync(
-    identifier: PartialConceptScheme.$Identifier,
-  ): purify.Either<Error, PartialConceptScheme> {
-    return this.conceptSchemeStubsSync({
-      where: { identifiers: [identifier], type: "identifiers" },
-    }).map((objects) => objects[0]);
-  }
-
-  async conceptSchemeStubIdentifiers(
-    query?: $ObjectSet.Query<PartialConceptScheme.$Identifier>,
-  ): Promise<
-    purify.Either<Error, readonly PartialConceptScheme.$Identifier[]>
-  > {
-    return this.conceptSchemeStubIdentifiersSync(query);
-  }
-
-  conceptSchemeStubIdentifiersSync(
-    query?: $ObjectSet.Query<PartialConceptScheme.$Identifier>,
-  ): purify.Either<Error, readonly PartialConceptScheme.$Identifier[]> {
-    return this.$objectIdentifiersSync<
-      PartialConceptScheme,
-      PartialConceptScheme.$Identifier
-    >(
-      [
-        {
-          $fromRdf: PartialConceptScheme.$fromRdf,
-          $fromRdfTypes: [PartialConceptScheme.$fromRdfType],
-        },
-      ],
-      query,
-    );
-  }
-
-  async conceptSchemeStubs(
-    query?: $ObjectSet.Query<PartialConceptScheme.$Identifier>,
-  ): Promise<purify.Either<Error, readonly PartialConceptScheme[]>> {
-    return this.conceptSchemeStubsSync(query);
-  }
-
-  conceptSchemeStubsSync(
-    query?: $ObjectSet.Query<PartialConceptScheme.$Identifier>,
-  ): purify.Either<Error, readonly PartialConceptScheme[]> {
-    return this.$objectsSync<
-      PartialConceptScheme,
-      PartialConceptScheme.$Identifier
-    >(
-      [
-        {
-          $fromRdf: PartialConceptScheme.$fromRdf,
-          $fromRdfTypes: [PartialConceptScheme.$fromRdfType],
-        },
-      ],
-      query,
-    );
-  }
-
-  async conceptSchemeStubsCount(
-    query?: Pick<$ObjectSet.Query<PartialConceptScheme.$Identifier>, "where">,
-  ): Promise<purify.Either<Error, number>> {
-    return this.conceptSchemeStubsCountSync(query);
-  }
-
-  conceptSchemeStubsCountSync(
-    query?: Pick<$ObjectSet.Query<PartialConceptScheme.$Identifier>, "where">,
-  ): purify.Either<Error, number> {
-    return this.$objectsCountSync<
-      PartialConceptScheme,
-      PartialConceptScheme.$Identifier
-    >(
-      [
-        {
-          $fromRdf: PartialConceptScheme.$fromRdf,
-          $fromRdfTypes: [PartialConceptScheme.$fromRdfType],
-        },
-      ],
-      query,
-    );
-  }
-
-  async conceptStub(
-    identifier: PartialConcept.$Identifier,
-  ): Promise<purify.Either<Error, PartialConcept>> {
-    return this.conceptStubSync(identifier);
-  }
-
-  conceptStubSync(
-    identifier: PartialConcept.$Identifier,
-  ): purify.Either<Error, PartialConcept> {
-    return this.conceptStubsSync({
-      where: { identifiers: [identifier], type: "identifiers" },
-    }).map((objects) => objects[0]);
-  }
-
-  async conceptStubIdentifiers(
-    query?: $ObjectSet.Query<PartialConcept.$Identifier>,
-  ): Promise<purify.Either<Error, readonly PartialConcept.$Identifier[]>> {
-    return this.conceptStubIdentifiersSync(query);
-  }
-
-  conceptStubIdentifiersSync(
-    query?: $ObjectSet.Query<PartialConcept.$Identifier>,
-  ): purify.Either<Error, readonly PartialConcept.$Identifier[]> {
-    return this.$objectIdentifiersSync<
-      PartialConcept,
-      PartialConcept.$Identifier
-    >(
-      [
-        {
-          $fromRdf: PartialConcept.$fromRdf,
-          $fromRdfTypes: [PartialConcept.$fromRdfType],
-        },
-      ],
-      query,
-    );
-  }
-
-  async conceptStubs(
-    query?: $ObjectSet.Query<PartialConcept.$Identifier>,
-  ): Promise<purify.Either<Error, readonly PartialConcept[]>> {
-    return this.conceptStubsSync(query);
-  }
-
-  conceptStubsSync(
-    query?: $ObjectSet.Query<PartialConcept.$Identifier>,
-  ): purify.Either<Error, readonly PartialConcept[]> {
-    return this.$objectsSync<PartialConcept, PartialConcept.$Identifier>(
-      [
-        {
-          $fromRdf: PartialConcept.$fromRdf,
-          $fromRdfTypes: [PartialConcept.$fromRdfType],
-        },
-      ],
-      query,
-    );
-  }
-
-  async conceptStubsCount(
-    query?: Pick<$ObjectSet.Query<PartialConcept.$Identifier>, "where">,
-  ): Promise<purify.Either<Error, number>> {
-    return this.conceptStubsCountSync(query);
-  }
-
-  conceptStubsCountSync(
-    query?: Pick<$ObjectSet.Query<PartialConcept.$Identifier>, "where">,
-  ): purify.Either<Error, number> {
-    return this.$objectsCountSync<PartialConcept, PartialConcept.$Identifier>(
-      [
-        {
-          $fromRdf: PartialConcept.$fromRdf,
-          $fromRdfTypes: [PartialConcept.$fromRdfType],
-        },
-      ],
-      query,
-    );
-  }
-
   async label(
     identifier: Label.$Identifier,
   ): Promise<purify.Either<Error, Label>> {
@@ -7631,27 +8362,189 @@ export class $RdfjsDatasetObjectSet implements $ObjectSet {
     );
   }
 
-  async labelStub(
-    identifier: PartialLabel.$Identifier,
-  ): Promise<purify.Either<Error, PartialLabel>> {
-    return this.labelStubSync(identifier);
+  async partialConcept(
+    identifier: PartialConcept.$Identifier,
+  ): Promise<purify.Either<Error, PartialConcept>> {
+    return this.partialConceptSync(identifier);
   }
 
-  labelStubSync(
-    identifier: PartialLabel.$Identifier,
-  ): purify.Either<Error, PartialLabel> {
-    return this.labelStubsSync({
+  partialConceptSync(
+    identifier: PartialConcept.$Identifier,
+  ): purify.Either<Error, PartialConcept> {
+    return this.partialConceptsSync({
       where: { identifiers: [identifier], type: "identifiers" },
     }).map((objects) => objects[0]);
   }
 
-  async labelStubIdentifiers(
-    query?: $ObjectSet.Query<PartialLabel.$Identifier>,
-  ): Promise<purify.Either<Error, readonly PartialLabel.$Identifier[]>> {
-    return this.labelStubIdentifiersSync(query);
+  async partialConceptIdentifiers(
+    query?: $ObjectSet.Query<PartialConcept.$Identifier>,
+  ): Promise<purify.Either<Error, readonly PartialConcept.$Identifier[]>> {
+    return this.partialConceptIdentifiersSync(query);
   }
 
-  labelStubIdentifiersSync(
+  partialConceptIdentifiersSync(
+    query?: $ObjectSet.Query<PartialConcept.$Identifier>,
+  ): purify.Either<Error, readonly PartialConcept.$Identifier[]> {
+    return this.$objectIdentifiersSync<
+      PartialConcept,
+      PartialConcept.$Identifier
+    >(
+      [
+        {
+          $fromRdf: PartialConcept.$fromRdf,
+          $fromRdfTypes: [PartialConcept.$fromRdfType],
+        },
+      ],
+      query,
+    );
+  }
+
+  async partialConcepts(
+    query?: $ObjectSet.Query<PartialConcept.$Identifier>,
+  ): Promise<purify.Either<Error, readonly PartialConcept[]>> {
+    return this.partialConceptsSync(query);
+  }
+
+  partialConceptsSync(
+    query?: $ObjectSet.Query<PartialConcept.$Identifier>,
+  ): purify.Either<Error, readonly PartialConcept[]> {
+    return this.$objectsSync<PartialConcept, PartialConcept.$Identifier>(
+      [
+        {
+          $fromRdf: PartialConcept.$fromRdf,
+          $fromRdfTypes: [PartialConcept.$fromRdfType],
+        },
+      ],
+      query,
+    );
+  }
+
+  async partialConceptsCount(
+    query?: Pick<$ObjectSet.Query<PartialConcept.$Identifier>, "where">,
+  ): Promise<purify.Either<Error, number>> {
+    return this.partialConceptsCountSync(query);
+  }
+
+  partialConceptsCountSync(
+    query?: Pick<$ObjectSet.Query<PartialConcept.$Identifier>, "where">,
+  ): purify.Either<Error, number> {
+    return this.$objectsCountSync<PartialConcept, PartialConcept.$Identifier>(
+      [
+        {
+          $fromRdf: PartialConcept.$fromRdf,
+          $fromRdfTypes: [PartialConcept.$fromRdfType],
+        },
+      ],
+      query,
+    );
+  }
+
+  async partialConceptScheme(
+    identifier: PartialConceptScheme.$Identifier,
+  ): Promise<purify.Either<Error, PartialConceptScheme>> {
+    return this.partialConceptSchemeSync(identifier);
+  }
+
+  partialConceptSchemeSync(
+    identifier: PartialConceptScheme.$Identifier,
+  ): purify.Either<Error, PartialConceptScheme> {
+    return this.partialConceptSchemesSync({
+      where: { identifiers: [identifier], type: "identifiers" },
+    }).map((objects) => objects[0]);
+  }
+
+  async partialConceptSchemeIdentifiers(
+    query?: $ObjectSet.Query<PartialConceptScheme.$Identifier>,
+  ): Promise<
+    purify.Either<Error, readonly PartialConceptScheme.$Identifier[]>
+  > {
+    return this.partialConceptSchemeIdentifiersSync(query);
+  }
+
+  partialConceptSchemeIdentifiersSync(
+    query?: $ObjectSet.Query<PartialConceptScheme.$Identifier>,
+  ): purify.Either<Error, readonly PartialConceptScheme.$Identifier[]> {
+    return this.$objectIdentifiersSync<
+      PartialConceptScheme,
+      PartialConceptScheme.$Identifier
+    >(
+      [
+        {
+          $fromRdf: PartialConceptScheme.$fromRdf,
+          $fromRdfTypes: [PartialConceptScheme.$fromRdfType],
+        },
+      ],
+      query,
+    );
+  }
+
+  async partialConceptSchemes(
+    query?: $ObjectSet.Query<PartialConceptScheme.$Identifier>,
+  ): Promise<purify.Either<Error, readonly PartialConceptScheme[]>> {
+    return this.partialConceptSchemesSync(query);
+  }
+
+  partialConceptSchemesSync(
+    query?: $ObjectSet.Query<PartialConceptScheme.$Identifier>,
+  ): purify.Either<Error, readonly PartialConceptScheme[]> {
+    return this.$objectsSync<
+      PartialConceptScheme,
+      PartialConceptScheme.$Identifier
+    >(
+      [
+        {
+          $fromRdf: PartialConceptScheme.$fromRdf,
+          $fromRdfTypes: [PartialConceptScheme.$fromRdfType],
+        },
+      ],
+      query,
+    );
+  }
+
+  async partialConceptSchemesCount(
+    query?: Pick<$ObjectSet.Query<PartialConceptScheme.$Identifier>, "where">,
+  ): Promise<purify.Either<Error, number>> {
+    return this.partialConceptSchemesCountSync(query);
+  }
+
+  partialConceptSchemesCountSync(
+    query?: Pick<$ObjectSet.Query<PartialConceptScheme.$Identifier>, "where">,
+  ): purify.Either<Error, number> {
+    return this.$objectsCountSync<
+      PartialConceptScheme,
+      PartialConceptScheme.$Identifier
+    >(
+      [
+        {
+          $fromRdf: PartialConceptScheme.$fromRdf,
+          $fromRdfTypes: [PartialConceptScheme.$fromRdfType],
+        },
+      ],
+      query,
+    );
+  }
+
+  async partialLabel(
+    identifier: PartialLabel.$Identifier,
+  ): Promise<purify.Either<Error, PartialLabel>> {
+    return this.partialLabelSync(identifier);
+  }
+
+  partialLabelSync(
+    identifier: PartialLabel.$Identifier,
+  ): purify.Either<Error, PartialLabel> {
+    return this.partialLabelsSync({
+      where: { identifiers: [identifier], type: "identifiers" },
+    }).map((objects) => objects[0]);
+  }
+
+  async partialLabelIdentifiers(
+    query?: $ObjectSet.Query<PartialLabel.$Identifier>,
+  ): Promise<purify.Either<Error, readonly PartialLabel.$Identifier[]>> {
+    return this.partialLabelIdentifiersSync(query);
+  }
+
+  partialLabelIdentifiersSync(
     query?: $ObjectSet.Query<PartialLabel.$Identifier>,
   ): purify.Either<Error, readonly PartialLabel.$Identifier[]> {
     return this.$objectIdentifiersSync<PartialLabel, PartialLabel.$Identifier>(
@@ -7665,13 +8558,13 @@ export class $RdfjsDatasetObjectSet implements $ObjectSet {
     );
   }
 
-  async labelStubs(
+  async partialLabels(
     query?: $ObjectSet.Query<PartialLabel.$Identifier>,
   ): Promise<purify.Either<Error, readonly PartialLabel[]>> {
-    return this.labelStubsSync(query);
+    return this.partialLabelsSync(query);
   }
 
-  labelStubsSync(
+  partialLabelsSync(
     query?: $ObjectSet.Query<PartialLabel.$Identifier>,
   ): purify.Either<Error, readonly PartialLabel[]> {
     return this.$objectsSync<PartialLabel, PartialLabel.$Identifier>(
@@ -7685,13 +8578,13 @@ export class $RdfjsDatasetObjectSet implements $ObjectSet {
     );
   }
 
-  async labelStubsCount(
+  async partialLabelsCount(
     query?: Pick<$ObjectSet.Query<PartialLabel.$Identifier>, "where">,
   ): Promise<purify.Either<Error, number>> {
-    return this.labelStubsCountSync(query);
+    return this.partialLabelsCountSync(query);
   }
 
-  labelStubsCountSync(
+  partialLabelsCountSync(
     query?: Pick<$ObjectSet.Query<PartialLabel.$Identifier>, "where">,
   ): purify.Either<Error, number> {
     return this.$objectsCountSync<PartialLabel, PartialLabel.$Identifier>(
@@ -8014,85 +8907,6 @@ export class $SparqlObjectSet implements $ObjectSet {
     return this.$objectsCount<ConceptScheme.$Identifier>(ConceptScheme, query);
   }
 
-  async conceptSchemeStub(
-    identifier: PartialConceptScheme.$Identifier,
-  ): Promise<purify.Either<Error, PartialConceptScheme>> {
-    return (
-      await this.conceptSchemeStubs({
-        where: { identifiers: [identifier], type: "identifiers" },
-      })
-    ).map((objects) => objects[0]);
-  }
-
-  async conceptSchemeStubIdentifiers(
-    query?: $SparqlObjectSet.Query<PartialConceptScheme.$Identifier>,
-  ): Promise<
-    purify.Either<Error, readonly PartialConceptScheme.$Identifier[]>
-  > {
-    return this.$objectIdentifiers<PartialConceptScheme.$Identifier>(
-      PartialConceptScheme,
-      query,
-    );
-  }
-
-  async conceptSchemeStubs(
-    query?: $SparqlObjectSet.Query<PartialConceptScheme.$Identifier>,
-  ): Promise<purify.Either<Error, readonly PartialConceptScheme[]>> {
-    return this.$objects<
-      PartialConceptScheme,
-      PartialConceptScheme.$Identifier
-    >(PartialConceptScheme, query);
-  }
-
-  async conceptSchemeStubsCount(
-    query?: Pick<
-      $SparqlObjectSet.Query<PartialConceptScheme.$Identifier>,
-      "where"
-    >,
-  ): Promise<purify.Either<Error, number>> {
-    return this.$objectsCount<PartialConceptScheme.$Identifier>(
-      PartialConceptScheme,
-      query,
-    );
-  }
-
-  async conceptStub(
-    identifier: PartialConcept.$Identifier,
-  ): Promise<purify.Either<Error, PartialConcept>> {
-    return (
-      await this.conceptStubs({
-        where: { identifiers: [identifier], type: "identifiers" },
-      })
-    ).map((objects) => objects[0]);
-  }
-
-  async conceptStubIdentifiers(
-    query?: $SparqlObjectSet.Query<PartialConcept.$Identifier>,
-  ): Promise<purify.Either<Error, readonly PartialConcept.$Identifier[]>> {
-    return this.$objectIdentifiers<PartialConcept.$Identifier>(
-      PartialConcept,
-      query,
-    );
-  }
-
-  async conceptStubs(
-    query?: $SparqlObjectSet.Query<PartialConcept.$Identifier>,
-  ): Promise<purify.Either<Error, readonly PartialConcept[]>> {
-    return this.$objects<PartialConcept, PartialConcept.$Identifier>(
-      PartialConcept,
-      query,
-    );
-  }
-
-  async conceptStubsCount(
-    query?: Pick<$SparqlObjectSet.Query<PartialConcept.$Identifier>, "where">,
-  ): Promise<purify.Either<Error, number>> {
-    return this.$objectsCount<PartialConcept.$Identifier>(
-      PartialConcept,
-      query,
-    );
-  }
-
   async label(
     identifier: Label.$Identifier,
   ): Promise<purify.Either<Error, Label>> {
@@ -8121,17 +8935,96 @@ export class $SparqlObjectSet implements $ObjectSet {
     return this.$objectsCount<Label.$Identifier>(Label, query);
   }
 
-  async labelStub(
-    identifier: PartialLabel.$Identifier,
-  ): Promise<purify.Either<Error, PartialLabel>> {
+  async partialConcept(
+    identifier: PartialConcept.$Identifier,
+  ): Promise<purify.Either<Error, PartialConcept>> {
     return (
-      await this.labelStubs({
+      await this.partialConcepts({
         where: { identifiers: [identifier], type: "identifiers" },
       })
     ).map((objects) => objects[0]);
   }
 
-  async labelStubIdentifiers(
+  async partialConceptIdentifiers(
+    query?: $SparqlObjectSet.Query<PartialConcept.$Identifier>,
+  ): Promise<purify.Either<Error, readonly PartialConcept.$Identifier[]>> {
+    return this.$objectIdentifiers<PartialConcept.$Identifier>(
+      PartialConcept,
+      query,
+    );
+  }
+
+  async partialConcepts(
+    query?: $SparqlObjectSet.Query<PartialConcept.$Identifier>,
+  ): Promise<purify.Either<Error, readonly PartialConcept[]>> {
+    return this.$objects<PartialConcept, PartialConcept.$Identifier>(
+      PartialConcept,
+      query,
+    );
+  }
+
+  async partialConceptsCount(
+    query?: Pick<$SparqlObjectSet.Query<PartialConcept.$Identifier>, "where">,
+  ): Promise<purify.Either<Error, number>> {
+    return this.$objectsCount<PartialConcept.$Identifier>(
+      PartialConcept,
+      query,
+    );
+  }
+
+  async partialConceptScheme(
+    identifier: PartialConceptScheme.$Identifier,
+  ): Promise<purify.Either<Error, PartialConceptScheme>> {
+    return (
+      await this.partialConceptSchemes({
+        where: { identifiers: [identifier], type: "identifiers" },
+      })
+    ).map((objects) => objects[0]);
+  }
+
+  async partialConceptSchemeIdentifiers(
+    query?: $SparqlObjectSet.Query<PartialConceptScheme.$Identifier>,
+  ): Promise<
+    purify.Either<Error, readonly PartialConceptScheme.$Identifier[]>
+  > {
+    return this.$objectIdentifiers<PartialConceptScheme.$Identifier>(
+      PartialConceptScheme,
+      query,
+    );
+  }
+
+  async partialConceptSchemes(
+    query?: $SparqlObjectSet.Query<PartialConceptScheme.$Identifier>,
+  ): Promise<purify.Either<Error, readonly PartialConceptScheme[]>> {
+    return this.$objects<
+      PartialConceptScheme,
+      PartialConceptScheme.$Identifier
+    >(PartialConceptScheme, query);
+  }
+
+  async partialConceptSchemesCount(
+    query?: Pick<
+      $SparqlObjectSet.Query<PartialConceptScheme.$Identifier>,
+      "where"
+    >,
+  ): Promise<purify.Either<Error, number>> {
+    return this.$objectsCount<PartialConceptScheme.$Identifier>(
+      PartialConceptScheme,
+      query,
+    );
+  }
+
+  async partialLabel(
+    identifier: PartialLabel.$Identifier,
+  ): Promise<purify.Either<Error, PartialLabel>> {
+    return (
+      await this.partialLabels({
+        where: { identifiers: [identifier], type: "identifiers" },
+      })
+    ).map((objects) => objects[0]);
+  }
+
+  async partialLabelIdentifiers(
     query?: $SparqlObjectSet.Query<PartialLabel.$Identifier>,
   ): Promise<purify.Either<Error, readonly PartialLabel.$Identifier[]>> {
     return this.$objectIdentifiers<PartialLabel.$Identifier>(
@@ -8140,7 +9033,7 @@ export class $SparqlObjectSet implements $ObjectSet {
     );
   }
 
-  async labelStubs(
+  async partialLabels(
     query?: $SparqlObjectSet.Query<PartialLabel.$Identifier>,
   ): Promise<purify.Either<Error, readonly PartialLabel[]>> {
     return this.$objects<PartialLabel, PartialLabel.$Identifier>(
@@ -8149,7 +9042,7 @@ export class $SparqlObjectSet implements $ObjectSet {
     );
   }
 
-  async labelStubsCount(
+  async partialLabelsCount(
     query?: Pick<$SparqlObjectSet.Query<PartialLabel.$Identifier>, "where">,
   ): Promise<purify.Either<Error, number>> {
     return this.$objectsCount<PartialLabel.$Identifier>(PartialLabel, query);
