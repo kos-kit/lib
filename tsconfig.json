@@ -12,6 +12,7 @@
     "sourceMap": true
   },
   "extends": [
+    "@tsconfig/node18/tsconfig.json",
     "@tsconfig/strictest/tsconfig.json"
   ],
   "include": [

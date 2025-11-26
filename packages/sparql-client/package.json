@@ -8,6 +8,7 @@
     "oxigraph": "0.4.7",
     "vitest-fetch-mock": "^0.3.0",
     "@biomejs/biome": "1.9.4",
+    "@tsconfig/node18": "^18.2.4",
     "@tsconfig/strictest": "^2.0.5",
     "depcheck": "^1.4.7",
     "rimraf": "^6.0.1",
@@ -16,6 +17,9 @@
     "@vitest/coverage-v8": "^3.2.4"
   },
   "files": [
+    "dist/dist/*.d.ts",
+    "dist/dist/*.js",
+    "dist/dist/*.ttl",
     "dist/src/*.d.ts",
     "dist/src/*.js",
     "dist/src/*.ttl"

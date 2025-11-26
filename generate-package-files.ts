@@ -20,6 +20,7 @@ const externalDependencyVersions = {
   "@biomejs/biome": { "@biomejs/biome": "1.9.4" },
   "@rdfjs/term-set": { "@rdfjs/term-set": "^2.0.3" },
   "@rdfjs/types": { "@rdfjs/types": "^1.1.0" },
+  "@tsconfig/node18": { "@tsconfig/node18": "^18.2.4" },
   "@tsconfig/strictest": { "@tsconfig/strictest": "^2.0.5" },
   "@tpluscode/rdf-ns-builders": { "@tpluscode/rdf-ns-builders": "^4.3.0" },
   "@types/n3": { "@types/n3": "^1.26.0" },
@@ -108,6 +109,7 @@ for (const package_ of packages) {
         devDependencies: {
           ...package_.devDependencies,
           ...externalDependencyVersions["@biomejs/biome"],
+          ...externalDependencyVersions["@tsconfig/node18"],
           ...externalDependencyVersions["@tsconfig/strictest"],
           ...externalDependencyVersions["depcheck"],
           ...externalDependencyVersions["rimraf"],
@@ -175,7 +177,10 @@ for (const package_ of packages) {
           outDir: "dist",
           sourceMap: true,
         },
-        extends: ["@tsconfig/strictest/tsconfig.json"],
+        extends: [
+          "@tsconfig/node18/tsconfig.json",
+          "@tsconfig/strictest/tsconfig.json",
+        ],
         include: ["src/**/*.ts"],
       },
       undefined,
