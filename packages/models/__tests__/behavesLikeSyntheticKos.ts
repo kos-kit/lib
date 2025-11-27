@@ -1,6 +1,6 @@
+import { Kos, LanguageTag } from "@kos-kit/models";
 import { DataFactory } from "n3";
 import { it } from "vitest";
-import { Kos, LanguageTag } from "../index.js";
 
 export const behavesLikeSyntheticKos = (
   kosFactory: (preferredLanguage: LanguageTag) => Kos,
@@ -24,8 +24,8 @@ export const behavesLikeSyntheticKos = (
   it("Synthetic KOS: concept SKOS-XL prefLabel", async ({ expect }) => {
     const concept = (await kos.concept(conceptIdentifier)).unsafeCoerce();
     expect(concept.prefLabelXl).toHaveLength(1);
-    expect(concept.prefLabelXl[0].literalForm).toHaveLength(1);
-    expect(concept.prefLabelXl[0].literalForm[0].value).toStrictEqual(
+    expect(concept.prefLabelXl.partials[0].literalForm).toHaveLength(1);
+    expect(concept.prefLabelXl.partials[0].literalForm[0].value).toStrictEqual(
       "Concept",
     );
   });
@@ -35,7 +35,7 @@ export const behavesLikeSyntheticKos = (
   }) => {
     const concept = (await kos.concept(conceptIdentifier)).unsafeCoerce();
     expect(concept.related).toHaveLength(1);
-    const relatedConceptStub = concept.related[0];
+    const relatedConceptStub = concept.related.partials[0];
     expect(relatedConceptStub.prefLabel).toHaveLength(0);
     expect(relatedConceptStub.prefLabelXl).toHaveLength(0);
     expect(

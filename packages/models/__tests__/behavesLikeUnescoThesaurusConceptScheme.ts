@@ -1,6 +1,6 @@
+import { Kos, LanguageTag } from "@kos-kit/models";
 import { DataFactory } from "n3";
 import { expect, it } from "vitest";
-import { Kos, LanguageTag } from "../index.js";
 
 export const behavesLikeUnescoThesaurusConceptScheme = (
   kosFactory: (preferredLanguage: LanguageTag) => Kos,

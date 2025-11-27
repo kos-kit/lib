@@ -9,11 +9,11 @@ import {
   ConceptQuery,
   ConceptScheme,
   ConceptSchemeQuery,
-  ConceptSchemeStub,
-  ConceptStub,
   Identifier,
   Kos,
   LanguageTag,
+  PartialConcept,
+  PartialConceptScheme,
   SemanticRelationProperty,
 } from "./index.js";
 
@@ -88,8 +88,8 @@ function sortIdentifiers(
 export class RdfjsDatasetKos<
   ConceptT extends Concept = Concept,
   ConceptSchemeT extends ConceptScheme = ConceptScheme,
-  ConceptSchemeStubT extends ConceptSchemeStub = ConceptSchemeStub,
-  ConceptStubT extends ConceptStub = ConceptStub,
+  ConceptSchemeStubT extends PartialConceptScheme = PartialConceptScheme,
+  ConceptStubT extends PartialConcept = PartialConcept,
 > implements Kos<ConceptT, ConceptSchemeT, ConceptSchemeStubT, ConceptStubT>
 {
   readonly preferredLanguages: readonly LanguageTag[];

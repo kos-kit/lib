@@ -10,9 +10,8 @@ format_rdf() {
 }
 
 format_rdf $PWD/models.shaclmate.ttl
-format_rdf $PWD/stubs.shaclmate.ttl
 
-../../../../shaclmate/packages/cli/dist/cli.js generate $PWD/models.shaclmate.ttl $PWD/stubs.shaclmate.ttl  >$PWD/generated.ts
+../../../../shaclmate/apps/cli/dist/cli.js generate models.shaclmate.ttl  >src/generated.ts
 
-npm exec biome -- check --write --unsafe $PWD/generated.ts
-npm exec biome -- check --write --unsafe $PWD/generated.ts
+npm exec biome -- check --write --unsafe src/generated.ts
+npm exec biome -- check --write --unsafe src/generated.ts

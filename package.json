@@ -1,51 +1,35 @@
 {
   "devDependencies": {
-    "@biomejs/biome": "1.9.4",
-    "@tsconfig/strictest": "^2.0.5",
-    "@types/node": "^22",
-    "@vitest/coverage-v8": "^2.0.5",
-    "npm-run-all": "^4.1.5",
-    "rimraf": "^6.0.1",
     "tsx": "^4.16.2",
-    "typescript": "~5.6",
-    "vitest": "^2.0.5",
+    "turbo": "^2.5.5",
     "yaml": "^2.5.0"
   },
-  "name": "@kos-kit/lib",
+  "name": "shaclmate",
   "optionalDependencies": {
     "@biomejs/cli-linux-x64": "1.9.4",
     "@rollup/rollup-linux-x64-gnu": "4.24.0"
   },
+  "packageManager": "npm@10.9.0",
   "private": true,
   "scripts": {
-    "build": "npm run build --workspaces",
-    "check": "npm run check --workspaces",
-    "check:write": "npm run check:write --workspaces",
-    "check:write:unsafe": "npm run check:write --workspaces",
-    "clean": "npm run clean --workspaces",
-    "generate-package-files": "tsx generate-package-files.ts",
+    "build": "turbo run build",
+    "build:packages": "turbo run --filter \"./packages/*\" build",
+    "build:noEmit": "turbo run build:noEmit",
+    "check": "biome check",
+    "check:write": "biome check --write",
+    "check:write:unsafe": "biome check --write --unsafe",
+    "clean": "turbo run clean",
+    "depcheck": "turbo run depcheck",
+    "dev": "turbo run dev dev:tests",
+    "dev:noEmit": "turbo run dev:noEmit dev:tests",
     "link": "npm link --workspaces",
-    "link-dependencies": "npm run link-dependencies --workspaces",
-    "lint": "npm run lint --workspaces",
-    "rebuild": "npm run rebuild --workspaces",
-    "test": "npm run test --if-present --workspaces",
-    "test:coverage": "npm run test:coverage --if-present --workspaces",
-    "unlink": "npm run unlink --workspaces",
-    "watch": "run-p watch:*",
-    "watch:models": "npm run watch -w @kos-kit/models",
-    "watch:next-utils": "npm run watch -w @kos-kit/next-utils",
-    "watch:search": "npm run watch -w @kos-kit/search",
-    "watch:sparql-client": "npm run watch -w @kos-kit/sparql-client",
-    "watch:noEmit": "run-p watch:noEmit:*",
-    "watch:noEmit:models": "npm run watch:noEmit -w @kos-kit/models",
-    "watch:noEmit:next-utils": "npm run watch:noEmit -w @kos-kit/next-utils",
-    "watch:noEmit:search": "npm run watch:noEmit -w @kos-kit/search",
-    "watch:noEmit:sparql-client": "npm run watch:noEmit -w @kos-kit/sparql-client"
+    "link-dependencies": "turbo run link-dependencies",
+    "test": "turbo run test",
+    "test:coverage": "turbo run test:coverage",
+    "unlink": "turbo run unlink"
   },
   "workspaces": [
     "packages/models",
-    "packages/next-utils",
-    "packages/search",
     "packages/sparql-client"
   ]
 }

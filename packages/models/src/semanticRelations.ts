@@ -1,37 +1,37 @@
 import {
   Concept,
-  ConceptStub,
+  PartialConcept,
   SemanticRelationProperty,
   semanticRelationProperties,
 } from "./index.js";
 
 export function semanticRelations(
   concept: Concept,
-): readonly [SemanticRelationProperty, readonly ConceptStub[]][] {
+): readonly [SemanticRelationProperty, readonly PartialConcept[]][] {
   const getSemanticallyRelatedConcepts = (
     semanticRelationProperty: SemanticRelationProperty,
-  ): readonly ConceptStub[] => {
+  ): readonly PartialConcept[] => {
     switch (semanticRelationProperty.identifier.value) {
       case "http://www.w3.org/2004/02/skos/core#broader":
-        return concept.broader;
+        return concept.broader.partials;
       case "http://www.w3.org/2004/02/skos/core#broaderTransitive":
-        return concept.broaderTransitive;
+        return concept.broaderTransitive.partials;
       case "http://www.w3.org/2004/02/skos/core#broadMatch":
-        return concept.broadMatch;
+        return concept.broadMatch.partials;
       case "http://www.w3.org/2004/02/skos/core#closeMatch":
-        return concept.closeMatch;
+        return concept.closeMatch.partials;
       case "http://www.w3.org/2004/02/skos/core#exactMatch":
-        return concept.exactMatch;
+        return concept.exactMatch.partials;
       case "http://www.w3.org/2004/02/skos/core#narrower":
-        return concept.narrower;
+        return concept.narrower.partials;
       case "http://www.w3.org/2004/02/skos/core#narrowerTransitive":
-        return concept.narrowerTransitive;
+        return concept.narrowerTransitive.partials;
       case "http://www.w3.org/2004/02/skos/core#narrowMatch":
-        return concept.narrowMatch;
+        return concept.narrowMatch.partials;
       case "http://www.w3.org/2004/02/skos/core#related":
-        return concept.related;
+        return concept.related.partials;
       case "http://www.w3.org/2004/02/skos/core#relatedMatch":
-        return concept.relatedMatch;
+        return concept.relatedMatch.partials;
     }
   };
 

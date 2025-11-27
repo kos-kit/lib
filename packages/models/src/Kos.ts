@@ -4,16 +4,16 @@ import {
   ConceptQuery,
   ConceptScheme,
   ConceptSchemeQuery,
-  ConceptSchemeStub,
-  ConceptStub,
   Identifier,
+  PartialConcept,
+  PartialConceptScheme,
 } from "./index.js";
 
 export interface Kos<
   ConceptT extends Concept = Concept,
   ConceptSchemeT extends ConceptScheme = ConceptScheme,
-  ConceptSchemeStubT extends ConceptSchemeStub = ConceptSchemeStub,
-  ConceptStubT extends ConceptStub = ConceptStub,
+  ConceptSchemeStubT extends PartialConceptScheme = PartialConceptScheme,
+  ConceptStubT extends PartialConcept = PartialConcept,
 > {
   concept(identifier: Identifier): Promise<Either<Error, ConceptT>>;
 

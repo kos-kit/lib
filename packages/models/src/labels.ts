@@ -3,7 +3,7 @@ import type * as rdfjs from "@rdfjs/types";
 import { sha256 } from "js-sha256";
 import { DataFactory as dataFactory } from "n3";
 import { Maybe, NonEmptyList } from "purify-ts";
-import { Identifier, Label, LabelStub } from "./index.js";
+import { Identifier, Label, PartialLabel } from "./index.js";
 
 function literalLabel(literal: Literal): Label {
   const literalHash = sha256.create();
@@ -32,7 +32,7 @@ class Labels {
     readonly hiddenLabelXl?: readonly Label[];
     readonly $identifier: Identifier;
     readonly prefLabel: readonly rdfjs.Literal[];
-    readonly prefLabelXl: readonly (Label | LabelStub)[];
+    readonly prefLabelXl: readonly (Label | PartialLabel)[];
   }) {
     const alternativeOrHiddenLabels = (
       skosLabels?: readonly Literal[],
@@ -64,7 +64,7 @@ class Labels {
         switch (skosXlLabel.$type) {
           case "Label":
             return Maybe.of(skosXlLabel);
-          case "LabelStub":
+          case "PartialLabel":
             return Maybe.of({
               $identifier: skosXlLabel.$identifier,
               literalForm: skosXlLabel.literalForm,
