@@ -1,6 +1,6 @@
+import { Kos, LanguageTag, SemanticRelationProperty } from "@kos-kit/models";
 import { DataFactory } from "n3";
 import { assert, expect, it } from "vitest";
-import { Kos, LanguageTag, SemanticRelationProperty } from "../index.js";
 import { behavesLikeUnescoThesaurusConcept10 } from "./behavesLikeUnescoThesaurusConcept10.js";
 import { behavesLikeUnescoThesaurusConcept10018 } from "./behavesLikeUnescoThesaurusConcept10018.js";
 import { behavesLikeUnescoThesaurusConceptScheme } from "./behavesLikeUnescoThesaurusConceptScheme.js";

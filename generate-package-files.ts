@@ -144,6 +144,7 @@ for (const package_ of packages) {
           depcheck: "depcheck .",
           dev: "tsc -w --preserveWatchOutput",
           "dev:noEmit": "tsc --noEmit -w --preserveWatchOutput",
+          "dev:tests": "tsc -p __tests__ -w --preserveWatchOutput",
           "link-dependencies": "npm link rdfjs-resource",
           test: "biome check && vitest run",
           "test:coverage": "biome check && vitest run --coverage",

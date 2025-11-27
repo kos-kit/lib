@@ -1,6 +1,6 @@
+import { Kos, LanguageTag } from "@kos-kit/models";
 import { DataFactory } from "n3";
 import { expect, it } from "vitest";
-import { Kos, LanguageTag } from "../index.js";
 
 export function behavesLikeUnescoThesaurusConcept10018(
   kosFactory: (preferredLanguage: LanguageTag) => Kos,
@@ -16,7 +16,7 @@ export function behavesLikeUnescoThesaurusConcept10018(
 
   it("UNESCO thesaurus concept 10018: should be in the single concept scheme", async () => {
     const concept = await testConcept("en");
-    const inSchemes = concept.inScheme;
+    const inSchemes = concept.inScheme.partials;
     expect(inSchemes).toHaveLength(1);
     expect(
       inSchemes[0].$identifier.equals(
@@ -68,11 +68,11 @@ export function behavesLikeUnescoThesaurusConcept10018(
     const concept = await testConcept("en");
     for (const { actualConcepts, expectedConceptNumbers } of [
       {
-        actualConcepts: concept.broader,
+        actualConcepts: concept.broader.partials,
         expectedConceptNumbers: [197],
       },
       {
-        actualConcepts: concept.related,
+        actualConcepts: concept.related.partials,
         expectedConceptNumbers: [207, 3317, 7775, 6317, 4533],
       },
     ]) {
