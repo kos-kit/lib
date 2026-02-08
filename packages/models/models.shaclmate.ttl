@@ -1,6 +1,5 @@
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix kos-kit: <http://kos-kit.github.io/ontology#> .
-@prefix dash: <http://datashapes.org/dash#> .
 @prefix dcterms: <http://purl.org/dc/terms/> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
@@ -26,7 +25,7 @@ kos-kit:KosResource-altLabel
     a sh:PropertyShape ;
     sh:name "altLabel" ;
     sh:path skos:altLabel ;
-    sh:xone dash:StringOrLangString .
+    sh:datatype xsd:string .
 
 kos-kit:KosResource-altLabelXl
     shaclmate:partial kos-kit:PartialLabel ;
@@ -39,34 +38,34 @@ kos-kit:KosResource-changeNote
     a sh:PropertyShape ;
     sh:name "changeNote" ;
     sh:path skos:changeNote ;
-    sh:xone dash:StringOrLangString .
+    sh:datatype xsd:string .
 
 kos-kit:KosResource-definition
     a sh:PropertyShape ;
     sh:name "definition" ;
     sh:path skos:definition ;
-    sh:xone dash:StringOrLangString .
+    sh:datatype xsd:string .
 
 kos-kit:KosResource-editorialNote
     a sh:PropertyShape ;
     sh:name "editorialNote" ;
     sh:path skos:editorialNote ;
-    sh:xone dash:StringOrLangString .
+    sh:datatype xsd:string .
 
 kos-kit:KosResource-example
     a sh:PropertyShape ;
     sh:name "example" ;
     sh:path skos:example ;
-    sh:xone dash:StringOrLangString .
+    sh:datatype xsd:string .
 
 kos-kit:KosResource-hiddenLabel
     a sh:PropertyShape ;
     sh:name "hiddenLabel" ;
     sh:path skos:hiddenLabel ;
-    sh:xone dash:StringOrLangString .
+    sh:datatype xsd:string .
 
 kos-kit:KosResource-hiddenLabelXl
-    shaclmate:partial kos-kit:Label ;
+    shaclmate:partial kos-kit:PartialLabel ;
     a sh:PropertyShape ;
     sh:name "hiddenLabelXl" ;
     sh:node skos-xl:Label ;
@@ -76,7 +75,7 @@ kos-kit:KosResource-historyNote
     a sh:PropertyShape ;
     sh:name "historyNote" ;
     sh:path skos:historyNote ;
-    sh:xone dash:StringOrLangString .
+    sh:datatype xsd:string .
 
 kos-kit:KosResource-modified
     a sh:PropertyShape ;
@@ -95,13 +94,13 @@ kos-kit:KosResource-note
     a sh:PropertyShape ;
     sh:name "note" ;
     sh:path skos:note ;
-    sh:xone dash:StringOrLangString .
+    sh:datatype xsd:string .
 
 kos-kit:KosResource-prefLabel
     a sh:PropertyShape ;
     sh:name "prefLabel" ;
     sh:path skos:prefLabel ;
-    sh:xone dash:StringOrLangString .
+    sh:datatype xsd:string .
 
 kos-kit:KosResource-prefLabelXl
     shaclmate:partial kos-kit:PartialLabel ;
@@ -114,7 +113,7 @@ kos-kit:KosResource-scopeNote
     a sh:PropertyShape ;
     sh:name "scopeNote" ;
     sh:path skos:scopeNote ;
-    sh:xone dash:StringOrLangString .
+    sh:datatype xsd:string .
 
 kos-kit:PartialConcept
     shaclmate:fromRdfType skos:Concept ;
@@ -139,7 +138,7 @@ kos-kit:PartialKosResource-prefLabel
     a sh:PropertyShape ;
     sh:name "prefLabel" ;
     sh:path skos:prefLabel ;
-    sh:xone dash:StringOrLangString .
+    sh:datatype xsd:string .
 
 kos-kit:PartialKosResource-prefLabelXl
     shaclmate:partial kos-kit:PartialLabel ;
@@ -160,7 +159,7 @@ kos-kit:PartialLabel-literalForm
     sh:minCount 1 ;
     sh:name "literalForm" ;
     sh:path skos-xl:literalForm ;
-    sh:xone dash:StringOrLangString .
+    sh:datatype xsd:string .
 
 <http://www.w3.org/2004/02/skos/core#>
     shaclmate:tsFeatureInclude shaclmate:_TsFeature_Create, shaclmate:_TsFeature_Rdf, shaclmate:_TsFeature_Sparql ;
@@ -327,5 +326,5 @@ skos-xl:Label-literalForm
     sh:minCount 1 ;
     sh:name "literalForm" ;
     sh:path skos-xl:literalForm ;
-    sh:xone dash:StringOrLangString .
+    sh:datatype xsd:string .
 
