@@ -6,7 +6,7 @@ import { stringify as stringifyYaml } from "yaml";
 
 const VERSION = "2.0.116";
 
-type PackageName = "models" | "sparql-client";
+type PackageName = "models";
 
 interface Package {
   devDependencies?: Record<string, string>;
@@ -54,20 +54,8 @@ const packages: readonly Package[] = [
       ...externalDependencyVersions["sparqljs"],
       ...externalDependencyVersions["rdfjs-resource"],
     },
-    internalDependencies: ["sparql-client"],
+    internalDependencies: [],
     name: "models",
-  },
-  {
-    devDependencies: {
-      ...externalDependencyVersions["oxigraph"],
-      "vitest-fetch-mock": "^0.3.0",
-    },
-    externalDependencies: {
-      ...externalDependencyVersions["@rdfjs/types"],
-      ...externalDependencyVersions["@types/n3"],
-      ...externalDependencyVersions.n3,
-    },
-    name: "sparql-client",
   },
 ];
 

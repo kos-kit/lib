@@ -29,7 +29,6 @@
     "unlink": "turbo run unlink"
   },
   "workspaces": [
-    "packages/models",
-    "packages/sparql-client"
+    "packages/models"
   ]
 }
